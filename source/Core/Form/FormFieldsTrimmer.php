@@ -21,8 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Core\Form;
 
-use OxidEsales\Eshop\Core\Form\FormFieldsTrimmerInterface as EshopFormFieldsTrimmerInterface;
 use OxidEsales\Eshop\Core\Form\FormFields as EshopFormFields;
+use OxidEsales\Eshop\Core\Form\FormFieldsTrimmerInterface as EshopFormFieldsTrimmerInterface;
 
 /**
  * Trim FormFields.

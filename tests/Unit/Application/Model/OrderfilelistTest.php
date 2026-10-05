@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,15 +18,15 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
-use \oxDb;
+use oxDb;
+use oxField;
 use OxidEsales\Eshop\Core\Field;
 
 class OrderfilelistTest extends \OxidTestCase
 {
-
     /**
      * Initialize the fixture.
      *
@@ -72,7 +73,6 @@ class OrderfilelistTest extends \OxidTestCase
         $oOrderFile2->setFile('_fileName_2', '_fileId_2', 10, 24, 12);
         $oOrderFile2->save();
 
-
         $oOrderFile3 = oxNew('oxOrderFile');
         $oOrderFile3->setOrderId('_orderId_2');
         $oOrderFile3->setOrderArticleId('_orderArticleId_2');
@@ -98,7 +98,7 @@ class OrderfilelistTest extends \OxidTestCase
         $this->cleanUpTable('oxorderarticles');
 
         $oDb = oxDb::getDb();
-        $oDb->execute("TRUNCATE TABLE `oxorderfiles`");
+        $oDb->execute('TRUNCATE TABLE `oxorderfiles`');
 
         parent::tearDown();
     }

@@ -59,7 +59,7 @@ class MyModuleController extends \OxidEsales\Eshop\Application\Controller\Fronte
      */
     public function displayMessage()
     {
-        $this->_aViewData['the_module_message'] =  $this->getMessage();
+        $this->_aViewData['the_module_message'] = $this->getMessage();
         $this->render();
     }
 

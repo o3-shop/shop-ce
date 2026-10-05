@@ -24,13 +24,15 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\MetaData\Dao;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataProviderInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\ModuleConfigurationDao;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\DataMapper\MetaDataToModuleConfigurationDataMapperInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataProviderInterface;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class ModuleConfigurationDaoTest extends TestCase
 {
+    use ProphecyTrait;
     /**
      * @var string
      */
@@ -47,7 +49,6 @@ class ModuleConfigurationDaoTest extends TestCase
             ->prophesize(MetaDataToModuleConfigurationDataMapperInterface::class);
         $metaDataToModuleConfigurationDataMapper->fromData([])
             ->willReturn($this->prophesize(ModuleConfiguration::class));
-
 
         $moduleConfigurationDao = new ModuleConfigurationDao(
             $metaDataProvider->reveal(),
@@ -69,5 +70,4 @@ class ModuleConfigurationDaoTest extends TestCase
     {
         return $moduleFullPath . DIRECTORY_SEPARATOR . $this->metadataFileName;
     }
-
 }

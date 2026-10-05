@@ -21,23 +21,30 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use InvalidArgumentException;
+use OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration;
+use OxidEsales\Eshop\Core\Config;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Module\Module;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Str;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\Setting;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActivationBridgeInterface;
+use Throwable;
 
 /**
  * Admin article main deliveryset manager.
- * There is possibility to change deliveryset name, article, user
- * and etc.
+ * There is possibility to change deliveryset name, article, user etc.
  * Admin Menu: Shop settings -> Shipping & Handling -> Main Sets.
  */
-class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration
+class ModuleConfiguration extends ShopConfiguration
 {
     /** @var string Template name. */
     protected $_sModule = 'shop_config.tpl';
+
+    protected string $_sModuleId = '';
 
     /**
      * Add additional config type for modules.
@@ -64,14 +71,14 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
             if (!empty($moduleConfiguration->getModuleSettings())) {
                 $formatModuleSettings = $this->formatModuleSettingsForTemplate($moduleConfiguration->getModuleSettings());
 
-                $this->_aViewData["var_constraints"] = $formatModuleSettings['constraints'];
-                $this->_aViewData["var_grouping"] = $formatModuleSettings['grouping'];
+                $this->_aViewData['var_constraints'] = $formatModuleSettings['constraints'];
+                $this->_aViewData['var_grouping'] = $formatModuleSettings['grouping'];
 
                 foreach ($this->_aConfParams as $sType => $sParam) {
                     $this->_aViewData[$sParam] = $formatModuleSettings['vars'][$sType];
                 }
             }
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             Registry::getUtilsView()->addErrorToDisplay($throwable);
             Registry::getLogger()->error($throwable->getMessage());
         }
@@ -93,7 +100,7 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
      */
     protected function _getModuleForConfigVars() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return \OxidEsales\Eshop\Core\Config::OXMODULE_MODULE_PREFIX . $this->_sModuleId;
+        return Config::OXMODULE_MODULE_PREFIX . $this->_sModuleId;
     }
 
     /**
@@ -103,23 +110,25 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
      *      'constraints' => constraints list as array[name] = constraint
      *      'grouping'    => grouping info as array[name] = grouping
      *
-     * @deprecated since v6.4.0 (2019-04-08); it moved to Internal\Framework\Module package
-     *
      * @param array $aModuleSettings settings array from module metadata
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @deprecated since v6.4.0 (2019-04-08); it moved to Internal\Framework\Module package
+     *
      */
     public function _loadMetadataConfVars($aModuleSettings) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oConfig = $this->getConfig();
+        $oConfig = Registry::getConfig();
 
         $aConfVars = [
-            "bool"     => [],
-            "str"      => [],
-            "arr"      => [],
-            "aarr"     => [],
-            "select"   => [],
-            "password" => [],
+            'bool'     => [],
+            'str'      => [],
+            'arr'      => [],
+            'aarr'     => [],
+            'select'   => [],
+            'password' => [],
         ];
         $aVarConstraints = [];
         $aGrouping = [];
@@ -128,37 +137,37 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
 
         if (is_array($aModuleSettings)) {
             foreach ($aModuleSettings as $aValue) {
-                $sName = $aValue["name"];
-                $sType = $aValue["type"];
+                $sName = $aValue['name'];
+                $sType = $aValue['type'];
                 $sValue = null;
                 if (is_null($oConfig->getConfigParam($sName))) {
-                    switch ($aValue["type"]) {
-                        case "arr":
-                            $sValue = $this->_arrayToMultiline($aValue["value"]);
+                    switch ($aValue['type']) {
+                        case 'arr':
+                            $sValue = $this->_arrayToMultiline($aValue['value']);
                             break;
-                        case "aarr":
-                            $sValue = $this->_aarrayToMultiline($aValue["value"]);
+                        case 'aarr':
+                            $sValue = $this->_aarrayToMultiline($aValue['value']);
                             break;
-                        case "bool":
-                            $sValue = filter_var($aValue["value"], FILTER_VALIDATE_BOOLEAN);
+                        case 'bool':
+                            $sValue = filter_var($aValue['value'], FILTER_VALIDATE_BOOLEAN);
                             break;
                         default:
-                            $sValue = $aValue["value"];
+                            $sValue = $aValue['value'];
                             break;
                     }
-                    $sValue = getStr()->htmlentities($sValue);
+                    $sValue = Str::getStr()->htmlentities($sValue);
                 } else {
                     $sDbType = $this->_getDbConfigTypeName($sType);
                     $sValue = $aDbVariables['vars'][$sDbType][$sName];
                 }
 
-                $sGroup = $aValue["group"];
+                $sGroup = $aValue['group'];
 
-                $sConstraints = "";
-                if ($aValue["constraints"]) {
-                    $sConstraints = $aValue["constraints"];
-                } elseif ($aValue["constrains"]) {
-                    $sConstraints = $aValue["constrains"];
+                $sConstraints = '';
+                if ($aValue['constraints']) {
+                    $sConstraints = $aValue['constraints'];
+                } elseif ($aValue['constrains']) {
+                    $sConstraints = $aValue['constrains'];
                 }
 
                 $aConfVars[$sType][$sName] = $sValue;
@@ -203,7 +212,7 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
             if ($moduleWasActiveBeforeSaving) {
                 $this->getContainer()->get(ModuleActivationBridgeInterface::class)->activate($moduleId, $shopId);
             }
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             Registry::getUtilsView()->addErrorToDisplay($throwable);
             Registry::getLogger()->error($throwable->getMessage());
         }
@@ -219,7 +228,7 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
             ?? Registry::getSession()->getVariable('saved_oxid');
 
         if ($moduleId === null) {
-            throw new \InvalidArgumentException('Module id not found.');
+            throw new InvalidArgumentException('Module id not found.');
         }
 
         return $moduleId;
@@ -266,7 +275,7 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
         foreach ($this->_aConfParams as $requestParameterKey) {
             $settingsFromRequest = Registry::getRequest()->getRequestEscapedParameter($requestParameterKey);
 
-            if (\is_array($settingsFromRequest)) {
+            if (is_array($settingsFromRequest)) {
                 foreach ($settingsFromRequest as $name => $value) {
                     $settings[$name] = $value;
                 }
@@ -317,7 +326,6 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
             }
 
             $group = $setting->getGroupName();
-
 
             $confVars[$valueType][$name] = $value;
             $constraints[$name] = $setting->getConstraints() ?? '';

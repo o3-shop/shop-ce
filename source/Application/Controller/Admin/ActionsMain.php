@@ -21,21 +21,23 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use stdClass;
+use OxidEsales\Eshop\Application\Controller\Admin\ActionsMainAjax;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Actions;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
+use stdClass;
 
 /**
- * Admin article main actions manager.
+ * Admin article main actions' manager.
  * There is possibility to change actions description, assign articles to
- * this actions, etc.
+ * this action, etc.
  * Admin Menu: Manage Products -> actions -> Main.
  */
-class ActionsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ActionsMain extends AdminDetailsController
 {
     /**
-     * Loads article actionss info, passes it to Smarty engine and
+     * Loads article actions' info, passes it to Smarty engine and
      * returns name of template file "actions_main.tpl".
      *
      * @return string
@@ -44,7 +46,7 @@ class ActionsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
 
         if ($this->isNewEditObject() !== true) {
             $oAction = oxNew(Actions::class);
@@ -55,42 +57,41 @@ class ActionsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
                 $oAction->loadInLang(key($oOtherLang), $soxId);
             }
 
-            $this->_aViewData["edit"] = $oAction;
+            $this->_aViewData['edit'] = $oAction;
 
             // remove already created languages
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
 
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         }
 
-        if (Registry::getConfig()->getRequestParameter("aoc")) {
+        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             // generating category tree for select list
-            $this->_createCategoryTree("artcattree", $soxId);
+            $this->_createCategoryTree('artcattree', $soxId);
 
-            $oActionsMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMainAjax::class);
+            $oActionsMainAjax = oxNew(ActionsMainAjax::class);
             $this->_aViewData['oxajax'] = $oActionsMainAjax->getColumns();
 
-            return "popups/actions_main.tpl";
+            return 'popups/actions_main.tpl';
         }
 
-
-        if (($oPromotion = $this->getViewDataElement("edit"))) {
+        if (($oPromotion = $this->getViewDataElement('edit'))) {
             if (($oPromotion->oxactions__oxtype->value == 2) || ($oPromotion->oxactions__oxtype->value == 3)) {
-                if ($iAoc = Registry::getConfig()->getRequestParameter("oxpromotionaoc")) {
+                if ($iAoc = Registry::getRequest()->getRequestEscapedParameter('oxpromotionaoc')) {
                     $sPopup = false;
                     switch ($iAoc) {
                         case 'article':
                             // generating category tree for select list
-                            $this->_createCategoryTree("artcattree", $soxId);
+                            $this->_createCategoryTree('artcattree', $soxId);
 
                             if ($oArticle = $oPromotion->getBannerArticle()) {
                                 $this->_aViewData['actionarticle_artnum'] = $oArticle->oxarticles__oxartnum->value;
@@ -112,19 +113,19 @@ class ActionsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
                     }
                 } else {
                     if ($oPromotion->oxactions__oxtype->value == 2) {
-                        $this->_aViewData["editor"] = $this->_generateTextEditor(
-                            "100%",
+                        $this->_aViewData['editor'] = $this->_generateTextEditor(
+                            '100%',
                             300,
                             $oPromotion,
-                            "oxactions__oxlongdesc",
-                            "details.tpl.css"
+                            'oxactions__oxlongdesc',
+                            'details.tpl.css'
                         );
                     }
                 }
             }
         }
 
-        return "actions_main.tpl";
+        return 'actions_main.tpl';
     }
 
     /**
@@ -177,11 +178,9 @@ class ActionsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      */
     private function getActionFormData()
     {
-        $request    = oxNew(Request::class);
-        $formData   = $request->getRequestEscapedParameter("editval");
-        $formData   = $this->normalizeActionFormData($formData);
-
-        return $formData;
+        $request = oxNew(Request::class);
+        $formData = $request->getRequestEscapedParameter('editval');
+        return $this->normalizeActionFormData($formData);
     }
 
     /**

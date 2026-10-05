@@ -96,24 +96,24 @@ class DebugInfo
         global $aProfileTimes;
         global $executionCounts;
         if (is_array($aProfileTimes)) {
-            $log .= "----------------------------------------------------------<br>" . PHP_EOL;
+            $log .= '----------------------------------------------------------<br>' . PHP_EOL;
             arsort($aProfileTimes);
             $log .= "<table cellspacing='10px' style='border: 1px solid #000'>";
             foreach ($aProfileTimes as $key => $val) {
-                $log .= "<tr><td style='border-bottom: 1px dotted #000;min-width:300px;'>Profile $key: </td><td style='border-bottom: 1px dotted #000;min-width:100px;'>" . round($val, 5) . "s</td>";
+                $log .= "<tr><td style='border-bottom: 1px dotted #000;min-width:300px;'>Profile $key: </td><td style='border-bottom: 1px dotted #000;min-width:100px;'>" . round($val, 5) . 's</td>';
                 if ($dTotalTime) {
-                    $log .= "<td style='border-bottom: 1px dotted #000;min-width:100px;'>" . round($val * 100 / $dTotalTime, 2) . "%</td>";
+                    $log .= "<td style='border-bottom: 1px dotted #000;min-width:100px;'>" . round($val * 100 / $dTotalTime, 2) . '%</td>';
                 }
                 if ($executionCounts[$key]) {
-                    $log .= " <td style='border-bottom: 1px dotted #000;min-width:50px;padding-right:30px;' align='right'>" . $executionCounts[$key] . "</td>"
+                    $log .= " <td style='border-bottom: 1px dotted #000;min-width:50px;padding-right:30px;' align='right'>" . $executionCounts[$key] . '</td>'
                              . "<td style='border-bottom: 1px dotted #000;min-width:15px; '>*</td>"
-                             . "<td style='border-bottom: 1px dotted #000;min-width:100px;'>" . round($val / $executionCounts[$key], 5) . "s</td>" . PHP_EOL;
+                             . "<td style='border-bottom: 1px dotted #000;min-width:100px;'>" . round($val / $executionCounts[$key], 5) . 's</td>' . PHP_EOL;
                 } else {
                     $log .= " <td colspan=3 style='border-bottom: 1px dotted #000;min-width:100px;'> not stopped correctly! </td>" . PHP_EOL;
                 }
                 $log .= '</tr>';
             }
-            $log .= "</table>";
+            $log .= '</table>';
         }
 
         return $log;
@@ -126,7 +126,7 @@ class DebugInfo
      */
     public function formatGeneralInfo()
     {
-        $log = "cl=" . \OxidEsales\Eshop\Core\Registry::getConfig()->getActiveView()->getClassName();
+        $log = 'cl=' . \OxidEsales\Eshop\Core\Registry::getConfig()->getActiveView()->getClassName();
         if (($fnc = \OxidEsales\Eshop\Core\Registry::getConfig()->getActiveView()->getFncName())) {
             $log .= " fnc=$fnc";
         }
@@ -143,8 +143,8 @@ class DebugInfo
     {
         $log = '';
         $className = \OxidEsales\Eshop\Core\Registry::getConfig()->getActiveView()->getClassName();
-        $log .= "<div id='" . $className . "_executed'>Executed: " . date('Y-m-d H:i:s') . "</div>";
-        $log .= "<div id='" . $className . "_timestamp'>Timestamp: " . microtime(true) . "</div>";
+        $log .= "<div id='" . $className . "_executed'>Executed: " . date('Y-m-d H:i:s') . '</div>';
+        $log .= "<div id='" . $className . "_timestamp'>Timestamp: " . microtime(true) . '</div>';
 
         return $log;
     }

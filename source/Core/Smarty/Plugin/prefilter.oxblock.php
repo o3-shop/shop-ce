@@ -19,7 +19,6 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-
 /**
  * Check if this template is registered for block extends. If yes, then collect
  * the extended blocks and replace them into the compile result of this template.
@@ -53,7 +52,7 @@ function smarty_prefilter_oxblock($sSource, &$oSmartyCompiler)
             $sBlockContent = $m[4];
         }
         $sPrepend = '';
-        $sAppend  = '';
+        $sAppend = '';
         if ($blUseSmarty3) {
             $sPrepend = '[{__smartyblock__ name="' . $sBlockName . '"}]' . $sPrepend;
             $sAppend .= '[{/__smartyblock__}]';
@@ -67,7 +66,7 @@ function smarty_prefilter_oxblock($sSource, &$oSmartyCompiler)
 
             $sDbgName = $sFile . '-&gt;' . $sBlockName;
             $sPrepend = '[{capture name="_dbg_blocks"}]' . $sPrepend;
-            $sDbgId = 'block_' . sprintf("%u", crc32($sDbgName)) . '_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]';
+            $sDbgId = 'block_' . sprintf('%u', crc32($sDbgName)) . '_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]';
             $sAppend .= '[{/capture}][{math equation="rand()" assign="_dbg_block_idr1"}][{math equation="rand()" assign="_dbg_block_idr2"}]'
                        . '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="' . $sDbgId . '" title="' . $sDbgName . '">'
                        . '[{$smarty.capture._dbg_blocks}]'
@@ -88,9 +87,9 @@ function smarty_prefilter_oxblock($sSource, &$oSmartyCompiler)
     }
     if (!$iLimit) {
         if ($blUseSmarty3) {
-            $oSmartyCompiler->trigger_error("block tags mismatch (or there are more than 500 blocks in one file).", E_USER_ERROR);
+            $oSmartyCompiler->trigger_error('block tags mismatch (or there are more than 500 blocks in one file).', E_USER_ERROR);
         } else {
-            $oSmartyCompiler->_syntax_error("block tags mismatch (or there are more than 500 blocks in one file).", E_USER_ERROR, __FILE__, __LINE__);
+            $oSmartyCompiler->_syntax_error('block tags mismatch (or there are more than 500 blocks in one file).', E_USER_ERROR, __FILE__, __LINE__);
         }
     }
     if ($blUseSmarty3) {

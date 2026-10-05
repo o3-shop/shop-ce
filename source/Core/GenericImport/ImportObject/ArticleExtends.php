@@ -32,7 +32,7 @@ class ArticleExtends extends \OxidEsales\Eshop\Core\GenericImport\ImportObject\I
     protected $tableName = 'oxartextends';
 
     /** @var string Shop object name. */
-    protected $shopObjectName = 'oxI18n';
+    protected $shopObjectName = '';
 
     /**
      * Creates shop object.

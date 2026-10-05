@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,11 +18,12 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
-use \oxCompanyVatIn;
+use oxCompanyVatIn;
 use oxCompanyVatInCountryChecker;
-use \oxField;
+use oxField;
 
 class CompanyVatInCountryCheckerTest extends \OxidTestCase
 {
@@ -65,13 +67,13 @@ class CompanyVatInCountryCheckerTest extends \OxidTestCase
 
     public function validateDataProvider()
     {
-        return array(
-            array('LT', 'LT12345', true),
-            array('LT', '', false),
-            array('LT', '11', false),
-            array('LT', 'ab', false),
-            array('DE', 'LT12345', false),
-        );
+        return [
+            ['LT', 'LT12345', true],
+            ['LT', '', false],
+            ['LT', '11', false],
+            ['LT', 'ab', false],
+            ['DE', 'LT12345', false],
+        ];
     }
 
     /**

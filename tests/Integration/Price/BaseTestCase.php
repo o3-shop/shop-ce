@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,9 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Price;
 
-require_once __DIR__. '/BasketConstruct.php';
+require_once __DIR__ . '/BasketConstruct.php';
 
 /**
  * Base test case for price calculation tests.
@@ -34,10 +36,10 @@ abstract class BaseTestCase extends \OxidTestCase
      *
      * @return array
      */
-    protected function getTestCases($directoriesToScan, $testCases = array())
+    protected function getTestCases($directoriesToScan, $testCases = [])
     {
         $directoriesToScan = (array) $directoriesToScan;
-        $allFiles = array();
+        $allFiles = [];
         foreach ($directoriesToScan as $directory) {
             $directory = __DIR__ . "/$directory/";
             $files = $testCases ? $this->getTestCasesFiles($testCases, $directory) : $this->collectFilesFromPath($directory);
@@ -53,10 +55,10 @@ abstract class BaseTestCase extends \OxidTestCase
      *
      * @return array
      */
-    private function collectFilesFromPath($path, $collector = "*.php")
+    private function collectFilesFromPath($path, $collector = '*.php')
     {
         $files = glob($path . $collector, GLOB_NOSORT);
-        $directories = glob($path.'*', GLOB_ONLYDIR);
+        $directories = glob($path . '*', GLOB_ONLYDIR);
         foreach ($directories as $directory) {
             $files = array_merge($files, $this->collectFilesFromPath($directory));
         }
@@ -72,7 +74,7 @@ abstract class BaseTestCase extends \OxidTestCase
      */
     private function getTestCasesFiles($testCases, $basePath)
     {
-        $files = array();
+        $files = [];
         foreach ($testCases as $sTestCase) {
             $file = $basePath . $sTestCase;
             if (file_exists($file)) {
@@ -89,12 +91,12 @@ abstract class BaseTestCase extends \OxidTestCase
      */
     private function collectDataFromFiles($files)
     {
-        $testCaseFiles = array();
+        $testCaseFiles = [];
         foreach ($files as $filePath) {
             $aData = null;
             include $filePath;
             if ($aData) {
-                $testCaseFiles[$filePath] = array($aData);
+                $testCaseFiles[$filePath] = [$aData];
             }
         }
 

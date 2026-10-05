@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,9 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Smarty;
 
-use \oxRegistry;
+use oxRegistry;
 
 $filePath = oxRegistry::getConfig()->getConfigParam('sCoreDir') . 'Smarty/Plugin/modifier.oxfilesize.php';
 if (file_exists($filePath)) {
@@ -28,13 +30,11 @@ if (file_exists($filePath)) {
     require_once dirname(__FILE__) . '/../../../../source/Core/Smarty/Plugin/modifier.oxfilesize.php';
 }
 
-
 /**
  * Smarty modifier test case
  */
 class FilesizeTest extends \OxidTestCase
 {
-
     /**
      * Byte result test
      *
@@ -44,7 +44,7 @@ class FilesizeTest extends \OxidTestCase
     {
         $iSize = 1023;
         $sRes = smarty_modifier_oxfilesize($iSize);
-        $this->assertEquals("1023 B", $sRes);
+        $this->assertEquals('1023 B', $sRes);
     }
 
     /**
@@ -56,7 +56,7 @@ class FilesizeTest extends \OxidTestCase
     {
         $iSize = 1025;
         $sRes = smarty_modifier_oxfilesize($iSize);
-        $this->assertEquals("1.0 KB", $sRes);
+        $this->assertEquals('1.0 KB', $sRes);
     }
 
     /**
@@ -69,7 +69,7 @@ class FilesizeTest extends \OxidTestCase
         $iSize = 1024 * 1024 * 1.1;
         $sRes = smarty_modifier_oxfilesize($iSize);
 
-        $this->assertEquals("1.1 MB", $sRes);
+        $this->assertEquals('1.1 MB', $sRes);
     }
 
     /**
@@ -82,6 +82,6 @@ class FilesizeTest extends \OxidTestCase
         $iSize = 1024 * 1024 * 1024 * 1.3;
         $sRes = smarty_modifier_oxfilesize($iSize);
 
-        $this->assertEquals("1.3 GB", $sRes);
+        $this->assertEquals('1.3 GB', $sRes);
     }
 }

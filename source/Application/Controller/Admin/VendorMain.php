@@ -21,14 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Vendor;
+use OxidEsales\Eshop\Core\Registry;
 use stdClass;
 
 /**
  * Admin vendor main screen.
  * Performs collection and updating (on user submit) main item information.
  */
-class VendorMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class VendorMain extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(),
@@ -41,10 +43,10 @@ class VendorMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDet
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
-            $oVendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
+            $oVendor = oxNew(Vendor::class);
             $oVendor->loadInLang($this->_iEditLang, $soxId);
 
             $oOtherLang = $oVendor->getAvailableInLangs();
@@ -52,10 +54,10 @@ class VendorMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDet
                 // echo "language entry doesn't exist! using: ".key($oOtherLang);
                 $oVendor->loadInLang(key($oOtherLang), $soxId);
             }
-            $this->_aViewData["edit"] = $oVendor;
+            $this->_aViewData['edit'] = $oVendor;
 
             // category tree
-            $this->_createCategoryTree("artcattree");
+            $this->_createCategoryTree('artcattree');
 
             //Disable editing for derived articles
             if ($oVendor->isDerived()) {
@@ -63,47 +65,47 @@ class VendorMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDet
             }
 
             // remove already created languages
-            $aLang = array_diff(\OxidEsales\Eshop\Core\Registry::getLang()->getLanguageNames(), $oOtherLang);
+            $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         }
 
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aoc")) {
+        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $oVendorMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\VendorMainAjax::class);
             $this->_aViewData['oxajax'] = $oVendorMainAjax->getColumns();
 
-            return "popups/vendor_main.tpl";
+            return 'popups/vendor_main.tpl';
         }
 
-        return "vendor_main.tpl";
+        return 'vendor_main.tpl';
     }
 
     /**
      * Saves selection list parameters changes.
      *
-     * @return mixed
+     * @return void
      */
     public function save()
     {
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if (!isset($aParams['oxvendor__oxactive'])) {
             $aParams['oxvendor__oxactive'] = 0;
         }
 
-        $oVendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
-        if ($soxId != "-1") {
+        $oVendor = oxNew(Vendor::class);
+        if ($soxId != '-1') {
             $oVendor->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxvendor__oxid'] = null;
@@ -117,7 +119,7 @@ class VendorMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDet
         $oVendor->setLanguage(0);
         $oVendor->assign($aParams);
         $oVendor->setLanguage($this->_iEditLang);
-        $oVendor = \OxidEsales\Eshop\Core\Registry::getUtilsFile()->processFiles($oVendor);
+        $oVendor = Registry::getUtilsFile()->processFiles($oVendor);
         $oVendor->save();
 
         // set oxid if inserted
@@ -125,22 +127,22 @@ class VendorMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDet
     }
 
     /**
-     * Saves selection list parameters changes in different language (eg. english).
+     * Saves selection list parameters changes in different language (e.g. english).
      *
-     * @return mixed
+     * @return void
      */
     public function saveinnlang()
     {
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if (!isset($aParams['oxvendor__oxactive'])) {
             $aParams['oxvendor__oxactive'] = 0;
         }
 
-        $oVendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
+        $oVendor = oxNew(Vendor::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oVendor->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxvendor__oxid'] = null;
@@ -154,7 +156,7 @@ class VendorMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDet
         $oVendor->setLanguage(0);
         $oVendor->assign($aParams);
         $oVendor->setLanguage($this->_iEditLang);
-        $oVendor = \OxidEsales\Eshop\Core\Registry::getUtilsFile()->processFiles($oVendor);
+        $oVendor = Registry::getUtilsFile()->processFiles($oVendor);
         $oVendor->save();
 
         // set oxid if inserted

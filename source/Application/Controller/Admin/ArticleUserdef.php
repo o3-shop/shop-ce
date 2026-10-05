@@ -21,26 +21,31 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+
 /**
  * Class reserved for extending (for customization - you can add you own fields, etc.).
  */
-class ArticleUserdef extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ArticleUserdef extends AdminDetailsController
 {
     /**
      * Loads article data from DB, passes it to Smarty engine, returns name
      * of template file "article_userdef.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
         parent::render();
 
-        $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-        $this->_aViewData["edit"] = $oArticle;
+        $oArticle = oxNew(Article::class);
+        $this->_aViewData['edit'] = $oArticle;
 
         $soxId = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             if ($oArticle->isDerived()) {
                 $this->_aViewData['readonly'] = true;
             }
@@ -49,6 +54,6 @@ class ArticleUserdef extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
             $oArticle->load($soxId);
         }
 
-        return "article_userdef.tpl";
+        return 'article_userdef.tpl';
     }
 }

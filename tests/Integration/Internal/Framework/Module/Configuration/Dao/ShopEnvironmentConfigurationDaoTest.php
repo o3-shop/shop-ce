@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -20,9 +22,9 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\Configuration\Dao;
 
-use OxidEsales\EshopCommunity\Internal\Framework\Storage\FileStorageFactoryInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopEnvironmentConfigurationDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataMapper\ModuleConfiguration\ModuleSettingsDataMapper;
+use OxidEsales\EshopCommunity\Internal\Framework\Storage\FileStorageFactoryInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 use OxidEsales\EshopCommunity\Tests\Integration\Internal\ContainerTrait;
 use PHPUnit\Framework\TestCase;
@@ -41,10 +43,10 @@ final class ShopEnvironmentConfigurationDaoTest extends TestCase
                     ModuleSettingsDataMapper::MAPPING_KEY => [
                         'settingToOverwrite' => [
                             'value' => 'overwrittenValue',
-                        ]
-                    ]
-                ]
-            ]
+                        ],
+                    ],
+                ],
+            ],
         ];
 
         $this->assertEquals($expectedEnvironmentConfiguration, $environmentConfiguration);
@@ -89,10 +91,10 @@ final class ShopEnvironmentConfigurationDaoTest extends TestCase
                     ModuleSettingsDataMapper::MAPPING_KEY => [
                         'settingToOverwrite' => [
                             'value' => 'overwrittenValue',
-                        ]
-                    ]
-                ]
-            ]
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 }

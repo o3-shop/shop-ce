@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -30,7 +31,6 @@ use PHPUnit\Framework\TestCase;
  */
 class ScriptLogicTest extends TestCase
 {
-
     /** @var Config */
     private $config;
 
@@ -47,8 +47,8 @@ class ScriptLogicTest extends TestCase
     public function setUp(): void
     {
         $this->config = Registry::getConfig();
-        $this->oldIDebug = $this->config->getConfigParam("iDebug");
-        $this->config->setConfigParam("iDebug", -1);
+        $this->oldIDebug = $this->config->getConfigParam('iDebug');
+        $this->config->setConfigParam('iDebug', -1);
 
         $this->scriptLogic = new ScriptLogic();
     }
@@ -59,13 +59,23 @@ class ScriptLogicTest extends TestCase
      */
     protected function tearDown(): void
     {
-        $this->config->setConfigParam("iDebug", $this->oldIDebug);
+        $this->config->setConfigParam('iDebug', $this->oldIDebug);
     }
 
     public function testIncludeFileNotExists(): void
     {
-        $this->expectWarning();
+        $triggeredWarning = false;
+
+        set_error_handler(function ($errno, $errstr) use (&$triggeredWarning) {
+            if ($errno === E_USER_WARNING && strpos($errstr, '{oxscript}') !== false) {
+                $triggeredWarning = true;
+            }
+        });
+
         $this->scriptLogic->include('somescript.js');
+        restore_error_handler();
+
+        $this->assertTrue($triggeredWarning, 'Expected warning was not triggered.');
     }
 
     public function testIncludeFileExists(): void

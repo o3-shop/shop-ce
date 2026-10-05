@@ -61,7 +61,7 @@ final class ModulePathHandlerTest extends TestCase
             ->setType(ShopSettingType::ARRAY)
             ->setValue([
                 'moduleToStayActive' => 'path',
-                'moduleToDeactivate' => 'path'
+                'moduleToDeactivate' => 'path',
             ]);
 
         $shopConfigurationSettingDao->save($shopConfigurationSetting);
@@ -82,8 +82,7 @@ final class ModulePathHandlerTest extends TestCase
 
     private function getTestShopConfigurationSettingDao(): ShopConfigurationSettingDaoInterface
     {
-        return new class implements ShopConfigurationSettingDaoInterface
-        {
+        return new class () implements ShopConfigurationSettingDaoInterface {
             private $settings = [];
 
             public function save(ShopConfigurationSetting $setting): void

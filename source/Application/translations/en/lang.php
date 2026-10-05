@@ -19,7 +19,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-$sLangName  = "English";
+$sLangName = 'English';
 
 // -------------------------------
 // RESOURCE IDENTIFIER = STRING
@@ -77,6 +77,10 @@ $aLang = [
 /** @deprecated since v6.5.4 (2020-04-06); Suggest feature will be removed completely */
 'CARD_TO'                                                     => 'Card to',
 /** end deprecated */
+'CARD_MASTERCARD'                                             => 'MasterCard',
+'CARD_VISA'                                                   => 'Visa',
+'CARD_SECURITY_CODE'                                          => 'Security code',
+'CARD_SECURITY_CODE_DESCRIPTION'                              => 'Last 3 digits on the back of your credit card.',
 'CART'                                                        => 'Cart',
 'CATEGORIES'                                                  => 'Categories',
 'CATEGORY'                                                    => 'Category',
@@ -109,6 +113,7 @@ $aLang = [
 'COUPON'                                                      => 'Coupon',
 'COUPON_NOT_ACCEPTED'                                         => 'Your coupon "%s" couldn\'t be accepted.',
 'CREATE_PASSWORD'                                             => 'Create password',
+'CREDITCARD'                                                  => 'Credit card',
 'CURRENT_PRODUCT'                                             => 'Current product',
 'CUSTOMERS_ALSO_BOUGHT'                                       => 'Customers who bought this product also bought',
 'DATE'                                                        => 'Date',
@@ -136,6 +141,8 @@ $aLang = [
 'EDIT'                                                        => 'Edit',
 'EMAIL'                                                       => 'E-mail',
 'EMAIL_ADDRESS'                                               => 'E-mail address',
+'EMAIL_INVITE_HTML_INVITETOSHOP2'                             => 'has invited you to visit',
+'EMAIL_INVITE_HTML_INVITETOSHOP3'                             => '.',
 'ENABLE'                                                      => 'Enable',
 'ENTER_COUPON_NUMBER'                                         => 'Enter coupon number',
 'ENTER_EMAIL_OR_NAME'                                         => 'Enter e-mail address or last name',
@@ -451,6 +458,8 @@ $aLang = [
 'RECIPIENT_EMAIL'                                             => 'Recipient\'s e-mail',
 'RECIPIENT_NAME'                                              => 'Recipient\'s name',
 'RECOMMEND'                                                   => 'Recommend',
+'RECOMMLIST'                                                  => 'Recommendation List',
+'RECOMMLIST_SEARCH'                                           => 'Search',
 /** @deprecated since v6.5.4 (2020-04-06); Suggest feature will be removed completely */
 'RECOMMENDED_PRODUCTS'                                        => 'My product recommendation',
 /** end deprecated */
@@ -710,6 +719,8 @@ $aLang = [
 'BASKET_TOTAL_PLUS_PROPORTIONAL_VAT'                          => 'plus tax (calculated proportionally)',
 'PROPORTIONALLY_CALCULATED'                                   => 'Calculated proportionally',
 'PRICE_FROM'                                                  => 'from',
+'PAGE_CHECKOUT_ORDER_COUPONNOTACCEPTED1'                      => 'Coupon',
+'PAGE_CHECKOUT_ORDER_COUPONNOTACCEPTED2'                      => 'couldn\'t be accepted.',
 'PAGE_DETAILS_THANKYOUMESSAGE1'                               => 'Thank you.',
 'PAGE_DETAILS_THANKYOUMESSAGE2'                               => ' appreciates your comments.',
 'PAGE_DETAILS_THANKYOUMESSAGE3'                               => 'We will inform you as soon as the price falls below',
@@ -742,16 +753,15 @@ $aLang = [
 'PAGE_TITLE_SUGGEST'                                          => 'Recommend product',
 'PAGE_TITLE_INVITE'                                           => 'Invite your friends',
 'PAGE_TITLE_REVIEW'                                           => 'Review',
+'PAGE_TITLE_REVOCATION'                                       => 'Cancel contract',
 
 'WISHLIST_PRODUCTS'                                           => 'These products are on the wish list of %s. If you want to please him/her, purchase one or more of these products.',
-
 
 'BETA_NOTE'                                                   => 'Welcome to ',
 'BETA_NOTE_RELEASE_BETA'                                      => 'Beta',
 'BETA_NOTE_RELEASE_RC'                                        => 'Release candidate',
 'BETA_NOTE_MIDDLE'                                            => ' of O3-Shop ',
 'BETA_NOTE_FAQ'                                               => '. Please refer to our %s if you have any questions.',
-
 
 'NO_LISTMANIA_LIST'                                           => 'There is no listmania lists at the moment. To create a new list, please ',
 'DETAILS_VPE_MESSAGE'                                         => 'This product can only be ordered in packaging units of %s',
@@ -763,6 +773,10 @@ $aLang = [
 'SERVICES'                                                    => 'Service',
 'FORM_FIELDSET_USER_SHIPPING_ADDITIONALINFO2_TOOLTIP'         => '', // this is specifically for DHL
 'FORM_FIELDSET_USER_BILLING_ADDITIONALINFO_TOOLTIP'           => '', // this is specifically for DHL
+'FORM_REGISTER_IAGREETOTERMS1'                                => 'I agree to the',
+'FORM_REGISTER_IAGREETOTERMS3'                                => 'and accept',
+'FORM_REGISTER_IAGREETORIGHTOFWITHDRAWAL1'                    => 'and have been informed about my',
+'FORM_REGISTER_IAGREETORIGHTOFWITHDRAWAL3'                    => '.',
 'FORM_SUGGEST_MESSAGE1'                                       => 'Hello, I was looking at',
 'FORM_SUGGEST_MESSAGE2'                                       => 'today and found something that might be interesting for you. Just click on the link below and you will be directed to the shop.',
 'SHOP_SUGGEST_MESSAGE'                                        => 'Hello, I was looking at %s today and found something that might be interesting for you. Just click on the link below and you will be directed to the shop.',
@@ -774,7 +788,6 @@ $aLang = [
 'THANK_YOU_FOR_ORDER'                                         => 'Thank you for ordering at',
 'PRICE_ALERT_THANK_YOU_MESSAGE'                               => 'Many thanks for the transmission of your wished price of %s %s. You will receive an e-mail as soon as this is reached.',
 'THANK_YOU_MESSAGE'                                           => 'Thank you for your message to %s.',
-
 
 'ALL_BRANDS'                                                  => 'All brands',
 'BY_BRAND'                                                    => 'By brand',
@@ -790,4 +803,55 @@ $aLang = [
 'PARTNERS'                                                    => 'Partners',
 
 'MY_REVIEWS'                                                  => 'My reviews',
+
+// §356a BGB electronic revocation feature (issue #99) — admin, email and
+// storefront default strings. Theme-specific storefront strings may be
+// overridden in wave / o3-theme lang files. All keys share the `O3_REVOCATION_` prefix.
+
+// Storefront — defaults (overridable by wave / o3-theme)
+'O3_REVOCATION_FOOTER_LINK'                                   => 'Cancel contract',
+'O3_REVOCATION_FORM_HEADING'                                  => 'Cancel contract',
+'O3_REVOCATION_FIELD_NAME_LABEL'                              => 'Full name',
+'O3_REVOCATION_FIELD_ORDERNUMBER_LABEL'                       => 'Order ID',
+'O3_REVOCATION_FIELD_EMAIL_LABEL'                             => 'Email address',
+'O3_REVOCATION_FIELD_FREETEXT_LABEL'                          => 'Notes (optional)',
+'O3_REVOCATION_CONFIRM_BUTTON'                                => 'Confirm revocation',
+'O3_REVOCATION_CONFIRMATION_PAGE_HEADING'                     => 'Revocation received',
+'O3_REVOCATION_VALIDATION_REQUIRED'                           => 'Required.',
+'O3_REVOCATION_VALIDATION_EMAIL_FORMAT'                       => 'Please enter a valid email address.',
+'O3_REVOCATION_VALIDATION_SESSION_EXPIRED'                    => 'Your session has expired. Please submit the form again.',
+'O3_REVOCATION_VALIDATION_SPAM'                               => 'Your request could not be processed at this time. Please try again later.',
+
+// Email field labels — duplicated from admin lang (where the same labels live
+// for the admin detail view) so storefront-context email rendering can
+// resolve them. OXID's Language::translateString does not fall back across
+// domains.
+'O3_REVOCATION_ADMIN_FIELD_OXID'                              => 'Submission ID',
+'O3_REVOCATION_ADMIN_FIELD_SUBMITTED'                         => 'Received at',
+
+// Customer email (receipt of declaration per § 356a Abs. 4 BGB)
+'O3_REVOCATION_CUSTOMER_EMAIL_SUBJECT'                        => 'We have received your revocation declaration',
+'O3_REVOCATION_CUSTOMER_EMAIL_BODY_INTRO'                     => 'we hereby confirm that your revocation declaration has been received.',
+'O3_REVOCATION_CUSTOMER_EMAIL_BODY_RECEIPT_NOTE'              => 'Please note that this is solely a confirmation of receipt. The validity and scope of your revocation declaration will be reviewed separately. We will get back to you on this shortly.',
+'O3_REVOCATION_CUSTOMER_EMAIL_BODY_FOOTER'                    => 'Kind regards',
+
+// Operator email (notification — operational, not legally required)
+'O3_REVOCATION_OPERATOR_EMAIL_SUBJECT'                        => 'New revocation received',
+'O3_REVOCATION_OPERATOR_EMAIL_BODY'                           => 'A new revocation declaration has been received in the shop pursuant to § 356a BGB. The record is available in the admin area under "Customer Info → Revocations".',
+
+// Core CAPTCHA provider feature (issue #213) — storefront texts
+'O3_CAPTCHA_FAILED'                                           => 'The security check failed. Please try again.',
+'O3_CAPTCHA_CONSENT_NOTICE'                                   => 'Please accept the required cookies. Otherwise we cannot verify that you are human, and the form cannot be submitted.',
+
+// EU guarantee labels (issue #219, Reg. (EU) 2025/1960) - storefront texts.
+// Texts INSIDE the labels are fixed EU artwork, not translations.
+'O3_GUARANTEE_NOTICE_IMG_ALT'                                 => 'Harmonised EU notice on the legal guarantee of conformity of at least two years',
+'O3_GUARANTEE_LABEL_IMG_ALT'                                  => 'EU guarantee label: producer durability guarantee for this product',
+'O3_GUARANTEE_LABEL_FALLBACK_DURATION'                        => 'Producer durability guarantee: %s years',
+'O3_GUARANTEE_LABEL_FALLBACK_GUARANTOR'                       => 'Guarantor: %s',
+'O3_GUARANTEE_LABEL_FALLBACK_NOTE'                            => 'The official EU guarantee label cannot be displayed right now.',
+'O3_GUARANTEE_LEGAL_REMINDER'                                => 'Regardless of this guarantee, the statutory legal guarantee of at least two years applies.',
+'O3_GUARANTEE_CONDITIONS_HEADING'                            => 'Guarantee conditions',
+'O3_GUARANTEE_RIGHTS_LINK'                                   => 'Your legal guarantee rights',
+'O3_GUARANTEE_CLOSE'                                         => 'Close',
 ];

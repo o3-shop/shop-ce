@@ -37,9 +37,8 @@ class SmartyResourcesDataProvider implements SmartyResourcesDataProviderInterfac
                 'ox_get_template',
                 'ox_get_timestamp',
                 'ox_get_secure',
-                'ox_get_trusted'
-
-            ]
+                'ox_get_trusted',
+            ],
         ];
     }
 }

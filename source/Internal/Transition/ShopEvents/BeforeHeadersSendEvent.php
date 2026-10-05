@@ -29,7 +29,7 @@ use Symfony\Component\EventDispatcher\Event;
 
 class BeforeHeadersSendEvent extends Event
 {
-    const NAME = self::class;
+    public const NAME = self::class;
 
     /**
      * @var BaseController

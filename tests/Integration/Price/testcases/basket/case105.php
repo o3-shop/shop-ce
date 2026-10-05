@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: netto
  * Price view mode: netto
@@ -17,22 +18,22 @@
  * Short description:
  * Payment methods calculation in Neto-Neto Mode. Used discount for basket
  */
-$aData = array(
+$aData = [
     // Articles
-    'articles' => array(
-        0 => array(
+    'articles' => [
+        0 => [
             // oxarticles db fields
             'oxid'                     => 111,
             'oxprice'                  => 1,00,
             'oxvat'                    => 20,
             // Amount in basket
             'amount'                   => 2,
-        ),
-    ),
+        ],
+    ],
  // Discounts
-    'discounts' => array(
+    'discounts' => [
         // oxdiscount DB fields
-        0 => array(
+        0 => [
             // 10% discount for basket
             'oxid'         => 'discountforbasket10%',
             'oxaddsum'     => 10,
@@ -41,16 +42,14 @@ $aData = array(
             'oxamountto' => 99999,
             'oxactive' => 1,
             'oxsort' => 10,
-        ),
-
-    ),
+        ],
+    ],
 
     // Additional costs
-    'costs' => array(
-
+    'costs' => [
         // Delivery
-        'delivery' => array(
-            0 => array(
+        'delivery' => [
+            0 => [
                 // oxdelivery DB fields
                 'oxactive' => 1,
                 'oxaddsum' => 55,
@@ -59,11 +58,11 @@ $aData = array(
                 'oxfinalize' => 1,
                  'oxparam'=> 0.1,
                 'oxparamend' => 99999,
-            ),
-        ),
+            ],
+        ],
         // Payment
-        'payment' => array(
-            0 => array(
+        'payment' => [
+            0 => [
                 // oxpayments DB fields
                 'oxaddsum' => 10,
                 'oxaddsumtype' => '%',
@@ -72,62 +71,59 @@ $aData = array(
                 'oxchecked' => 1,
                 // 1. Value of all goods in cart
                 'oxaddsumrules'=>1,
-            ),
-        ),
-
-    ),
+            ],
+        ],
+    ],
     // TEST EXPECTATIONS
-    'expected' => array(
+    'expected' => [
         // Article expected prices: ARTICLE ID => ( Unit price, Total Price )
-        'articles' => array(
-             111 => array( '1,00', '2,00' ),
-
-        ),
+        'articles' => [
+             111 => [ '1,00', '2,00' ],
+        ],
         // Expectations of other totals
-        'totals' => array(
+        'totals' => [
             // Total BRUTTO
             'totalBrutto' => '2,16',
             // Total NETTO
             'totalNetto'  => '2,00',
             // Total VAT amount: vat% => total cost
-            'vats' => array(
+            'vats' => [
                 20 => '0,36',
-            ),
+            ],
         // Total discount amounts: discount id => total cost
-        'discounts' => array(
+        'discounts' => [
             // Expectation for special discount with specified ID
-            'discountforbasket10%' => '0,20'
-            ),
+            'discountforbasket10%' => '0,20',
+            ],
 
             // Total delivery amounts
-            'delivery' => array(
+            'delivery' => [
                 'brutto' => '1,32',
                 'netto' => '1,10',
-                'vat' => '0,22'
-            ),
+                'vat' => '0,22',
+            ],
             // Total payment amounts
-            'payment' => array(
+            'payment' => [
                 'brutto' => '0,24',
                 'netto' => '0,20',
-                'vat' => '0,04'
-            ),
+                'vat' => '0,04',
+            ],
             // GRAND TOTAL
-            'grandTotal'  => '3,72'
-        ),
-    ),
+            'grandTotal'  => '3,72',
+        ],
+    ],
     // Test case options
-    'options' => array(
+    'options' => [
         // Configs (real named)
-        'config' => array(
+        'config' => [
             'blEnterNetPrice' => true,
             'blShowNetPrice' => true,
             'blShowVATForPayCharge' => true,
             'blShowVATForDelivery' => true,
             'blPaymentVatOnTop'=>true,
             'blDeliveryVatOnTop'=>true,
-
-        ),
+        ],
         // Other options
         'activeCurrencyRate' => 1,
-    ),
-);
+    ],
+];

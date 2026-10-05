@@ -5,16 +5,16 @@ SET @@session.sql_mode = '';
 
 create table o3rightsroles
 (
-    OXID char(32) not null
-        primary key,
-    SHOPID int not null,
-    TITLE varchar(255) not null,
-    ACTIVE tinyint(1) not null,
-    OXTIMESTAMP datetime default CURRENT_TIMESTAMP not null,
-    TITLE_1 varchar(255) not null,
-    TITLE_2 varchar(255) not null,
-    TITLE_3 varchar(255) not null,
-    OXSHOPID int not null
+    OXID char(32) character set latin1 collate latin1_general_ci NOT NULL
+        PRIMARY KEY,
+    SHOPID int NOT NULL,
+    TITLE varchar(255) NOT NULL,
+    ACTIVE tinyint(1) NOT NULL,
+    OXTIMESTAMP datetime default CURRENT_TIMESTAMP NOT NULL,
+    TITLE_1 varchar(255) NOT NULL,
+    TITLE_2 varchar(255) NOT NULL,
+    TITLE_3 varchar(255) NOT NULL,
+    OXSHOPID int NOT NULL
 )
     collate=utf8_unicode_ci;
 create index SHOPNAVIGATION
@@ -22,12 +22,12 @@ create index SHOPNAVIGATION
 
 create table o3object2role
 (
-    OXID char(32) not null
-        primary key,
-    OXSHOPID char(32) not null,
-    OBJECTID char(32) not null,
-    ROLEID char(32) not null,
-    OXTIMESTAMP datetime default CURRENT_TIMESTAMP not null,
+    OXID char(32) character set latin1 collate latin1_general_ci NOT NULL
+        PRIMARY KEY,
+    OXSHOPID char(32) character set latin1 collate latin1_general_ci NOT NULL,
+    OBJECTID char(32) character set latin1 collate latin1_general_ci NOT NULL,
+    ROLEID char(32) character set latin1 collate latin1_general_ci NOT NULL,
+    OXTIMESTAMP datetime default CURRENT_TIMESTAMP NOT NULL,
     constraint ROLEOBJECT_IDX
         unique (ROLEID, OBJECTID)
 )
@@ -35,12 +35,12 @@ create table o3object2role
 
 create table o3rightsroleselements
 (
-    ELEMENTID char(32) not null,
-    OBJECTID char(32) not null,
-    OXTIMESTAMP datetime default CURRENT_TIMESTAMP not null,
-    OXID char(32) not null
-        primary key,
-    TYPE int default 1 not null comment 'right type: 0 = hidden, 1 = editable, 2 = readonly'
+    ELEMENTID char(32) character set latin1 collate latin1_general_ci NOT NULL,
+    OBJECTID char(32) character set latin1 collate latin1_general_ci NOT NULL,
+    OXTIMESTAMP datetime default CURRENT_TIMESTAMP NOT NULL,
+    OXID char(32) character set latin1 collate latin1_general_ci NOT NULL
+        PRIMARY KEY,
+    TYPE int default 1 NOT NULL comment 'right type: 0 = hidden, 1 = editable, 2 = readonly'
 )
     collate=utf8_unicode_ci;
 create index ROLETYPE_IDX
@@ -198,6 +198,10 @@ CREATE TABLE `oxarticles` (
   `OXTITLE` varchar(255) NOT NULL default '' COMMENT 'Title (multilanguage)',
   `OXSHORTDESC` varchar(255) NOT NULL default '' COMMENT 'Short description (multilanguage)',
   `OXPRICE` double NOT NULL default '0' COMMENT 'Article Price',
+  `O3GUARANTEEYEARS` INT NULL DEFAULT NULL COMMENT 'Producer commercial guarantee of durability in WHOLE YEARS; NULL/0 = none/not communicated (nullable so an unset field reads empty, not a misleading 0). Label-eligible only when > 2 (Art. 6(1)(la) CRD as amended by Directive (EU) 2024/825; label design per Reg. (EU) 2025/1960 renders whole years only). Producer guarantees only - seller guarantees never qualify.',
+  `O3GUARANTEEGUARANTOR` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Producer/brand name exactly as it must appear on the EU durability-guarantee label. Empty = fall back to the linked oxmanufacturers title; if that is also empty the label cannot render.',
+  `O3GUARANTEEMODEL` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Model identifier exactly as it must appear on the EU durability-guarantee label (mandatory label component per Reg. (EU) 2025/1960 Annex II). Empty = fall back to OXARTNUM, then to the article title.',
+  `O3GUARANTEECONDITIONS` TEXT NULL COMMENT 'Guarantee conditions the trader must provide when advertising with the guarantee (sec. 479 BGB: guarantor name/address, scope, conditions). Shown as an expandable section under the label. Single-language field by design.',
   `OXBLFIXEDPRICE` tinyint(1) NOT NULL default '0' COMMENT 'No Promotions (Price Alert) ',
   `OXPRICEA` double NOT NULL default '0' COMMENT 'Price A',
   `OXPRICEB` double NOT NULL default '0' COMMENT 'Price B',

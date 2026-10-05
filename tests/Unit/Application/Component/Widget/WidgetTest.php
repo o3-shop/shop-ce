@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Component\Widget;
 
 /**
@@ -24,9 +26,8 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Component\Widget;
  */
 class WidgetTest extends \OxidEsales\TestingLibrary\UnitTestCase
 {
-
     /**
-     * @covers \OxidEsales\Eshop\Application\Component\Widget\WidgetController::init()
+     * @covers \OxidEsales\EshopCommunity\Application\Component\Widget\WidgetController::init()
      */
     public function testInitComponentNotSet()
     {
@@ -35,15 +36,15 @@ class WidgetTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
         $components = $languageList->getComponents();
         $this->assertEquals(1, count($components));
-        $this->assertEquals('oxidesales\eshop\application\component\languagecomponent', $components["oxcmp_lang"]->getThisAction());
+        $this->assertEquals('oxidesales\eshop\application\component\languagecomponent', $components['oxcmp_lang']->getThisAction());
     }
 
     /**
-     * @covers \OxidEsales\Eshop\Application\Component\Widget\WidgetController::init()
+     * @covers \OxidEsales\EshopCommunity\Application\Component\Widget\WidgetController::init()
      */
     public function testInitComponentIsSet()
     {
-        $components["oxcmp_lang"] = oxNew(\OxidEsales\Eshop\Application\Component\LanguageComponent::class);
+        $components['oxcmp_lang'] = oxNew(\OxidEsales\Eshop\Application\Component\LanguageComponent::class);
         $view = oxNew(\OxidEsales\Eshop\Application\Controller\ArticleDetailsController::class);
         $view->setComponents($components);
         $this->getConfig()->setActiveView($view);
@@ -53,6 +54,6 @@ class WidgetTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
         $components = $languageListWidget->getComponents();
         $this->assertEquals(1, count($components));
-        $this->assertTrue(isset($components["oxcmp_lang"]));
+        $this->assertTrue(isset($components['oxcmp_lang']));
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -18,14 +19,13 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Transition\TemplateLogic;
+namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Transition\Adapter\TemplateLogic;
 
 use OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\FormatPriceLogic;
 use PHPUnit\Framework\TestCase;
 
 class FormatPriceLogicTest extends TestCase
 {
-
     /**
      * @var FormatPriceLogic
      */
@@ -54,12 +54,12 @@ class FormatPriceLogicTest extends TestCase
         return [
             [
                 ['price' => 100],
-                '100,00 €'
+                '100,00 €',
             ],
             [
                 ['price' => null],
-                ''
-            ]
+                '',
+            ],
         ];
     }
 
@@ -88,20 +88,20 @@ class FormatPriceLogicTest extends TestCase
 
         return [
             [
-                1, '1,00 €'
+                1, '1,00 €',
             ],
             [
-                'incorrect', '0,00 €'
+                'incorrect', '0,00 €',
             ],
             [
-                $incorrectPriceObj, '0,00 €'
+                $incorrectPriceObj, '0,00 €',
             ],
             [
-                $incorrectPriceObj, '0,00 €'
+                $incorrectPriceObj, '0,00 €',
             ],
             [
-                $correctPriceObj, '120,00 €'
-            ]
+                $correctPriceObj, '120,00 €',
+            ],
         ];
     }
 
@@ -129,29 +129,29 @@ class FormatPriceLogicTest extends TestCase
 
         return [
             [
-                '', $price, '10.000,00'
+                '', $price, '10.000,00',
             ],
             [
-                '', -100, ''
+                '', -100, '',
             ],
             [
-                $this->getCurrencyWithSeparator(['dec' => '-']), $price, '10.000-00'
+                $this->getCurrencyWithSeparator(['dec' => '-']), $price, '10.000-00',
             ],
             [
-                $this->getCurrencyWithSeparator(['thousand' => '-']), $price, '10-000,00'
+                $this->getCurrencyWithSeparator(['thousand' => '-']), $price, '10-000,00',
             ],
             [
-                $this->getCurrencyWithSeparator(['sign' => '$']), $price, '10.000,00 $'
+                $this->getCurrencyWithSeparator(['sign' => '$']), $price, '10.000,00 $',
             ],
             [
-                $this->getCurrencyWithSeparator(['decimal' => 4]), $price, '10.000,0000'
+                $this->getCurrencyWithSeparator(['decimal' => 4]), $price, '10.000,0000',
             ],
             [
-                $this->getCurrencyWithSeparator(['sign' => '$', 'side' => 'Front']), $price, '$10.000,00'
+                $this->getCurrencyWithSeparator(['sign' => '$', 'side' => 'Front']), $price, '$10.000,00',
             ],
             [
-                $this->getCurrencyWithSeparator(['sign' => '$', 'side' => 'incorrect']), $price, '10.000,00 $'
-            ]
+                $this->getCurrencyWithSeparator(['sign' => '$', 'side' => 'incorrect']), $price, '10.000,00 $',
+            ],
         ];
     }
 
@@ -169,5 +169,4 @@ class FormatPriceLogicTest extends TestCase
 
         return $currency;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,15 +18,11 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 use modOxUtilsDate;
-use oxConfig;
 use OxidEsales\Eshop\Core\Registry;
-use oxLang;
-use oxSession;
-use oxStr;
-use oxUtils;
 use Psr\Log\LoggerInterface;
 use stdClass;
 
@@ -34,7 +31,6 @@ use stdClass;
  */
 class RegistryTest extends \OxidEsales\TestingLibrary\UnitTestCase
 {
-
     /**
      * Test, that the method get creates the object of the correct current edition namespace.
      */
@@ -50,7 +46,7 @@ class RegistryTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testGet()
     {
-        $oStr = Registry::get("oxstr");
+        $oStr = Registry::get('oxstr');
         $this->assertTrue($oStr instanceof \OxidEsales\Eshop\Core\Str);
     }
 
@@ -59,11 +55,11 @@ class RegistryTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testSetGetCaseInsensitive()
     {
-        $oStr = Registry::get("oxSTR");
-        $oStr->test = "testValue";
+        $oStr = Registry::get('oxSTR');
+        $oStr->test = 'testValue';
         //differen case
-        $oStr2 = Registry::get("OxStr");
-        $this->assertEquals("testValue", $oStr2->test);
+        $oStr2 = Registry::get('OxStr');
+        $this->assertEquals('testValue', $oStr2->test);
     }
 
     /**
@@ -71,10 +67,10 @@ class RegistryTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testGetSameInstance()
     {
-        $oStr = Registry::get("oxstr");
-        $oStr->test = "testValue";
-        $oStr = Registry::get("oxstr");
-        $this->assertEquals("testValue", $oStr->test);
+        $oStr = Registry::get('oxstr');
+        $oStr->test = 'testValue';
+        $oStr = Registry::get('oxstr');
+        $this->assertEquals('testValue', $oStr->test);
     }
 
     /**
@@ -83,13 +79,13 @@ class RegistryTest extends \OxidEsales\TestingLibrary\UnitTestCase
     public function testSetGetInstance()
     {
         $oTest = new stdClass();
-        $oTest->testPublic = "testPublicVal";
+        $oTest->testPublic = 'testPublicVal';
 
-        Registry::set("testCase", $oTest);
-        $oTest2 = Registry::get("testCase");
+        Registry::set('testCase', $oTest);
+        $oTest2 = Registry::get('testCase');
 
-        $this->assertEquals("testPublicVal", $oTest2->testPublic);
-        Registry::set("testCase", null);
+        $this->assertEquals('testPublicVal', $oTest2->testPublic);
+        Registry::set('testCase', null);
     }
 
     /**
@@ -121,25 +117,25 @@ class RegistryTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
     public function testGetKeys()
     {
-        Registry::set("testKey", "testVal");
-        $this->assertTrue(in_array("testkey", Registry::getKeys()));
-        \OxidEsales\Eshop\Core\Registry::set("testKey", null);
+        Registry::set('testKey', 'testVal');
+        $this->assertTrue(in_array('testkey', Registry::getKeys()));
+        \OxidEsales\Eshop\Core\Registry::set('testKey', null);
     }
 
     public function testUnset()
     {
-        \OxidEsales\Eshop\Core\Registry::set("testKey", "testVal");
-        $this->assertTrue(in_array("testkey", Registry::getKeys()));
-        \OxidEsales\Eshop\Core\Registry::set("testKey", null);
-        $this->assertFalse(in_array("testKey", Registry::getKeys()));
-        $this->assertFalse(in_array("testkey", Registry::getKeys()));
+        \OxidEsales\Eshop\Core\Registry::set('testKey', 'testVal');
+        $this->assertTrue(in_array('testkey', Registry::getKeys()));
+        \OxidEsales\Eshop\Core\Registry::set('testKey', null);
+        $this->assertFalse(in_array('testKey', Registry::getKeys()));
+        $this->assertFalse(in_array('testkey', Registry::getKeys()));
     }
 
     public function testInstanceExists()
     {
-        \OxidEsales\Eshop\Core\Registry::set("testKey", "testVal");
+        \OxidEsales\Eshop\Core\Registry::set('testKey', 'testVal');
         $this->assertTrue(Registry::instanceExists('testKey'));
-        \OxidEsales\Eshop\Core\Registry::set("testKey", null);
+        \OxidEsales\Eshop\Core\Registry::set('testKey', null);
         $this->assertFalse(Registry::instanceExists('testKey'));
     }
 
@@ -478,7 +474,7 @@ class RegistryTest extends \OxidEsales\TestingLibrary\UnitTestCase
             ['getLang', \OxidEsales\Eshop\Core\Language::class],
             ['getUtils', \OxidEsales\Eshop\Core\Utils::class],
             ['getUtilsObject', \OxidEsales\Eshop\Core\UtilsObject::class],
-            ['getLogger', LoggerInterface::class]
+            ['getLogger', LoggerInterface::class],
         ];
     }
 

@@ -78,14 +78,14 @@ class Rating extends \OxidEsales\Eshop\Application\Component\Widget\WidgetContro
     public function getRatingValue()
     {
         if ($this->_dRatingValue === null) {
-            $this->_dRatingValue = (double) 0;
-            $dValue = $this->getViewParameter("dRatingValue");
+            $this->_dRatingValue = 0.0;
+            $dValue = $this->getViewParameter('dRatingValue');
             if ($dValue) {
                 $this->_dRatingValue = round($dValue, 1);
             }
         }
 
-        return (double) $this->_dRatingValue;
+        return (float) $this->_dRatingValue;
     }
 
     /**
@@ -95,7 +95,7 @@ class Rating extends \OxidEsales\Eshop\Application\Component\Widget\WidgetContro
      */
     public function getRatingCount()
     {
-        return $dCount = $this->getViewParameter("dRatingCount");
+        return (int)$this->getViewParameter('dRatingCount');
     }
 
     /**
@@ -105,7 +105,7 @@ class Rating extends \OxidEsales\Eshop\Application\Component\Widget\WidgetContro
      */
     public function getRateUrl()
     {
-        return $this->getViewParameter("sRateUrl");
+        return $this->getViewParameter('sRateUrl');
     }
 
     /**
@@ -115,7 +115,7 @@ class Rating extends \OxidEsales\Eshop\Application\Component\Widget\WidgetContro
      */
     public function canRate()
     {
-        return $this->getViewParameter("blCanRate");
+        return (int)$this->getViewParameter('blCanRate');
     }
 
     /**

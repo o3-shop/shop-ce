@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @category      module
@@ -8,8 +9,6 @@
  * @copyright (C) John Doe 20162016
  */
 
-use unifiednamespace_module1\Model\TestContent;
-
 /**
  * Metadata version
  */
@@ -18,28 +17,28 @@ $sMetadataVersion = '1.1';
 /**
  * Module information
  */
-$aModule = array(
+$aModule = [
     'id'          => 'unifiednamespace_module1',
-    'title'       => array(
+    'title'       => [
         'de' => 'OXID eSales example module 1',
         'en' => 'OXID eSales example module 1',
-    ),
-    'description' => array(
+    ],
+    'description' => [
         'de' => 'This module overrides ContentController::getTitle()',
         'en' => 'This module overrides ContentController::getTitle()',
-    ),
+    ],
     'version'     => '1.0.0',
     'author'      => 'John Doe',
     'url'         => 'www.johndoe.com',
     'email'       => 'john@doe.com',
-    'extend'      => array(
+    'extend'      => [
         'content' => 'oeTest/unifiednamespace_module1/Controller/Test1ContentController',
-    ),
-    'files'       => array(
+    ],
+    'files'       => [
         'Test1Content' => 'oeTest/unifiednamespace_module1/Model/Test1Content.php',
-    ),
-    'templates'   => array(),
-    'blocks'      => array(),
-    'settings'    => array(),
-    'events'      => array(),
-);
+    ],
+    'templates'   => [],
+    'blocks'      => [],
+    'settings'    => [],
+    'events'      => [],
+];

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -26,7 +27,7 @@ $sMetadataVersion = '2.0';
 /**
  * Module information
  */
-$aModule = array(
+$aModule = [
     'id'           => 'metadata_controllers_feature',
     'title'        => 'Test metadata_controllers_feature',
     'description'  => '',
@@ -35,6 +36,6 @@ $aModule = array(
     'author'       => 'OXID eSales AG',
     'controllers'  => [
         'metadata_controllers_feature-controllers-id-1' => 'metadata_controllers_feature-controllers-value-1',
-        'metadata_controllers_feature-controllers-id-2' => 'metadata_controllers_feature-controllers-value-2'
-    ]
-);
+        'metadata_controllers_feature-controllers-id-2' => 'metadata_controllers_feature-controllers-value-2',
+    ],
+];

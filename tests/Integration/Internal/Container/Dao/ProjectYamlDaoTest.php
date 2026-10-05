@@ -121,9 +121,9 @@ EOT;
                 'services' => [
                     'somekey' => [
                         'class' => DummyExecutor::class,
-                        'factory' => ['some/factory', 'someMethod']
-                    ]
-                ]
+                        'factory' => ['some/factory', 'someMethod'],
+                    ],
+                ],
             ]
         );
         $this->dao->saveProjectConfigFile($projectYaml);

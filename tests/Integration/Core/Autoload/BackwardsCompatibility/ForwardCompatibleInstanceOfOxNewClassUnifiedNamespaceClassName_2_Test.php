@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -22,7 +23,6 @@ namespace OxidEsales\EshopCommunity\Tests\Integration\Core\Autoload\BackwardsCom
 
 class ForwardCompatibleInstanceOfOxNewClassUnifiedNamespaceClassName_2_Test extends \PHPUnit\Framework\TestCase
 {
-
     /**
      * Test the backwards compatibility of class instances created with oxNew and the alias class name
      */
@@ -32,7 +32,7 @@ class ForwardCompatibleInstanceOfOxNewClassUnifiedNamespaceClassName_2_Test exte
         $unifiedNamespaceClassName = \OxidEsales\Eshop\Application\Model\Article::class;
         $backwardsCompatibleClassAlias = 'oxarticle';
         $message = 'Backwards compatible class name - lowercase string';
-        
+
         $object = oxNew($unifiedNamespaceClassName);
 
         $message = 'An object created with oxNew(\OxidEsales\Eshop\Application\Model\Article::class) is an instance of "oxarticle"';

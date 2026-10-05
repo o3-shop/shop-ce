@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -26,11 +27,11 @@ $sMetadataVersion = '1.0';
 /**
  * Module information
  */
-$aModule = array(
+$aModule = [
     'id'           => 'no_extending',
     'title'        => 'Test no extending classes',
     'description'  => 'Module testing no extending classes',
     'thumbnail'    => 'picture.png',
     'version'      => '1.0',
     'author'       => 'OXID eSales AG',
-);
+];

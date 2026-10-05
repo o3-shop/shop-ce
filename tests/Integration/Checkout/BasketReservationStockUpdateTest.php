@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Checkout;
 
 use OxidEsales\EshopCommunity\Core\ShopIdCalculator;
@@ -30,8 +32,8 @@ class BasketReservationStockUpdateTest extends \OxidTestCase
     /**
      * Make a copy of Stewart+Brown Shirt Kisser Fish parent and variant L violet for testing
      */
-    const SOURCE_ARTICLE_ID = '6b6d966c899dd9977e88f842f67eb751';
-    const SOURCE_ARTICLE_PARENT_ID = '6b6099c305f591cb39d4314e9a823fc1';
+    public const SOURCE_ARTICLE_ID = '6b6d966c899dd9977e88f842f67eb751';
+    public const SOURCE_ARTICLE_PARENT_ID = '6b6099c305f591cb39d4314e9a823fc1';
 
     /**
      * Generated test article, test user and order ids.
@@ -166,7 +168,7 @@ class BasketReservationStockUpdateTest extends \OxidTestCase
      */
     public function testPlaceOrderWithBasketTimeout()
     {
-        $stock     = 60;
+        $stock = 60;
         $buyAmount = 20;
 
         $this->setStock($stock);
@@ -199,7 +201,7 @@ class BasketReservationStockUpdateTest extends \OxidTestCase
         $orderArticles = $orderMain->getOrderArticles();
 
         //relevant code from oxorder::_addOrderArticlesToBasket
-        $orderBasketContents = array();
+        $orderBasketContents = [];
         foreach ($orderArticles as $orderArticle) {
             $orderBasketContents[] = $orderBasket->addOrderArticleToBasket($orderArticle);
         }
@@ -440,11 +442,11 @@ class BasketReservationStockUpdateTest extends \OxidTestCase
      */
     private function createOrder()
     {
-        $order = $this->getMock(\OxidEsales\Eshop\Application\Model\Order::class, array(
+        $order = $this->getMock(\OxidEsales\Eshop\Application\Model\Order::class, [
             'validateDeliveryAddress',
             '_sendOrderByEmail',
             'validatePayment',
-        ));
+        ]);
         // sending order by email is always successful for tests
         $order->expects($this->any())->method('_sendOrderByEmail')->will($this->returnValue(1));
         //mocked to circumvent delivery address change md5 check from requestParameter
@@ -617,8 +619,8 @@ class BasketReservationStockUpdateTest extends \OxidTestCase
                 'aid ' => $this->testArticleId,
                 'basketitemid' => $basket->getItemKey($this->testArticleId),
                 'override' => 1,
-                'am' => $countBefore]
-            ]
+                'am' => $countBefore],
+            ],
         ];
 
         //try to be as close to the checkout as possible
@@ -648,7 +650,7 @@ class BasketReservationStockUpdateTest extends \OxidTestCase
             'fnc' => 'tobasket',
             'aid' => $this->testArticleId,
             'anid' => $this->testArticleId,
-            'am' => 1
+            'am' => 1,
         ];
 
         //try to be as close to the checkout as possible

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -34,7 +35,7 @@ return [
         'OXTPRICE' => 0,
         'OXUNITNAME' => '',
         'OXUNITQUANTITY' => 0,
-        'OXVAT' => NULL,
+        'OXVAT' => null,
         'OXWEIGHT' => 0,
         'OXSTOCK' => 0,
         'OXSTOCKFLAG' => 1,
@@ -263,7 +264,7 @@ return [
         'OXTPRICE' => 0,
         'OXUNITNAME' => 'kg',
         'OXUNITQUANTITY' => 2,
-        'OXVAT' => NULL,
+        'OXVAT' => null,
         'OXWEIGHT' => 2,
         'OXSTOCK' => 15,
         'OXSTOCKFLAG' => 1,
@@ -312,7 +313,7 @@ return [
         'OXTPRICE' => 0,
         'OXUNITNAME' => '',
         'OXUNITQUANTITY' => 0,
-        'OXVAT' => NULL,
+        'OXVAT' => null,
         'OXWEIGHT' => 0,
         'OXSTOCK' => 0,
         'OXSTOCKFLAG' => 1,
@@ -361,7 +362,7 @@ return [
         'OXTPRICE' => 0,
         'OXUNITNAME' => '',
         'OXUNITQUANTITY' => 0,
-        'OXVAT' => NULL,
+        'OXVAT' => null,
         'OXWEIGHT' => 0,
         'OXSTOCK' => 5,
         'OXSTOCKFLAG' => 1,
@@ -410,7 +411,7 @@ return [
         'OXTPRICE' => 0,
         'OXUNITNAME' => '',
         'OXUNITQUANTITY' => 0,
-        'OXVAT' => NULL,
+        'OXVAT' => null,
         'OXWEIGHT' => 0,
         'OXSTOCK' => 5,
         'OXSTOCKFLAG' => 1,

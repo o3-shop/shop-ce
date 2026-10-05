@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -20,9 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Codeception;
 
+use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidEsales\Codeception\Step\ProductNavigation;
 use OxidEsales\Codeception\Step\Start;
-use OxidEsales\Codeception\Module\Translation\Translator;
 
 class ProductCompareCest
 {
@@ -40,7 +41,7 @@ class ProductCompareCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 € *'
+            'price' => '50,00 € *',
         ];
 
         $userData = $this->getExistingUserData();
@@ -56,12 +57,12 @@ class ProductCompareCest
 
         $userAccountPage = $detailsPage->openAccountPage();
         $I->see(Translator::translate('MY_PRODUCT_COMPARISON'));
-        $I->see(Translator::translate('PRODUCT').' 1');
+        $I->see(Translator::translate('PRODUCT') . ' 1');
 
         $userAccountPage = $userAccountPage->logoutUserInAccountPage()
             ->login($userData['userLoginName'], $userData['userPassword']);
         $I->see(Translator::translate('MY_PRODUCT_COMPARISON'));
-        $I->see(Translator::translate('PRODUCT').' 1');
+        $I->see(Translator::translate('PRODUCT') . ' 1');
 
         //open details page
         $detailsPage = $productNavigation->openProductDetailsPage($productData['id']);
@@ -86,21 +87,21 @@ class ProductCompareCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 € *'
+            'price' => '50,00 € *',
         ];
 
         $productData2 = [
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
             'description' => 'Test product 1 short desc [EN] šÄßüл',
-            'price' => '100,00 € *'
+            'price' => '100,00 € *',
         ];
 
         $productData3 = [
             'id' => '10014',
             'title' => '14 EN product šÄßüл',
             'description' => '13 EN description šÄßüл',
-            'price' => 'from 15,00 € *'
+            'price' => 'from 15,00 € *',
         ];
 
         $userData = $this->getExistingUserData();
@@ -142,13 +143,13 @@ class ProductCompareCest
         $I->see($productData2['title'], $detailsPage->productTitle);
         $comparePage = $detailsPage->openProductComparePage();
 
-        $comparePage->seeProductAttributeName('Test attribute 1 [EN] šÄßüл:',1);
+        $comparePage->seeProductAttributeName('Test attribute 1 [EN] šÄßüл:', 1);
         $comparePage->seeProductAttributeValue('attr value 1 [EN] šÄßüл', 1, 1);
         $comparePage->seeProductAttributeValue('attr value 11 [EN] šÄßüл', 1, 2);
-        $comparePage->seeProductAttributeName('Test attribute 3 [EN] šÄßüл:',2);
+        $comparePage->seeProductAttributeName('Test attribute 3 [EN] šÄßüл:', 2);
         $comparePage->seeProductAttributeValue('attr value 3 [EN] šÄßüл', 2, 1);
         $comparePage->seeProductAttributeValue('attr value 3 [EN] šÄßüл', 2, 2);
-        $comparePage->seeProductAttributeName('Test attribute 2 [EN] šÄßüл:',3);
+        $comparePage->seeProductAttributeName('Test attribute 2 [EN] šÄßüл:', 3);
         $comparePage->seeProductAttributeValue('attr value 2 [EN] šÄßüл', 3, 1);
         $comparePage->seeProductAttributeValue('attr value 12 [EN] šÄßüл', 3, 2);
 
@@ -164,7 +165,6 @@ class ProductCompareCest
         $comparePage->removeProductFromList($productData2['id']);
         $comparePage->removeProductFromList($productData3['id']);
         $I->see(Translator::translate('MESSAGE_SELECT_AT_LEAST_ONE_PRODUCT'));
-
     }
 
     /**
@@ -179,13 +179,13 @@ class ProductCompareCest
         $I->wantToTest('if product compare functionality is correctly disabled');
 
         //(Use product compare) is disabled
-        $I->updateConfigInDatabase('bl_showCompareList', false, "bool");
+        $I->updateConfigInDatabase('bl_showCompareList', false, 'bool');
 
         $productData = [
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 € *'
+            'price' => '50,00 € *',
         ];
 
         $userData = $this->getExistingUserData();
@@ -206,7 +206,7 @@ class ProductCompareCest
 
         $I->cleanUp();
         //(Use product compare) is enabled
-        $I->updateConfigInDatabase('bl_showCompareList', true, "bool");
+        $I->updateConfigInDatabase('bl_showCompareList', true, 'bool');
     }
 
     public function _failed(AcceptanceTester $I)
@@ -219,5 +219,4 @@ class ProductCompareCest
     {
         return \Codeception\Util\Fixtures::get('existingUser');
     }
-
 }

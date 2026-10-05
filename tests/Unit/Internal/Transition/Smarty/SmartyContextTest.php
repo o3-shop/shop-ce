@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -35,7 +37,7 @@ class SmartyContextTest extends \PHPUnit\Framework\TestCase
             [4, true],
             [6, false],
             ['two', false],
-            ['5', false]
+            ['5', false],
         ];
     }
 

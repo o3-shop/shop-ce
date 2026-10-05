@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,14 +18,15 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Smarty;
 
-use \stdClass;
-use \oxException;
-use \oxRegistry;
-use \oxTestModules;
+use oxException;
+use oxRegistry;
+use oxTestModules;
+use stdClass;
 
-$filePath = oxRegistry::getConfig()->getConfigParam('sShopDir').'Core/Smarty/Plugin/prefilter.oxblock.php';
+$filePath = oxRegistry::getConfig()->getConfigParam('sShopDir') . 'Core/Smarty/Plugin/prefilter.oxblock.php';
 if (file_exists($filePath)) {
     require_once $filePath;
 } else {
@@ -45,17 +47,17 @@ class PluginSmartyOxBlockTest extends \OxidTestCase
 
         $this->getConfig()->setConfigParam('blDebugTemplateBlocks', false);
 
-        $oUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, array('getTemplateBlocks'));
+        $oUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, ['getTemplateBlocks']);
         $oUtilsView->expects($this->once())->method('getTemplateBlocks')
                 ->with($this->equalTo('testfile.tpl'))
                 ->will(
                     $this->returnValue(
-                        array(
-                            'test1' => array('block content 1 [{block name="test1_2"}]orig test1_2[{/block}]'),
-                            'test1_2' => array('<<[{$smarty.block.parent}]>>'),
-                            'test2' => array('[[[{$smarty.block.parent}]]]'),
-                            'test3' => array('<prep>[{$smarty.block.parent}]', '[{$smarty.block.parent}]<app>'),
-                        )
+                        [
+                            'test1' => ['block content 1 [{block name="test1_2"}]orig test1_2[{/block}]'],
+                            'test1_2' => ['<<[{$smarty.block.parent}]>>'],
+                            'test2' => ['[[[{$smarty.block.parent}]]]'],
+                            'test3' => ['<prep>[{$smarty.block.parent}]', '[{$smarty.block.parent}]<app>'],
+                        ]
                     )
                 );
 
@@ -77,7 +79,7 @@ class PluginSmartyOxBlockTest extends \OxidTestCase
      */
     public function testSmarty2NoDebugErrorHandling()
     {
-        $oSmartyCompiler = $this->getMock('stdclass', array('_syntax_error'));
+        $oSmartyCompiler = $this->getMock('stdclass', ['_syntax_error']);
         $oSmartyCompiler->expects($this->once())->method('_syntax_error')
                 ->with(
                     $this->equalTo('block tags mismatch (or there are more than 500 blocks in one file).'),
@@ -91,14 +93,14 @@ class PluginSmartyOxBlockTest extends \OxidTestCase
 
         $this->getConfig()->setConfigParam('blDebugTemplateBlocks', false);
 
-        $oUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, array('getTemplateBlocks'));
+        $oUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, ['getTemplateBlocks']);
         $oUtilsView->expects($this->once())->method('getTemplateBlocks')
                 ->with($this->equalTo('testfile.tpl'))
                 ->will(
                     $this->returnValue(
-                        array(
-                            'test1' => array('[{block name="test1"}]looping[{/block}]'),
-                        )
+                        [
+                            'test1' => ['[{block name="test1"}]looping[{/block}]'],
+                        ]
                     )
                 );
 
@@ -126,62 +128,62 @@ class PluginSmartyOxBlockTest extends \OxidTestCase
 
         $this->getConfig()->setConfigParam('blDebugTemplateBlocks', true);
 
-        $oUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, array('getTemplateBlocks'));
+        $oUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, ['getTemplateBlocks']);
         $oUtilsView->expects($this->once())->method('getTemplateBlocks')
                 ->with($this->equalTo('testfile.tpl'))
                 ->will(
                     $this->returnValue(
-                        array(
-                            'test1' => array('block content 1 [{block name="test1_2"}]orig test1_2[{/block}]'),
-                            'test1_2' => array('<<[{$smarty.block.parent}]>>'),
-                            'test2' => array('[[[{$smarty.block.parent}]]]'),
-                            'test3' => array('<prep>[{$smarty.block.parent}]', '[{$smarty.block.parent}]<app>'),
-                        )
+                        [
+                            'test1' => ['block content 1 [{block name="test1_2"}]orig test1_2[{/block}]'],
+                            'test1_2' => ['<<[{$smarty.block.parent}]>>'],
+                            'test2' => ['[[[{$smarty.block.parent}]]]'],
+                            'test3' => ['<prep>[{$smarty.block.parent}]', '[{$smarty.block.parent}]<app>'],
+                        ]
                     )
                 );
 
         oxTestModules::addModuleObject('oxUtilsView', $oUtilsView);
 
         $this->assertEquals(
-            '[{capture name="_dbg_blocks"}]'.
-                'blocknotset '.
-            '[{/capture}]'.
-            '[{math equation="rand()" assign="_dbg_block_idr1"}]'.
-            '[{math equation="rand()" assign="_dbg_block_idr2"}]'.
-            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="block_1838478057_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]" title="testfile.tpl-&gt;blocknotset">'.
-                '[{$smarty.capture._dbg_blocks}]'.
-            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksEnd" title="block_1838478057_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]">'.
+            '[{capture name="_dbg_blocks"}]' .
+                'blocknotset ' .
+            '[{/capture}]' .
+            '[{math equation="rand()" assign="_dbg_block_idr1"}]' .
+            '[{math equation="rand()" assign="_dbg_block_idr2"}]' .
+            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="block_1838478057_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]" title="testfile.tpl-&gt;blocknotset">' .
+                '[{$smarty.capture._dbg_blocks}]' .
+            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksEnd" title="block_1838478057_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]">' .
 
-            '[{capture name="_dbg_blocks"}]'.
-                '[[<b2>'.
-                '[{capture name="_dbg_blocks"}]'.
-                    'block content 1 '.
-                    '[{capture name="_dbg_blocks"}]'.
-                       '<<orig test1_2>>'.
-                    '[{/capture}]'.
-                    '[{math equation="rand()" assign="_dbg_block_idr1"}][{math equation="rand()" assign="_dbg_block_idr2"}]'.
-                    '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="block_3673087697_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]" title="testfile.tpl-&gt;test1_2">'.
-                    '[{$smarty.capture._dbg_blocks}]'.''.
-                    '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksEnd" title="block_3673087697_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]">'.
-                '[{/capture}]'.
-                '[{math equation="rand()" assign="_dbg_block_idr1"}][{math equation="rand()" assign="_dbg_block_idr2"}]'.
-                '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="block_3171795629_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]" title="testfile.tpl-&gt;test1">'.
-                '[{$smarty.capture._dbg_blocks}]'.
-                '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksEnd" title="block_3171795629_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]">'.
+            '[{capture name="_dbg_blocks"}]' .
+                '[[<b2>' .
+                '[{capture name="_dbg_blocks"}]' .
+                    'block content 1 ' .
+                    '[{capture name="_dbg_blocks"}]' .
+                       '<<orig test1_2>>' .
+                    '[{/capture}]' .
+                    '[{math equation="rand()" assign="_dbg_block_idr1"}][{math equation="rand()" assign="_dbg_block_idr2"}]' .
+                    '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="block_3673087697_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]" title="testfile.tpl-&gt;test1_2">' .
+                    '[{$smarty.capture._dbg_blocks}]' . '' .
+                    '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksEnd" title="block_3673087697_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]">' .
+                '[{/capture}]' .
+                '[{math equation="rand()" assign="_dbg_block_idr1"}][{math equation="rand()" assign="_dbg_block_idr2"}]' .
+                '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="block_3171795629_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]" title="testfile.tpl-&gt;test1">' .
+                '[{$smarty.capture._dbg_blocks}]' .
+                '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksEnd" title="block_3171795629_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]">' .
 
-                '</b2>]]'.
-            '[{/capture}]'.
-            '[{math equation="rand()" assign="_dbg_block_idr1"}][{math equation="rand()" assign="_dbg_block_idr2"}]'.
-            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="block_604279575_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]" title="testfile.tpl-&gt;test2">'.
-            '[{$smarty.capture._dbg_blocks}]'.
-            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksEnd" title="block_604279575_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]">'.
+                '</b2>]]' .
+            '[{/capture}]' .
+            '[{math equation="rand()" assign="_dbg_block_idr1"}][{math equation="rand()" assign="_dbg_block_idr2"}]' .
+            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="block_604279575_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]" title="testfile.tpl-&gt;test2">' .
+            '[{$smarty.capture._dbg_blocks}]' .
+            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksEnd" title="block_604279575_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]">' .
 
-            '[{capture name="_dbg_blocks"}]'.
-                '<prep><b3/><app>'.
-            '[{/capture}]'.
-            '[{math equation="rand()" assign="_dbg_block_idr1"}][{math equation="rand()" assign="_dbg_block_idr2"}]'.
-            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="block_1392747393_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]" title="testfile.tpl-&gt;test3">'.
-            '[{$smarty.capture._dbg_blocks}]'.
+            '[{capture name="_dbg_blocks"}]' .
+                '<prep><b3/><app>' .
+            '[{/capture}]' .
+            '[{math equation="rand()" assign="_dbg_block_idr1"}][{math equation="rand()" assign="_dbg_block_idr2"}]' .
+            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="block_1392747393_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]" title="testfile.tpl-&gt;test3">' .
+            '[{$smarty.capture._dbg_blocks}]' .
             '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksEnd" title="block_1392747393_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]">',
             smarty_prefilter_oxblock(
                 '[{block name="blocknotset"}]blocknotset [{/block}][{block name="test2"}]<b2>[{block name="test1"}]<b1/>[{/block}]</b2>[{/block}][{block name="test3"}]<b3/>[{/block}]',
@@ -189,9 +191,6 @@ class PluginSmartyOxBlockTest extends \OxidTestCase
             )
         );
     }
-
-
-
 
     /**
      * test case for smarty 3 with no dbg output
@@ -206,38 +205,38 @@ class PluginSmartyOxBlockTest extends \OxidTestCase
 
         $this->getConfig()->setConfigParam('blDebugTemplateBlocks', false);
 
-        $oUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, array('getTemplateBlocks'));
+        $oUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, ['getTemplateBlocks']);
         $oUtilsView->expects($this->once())->method('getTemplateBlocks')
                 ->with($this->equalTo('testfile.tpl'))
                 ->will(
                     $this->returnValue(
-                        array(
-                            'test1' => array('block content 1 [{block name="test1_2"}]orig test1_2[{/block}]'),
-                            'test1_2' => array('<<[{$smarty.block.parent}]>>'),
-                            'test2' => array('[[[{$smarty.block.parent}]]]'),
-                            'test3' => array('<prep>[{$smarty.block.parent}]', '[{$smarty.block.parent}]<app>'),
-                        )
+                        [
+                            'test1' => ['block content 1 [{block name="test1_2"}]orig test1_2[{/block}]'],
+                            'test1_2' => ['<<[{$smarty.block.parent}]>>'],
+                            'test2' => ['[[[{$smarty.block.parent}]]]'],
+                            'test3' => ['<prep>[{$smarty.block.parent}]', '[{$smarty.block.parent}]<app>'],
+                        ]
                     )
                 );
 
         oxTestModules::addModuleObject('oxUtilsView', $oUtilsView);
 
         $this->assertEquals(
-            '[{block name="blocknotset"}]'.
-                'blocknotset '.
-            '[{/block}]'.
-            '[{block name="test2"}]'.
-                '[[<b2>'.
-                '[{block name="test1"}]'.
-                    'block content 1 '.
-                    '[{block name="test1_2"}]'.
-                        '<<orig test1_2>>'.
-                    '[{/block}]'.
-                '[{/block}]'.
-                '</b2>]]'.
-            '[{/block}]'.
-            '[{block name="test3"}]'.
-                '<prep><b3/><app>'.
+            '[{block name="blocknotset"}]' .
+                'blocknotset ' .
+            '[{/block}]' .
+            '[{block name="test2"}]' .
+                '[[<b2>' .
+                '[{block name="test1"}]' .
+                    'block content 1 ' .
+                    '[{block name="test1_2"}]' .
+                        '<<orig test1_2>>' .
+                    '[{/block}]' .
+                '[{/block}]' .
+                '</b2>]]' .
+            '[{/block}]' .
+            '[{block name="test3"}]' .
+                '<prep><b3/><app>' .
             '[{/block}]',
             smarty_prefilter_oxblock(
                 '[{block name="blocknotset"}]blocknotset [{/block}][{block name="test2"}]<b2>[{block name="test1"}]<b1/>[{/block}]</b2>[{/block}][{block name="test3"}]<b3/>[{/block}]',
@@ -253,7 +252,7 @@ class PluginSmartyOxBlockTest extends \OxidTestCase
      */
     public function testSmarty3NoDebugErrorHandling()
     {
-        $oSmartyCompiler = $this->getMock('stdclass', array('trigger_error'));
+        $oSmartyCompiler = $this->getMock('stdclass', ['trigger_error']);
         $oSmartyCompiler->expects($this->once())->method('trigger_error')
                 ->with(
                     $this->equalTo('block tags mismatch (or there are more than 500 blocks in one file).'),
@@ -266,14 +265,14 @@ class PluginSmartyOxBlockTest extends \OxidTestCase
 
         $this->getConfig()->setConfigParam('blDebugTemplateBlocks', false);
 
-        $oUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, array('getTemplateBlocks'));
+        $oUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, ['getTemplateBlocks']);
         $oUtilsView->expects($this->once())->method('getTemplateBlocks')
                 ->with($this->equalTo('testfile.tpl'))
                 ->will(
                     $this->returnValue(
-                        array(
-                            'test1' => array('[{block name="test1"}]looping[{/block}]'),
-                        )
+                        [
+                            'test1' => ['[{block name="test1"}]looping[{/block}]'],
+                        ]
                     )
                 );
 
@@ -289,8 +288,6 @@ class PluginSmartyOxBlockTest extends \OxidTestCase
         }
     }
 
-
-
     /**
      * test case for smarty 3 with dbg output
      *
@@ -304,72 +301,72 @@ class PluginSmartyOxBlockTest extends \OxidTestCase
 
         $this->getConfig()->setConfigParam('blDebugTemplateBlocks', true);
 
-        $oUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, array('getTemplateBlocks'));
+        $oUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, ['getTemplateBlocks']);
         $oUtilsView->expects($this->once())->method('getTemplateBlocks')
                 ->with($this->equalTo('testfile.tpl'))
                 ->will(
                     $this->returnValue(
-                        array(
-                            'test1' => array('block content 1 [{block name="test1_2"}]orig test1_2[{/block}]'),
-                            'test1_2' => array('<<[{$smarty.block.parent}]>>'),
-                            'test2' => array('[[[{$smarty.block.parent}]]]'),
-                            'test3' => array('<prep>[{$smarty.block.parent}]', '[{$smarty.block.parent}]<app>'),
-                        )
+                        [
+                            'test1' => ['block content 1 [{block name="test1_2"}]orig test1_2[{/block}]'],
+                            'test1_2' => ['<<[{$smarty.block.parent}]>>'],
+                            'test2' => ['[[[{$smarty.block.parent}]]]'],
+                            'test3' => ['<prep>[{$smarty.block.parent}]', '[{$smarty.block.parent}]<app>'],
+                        ]
                     )
                 );
 
         oxTestModules::addModuleObject('oxUtilsView', $oUtilsView);
 
         $this->assertEquals(
-            '[{capture name="_dbg_blocks"}]'.
-                '[{block name="blocknotset"}]'.
-                   'blocknotset '.
-                '[{/block}]'.
-            '[{/capture}]'.
-            '[{math equation="rand()" assign="_dbg_block_idr1"}]'.
-            '[{math equation="rand()" assign="_dbg_block_idr2"}]'.
-            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="block_1838478057_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]" title="testfile.tpl-&gt;blocknotset">'.
-                '[{$smarty.capture._dbg_blocks}]'.
-            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksEnd" title="block_1838478057_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]">'.
+            '[{capture name="_dbg_blocks"}]' .
+                '[{block name="blocknotset"}]' .
+                   'blocknotset ' .
+                '[{/block}]' .
+            '[{/capture}]' .
+            '[{math equation="rand()" assign="_dbg_block_idr1"}]' .
+            '[{math equation="rand()" assign="_dbg_block_idr2"}]' .
+            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="block_1838478057_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]" title="testfile.tpl-&gt;blocknotset">' .
+                '[{$smarty.capture._dbg_blocks}]' .
+            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksEnd" title="block_1838478057_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]">' .
 
-            '[{capture name="_dbg_blocks"}]'.
-                '[{block name="test2"}]'.
-                    '[[<b2>'.
-                    '[{capture name="_dbg_blocks"}]'.
-                        '[{block name="test1"}]'.
-                            'block content 1 '.
-                            '[{capture name="_dbg_blocks"}]'.
-                               '[{block name="test1_2"}]'.
-                                    '<<orig test1_2>>'.
-                                '[{/block}]'.
-                            '[{/capture}]'.
-                            '[{math equation="rand()" assign="_dbg_block_idr1"}][{math equation="rand()" assign="_dbg_block_idr2"}]'.
-                            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="block_3673087697_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]" title="testfile.tpl-&gt;test1_2">'.
-                            '[{$smarty.capture._dbg_blocks}]'.''.
-                            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksEnd" title="block_3673087697_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]">'.
-                        '[{/block}]'.
-                    '[{/capture}]'.
-                    '[{math equation="rand()" assign="_dbg_block_idr1"}][{math equation="rand()" assign="_dbg_block_idr2"}]'.
-                    '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="block_3171795629_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]" title="testfile.tpl-&gt;test1">'.
-                    '[{$smarty.capture._dbg_blocks}]'.
-                    '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksEnd" title="block_3171795629_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]">'.
+            '[{capture name="_dbg_blocks"}]' .
+                '[{block name="test2"}]' .
+                    '[[<b2>' .
+                    '[{capture name="_dbg_blocks"}]' .
+                        '[{block name="test1"}]' .
+                            'block content 1 ' .
+                            '[{capture name="_dbg_blocks"}]' .
+                               '[{block name="test1_2"}]' .
+                                    '<<orig test1_2>>' .
+                                '[{/block}]' .
+                            '[{/capture}]' .
+                            '[{math equation="rand()" assign="_dbg_block_idr1"}][{math equation="rand()" assign="_dbg_block_idr2"}]' .
+                            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="block_3673087697_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]" title="testfile.tpl-&gt;test1_2">' .
+                            '[{$smarty.capture._dbg_blocks}]' . '' .
+                            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksEnd" title="block_3673087697_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]">' .
+                        '[{/block}]' .
+                    '[{/capture}]' .
+                    '[{math equation="rand()" assign="_dbg_block_idr1"}][{math equation="rand()" assign="_dbg_block_idr2"}]' .
+                    '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="block_3171795629_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]" title="testfile.tpl-&gt;test1">' .
+                    '[{$smarty.capture._dbg_blocks}]' .
+                    '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksEnd" title="block_3171795629_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]">' .
 
-                    '</b2>]]'.
-                '[{/block}]'.
-            '[{/capture}]'.
-            '[{math equation="rand()" assign="_dbg_block_idr1"}][{math equation="rand()" assign="_dbg_block_idr2"}]'.
-            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="block_604279575_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]" title="testfile.tpl-&gt;test2">'.
-            '[{$smarty.capture._dbg_blocks}]'.
-            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksEnd" title="block_604279575_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]">'.
+                    '</b2>]]' .
+                '[{/block}]' .
+            '[{/capture}]' .
+            '[{math equation="rand()" assign="_dbg_block_idr1"}][{math equation="rand()" assign="_dbg_block_idr2"}]' .
+            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="block_604279575_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]" title="testfile.tpl-&gt;test2">' .
+            '[{$smarty.capture._dbg_blocks}]' .
+            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksEnd" title="block_604279575_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]">' .
 
-            '[{capture name="_dbg_blocks"}]'.
-                '[{block name="test3"}]'.
-                    '<prep><b3/><app>'.
-                '[{/block}]'.
-            '[{/capture}]'.
-            '[{math equation="rand()" assign="_dbg_block_idr1"}][{math equation="rand()" assign="_dbg_block_idr2"}]'.
-            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="block_1392747393_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]" title="testfile.tpl-&gt;test3">'.
-            '[{$smarty.capture._dbg_blocks}]'.
+            '[{capture name="_dbg_blocks"}]' .
+                '[{block name="test3"}]' .
+                    '<prep><b3/><app>' .
+                '[{/block}]' .
+            '[{/capture}]' .
+            '[{math equation="rand()" assign="_dbg_block_idr1"}][{math equation="rand()" assign="_dbg_block_idr2"}]' .
+            '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksStart" id="block_1392747393_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]" title="testfile.tpl-&gt;test3">' .
+            '[{$smarty.capture._dbg_blocks}]' .
             '<hr style="visibility:hidden;height:0;margin:0;padding:0;border:0;line-height:0;font-size:0;" class="debugBlocksEnd" title="block_1392747393_[{$_dbg_block_idr1}][{$_dbg_block_idr2}]">',
             smarty_prefilter_oxblock(
                 '[{block name="blocknotset"}]blocknotset [{/block}][{block name="test2"}]<b2>[{block name="test1"}]<b1/>[{/block}]</b2>[{/block}][{block name="test3"}]<b3/>[{/block}]',

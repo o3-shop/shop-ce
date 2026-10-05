@@ -22,48 +22,67 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
+use OxidEsales\Eshop\Application\Model\Shop;
+use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\EshopCommunity\Core\AdminNaviRights;
 use OxidEsales\EshopCommunity\Core\AdminViewSetting;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Framework\UpdateCheck\UpdateCheckServiceInterface;
 
 /**
  * Administrator GUI navigation manager class.
  */
-class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class NavigationController extends AdminController
 {
     /**
      * Executes parent method parent::render(), generates menu HTML code,
      * passes data to Smarty engine, returns name of template file "nav_frame.tpl".
      *
      * @return string
+     * @throws Exception
      */
     public function render()
     {
         parent::render();
-        $myUtilsServer = Registry::getUtilsServer();
 
-        $sItem = Registry::getConfig()->getRequestParameter("item");
+        // Make the most recent cached UpdateCheckResult available to all
+        // NavigationController renders — including header.tpl, which has no
+        // path of its own to UpdateCheckService and needs to know whether
+        // the providers were reachable last time we ran a check (to decide
+        // whether to render the manual re-check icon). _doStartUpChecks()
+        // (called below for home.tpl) may overwrite this with a freshly
+        // fetched result.
+        $cachedUpdateCheckResult = $this->getUpdateCheckService()->getCachedResult();
+        if ($cachedUpdateCheckResult !== null) {
+            $this->_aViewData['updateCheckResult'] = $cachedUpdateCheckResult;
+        }
+
+        $sItem = Registry::getRequest()->getRequestEscapedParameter('item');
         $sItem = $sItem ? basename($sItem) : false;
         if (!$sItem) {
-            $sItem = "nav_frame.tpl";
+            $sItem = 'nav_frame.tpl';
         } else {
             $oNavTree = $this->getNavigation();
 
             // set menu structure
-            $this->_aViewData["menustructure"] = $oNavTree->getDomXml()->documentElement->childNodes;
+            $this->_aViewData['menustructure'] = $oNavTree->getDomXml()->documentElement->childNodes;
 
             // version patch string
-            $this->_aViewData["sVersion"] = $this->_sShopVersion;
+            $this->_aViewData['sVersion'] = oxNew(ShopVersion::class)->getVersion();
 
             //checking requirements if this is not nav frame reload
-            if (!Registry::getConfig()->getRequestParameter("navReload")) {
+            if (!Registry::getRequest()->getRequestEscapedParameter('navReload')) {
                 // #661 execute stuff we run each time when we start admin once
                 if ('home.tpl' == $sItem) {
                     $this->_aViewData['aMessage'] = $this->_doStartUpChecks();
                 }
             } else {
                 //removing reload param to force requirements checking next time
-                Registry::getSession()->deleteVariable("navReload");
+                Registry::getSession()->deleteVariable('navReload');
             }
         }
 
@@ -71,8 +90,8 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
         $oShoplist = oxNew(\OxidEsales\Eshop\Application\Model\ShopList::class);
         if (!$blisMallAdmin) {
             // we only allow to see our shop
-            $iShopId = Registry::getSession()->getVariable("actshop");
-            $oShop = oxNew(\OxidEsales\Eshop\Application\Model\Shop::class);
+            $iShopId = Registry::getSession()->getVariable('actshop');
+            $oShop = oxNew(Shop::class);
             $oShop->load($iShopId);
             $oShoplist->add($oShop);
         } else {
@@ -92,9 +111,9 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
 
         // informing about basefrm parameters
         $this->_aViewData['loadbasefrm'] = true;
-        $this->_aViewData['listview'] = Registry::getConfig()->getRequestParameter('listview');
-        $this->_aViewData['editview'] = Registry::getConfig()->getRequestParameter('editview');
-        $this->_aViewData['actedit'] = Registry::getConfig()->getRequestParameter('actedit');
+        $this->_aViewData['listview'] = Registry::getRequest()->getRequestEscapedParameter('listview');
+        $this->_aViewData['editview'] = Registry::getRequest()->getRequestEscapedParameter('editview');
+        $this->_aViewData['actedit'] = Registry::getRequest()->getRequestEscapedParameter('actedit');
     }
 
     /**
@@ -102,10 +121,10 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     public function logout()
     {
-        $mySession = $this->getSession();
-        $myConfig = $this->getConfig();
+        $mySession = Registry::getSession();
+        $myConfig = Registry::getConfig();
 
-        $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+        $oUser = oxNew(User::class);
         $oUser->logout();
 
         // kill session
@@ -120,17 +139,17 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
     }
 
     /**
-     * Caches external url file locally, adds <base> tag with original url to load images and other links correcly
+     * Caches external url file locally, adds <base> tag with original url to load images and other links correctly
      */
     public function exturl()
     {
         $myUtils = Registry::getUtils();
-        if ($sUrl = Registry::getConfig()->getRequestParameter("url")) {
+        if ($sUrl = Registry::getRequest()->getRequestEscapedParameter('url')) {
             // Caching not allowed, redirecting
             $myUtils->redirect($sUrl, true, 302);
         }
 
-        $myUtils->showMessageAndExit("");
+        $myUtils->showMessageAndExit('');
     }
 
     /**
@@ -138,74 +157,128 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
      * returns some messages if there is something to display
      *
      * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "doStartUpChecks" in next major
+     * @throws Exception
+     * @deprecated Transitional during #107. Modules SHOULD override _doStartUpChecks()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes doStartUpChecks() to the canonical override
+      *             target and retires _doStartUpChecks(); until then, _doStartUpChecks() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _doStartUpChecks() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $messages = [];
 
-        if ($this->getConfig()->getConfigParam('blCheckSysReq') !== false) {
+        if (!empty(Registry::getConfig()->getConfigParam('blCheckSysReq', true))) {
             // check if system requirements are ok
             $oSysReq = oxNew(\OxidEsales\Eshop\Core\SystemRequirements::class);
             if (!$oSysReq->getSysReqStatus()) {
                 $messages['warning'] = Registry::getLang()->translateString('NAVIGATION_SYSREQ_MESSAGE');
-                $messages['warning'] .= '<a href="?cl=sysreq&amp;stoken=' . $this->getSession()->getSessionChallengeToken() . '" target="basefrm">';
+                $messages['warning'] .= '<a href="?cl=sysreq&amp;stoken=' . Registry::getSession()->getSessionChallengeToken() . '" target="basefrm">';
                 $messages['warning'] .= Registry::getLang()->translateString('NAVIGATION_SYSREQ_MESSAGE2') . '</a>';
             }
         } else {
             $messages['message'] = Registry::getLang()->translateString('NAVIGATION_SYSREQ_MESSAGE_INACTIVE');
-            $messages['message'] .= '<a href="?cl=sysreq&amp;stoken=' . $this->getSession()->getSessionChallengeToken() . '" target="basefrm">';
+            $messages['message'] .= '<a href="?cl=sysreq&amp;stoken=' . Registry::getSession()->getSessionChallengeToken() . '" target="basefrm">';
             $messages['message'] .= Registry::getLang()->translateString('NAVIGATION_SYSREQ_MESSAGE2') . '</a>';
         }
 
-        // version check
-        if ($this->getConfig()->getConfigParam('blCheckForUpdates')) {
-            if ($sVersionNotice = $this->_checkVersion()) {
-                $messages['message'] .= $sVersionNotice;
-            }
+        // version check via UpdateCheckService
+        $forceUpdateCheck = (bool) Registry::getRequest()->getRequestEscapedParameter('forceUpdateCheck');
+        if ($forceUpdateCheck || Registry::getConfig()->getConfigParam('blCheckForUpdates')) {
+            $updateCheckResult = $this->getUpdateCheckService()->check($forceUpdateCheck);
+            $this->_aViewData['updateCheckResult'] = $updateCheckResult;
         }
 
         // check if setup dir is deleted
-        if (file_exists($this->getConfig()->getConfigParam('sShopDir') . '/Setup/index.php')) {
-            $messages['warning'] .= ((!empty($messages['warning'])) ? "<br>" : '') . Registry::getLang()->translateString('SETUP_DIRNOTDELETED_WARNING');
+        if (file_exists(Registry::getConfig()->getConfigParam('sShopDir') . '/Setup/index.php')) {
+            $messages['warning'] .= ((!empty($messages['warning'])) ? '<br>' : '') . Registry::getLang()->translateString('SETUP_DIRNOTDELETED_WARNING');
         }
 
         // check if updateApp dir is deleted or empty
-        $sUpdateDir = $this->getConfig()->getConfigParam('sShopDir') . '/updateApp/';
+        $sUpdateDir = Registry::getConfig()->getConfigParam('sShopDir') . '/updateApp/';
         if (file_exists($sUpdateDir) && !(count(glob("$sUpdateDir/*")) === 0)) {
-            $messages['warning'] .= ((!empty($messages['warning'])) ? "<br>" : '') . Registry::getLang()->translateString('UPDATEAPP_DIRNOTDELETED_WARNING');
+            $messages['warning'] .= ((!empty($messages['warning'])) ? '<br>' : '') . Registry::getLang()->translateString('UPDATEAPP_DIRNOTDELETED_WARNING');
         }
 
         // check if config file is writable
-        $sConfPath = $this->getConfig()->getConfigParam('sShopDir') . "/config.inc.php";
+        $sConfPath = Registry::getConfig()->getConfigParam('sShopDir') . '/config.inc.php';
         if (!is_readable($sConfPath) || is_writable($sConfPath)) {
-            $messages['warning'] .= ((!empty($messages['warning'])) ? "<br>" : '') . Registry::getLang()->translateString('SETUP_CONFIGPERMISSIONS_WARNING');
+            $messages['warning'] .= ((!empty($messages['warning'])) ? '<br>' : '') . Registry::getLang()->translateString('SETUP_CONFIGPERMISSIONS_WARNING');
         }
 
         return $messages;
     }
 
     /**
+     * Every Time Admin starts we perform these checks
+     * returns some messages if there is something to display
+     *
+     * @return array
+     * @throws Exception
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _doStartUpChecks(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make doStartUpChecks() the canonical override target.
+     */
+    protected function doStartUpChecks()
+    {
+        return $this->_doStartUpChecks();
+    }
+
+    /**
      * Checks if newer shop version available. If true - returns message
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "checkVersion" in next major
+     * @throws Exception
+     * @deprecated Transitional during #107. Modules SHOULD override _checkVersion()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes checkVersion() to the canonical override
+      *             target and retires _checkVersion(); until then, _checkVersion() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _checkVersion() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $edition = $this->getConfig()->getEdition();
-        $query = 'http://admin.oxid-esales.com/' . $edition . '/onlinecheck.php?getlatestversion';
-        $latestVersion = Registry::getUtilsFile()->readRemoteFileAsString($query);
-        if ($latestVersion) {
-            $currentVersion = $this->getConfig()->getVersion();
-            if (version_compare($currentVersion, $latestVersion, '<')) {
-                return sprintf(
-                    Registry::getLang()->translateString('NAVIGATION_NEW_VERSION_AVAILABLE'),
-                    $currentVersion,
-                    $latestVersion
-                );
-            }
+        $result = $this->getUpdateCheckService()->check();
+
+        if ($result->isCoreUpdateAvailable()) {
+            $currentVersion = oxNew(ShopVersion::class)->getVersion();
+            return sprintf(
+                Registry::getLang()->translateString('NAVIGATION_NEW_VERSION_AVAILABLE'),
+                $currentVersion,
+                $result->getLatestCoreVersion()
+            );
         }
+    }
+
+    /**
+     * Checks if newer shop version available. If true - returns message
+     *
+     * @return string|void
+     * @throws Exception
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _checkVersion(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make checkVersion() the canonical override target.
+     */
+    protected function checkVersion()
+    {
+        return $this->_checkVersion();
+    }
+
+    /**
+     * @return UpdateCheckServiceInterface
+     */
+    protected function getUpdateCheckService(): UpdateCheckServiceInterface
+    {
+        return ContainerFactory::getInstance()
+            ->getContainer()
+            ->get(UpdateCheckServiceInterface::class);
     }
 
     public function canHaveRestrictedView()

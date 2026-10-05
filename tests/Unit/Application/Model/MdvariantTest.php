@@ -1,14 +1,15 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
 /**
@@ -25,7 +27,6 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
  */
 class MdvariantTest extends \OxidTestCase
 {
-
     /**
      * OxMdVariant
      *
@@ -42,70 +43,70 @@ class MdvariantTest extends \OxidTestCase
     {
         parent::setUp();
 
-        $aNames = array("Red|S|Silk",
-                        "Red|M|Silk",
-                        "Red|M|Wool",
-                        "Red|L|Silk",
-                        "Red|L|Wool",
-                        "Blue|S|Silk",
-                        "Blue|M|Silk",
-                        "Blue|M|Wool",
-                        "Blue|L|Silk",
-                        "Blue|L|Wool",
-                        "Green|S|Silk",
-                        "Green|S|Wool",
-                        "Green|M|Silk",
-                        "Green|M|Wool",
-                        "Yellow|XL|Leather",
-                        "Magenta|S|Wool",
-                        "Magenta|S|Silk"
-        );
+        $aNames = ['Red|S|Silk',
+                        'Red|M|Silk',
+                        'Red|M|Wool',
+                        'Red|L|Silk',
+                        'Red|L|Wool',
+                        'Blue|S|Silk',
+                        'Blue|M|Silk',
+                        'Blue|M|Wool',
+                        'Blue|L|Silk',
+                        'Blue|L|Wool',
+                        'Green|S|Silk',
+                        'Green|S|Wool',
+                        'Green|M|Silk',
+                        'Green|M|Wool',
+                        'Yellow|XL|Leather',
+                        'Magenta|S|Wool',
+                        'Magenta|S|Silk',
+        ];
 
-        $aPrices = array(1, 1, 1, 1, 2, 3, 4, 4, 4, 4, 4, 4, 5, 5, 1, 2, 3);
-        $aArtIds = array("id01",
-                         "id02",
-                         "id03",
-                         "id04",
-                         "id05",
-                         "id06",
-                         "id07",
-                         "id08",
-                         "id09",
-                         "id10",
-                         "id11",
-                         "id12",
-                         "id13",
-                         "id14",
-                         "id15",
-                         "id16",
-                         "id17",
-        );
+        $aPrices = [1, 1, 1, 1, 2, 3, 4, 4, 4, 4, 4, 4, 5, 5, 1, 2, 3];
+        $aArtIds = ['id01',
+                         'id02',
+                         'id03',
+                         'id04',
+                         'id05',
+                         'id06',
+                         'id07',
+                         'id08',
+                         'id09',
+                         'id10',
+                         'id11',
+                         'id12',
+                         'id13',
+                         'id14',
+                         'id15',
+                         'id16',
+                         'id17',
+        ];
 
-        $aLinks = array("ld01",
-                        "ld02",
-                        "ld03",
-                        "ld04",
-                        "ld05",
-                        "ld06",
-                        "ld07",
-                        "ld08",
-                        "ld09",
-                        "ld10",
-                        "ld11",
-                        "ld12",
-                        "ld13",
-                        "ld14",
-                        "ld15",
-                        "ld16",
-                        "ld17",
-        );
+        $aLinks = ['ld01',
+                        'ld02',
+                        'ld03',
+                        'ld04',
+                        'ld05',
+                        'ld06',
+                        'ld07',
+                        'ld08',
+                        'ld09',
+                        'ld10',
+                        'ld11',
+                        'ld12',
+                        'ld13',
+                        'ld14',
+                        'ld15',
+                        'ld16',
+                        'ld17',
+        ];
 
-        $this->_oSubj = $this->getProxyClass("oxMdVariant");
+        $this->_oSubj = $this->getProxyClass('oxMdVariant');
         $iC = count($aNames);
         for ($i = 0; $i < $iC; $i++) {
             $this->_oSubj->addNames(
                 $aArtIds[$i],
-                explode("|", $aNames[$i]),
+                explode('|', $aNames[$i]),
                 $aPrices[$i],
                 $aLinks[$i]
             );
@@ -119,8 +120,8 @@ class MdvariantTest extends \OxidTestCase
      */
     public function testSetGetId()
     {
-        $this->_oSubj->setId("testId");
-        $this->assertEquals("testId", $this->_oSubj->getId());
+        $this->_oSubj->setId('testId');
+        $this->assertEquals('testId', $this->_oSubj->getId());
     }
 
     /**
@@ -130,8 +131,8 @@ class MdvariantTest extends \OxidTestCase
      */
     public function testSetGetParentId()
     {
-        $this->_oSubj->setParentId("testParentId");
-        $this->assertEquals("testParentId", $this->_oSubj->getParentId());
+        $this->_oSubj->setParentId('testParentId');
+        $this->assertEquals('testParentId', $this->_oSubj->getParentId());
     }
 
     /**
@@ -141,10 +142,10 @@ class MdvariantTest extends \OxidTestCase
      */
     public function testAddNames1()
     {
-        $this->_oSubj->addNames("testId", array("Yellow", "M", "Wool"), 5, "testLink");
-        $this->assertEquals($this->_oSubj->getMdSubvariantByName("Yellow")->getMdSubvariantByName("M")->getMdSubvariantByName("Wool")->getDPrice(), 5);
-        $this->assertEquals($this->_oSubj->getMdSubvariantByName("Yellow")->getMdSubvariantByName("M")->getMdSubvariantByName("Wool")->getArticleId(), "testId");
-        $this->assertEquals($this->_oSubj->getMdSubvariantByName("Yellow")->getMdSubvariantByName("M")->getMdSubvariantByName("Wool")->getLink(), "testLink");
+        $this->_oSubj->addNames('testId', ['Yellow', 'M', 'Wool'], 5, 'testLink');
+        $this->assertEquals($this->_oSubj->getMdSubvariantByName('Yellow')->getMdSubvariantByName('M')->getMdSubvariantByName('Wool')->getDPrice(), 5);
+        $this->assertEquals($this->_oSubj->getMdSubvariantByName('Yellow')->getMdSubvariantByName('M')->getMdSubvariantByName('Wool')->getArticleId(), 'testId');
+        $this->assertEquals($this->_oSubj->getMdSubvariantByName('Yellow')->getMdSubvariantByName('M')->getMdSubvariantByName('Wool')->getLink(), 'testLink');
     }
 
     /**
@@ -154,9 +155,9 @@ class MdvariantTest extends \OxidTestCase
      */
     public function testAddNames2()
     {
-        $oSubVariant = $this->_oSubj->getMdSubvariantByName("Blue")->getMdSubvariantByName("M");
-        $oNewSubVariant = $this->_oSubj->addNames("testId", array("Blue", "M", "Test"), 5, "testLink");
-        $this->assertEquals($this->_oSubj->getMdSubvariantByName("Blue")->getMdSubvariantByName("M")->getMdSubvariantByName("Test")->getParentId(), $oSubVariant->getId());
+        $oSubVariant = $this->_oSubj->getMdSubvariantByName('Blue')->getMdSubvariantByName('M');
+        $oNewSubVariant = $this->_oSubj->addNames('testId', ['Blue', 'M', 'Test'], 5, 'testLink');
+        $this->assertEquals($this->_oSubj->getMdSubvariantByName('Blue')->getMdSubvariantByName('M')->getMdSubvariantByName('Test')->getParentId(), $oSubVariant->getId());
         $this->assertTrue((bool) $oSubVariant->getId());
     }
 
@@ -168,13 +169,13 @@ class MdvariantTest extends \OxidTestCase
     public function testSetGetMdSubvariants()
     {
         $oVariant1 = oxNew('oxMdVariant');
-        $oVariant1->setName("testas1");
+        $oVariant1->setName('testas1');
 
         $oVariant2 = oxNew('oxMdVariant');
-        $oVariant2->setName("testas2");
+        $oVariant2->setName('testas2');
 
-        $this->_oSubj->setMdSubvariants(array($oVariant1, $oVariant2));
-        $this->assertEquals(array($oVariant1, $oVariant2), $this->_oSubj->getMdSubvariants());
+        $this->_oSubj->setMdSubvariants([$oVariant1, $oVariant2]);
+        $this->assertEquals([$oVariant1, $oVariant2], $this->_oSubj->getMdSubvariants());
     }
 
     /**
@@ -185,12 +186,12 @@ class MdvariantTest extends \OxidTestCase
     public function testAddMdSubvariant()
     {
         $oVariant1 = oxNew('oxMdVariant');
-        $oVariant1->setName("testas1");
-        $oVariant1->setId("testId1");
+        $oVariant1->setName('testas1');
+        $oVariant1->setId('testId1');
 
         $this->_oSubj->UNITaddMdSubvariant($oVariant1);
 
-        $this->assertEquals($oVariant1, $this->_oSubj->getMdSubvariantByName("testas1"));
+        $this->assertEquals($oVariant1, $this->_oSubj->getMdSubvariantByName('testas1'));
     }
 
     /**
@@ -201,12 +202,12 @@ class MdvariantTest extends \OxidTestCase
     public function testGetFirstMdSubvariant()
     {
         $oVariant1 = oxNew('oxMdVariant');
-        $oVariant1->setName("testas1");
+        $oVariant1->setName('testas1');
 
         $oVariant2 = oxNew('oxMdVariant');
-        $oVariant2->setName("testas2");
+        $oVariant2->setName('testas2');
 
-        $this->_oSubj->setMdSubvariants(array($oVariant1, $oVariant2));
+        $this->_oSubj->setMdSubvariants([$oVariant1, $oVariant2]);
         $this->assertSame($oVariant1, $this->_oSubj->getFirstMdSubvariant());
     }
 
@@ -217,7 +218,7 @@ class MdvariantTest extends \OxidTestCase
      */
     public function testGetMdSubvariantByName()
     {
-        $this->assertSame($this->_oSubj->getFirstMdSubvariant(), $this->_oSubj->getMdSubvariantByName("Red"));
+        $this->assertSame($this->_oSubj->getFirstMdSubvariant(), $this->_oSubj->getMdSubvariantByName('Red'));
     }
 
     /**
@@ -227,11 +228,11 @@ class MdvariantTest extends \OxidTestCase
      */
     public function testGetMdSubvariantByNameCreatesNew()
     {
-        $oGreen = $this->_oSubj->getMdSubvariantByName("Green");
-        $oVariant = $oGreen->getMdSubvariantByName("XXL");
+        $oGreen = $this->_oSubj->getMdSubvariantByName('Green');
+        $oVariant = $oGreen->getMdSubvariantByName('XXL');
         $this->assertNotNull($oVariant);
         $this->assertEquals(32, strlen($oVariant->getId()));
-        $this->assertEquals($oGreen->getId(), $oGreen->getMdSubvariantByName("XXL")->getParentId());
+        $this->assertEquals($oGreen->getId(), $oGreen->getMdSubvariantByName('XXL')->getParentId());
     }
 
     /**
@@ -241,10 +242,10 @@ class MdvariantTest extends \OxidTestCase
      */
     public function testGetArticleId()
     {
-        $this->assertEquals("id01", $this->_oSubj->getArticleId());
-        $this->assertEquals("id11", $this->_oSubj->getMdSubvariantByName("Green")->getArticleId());
-        $this->assertEquals("id11", $this->_oSubj->getMdSubvariantByName("Green")->getMdSubvariantByName("S")->getArticleId());
-        $this->assertEquals("id11", $this->_oSubj->getMdSubvariantByName("Green")->getMdSubvariantByName("S")->getMdSubvariantByName("Silk")->getArticleId());
+        $this->assertEquals('id01', $this->_oSubj->getArticleId());
+        $this->assertEquals('id11', $this->_oSubj->getMdSubvariantByName('Green')->getArticleId());
+        $this->assertEquals('id11', $this->_oSubj->getMdSubvariantByName('Green')->getMdSubvariantByName('S')->getArticleId());
+        $this->assertEquals('id11', $this->_oSubj->getMdSubvariantByName('Green')->getMdSubvariantByName('S')->getMdSubvariantByName('Silk')->getArticleId());
     }
 
     /**
@@ -254,8 +255,8 @@ class MdvariantTest extends \OxidTestCase
      */
     public function testHasArticleId()
     {
-        $this->assertTrue($this->_oSubj->hasArticleId("id10"));
-        $this->assertTrue($this->_oSubj->hasArticleId("id11"));
+        $this->assertTrue($this->_oSubj->hasArticleId('id10'));
+        $this->assertTrue($this->_oSubj->hasArticleId('id11'));
     }
 
     /**
@@ -265,7 +266,7 @@ class MdvariantTest extends \OxidTestCase
      */
     public function testHasArticleIdNot()
     {
-        $this->assertFalse($this->_oSubj->hasArticleId("id25"));
+        $this->assertFalse($this->_oSubj->hasArticleId('id25'));
     }
 
     /**
@@ -275,10 +276,10 @@ class MdvariantTest extends \OxidTestCase
      */
     public function testGetLink()
     {
-        $this->assertEquals("ld01", $this->_oSubj->getLink());
-        $this->assertEquals("ld11", $this->_oSubj->getMdSubvariantByName("Green")->getLink());
-        $this->assertEquals("ld11", $this->_oSubj->getMdSubvariantByName("Green")->getMdSubvariantByName("S")->getLink());
-        $this->assertEquals("ld11", $this->_oSubj->getMdSubvariantByName("Green")->getMdSubvariantByName("S")->getMdSubvariantByName("Silk")->getLink());
+        $this->assertEquals('ld01', $this->_oSubj->getLink());
+        $this->assertEquals('ld11', $this->_oSubj->getMdSubvariantByName('Green')->getLink());
+        $this->assertEquals('ld11', $this->_oSubj->getMdSubvariantByName('Green')->getMdSubvariantByName('S')->getLink());
+        $this->assertEquals('ld11', $this->_oSubj->getMdSubvariantByName('Green')->getMdSubvariantByName('S')->getMdSubvariantByName('Silk')->getLink());
     }
 
     /**
@@ -288,8 +289,8 @@ class MdvariantTest extends \OxidTestCase
      */
     public function testSetGetName()
     {
-        $this->_oSubj->setName("testName");
-        $this->assertEquals("testName", $this->_oSubj->getName());
+        $this->_oSubj->setName('testName');
+        $this->assertEquals('testName', $this->_oSubj->getName());
     }
 
     /**
@@ -300,11 +301,11 @@ class MdvariantTest extends \OxidTestCase
     public function testGetDPrice()
     {
         $this->assertNull($this->_oSubj->getDPrice());
-        $this->assertNull($this->_oSubj->getMdSubvariantByName("Green")->getDPrice());
-        $this->assertNull($this->_oSubj->getMdSubvariantByName("Red")->getDPrice());
-        $this->assertNull($this->_oSubj->getMdSubvariantByName("Green")->getMdSubvariantByName("S")->getDPrice());
-        $this->assertEquals(4, $this->_oSubj->getMdSubvariantByName("Green")->getMdSubvariantByName("S")->getMdSubvariantByName("Silk")->getDPrice());
-        $this->assertEquals(1, $this->_oSubj->getMdSubvariantByName("Red")->getMdSubvariantByName("S")->getMdSubvariantByName("Silk")->getDPrice());
+        $this->assertNull($this->_oSubj->getMdSubvariantByName('Green')->getDPrice());
+        $this->assertNull($this->_oSubj->getMdSubvariantByName('Red')->getDPrice());
+        $this->assertNull($this->_oSubj->getMdSubvariantByName('Green')->getMdSubvariantByName('S')->getDPrice());
+        $this->assertEquals(4, $this->_oSubj->getMdSubvariantByName('Green')->getMdSubvariantByName('S')->getMdSubvariantByName('Silk')->getDPrice());
+        $this->assertEquals(1, $this->_oSubj->getMdSubvariantByName('Red')->getMdSubvariantByName('S')->getMdSubvariantByName('Silk')->getDPrice());
     }
 
     /**
@@ -315,13 +316,13 @@ class MdvariantTest extends \OxidTestCase
     public function testIsFixedPrice()
     {
         $this->assertFalse($this->_oSubj->UNITisFixedPrice());
-        $this->assertTrue($this->_oSubj->getMdSubvariantByName("Green")->UNITisFixedPrice());
-        $this->assertTrue($this->_oSubj->getMdSubvariantByName("Green")->getMdSubvariantByName("S")->UNITisFixedPrice());
-        $this->assertTrue($this->_oSubj->getMdSubvariantByName("Green")->getMdSubvariantByName("S")->getMdSubvariantByName("Silk")->UNITisFixedPrice());
-        $this->assertFalse($this->_oSubj->getMdSubvariantByName("Red")->UNITisFixedPrice());
-        $this->assertTrue($this->_oSubj->getMdSubvariantByName("Red")->getMdSubvariantByName("M")->UNITisFixedPrice());
-        $this->assertFalse($this->_oSubj->getMdSubvariantByName("Red")->getMdSubvariantByName("L")->UNITisFixedPrice());
-        $this->assertTrue($this->_oSubj->getMdSubvariantByName("Red")->getMdSubvariantByName("L")->getMdSubvariantByName("Silk")->UNITisFixedPrice());
+        $this->assertTrue($this->_oSubj->getMdSubvariantByName('Green')->UNITisFixedPrice());
+        $this->assertTrue($this->_oSubj->getMdSubvariantByName('Green')->getMdSubvariantByName('S')->UNITisFixedPrice());
+        $this->assertTrue($this->_oSubj->getMdSubvariantByName('Green')->getMdSubvariantByName('S')->getMdSubvariantByName('Silk')->UNITisFixedPrice());
+        $this->assertFalse($this->_oSubj->getMdSubvariantByName('Red')->UNITisFixedPrice());
+        $this->assertTrue($this->_oSubj->getMdSubvariantByName('Red')->getMdSubvariantByName('M')->UNITisFixedPrice());
+        $this->assertFalse($this->_oSubj->getMdSubvariantByName('Red')->getMdSubvariantByName('L')->UNITisFixedPrice());
+        $this->assertTrue($this->_oSubj->getMdSubvariantByName('Red')->getMdSubvariantByName('L')->getMdSubvariantByName('Silk')->UNITisFixedPrice());
     }
 
     /**
@@ -332,10 +333,10 @@ class MdvariantTest extends \OxidTestCase
     public function testGetMinDPrice()
     {
         $this->assertEquals(1, $this->_oSubj->getMinDPrice());
-        $this->assertEquals(1, $this->_oSubj->getMdSubvariantByName("Red")->getMinDPrice());
-        $this->assertEquals(1, $this->_oSubj->getMdSubvariantByName("Red")->getMdSubvariantByName("L")->getMinDPrice());
-        $this->assertEquals(1, $this->_oSubj->getMdSubvariantByName("Red")->getMdSubvariantByName("L")->getMdSubvariantByName("Silk")->getMinDPrice());
-        $this->assertEquals(2, $this->_oSubj->getMdSubvariantByName("Red")->getMdSubvariantByName("L")->getMdSubvariantByName("Wool")->getMinDPrice());
+        $this->assertEquals(1, $this->_oSubj->getMdSubvariantByName('Red')->getMinDPrice());
+        $this->assertEquals(1, $this->_oSubj->getMdSubvariantByName('Red')->getMdSubvariantByName('L')->getMinDPrice());
+        $this->assertEquals(1, $this->_oSubj->getMdSubvariantByName('Red')->getMdSubvariantByName('L')->getMdSubvariantByName('Silk')->getMinDPrice());
+        $this->assertEquals(2, $this->_oSubj->getMdSubvariantByName('Red')->getMdSubvariantByName('L')->getMdSubvariantByName('Wool')->getMinDPrice());
     }
 
     /**
@@ -346,10 +347,10 @@ class MdvariantTest extends \OxidTestCase
     public function testGetMaxDepth()
     {
         $this->assertEquals(3, $this->_oSubj->getMaxDepth());
-        $this->assertEquals(2, $this->_oSubj->getMdSubvariantByName("Red")->getMaxDepth());
-        $this->assertEquals(1, $this->_oSubj->getMdSubvariantByName("Red")->getMdSubvariantByName("L")->getMaxDepth());
-        $this->assertEquals(0, $this->_oSubj->getMdSubvariantByName("Red")->getMdSubvariantByName("L")->getMdSubvariantByName("Silk")->getMaxDepth());
-        $this->assertEquals(0, $this->_oSubj->getMdSubvariantByName("Red")->getMdSubvariantByName("L")->getMdSubvariantByName("Wool")->getMaxDepth());
+        $this->assertEquals(2, $this->_oSubj->getMdSubvariantByName('Red')->getMaxDepth());
+        $this->assertEquals(1, $this->_oSubj->getMdSubvariantByName('Red')->getMdSubvariantByName('L')->getMaxDepth());
+        $this->assertEquals(0, $this->_oSubj->getMdSubvariantByName('Red')->getMdSubvariantByName('L')->getMdSubvariantByName('Silk')->getMaxDepth());
+        $this->assertEquals(0, $this->_oSubj->getMdSubvariantByName('Red')->getMdSubvariantByName('L')->getMdSubvariantByName('Wool')->getMaxDepth());
     }
 
     /**
@@ -360,10 +361,10 @@ class MdvariantTest extends \OxidTestCase
     public function testGetFPrice()
     {
         $this->assertEquals('ab 1,00 €', $this->_oSubj->getFPrice());
-        $this->assertEquals('ab 1,00 €', $this->_oSubj->getMdSubvariantByName("Red")->getFPrice());
-        $this->assertEquals('ab 1,00 €', $this->_oSubj->getMdSubvariantByName("Red")->getMdSubvariantByName("L")->getFPrice());
-        $this->assertEquals('1,00 €', $this->_oSubj->getMdSubvariantByName("Red")->getMdSubvariantByName("L")->getMdSubvariantByName("Silk")->getFPrice());
-        $this->assertEquals('2,00 €', $this->_oSubj->getMdSubvariantByName("Red")->getMdSubvariantByName("L")->getMdSubvariantByName("Wool")->getFPrice());
+        $this->assertEquals('ab 1,00 €', $this->_oSubj->getMdSubvariantByName('Red')->getFPrice());
+        $this->assertEquals('ab 1,00 €', $this->_oSubj->getMdSubvariantByName('Red')->getMdSubvariantByName('L')->getFPrice());
+        $this->assertEquals('1,00 €', $this->_oSubj->getMdSubvariantByName('Red')->getMdSubvariantByName('L')->getMdSubvariantByName('Silk')->getFPrice());
+        $this->assertEquals('2,00 €', $this->_oSubj->getMdSubvariantByName('Red')->getMdSubvariantByName('L')->getMdSubvariantByName('Wool')->getFPrice());
     }
 
     /**
@@ -376,7 +377,7 @@ class MdvariantTest extends \OxidTestCase
 
         $oSubj = oxNew('oxMdVariant');
         $sArtId = '';
-        $aNames = array();
+        $aNames = [];
         $dPrice = 10.10;
         $sUrl = '';
         $oSubj->addNames($sArtId, $aNames, $dPrice, $sUrl);

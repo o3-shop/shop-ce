@@ -21,18 +21,22 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxDb;
-use oxField;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
+use OxidEsales\Eshop\Core\Base;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 use stdClass;
-use oxList;
-use oxBase;
-use oxI18n;
 
 /**
  * Admin selectlist list manager.
  */
-class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class AdminListController extends AdminController
 {
     /**
      * Name of chosen object class (default null).
@@ -51,7 +55,7 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
     /**
      * List of objects (default null).
      *
-     * @var oxList
+     * @var ListModel
      */
     protected $_oList = null;
 
@@ -84,7 +88,7 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
     protected $_blDesc = false;
 
     /**
-     * Set to true to enable multi language
+     * Set to true to enable multilanguage
      *
      * @var bool
      */
@@ -136,14 +140,15 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
      * Returns sorting fields array
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getListSorting()
     {
         if ($this->_aCurrSorting === null) {
-            $this->_aCurrSorting = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('sort');
+            $this->_aCurrSorting = Registry::getRequest()->getRequestEscapedParameter('sort');
 
             if (!$this->_aCurrSorting && $this->_sDefSortField && ($baseObject = $this->getItemListBaseObject())) {
-                $this->_aCurrSorting[$baseObject->getCoreTableName()] = [$this->_sDefSortField => "asc"];
+                $this->_aCurrSorting[$baseObject->getCoreTableName()] = [$this->_sDefSortField => 'asc'];
             }
         }
 
@@ -158,8 +163,8 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
     public function getListFilter()
     {
         if ($this->_aListFilter === null) {
-            $request = \OxidEsales\Eshop\Core\Registry::getRequest();
-            $filter = $request->getRequestParameter("where");
+            $request = Registry::getRequest();
+            $filter = $request->getRequestEscapedParameter('where');
             $request->checkParamSpecialChars($filter);
 
             $this->_aListFilter = $filter;
@@ -172,13 +177,16 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
      * Viewable list size getter
      *
      * @return int
-     * @deprecated underscore prefix violates PSR12, use "getViewListSize" instead
+     * @deprecated Use getViewListSize() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getViewListSize().
      */
     protected function _getViewListSize() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (!$this->_iViewListSize) {
-            $config = $this->getConfig();
-            if ($profile = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('profile')) {
+            $config = Registry::getConfig();
+            if ($profile = Registry::getSession()->getVariable('profile')) {
                 if (isset($profile[1])) {
                     $config->setConfigParam('iAdminListSize', (int)$profile[1]);
                 }
@@ -195,9 +203,14 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
     }
 
     /**
-     * Returns view list size
+     * Viewable list size getter
      *
      * @return int
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getViewListSize() (not the deprecated _getViewListSize()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
     public function getViewListSize()
     {
@@ -208,12 +221,15 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
      * Viewable list size getter (used in list_*.php views)
      *
      * @return int
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getUserDefListSize" in next major
+     * @deprecated Use getUserDefListSize() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _getUserDefListSize().
      */
     protected function _getUserDefListSize() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (!$this->_iViewListSize) {
-            if (!($viewListSize = (int)\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('viewListSize'))) {
+            if (!($viewListSize = (int)Registry::getRequest()->getRequestEscapedParameter('viewListSize'))) {
                 $viewListSize = $this->_iDefViewListSize;
             }
             $this->_iViewListSize = $viewListSize;
@@ -223,9 +239,25 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
     }
 
     /**
+     * Viewable list size getter (used in list_*.php views)
+     *
+     * @return int
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getUserDefListSize() (not the deprecated _getUserDefListSize()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getUserDefListSize()
+    {
+        return $this->_getUserDefListSize();
+    }
+
+    /**
      * Executes parent::render(), sets back search keys to view, sets navigation params
      *
      * @return null
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -243,7 +275,7 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
     /**
      * Deletes this entry from the database
      *
-     * @return null
+     * @return void
      */
     public function deleteEntry()
     {
@@ -270,11 +302,15 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
      * Calculates list items count
      *
      * @param string $sql SQL query used co select list items
-     * @deprecated underscore prefix violates PSR12, will be renamed to "calcListItemsCount" in next major
+     * @throws DatabaseConnectionException
+     * @deprecated Use calcListItemsCount() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _calcListItemsCount().
      */
     protected function _calcListItemsCount($sql) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $stringModifier = getStr();
+        $stringModifier = Str::getStr();
 
         // count SQL
         $sql = $stringModifier->preg_replace('/select .* from/i', 'select count(*) from ', $sql);
@@ -284,23 +320,42 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
         // con of list items which fits current search conditions
-        $this->_iListSize = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster()->getOne($sql);
+        $this->_iListSize = DatabaseProvider::getMaster()->getOne($sql);
 
         // set it into session that other frames know about size of DB
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('iArtCnt', $this->_iListSize);
+        Registry::getSession()->setVariable('iArtCnt', $this->_iListSize);
+    }
+
+    /**
+     * Calculates list items count
+     *
+     * @param string $sql SQL query used co select list items
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::calcListItemsCount() (not the deprecated _calcListItemsCount()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function calcListItemsCount($sql)
+    {
+        $this->_calcListItemsCount($sql);
     }
 
     /**
      * Set current list position
      *
      * @param string $page jump page string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "setCurrentListPosition" in next major
+     * @deprecated Use setCurrentListPosition() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _setCurrentListPosition().
      */
     protected function _setCurrentListPosition($page = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $adminListSize = $this->_getViewListSize();
 
-        $jumpToPage = $page ? ((int)$page) : ((int)((int)\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('lstrt')) / $adminListSize);
+        $jumpToPage = (int)($page ? $page : (((int)Registry::getRequest()->getRequestEscapedParameter('lstrt')) / $adminListSize));
         $jumpToPage = ($page && $jumpToPage) ? ($jumpToPage - 1) : $jumpToPage;
 
         $jumpToPage = $jumpToPage * $adminListSize;
@@ -314,12 +369,31 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
     }
 
     /**
+     * Set current list position
+     *
+     * @param string $page jump page string
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::setCurrentListPosition() (not the deprecated _setCurrentListPosition())
+     *           so downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function setCurrentListPosition($page = null)
+    {
+        $this->_setCurrentListPosition($page);
+    }
+
+    /**
      * Adds order by to SQL query string.
      *
-     * @param string $query sql string
+     * @param null $query sql string
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "prepareOrderByQuery" in next major
+     * @throws DatabaseConnectionException
+     * @deprecated Use prepareOrderByQuery() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _prepareOrderByQuery().
      */
     protected function _prepareOrderByQuery($query = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -332,21 +406,21 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
             $addSeparator = false;
 
             $listItem = $this->getItemListBaseObject();
-            $languageId = $listItem->isMultilang() ? $listItem->getLanguage() : \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
+            $languageId = $listItem->isMultilang() ? $listItem->getLanguage() : Registry::getLang()->getBaseLanguage();
 
-            $descending = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('adminorder');
+            $descending = Registry::getRequest()->getRequestEscapedParameter('adminorder');
             $descending = $descending !== null ? (bool)$descending : $this->_blDesc;
 
             foreach ($sortFields as $table => $fieldData) {
-                $table = $table ? (getViewName($table, $languageId) . '.') : '';
+                $table = $table ? (Registry::get(TableViewNameGenerator::class)->getViewName($table, $languageId) . '.') : '';
                 foreach ($fieldData as $column => $sortDirectory) {
                     $field = $table . $column;
 
                     //add table name to column name if no table name found attached to column name
-                    $query .= ((($addSeparator) ? ', ' : '')) . \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteIdentifier($field);
+                    $query .= ((($addSeparator) ? ', ' : '')) . DatabaseProvider::getDb()->quoteIdentifier($field);
 
                     //V oxActive field search always DESC
-                    if ($descending || $column == "oxactive" || strcasecmp($sortDirectory, 'desc') == 0) {
+                    if ($descending || $column == 'oxactive' || strcasecmp($sortDirectory, 'desc') == 0) {
                         $query .= ' desc ';
                     }
 
@@ -359,18 +433,55 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
     }
 
     /**
+     * Adds order by to SQL query string.
+     *
+     * @param null $query sql string
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::prepareOrderByQuery() (not the deprecated _prepareOrderByQuery()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function prepareOrderByQuery($query = null)
+    {
+        return $this->_prepareOrderByQuery($query);
+    }
+
+    /**
      * Builds and returns SQL query string.
      *
      * @param object $listObject list main object
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "buildSelectString" in next major
+     * @deprecated Use buildSelectString() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _buildSelectString().
      */
     protected function _buildSelectString($listObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $listObject !== null ? $listObject->buildSelectString(null) : "";
+        return $listObject !== null ? $listObject->buildSelectString(null) : '';
     }
 
+    /**
+     * Builds and returns SQL query string.
+     *
+     * @param object $listObject list main object
+     *
+     * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::buildSelectString() (not the deprecated _buildSelectString()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function buildSelectString($listObject = null)
+    {
+        return $this->_buildSelectString($listObject);
+    }
 
     /**
      * Prepares SQL where query according SQL condition array and attaches it to SQL end.
@@ -380,38 +491,86 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
      * @param string $fieldValue Filters
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "processFilter" in next major
+     * @deprecated Use processFilter() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _processFilter().
      */
     protected function _processFilter($fieldValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $stringModifier = getStr();
+        $stringModifier = Str::getStr();
 
         //removing % symbols
-        $fieldValue = $stringModifier->preg_replace("/^%|%$/", "", trim($fieldValue));
+        $fieldValue = $stringModifier->preg_replace('/^%|%$/', '', trim($fieldValue));
 
-        return $stringModifier->preg_replace("/\s+/", " ", $fieldValue);
+        return $stringModifier->preg_replace("/\s+/", ' ', $fieldValue);
+    }
+
+    /**
+     * Prepares SQL where query according SQL condition array and attaches it to SQL end.
+     * For each search value if german umlauts exist, adds them
+     * and replaced by spec. char to query
+     *
+     * @param string $fieldValue Filters
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _processFilter(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make processFilter() the canonical override target.
+     */
+    protected function processFilter($fieldValue)
+    {
+        return $this->_processFilter($fieldValue);
     }
 
     /**
      * Builds part of SQL query
      *
-     * @param string $value         filter value
-     * @param bool   $isSearchValue filter value type, true means surrount search key with '%'
+     * @param string $value filter value
+     * @param bool $isSearchValue filter value type, true means surround search key with '%'
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "buildFilter" in next major
+     * @throws DatabaseConnectionException
+     * @deprecated Transitional during #107. Modules SHOULD override _buildFilter()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes buildFilter() to the canonical override
+      *             target and retires _buildFilter(); until then, _buildFilter() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _buildFilter($value, $isSearchValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($isSearchValue) {
             //is search string, using LIKE
-            $query = " like " . \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quote('%' . $value . '%') . " ";
+            $query = ' like ' . DatabaseProvider::getDb()->quote('%' . $value . '%') . ' ';
         } else {
             //not search string, values must be equal
-            $query = " = " . \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quote($value) . " ";
+            $query = ' = ' . DatabaseProvider::getDb()->quote($value) . ' ';
         }
 
         return $query;
+    }
+
+    /**
+     * Builds part of SQL query
+     *
+     * @param string $value filter value
+     * @param bool $isSearchValue filter value type, true means surround search key with '%'
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _buildFilter(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make buildFilter() the canonical override target.
+     */
+    protected function buildFilter($value, $isSearchValue)
+    {
+        return $this->_buildFilter($value, $isSearchValue);
     }
 
     /**
@@ -420,11 +579,31 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
      * @param string $fieldValue filter value
      *
      * @return bool
-     * @deprecated underscore prefix violates PSR12, will be renamed to "isSearchValue" in next major
+     * @deprecated Use isSearchValue() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _isSearchValue().
      */
     protected function _isSearchValue($fieldValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return (getStr()->preg_match('/^%/', $fieldValue) && getStr()->preg_match('/%$/', $fieldValue));
+        return (Str::getStr()->preg_match('/^%/', $fieldValue) && Str::getStr()->preg_match('/%$/', $fieldValue));
+    }
+
+    /**
+     * Checks if filter contains wildcards like %
+     *
+     * @param string $fieldValue filter value
+     *
+     * @return bool
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _isSearchValue(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make isSearchValue() the canonical override target.
+     */
+    protected function isSearchValue($fieldValue)
+    {
+        return $this->_isSearchValue($fieldValue);
     }
 
     /**
@@ -432,16 +611,20 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
      * For each search value if german umlauts exist, adds them
      * and replaced by spec. char to query
      *
-     * @param array  $whereQuery SQL condition array
-     * @param string $fullQuery  SQL query string
+     * @param array $whereQuery SQL condition array
+     * @param string $fullQuery SQL query string
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "prepareWhereQuery" in next major
+     * @throws DatabaseConnectionException
+     * @deprecated Use prepareWhereQuery() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _prepareWhereQuery().
      */
     protected function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (is_array($whereQuery) && count($whereQuery)) {
-            $myUtilsString = \OxidEsales\Eshop\Core\Registry::getUtilsString();
+            $myUtilsString = Registry::getUtilsString();
             foreach ($whereQuery as $identifierName => $fieldValue) {
                 $fieldValue = trim($fieldValue);
 
@@ -465,7 +648,7 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
                             $queryBoolAction .= '(';
                         }
 
-                        $quotedIdentifierName = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteIdentifier($identifierName);
+                        $quotedIdentifierName = DatabaseProvider::getDb()->quoteIdentifier($identifierName);
                         $fullQuery .= " {$queryBoolAction} {$quotedIdentifierName} ";
 
                         //for search in same field for different values using AND
@@ -491,6 +674,27 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
     }
 
     /**
+     * Prepares SQL where query according SQL condition array and attaches it to SQL end.
+     * For each search value if german umlauts exist, adds them
+     * and replaced by spec. char to query
+     *
+     * @param array $whereQuery SQL condition array
+     * @param string $fullQuery SQL query string
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::prepareWhereQuery() (not the deprecated _prepareWhereQuery()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function prepareWhereQuery($whereQuery, $fullQuery)
+    {
+        return $this->_prepareWhereQuery($whereQuery, $fullQuery);
+    }
+
+    /**
      * Override this for individual search in admin.
      *
      * @param string $query SQL select to change
@@ -500,6 +704,18 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
      */
     protected function _changeselect($query) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->changeselect($query);
+    }
+
+    /**
+     * Override this for individual search in admin.
+     *
+     * @param string $query SQL select to change
+     *
+     * @return string
+     */
+    protected function changeselect($query)
+    {
         return $query;
     }
 
@@ -507,16 +723,17 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
      * Builds and returns array of SQL WHERE conditions.
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function buildWhere()
     {
-        if ($this->_aWhere === null && ($list = $this->getItemList())) {
+        if ($this->_aWhere === null && ($this->getItemList())) {
             $this->_aWhere = [];
             $filter = $this->getListFilter();
             if (is_array($filter)) {
                 $listItem = $this->getItemListBaseObject();
-                $languageId = $listItem->isMultilang() ? $listItem->getLanguage() : \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
-                $localDateFormat = $this->getConfig()->getConfigParam('sLocalDateFormat');
+                $languageId = $listItem->isMultilang() ? $listItem->getLanguage() : Registry::getLang()->getBaseLanguage();
+                $localDateFormat = Registry::getConfig()->getConfigParam('sLocalDateFormat');
 
                 foreach ($filter as $table => $filterData) {
                     foreach ($filterData as $name => $value) {
@@ -524,13 +741,13 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
                             $field = "{$table}__{$name}";
 
                             // if no table name attached to field name, add it
-                            $name = $table ? getViewName($table, $languageId) . ".{$name}" : $name;
+                            $name = $table ? Registry::get(TableViewNameGenerator::class)->getViewName($table, $languageId) . ".{$name}" : $name;
 
                             // #M1260: if field is date
                             if ($localDateFormat && $localDateFormat != 'ISO' && isset($listItem->$field)) {
                                 $fieldType = $listItem->{$field}->fldtype;
-                                if ("datetime" == $fieldType || "date" == $fieldType) {
-                                    $value = $this->_convertToDBDate($value, $fieldType);
+                                if ('datetime' == $fieldType || 'date' == $fieldType) {
+                                    $value = $this->convertToDBDate($value, $fieldType);
                                 }
                             }
 
@@ -555,23 +772,36 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
      */
     protected function _convertToDBDate($value, $fieldType) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $convertedObject = new \OxidEsales\Eshop\Core\Field();
+        return $this->convertToDBDate($value, $fieldType);
+    }
+
+    /**
+     * Converts date/datetime values to DB scheme (#M1260)
+     *
+     * @param string $value     Field value
+     * @param string $fieldType Field type
+     *
+     * @return string
+     */
+    protected function convertToDBDate($value, $fieldType)
+    {
+        $convertedObject = new Field();
         $convertedObject->setValue($value);
-        if ($fieldType == "datetime") {
-            if (strlen($value) == 10 || strlen($value) == 22 || (strlen($value) == 19 && !stripos($value, "m"))) {
-                \OxidEsales\Eshop\Core\Registry::getUtilsDate()->convertDBDateTime($convertedObject, true);
+        if ($fieldType == 'datetime') {
+            if (strlen($value) == 10 || strlen($value) == 22 || (strlen($value) == 19 && !stripos($value, 'm'))) {
+                Registry::getUtilsDate()->convertDBDateTime($convertedObject, true);
             } else {
                 if (strlen($value) > 10) {
-                    return $this->_convertTime($value);
+                    return $this->convertTime($value);
                 } else {
-                    return $this->_convertDate($value);
+                    return $this->convertDate($value);
                 }
             }
-        } elseif ($fieldType == "date") {
+        } elseif ($fieldType == 'date') {
             if (strlen($value) == 10) {
-                \OxidEsales\Eshop\Core\Registry::getUtilsDate()->convertDBDate($convertedObject, true);
+                Registry::getUtilsDate()->convertDBDate($convertedObject, true);
             } else {
-                return $this->_convertDate($value);
+                return $this->convertDate($value);
             }
         }
 
@@ -588,28 +818,40 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
      */
     protected function _convertDate($date) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->convertDate($date);
+    }
+
+    /**
+     * Converter for date field search. If not full date will be searched.
+     *
+     * @param string $date searched date
+     *
+     * @return string
+     */
+    protected function convertDate($date)
+    {
         // regexps to validate input
         $datePatterns = [
-            "/^([0-9]{2})\.([0-9]{4})/" => "EUR2", // MM.YYYY
-            "/^([0-9]{2})\.([0-9]{2})/" => "EUR1", // DD.MM
-            "/^([0-9]{2})\/([0-9]{4})/" => "USA2", // MM.YYYY
-            "/^([0-9]{2})\/([0-9]{2})/" => "USA1" // DD.MM
+            "/^([0-9]{2})\.([0-9]{4})/" => 'EUR2', // MM.YYYY
+            "/^([0-9]{2})\.([0-9]{2})/" => 'EUR1', // DD.MM
+            "/^([0-9]{2})\/([0-9]{4})/" => 'USA2', // MM.YYYY
+            "/^([0-9]{2})\/([0-9]{2})/" => 'USA1', // DD.MM
         ];
 
         // date/time formatting rules
         $dateFormats = [
-            "EUR1" => [2, 1],
-            "EUR2" => [2, 1],
-            "USA1" => [1, 2],
-            "USA2" => [2, 1]
+            'EUR1' => [2, 1],
+            'EUR2' => [2, 1],
+            'USA1' => [1, 2],
+            'USA2' => [2, 1],
         ];
 
         // looking for date field
         $dateMatches = [];
-        $stringModifier = getStr();
+        $stringModifier = Str::getStr();
         foreach ($datePatterns as $pattern => $type) {
             if ($stringModifier->preg_match($pattern, $date, $dateMatches)) {
-                $date = $dateMatches[$dateFormats[$type][0]] . "-" . $dateMatches[$dateFormats[$type][1]];
+                $date = $dateMatches[$dateFormats[$type][0]] . '-' . $dateMatches[$dateFormats[$type][1]];
                 break;
             }
         }
@@ -627,25 +869,37 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
      */
     protected function _convertTime($fullDate) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->convertTime($fullDate);
+    }
+
+    /**
+     * Converter for datetime field search. If not full time will be searched.
+     *
+     * @param string $fullDate searched date
+     *
+     * @return string
+     */
+    protected function convertTime($fullDate)
+    {
         $date = substr($fullDate, 0, 10);
-        $convertedObject = new \OxidEsales\Eshop\Core\Field();
+        $convertedObject = new Field();
         $convertedObject->setValue($date);
-        \OxidEsales\Eshop\Core\Registry::getUtilsDate()->convertDBDate($convertedObject, true);
-        $stringModifier = getStr();
+        Registry::getUtilsDate()->convertDBDate($convertedObject, true);
+        $stringModifier = Str::getStr();
 
         // looking for time field
         $time = substr($fullDate, 11);
-        if ($stringModifier->preg_match("/([0-9]{2}):([0-9]{2}) ([AP]{1}[M]{1})$/", $time, $timeMatches)) {
-            if ($timeMatches[3] == "PM") {
+        if ($stringModifier->preg_match('/([0-9]{2}):([0-9]{2}) ([AP]{1}[M]{1})$/', $time, $timeMatches)) {
+            if ($timeMatches[3] == 'PM') {
                 $intVal = (int)$timeMatches[1];
                 if ($intVal < 13) {
-                    $time = ($intVal + 12) . ":" . $timeMatches[2];
+                    $time = ($intVal + 12) . ':' . $timeMatches[2];
                 }
             } else {
-                $time = $timeMatches[1] . ":" . $timeMatches[2];
+                $time = $timeMatches[1] . ':' . $timeMatches[2];
             }
-        } elseif ($stringModifier->preg_match("/([0-9]{2}) ([AP]{1}[M]{1})$/", $time, $timeMatches)) {
-            if ($timeMatches[2] == "PM") {
+        } elseif ($stringModifier->preg_match('/([0-9]{2}) ([AP]{1}[M]{1})$/', $time, $timeMatches)) {
+            if ($timeMatches[2] == 'PM') {
                 $intVal = (int)$timeMatches[1];
                 if ($intVal < 13) {
                     $time = ($intVal + 12);
@@ -654,10 +908,10 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
                 $time = $timeMatches[1];
             }
         } else {
-            $time = str_replace(".", ":", $time);
+            $time = str_replace('.', ':', $time);
         }
 
-        return $convertedObject->value . " " . $time;
+        return $convertedObject->value . ' ' . $time;
     }
 
     /**
@@ -665,6 +919,14 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
      * @deprecated underscore prefix violates PSR12, will be renamed to "setListNavigationParams" in next major
      */
     protected function _setListNavigationParams() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->setListNavigationParams();
+    }
+
+    /**
+     * Set parameters needed for list navigation
+     */
+    protected function setListNavigationParams()
     {
         // list navigation
         $showNavigation = false;
@@ -683,11 +945,11 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
 
             $position = $this->_iCurrListPos + $adminListSize;
             if ($position < $this->_iListSize) {
-                $pageNavigation->nextlink = $position = $this->_iCurrListPos + $adminListSize;
+                $pageNavigation->nextlink = $this->_iCurrListPos + $adminListSize;
             }
 
             if (($this->_iCurrListPos - $adminListSize) >= 0) {
-                $pageNavigation->backlink = $position = $this->_iCurrListPos - $adminListSize;
+                $pageNavigation->backlink = $this->_iCurrListPos - $adminListSize;
             }
 
             // calculating list start position
@@ -699,7 +961,7 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
             $end = ($end < $start + 10) ? $start + 10 : $end;
             $end = ($end > $pageNavigation->pages) ? $pageNavigation->pages : $end;
 
-            // once again adjusting start pos ..
+            // once again adjusting start pos ...
             $start = ($end - 10 > 0) ? $end - 10 : $start;
             $start = ($pageNavigation->pages <= 11) ? 1 : $start;
 
@@ -719,7 +981,7 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
                 $position = $this->_iOverPos;
                 $this->_iOverPos = null;
             } else {
-                $position = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('lstrt');
+                $position = Registry::getRequest()->getRequestEscapedParameter('lstrt');
             }
 
             if (!$position) {
@@ -747,13 +1009,23 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
     /**
      * Sets-up navigation parameters
      *
-     * @param string $node active view id
+     * @param string $sNode active view id
      * @deprecated underscore prefix violates PSR12, will be renamed to "setupNavigation" in next major
      */
-    protected function _setupNavigation($node) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _setupNavigation($sNode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->setupNavigation($sNode);
+    }
+
+    /**
+     * Sets-up navigation parameters
+     *
+     * @param string $sNode active view id
+     */
+    protected function setupNavigation($sNode)
     {
         // navigation according to class
-        if ($node) {
+        if ($sNode) {
             $adminNavigation = $this->getNavigation();
 
             $objectId = $this->getEditObjectId();
@@ -763,18 +1035,18 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
                 $activeTab = $this->_iDefEdit;
             } else {
                 // active tab
-                $activeTab = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('actedit');
+                $activeTab = Registry::getRequest()->getRequestEscapedParameter('actedit');
                 $activeTab = $activeTab ? $activeTab : $this->_iDefEdit;
             }
 
             // tabs
-            $this->_aViewData['editnavi'] = $adminNavigation->getTabs($node, $activeTab);
+            $this->_aViewData['editnavi'] = $adminNavigation->getTabs($sNode, $activeTab);
 
             // active tab
-            $this->_aViewData['actlocation'] = $adminNavigation->getActiveTab($node, $activeTab);
+            $this->_aViewData['actlocation'] = $adminNavigation->getActiveTab($sNode, $activeTab);
 
             // default tab
-            $this->_aViewData['default_edit'] = $adminNavigation->getActiveTab($node, $this->_iDefEdit);
+            $this->_aViewData['default_edit'] = $adminNavigation->getActiveTab($sNode, $this->_iDefEdit);
 
             // assign active tab number
             $this->_aViewData['actedit'] = $activeTab;
@@ -784,7 +1056,8 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
     /**
      * Returns items list
      *
-     * @return oxList
+     * @return ListModel
+     * @throws DatabaseConnectionException
      */
     public function getItemList()
     {
@@ -797,14 +1070,14 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
 
             $listObject = $this->_oList->getBaseObject();
 
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('tabelle', $this->_sListClass);
-            $this->_aViewData['listTable'] = getViewName($listObject->getCoreTableName());
-            $this->getConfig()->setGlobalParameter('ListCoreTable', $listObject->getCoreTableName());
+            Registry::getSession()->setVariable('tabelle', $this->_sListClass);
+            $this->_aViewData['listTable'] = Registry::get(TableViewNameGenerator::class)->getViewName($listObject->getCoreTableName());
+            Registry::getConfig()->setGlobalParameter('ListCoreTable', $listObject->getCoreTableName());
 
             if ($listObject->isMultilang()) {
                 // is the object multilingual?
-                /** @var \OxidEsales\Eshop\Core\Model\MultiLanguageModel $listObject */
-                $listObject->setLanguage(\OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage());
+                /** @var MultiLanguageModel $listObject */
+                $listObject->setLanguage(Registry::getLang()->getBaseLanguage());
 
                 if (isset($this->_blEmployMultilanguage)) {
                     $listObject->setEnableMultilang($this->_blEmployMultilanguage);
@@ -814,13 +1087,13 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
             $query = $this->_buildSelectString($listObject);
             $query = $this->_prepareWhereQuery($where, $query);
             $query = $this->_prepareOrderByQuery($query);
-            $query = $this->_changeselect($query);
+            $query = $this->changeselect($query);
 
             // calculates count of list items
             $this->_calcListItemsCount($query);
 
             // setting current list position (page)
-            $this->_setCurrentListPosition(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('jumppage'));
+            $this->_setCurrentListPosition(Registry::getRequest()->getRequestEscapedParameter('jumppage'));
 
             // setting addition params for list: current list size
             $this->_oList->setSqlLimit($this->_iCurrListPos, $this->_getViewListSize());
@@ -842,7 +1115,8 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
     /**
      * Returns item list base object
      *
-     * @return oxBase|null
+     * @return Base|null
+     * @throws DatabaseConnectionException
      */
     public function getItemListBaseObject()
     {

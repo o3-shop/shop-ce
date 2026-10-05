@@ -26,8 +26,8 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator;
 use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\ContainerBuilder;
 use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Dao\ProjectYamlDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Exception\NoServiceYamlException;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use Webmozart\PathUtil\Path;
 
 class ServicesYamlValidator implements ModuleConfigurationValidatorInterface

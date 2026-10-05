@@ -21,12 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * State handler
  */
-class State extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
+class State extends MultiLanguageModel
 {
     /**
      * Current class name
@@ -41,28 +45,29 @@ class State extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     public function __construct()
     {
         parent::__construct();
-        $this->init("oxstates");
+        $this->init('oxstates');
     }
 
     /**
      * Returns country id by code
      *
-     * @param string $sCode      country code
+     * @param string $sCode country code
      * @param string $sCountryId country id
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getIdByCode($sCode, $sCountryId)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $params = [
             ':oxisoalpha2' => $sCode,
-            ':oxcountryid' => $sCountryId
+            ':oxcountryid' => $sCountryId,
         ];
 
-        return $oDb->getOne("SELECT oxid FROM oxstates 
+        return $oDb->getOne('SELECT oxid FROM oxstates 
             WHERE oxisoalpha2 = :oxisoalpha2 
-              AND oxcountryid = :oxcountryid", $params);
+              AND oxcountryid = :oxcountryid', $params);
     }
 
     /**
@@ -71,15 +76,16 @@ class State extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      * @param integer|string $iStateId
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getTitleById($iStateId)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sQ = "SELECT oxtitle FROM " . getViewName("oxstates") . " 
-            WHERE oxid = :oxid";
+        $oDb = DatabaseProvider::getDb();
+        $sQ = 'SELECT oxtitle FROM ' . Registry::get(TableViewNameGenerator::class)->getViewName('oxstates') . ' 
+            WHERE oxid = :oxid';
 
         $sStateTitle = $oDb->getOne($sQ, [
-            ':oxid' => $iStateId
+            ':oxid' => $iStateId,
         ]);
 
         return (string) $sStateTitle;

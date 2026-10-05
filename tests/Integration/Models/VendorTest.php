@@ -34,7 +34,7 @@ class VendorTest extends UnitTestCase
         $vendor->save();
 
         $seoEncoderVendorMock->expects($this->once())->method('onDeleteVendor')->with(
-            $this->callback(function($vendor) use ($id) {
+            $this->callback(function ($vendor) use ($id) {
                 return $vendor->getId() == $id;
             })
         );

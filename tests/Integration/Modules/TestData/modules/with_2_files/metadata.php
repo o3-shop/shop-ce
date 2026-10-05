@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -26,15 +27,15 @@ $sMetadataVersion = '1.0';
 /**
  * Module information
  */
-$aModule = array(
+$aModule = [
     'id'           => 'with_2_files',
     'title'        => 'Test with 2 classes added',
     'description'  => 'Module testing with 2 classes added',
     'thumbnail'    => 'picture.png',
     'version'      => '1.0',
     'author'       => 'OXID eSales AG',
-    'files' => array(
+    'files' => [
         'myexception'  => 'with_2_files/core/exception/myexception.php',
         'myconnection' => 'with_2_files/core/exception/myconnection.php',
-    ),
-);
+    ],
+];

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,17 +18,17 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \Exception;
-use \oxTestModules;
+use Exception;
+use oxTestModules;
 
 /**
  * Tests for Country_List class
  */
 class CountryListTest extends \OxidTestCase
 {
-
     /**
      * Country_List::DeleteEntry() test case
      *
@@ -37,18 +38,18 @@ class CountryListTest extends \OxidTestCase
     {
         oxTestModules::addFunction('oxcountry', 'delete', '{ throw new Exception("delete");}');
         oxTestModules::addFunction('oxcountry', 'isDerived', '{ return false;}');
-        $this->getConfig()->setConfigParam("blAllowSharedEdit", true);
+        $this->getConfig()->setConfigParam('blAllowSharedEdit', true);
 
         // testing..
         try {
             $oView = oxNew('Country_List');
             $oView->deleteEntry();
         } catch (Exception $oExcp) {
-            $this->assertEquals("delete", $oExcp->getMessage(), "Error in Country_List::DeleteEntry()");
+            $this->assertEquals('delete', $oExcp->getMessage(), 'Error in Country_List::DeleteEntry()');
 
             return;
         }
-        $this->fail("Error in Country_List::DeleteEntry()");
+        $this->fail('Error in Country_List::DeleteEntry()');
     }
 
     /**
@@ -60,7 +61,7 @@ class CountryListTest extends \OxidTestCase
     {
         $view = oxNew('Country_List');
 
-        $this->assertEquals(array('oxcountry' => array('oxactive' => 'asc', 'oxtitle' => 'asc')), $view->getListSorting());
+        $this->assertEquals(['oxcountry' => ['oxactive' => 'asc', 'oxtitle' => 'asc']], $view->getListSorting());
         $this->assertEquals('country_list.tpl', $view->render());
     }
 
@@ -77,7 +78,7 @@ class CountryListTest extends \OxidTestCase
         $firstInactiveTitle = null;
 
         foreach ($countryList as $country) {
-            $isCountryActive= $this->isCountryActive($country);
+            $isCountryActive = $this->isCountryActive($country);
 
             $firstActiveTitle = $this->getTitleIfUnset($firstActiveTitle, $country, $isCountryActive);
             $firstInactiveTitle = $this->getTitleIfUnset($firstInactiveTitle, $country, !$isCountryActive);

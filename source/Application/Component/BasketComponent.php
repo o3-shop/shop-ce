@@ -21,16 +21,23 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component;
 
+use Exception;
+use OxidEsales\Eshop\Application\Model\Basket;
+use OxidEsales\Eshop\Application\Model\BasketItem;
+use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Core\Controller\BaseController;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\ArticleException;
 use OxidEsales\Eshop\Core\Exception\ArticleInputException;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\NoArticleException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
+use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\BasketChangedEvent;
 use Psr\Log\LoggerInterface;
 use stdClass;
-use oxOutOfStockException;
-use oxArticleInputException;
-use oxNoArticleException;
 
 /**
  * Main shopping basket manager. Arranges shopping basket
@@ -38,7 +45,7 @@ use oxNoArticleException;
  *
  * @subpackage oxcmp
  */
-class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
+class BasketComponent extends BaseController
 {
     /**
      * Marking object as component
@@ -70,7 +77,7 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
                                     'searchmanufacturer', // search manufacturer
                                     // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
                                     'searchrecomm', // search recomendation
-                                    'recommid' // recomm. list id
+                                    'recommid', // recomm. list id
                                     // END deprecated
     ];
 
@@ -79,11 +86,11 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      */
     public function init()
     {
-        $oConfig = $this->getConfig();
+        $oConfig = Registry::getConfig();
         if ($oConfig->getConfigParam('blPsBasketReservationEnabled')) {
-            if ($oReservations = $this->getSession()->getBasketReservations()) {
+            if ($oReservations = Registry::getSession()->getBasketReservations()) {
                 if (!$oReservations->getTimeLeft()) {
-                    $oBasket = $this->getSession()->getBasket();
+                    $oBasket = Registry::getSession()->getBasket();
                     if ($oBasket && $oBasket->getProductsCount()) {
                         $this->emptyBasket($oBasket);
                     }
@@ -99,8 +106,8 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
         parent::init();
 
         // Basket exclude
-        if ($this->getConfig()->getConfigParam('blBasketExcludeEnabled')) {
-            if ($oBasket = $this->getSession()->getBasket()) {
+        if (Registry::getConfig()->getConfigParam('blBasketExcludeEnabled')) {
+            if ($oBasket = Registry::getSession()->getBasket()) {
                 $this->getParent()->setRootCatChanged($this->isRootCatChanged() && $oBasket->getContents());
             }
         }
@@ -111,11 +118,13 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      * executes parent::render() and returns basket object.
      *
      * @return object   $oBasket    basket object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
         // recalculating
-        if ($oBasket = $this->getSession()->getBasket()) {
+        if ($oBasket = Registry::getSession()->getBasket()) {
             $oBasket->calculateBasket(false);
         }
 
@@ -131,16 +140,20 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      * oxcmp_basket::_addItems() and puts article to basket.
      * Returns position where to redirect user browser.
      *
-     * @param string $sProductId Product ID (default null)
-     * @param double $dAmount    Product amount (default null)
-     * @param array  $aSel       (default null)
-     * @param array  $aPersParam (default null)
-     * @param bool   $blOverride If true amount in basket is replaced by $dAmount otherwise amount is increased by
+     * @param null $sProductId Product ID (default null)
+     * @param null $dAmount Product amount (default null)
+     * @param null $aSel (default null)
+     * @param null $aPersParam (default null)
+     * @param bool $blOverride If true amount in basket is replaced by $dAmount otherwise amount is increased by
      *                           $dAmount (default false)
      *
-     * @return mixed
-     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
-     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseErrorException
+     * @return void|string
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws NoArticleException
+     * @throws ObjectException
      */
     public function toBasket($sProductId = null, $dAmount = null, $aSel = null, $aPersParam = null, $blOverride = false)
     {
@@ -155,7 +168,7 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
         }
 
         // adding to basket is not allowed ?
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         if (Registry::getUtils()->isSearchEngine()) {
             return;
         }
@@ -164,16 +177,16 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
         if ($aProducts = $this->_getItems($sProductId, $dAmount, $aSel, $aPersParam, $blOverride)) {
             $this->_setLastCallFnc('tobasket');
 
-            $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $database = DatabaseProvider::getDb();
             $database->startTransaction();
             try {
                 $oBasketItem = $this->_addItems($aProducts);
                 //reserve active basket
-                if (Registry::getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
+                if ($myConfig->getConfigParam('blPsBasketReservationEnabled')) {
                     $basket = Registry::getSession()->getBasket();
                     Registry::getSession()->getBasketReservations()->reserveBasket($basket);
                 }
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 $database->rollbackTransaction();
                 unset($oBasketItem);
                 throw $exception;
@@ -194,7 +207,7 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
 
             // redirect to basket
             $redirectUrl = $this->_getRedirectUrl();
-            $this->dispatchEvent(new \OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\BasketChangedEvent($this));
+            $this->dispatchEvent(new BasketChangedEvent($this));
 
             return $redirectUrl;
         }
@@ -203,13 +216,19 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     /**
      * Similar to tobasket, except that as product id "bindex" parameter is (can be) taken
      *
-     * @param string $sProductId Product ID (default null)
-     * @param double $dAmount    Product amount (default null)
-     * @param array  $aSel       (default null)
-     * @param array  $aPersParam (default null)
-     * @param bool   $blOverride If true means increase amount of chosen article (default false)
+     * @param null $sProductId Product ID (default null)
+     * @param null $dAmount Product amount (default null)
+     * @param null $aSel (default null)
+     * @param null $aPersParam (default null)
+     * @param bool $blOverride If true means increase amount of chosen article (default false)
      *
-     * @return mixed
+     * @return void
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws NoArticleException
+     * @throws ObjectException
      */
     public function changeBasket(
         $sProductId = null,
@@ -229,33 +248,33 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
 
         // fetching item ID
         if (!$sProductId) {
-            $sBasketItemId = Registry::getConfig()->getRequestParameter('bindex');
+            $sBasketItemId = Registry::getRequest()->getRequestEscapedParameter('bindex');
 
             if ($sBasketItemId) {
-                $oBasket = $this->getSession()->getBasket();
+                $oBasket = Registry::getSession()->getBasket();
                 //take params
                 $aBasketContents = $oBasket->getContents();
                 $oItem = $aBasketContents[$sBasketItemId];
 
                 $sProductId = isset($oItem) ? $oItem->getProductId() : null;
             } else {
-                $sProductId = Registry::getConfig()->getRequestParameter('aid');
+                $sProductId = Registry::getRequest()->getRequestEscapedParameter('aid');
             }
         }
 
         // fetching other needed info
-        $dAmount = isset($dAmount) ? $dAmount : Registry::getConfig()->getRequestParameter('am');
-        $aSel = isset($aSel) ? $aSel : Registry::getConfig()->getRequestParameter('sel');
-        $aPersParam = $aPersParam ? $aPersParam : Registry::getConfig()->getRequestParameter('persparam');
+        $dAmount = isset($dAmount) ? $dAmount : Registry::getRequest()->getRequestEscapedParameter('am');
+        $aSel = isset($aSel) ? $aSel : Registry::getRequest()->getRequestEscapedParameter('sel');
+        $aPersParam = $aPersParam ?: Registry::getRequest()->getRequestEscapedParameter('persparam');
 
         // adding articles
         if ($aProducts = $this->_getItems($sProductId, $dAmount, $aSel, $aPersParam, $blOverride)) {
             // information that last call was changebasket
-            $oBasket = $this->getSession()->getBasket();
+            $oBasket = Registry::getSession()->getBasket();
             $oBasket->onUpdate();
             $this->_setLastCallFnc('changebasket');
 
-            $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $database = DatabaseProvider::getDb();
             $database->startTransaction();
             try {
                 $oBasketItem = $this->_addItems($aProducts);
@@ -263,7 +282,7 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
                 if (Registry::getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
                     Registry::getSession()->getBasketReservations()->reserveBasket($oBasket);
                 }
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 $database->rollbackTransaction();
                 unset($oBasketItem);
                 throw $exception;
@@ -277,11 +296,13 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      * storing something to basket
      *
      * @return string   $sClass.$sPosition  redirection URL
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getRedirectUrl" in next major
+     * @deprecated Use getRedirectUrl() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getRedirectUrl().
      */
     protected function _getRedirectUrl() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-
         // active controller id
         $controllerId = Registry::getConfig()->getRequestControllerId();
         $controllerId = $controllerId ? $controllerId . '?' : 'start?';
@@ -289,21 +310,21 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
 
         // setting redirect parameters
         foreach ($this->aRedirectParams as $sParamName) {
-            $sParamVal = Registry::getConfig()->getRequestParameter($sParamName);
+            $sParamVal = Registry::getRequest()->getRequestEscapedParameter($sParamName);
             $sPosition .= $sParamVal ? $sParamName . '=' . $sParamVal . '&' : '';
         }
 
         // special treatment
         // search param
-        $sParam = rawurlencode(Registry::getConfig()->getRequestParameter('searchparam', true));
+        $sParam = rawurlencode(Registry::getRequest()->getRequestParameter('searchparam'));
         $sPosition .= $sParam ? 'searchparam=' . $sParam . '&' : '';
 
         // current page number
-        $iPageNr = (int) Registry::getConfig()->getRequestParameter('pgNr');
+        $iPageNr = (int) Registry::getRequest()->getRequestEscapedParameter('pgNr');
         $sPosition .= ($iPageNr > 0) ? 'pgNr=' . $iPageNr . '&' : '';
 
         // reload and backbutton blocker
-        if ($this->getConfig()->getConfigParam('iNewBasketItemMessage') == 3) {
+        if (Registry::getConfig()->getConfigParam('iNewBasketItemMessage') == 3) {
             // saving return to shop link to session
             Registry::getSession()->setVariable('_backtoshop', $controllerId . $sPosition);
 
@@ -315,6 +336,22 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     }
 
     /**
+     * Formats and returns redirect URL where shop must be redirected after
+     * storing something to basket
+     *
+     * @return string   $sClass.$sPosition  redirection URL
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getRedirectUrl() (not the deprecated _getRedirectUrl()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getRedirectUrl()
+    {
+        return $this->_getRedirectUrl();
+    }
+
+    /**
      * Cleans and returns persisted parameters.
      *
      * @param array $persistedParameters key-value parameters (optional). If not passed - takes parameters from request.
@@ -323,7 +360,7 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      */
     protected function getPersistedParameters($persistedParameters = null)
     {
-        $persistedParameters = ($persistedParameters ?: Registry::getConfig()->getRequestParameter('persparam'));
+        $persistedParameters = ($persistedParameters ?: Registry::getRequest()->getRequestEscapedParameter('persparam'));
         if (!is_array($persistedParameters)) {
             return null;
         }
@@ -340,10 +377,16 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      * @param array  $aPersParam product persistent parameters
      * @param bool   $blOverride amount override status
      *
-     * @return mixed
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getItems" in next major
+     * @return array|bool
+     * @deprecated Transitional during #107. Modules SHOULD override _getItems()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getItems() to the canonical override
+      *             target and retires _getItems(); until then, _getItems() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function _getItems( // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _getItems(// phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
         $sProductId = null,
         $dAmount = null,
         $aSel = null,
@@ -351,34 +394,34 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
         $blOverride = false
     ) {
         // collecting items to add
-        $aProducts = Registry::getConfig()->getRequestParameter('aproducts');
+        $aProducts = Registry::getRequest()->getRequestEscapedParameter('aproducts');
 
         // collecting specified item
-        $sProductId = $sProductId ? $sProductId : Registry::getConfig()->getRequestParameter('aid');
+        $sProductId = $sProductId ?: Registry::getRequest()->getRequestEscapedParameter('aid');
         if ($sProductId) {
             // additionally fetching current product info
-            $dAmount = isset($dAmount) ? $dAmount : Registry::getConfig()->getRequestParameter('am');
+            $dAmount = isset($dAmount) ? $dAmount : Registry::getRequest()->getRequestEscapedParameter('am');
 
             // select lists
-            $aSel = isset($aSel) ? $aSel : Registry::getConfig()->getRequestParameter('sel');
+            $aSel = isset($aSel) ? $aSel : Registry::getRequest()->getRequestEscapedParameter('sel');
 
             // persistent parameters
             if (empty($aPersParam)) {
                 $aPersParam = $this->getPersistedParameters();
             }
 
-            $sBasketItemId = Registry::getConfig()->getRequestParameter('bindex');
+            $sBasketItemId = Registry::getRequest()->getRequestEscapedParameter('bindex');
 
             $aProducts[$sProductId] = ['am'           => $dAmount,
-                                            'sel'          => $aSel,
-                                            'persparam'    => $aPersParam,
-                                            'override'     => $blOverride,
-                                            'basketitemid' => $sBasketItemId
+                                       'sel'          => $aSel,
+                                       'persparam'    => $aPersParam,
+                                       'override'     => $blOverride,
+                                       'basketitemid' => $sBasketItemId,
             ];
         }
 
         if (is_array($aProducts) && count($aProducts)) {
-            if (Registry::getConfig()->getRequestParameter('removeBtn') !== null) {
+            if (Registry::getRequest()->getRequestEscapedParameter('removeBtn') !== null) {
                 //setting amount to 0 if removing article from basket
                 foreach ($aProducts as $sProductId => $aProduct) {
                     if (isset($aProduct['remove']) && $aProduct['remove']) {
@@ -396,20 +439,52 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     }
 
     /**
+     * Collects and returns array of items to add to basket. Product info is taken not only from
+     * given parameters, but additionally from request 'aproducts' parameter
+     *
+     * @param string $sProductId product ID
+     * @param double $dAmount    product amount
+     * @param array  $aSel       product select lists
+     * @param array  $aPersParam product persistent parameters
+     * @param bool   $blOverride amount override status
+     *
+     * @return array|bool
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getItems(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getItems() the canonical override target.
+     */
+    protected function getItems(
+        $sProductId = null,
+        $dAmount = null,
+        $aSel = null,
+        $aPersParam = null,
+        $blOverride = false
+    ) {
+        return $this->_getItems($sProductId, $dAmount, $aSel, $aPersParam, $blOverride);
+    }
+
+    /**
      * Adds all articles user wants to add to basket. Returns
      * last added to basket item.
      *
      * @param array $products products to add array
      *
      * @return  object  $oBasketItem    last added basket item
-     * @deprecated underscore prefix violates PSR12, will be renamed to "addItems" in next major
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws NoArticleException
+     * @throws ObjectException
      */
     protected function _addItems($products) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $activeView = $this->getConfig()->getActiveView();
+        $activeView = Registry::getConfig()->getActiveView();
         $errorDestination = $activeView->getErrorDestination();
 
-        $basket = $this->getSession()->getBasket();
+        $basket = Registry::getSession()->getBasket();
         $basketInfo = $basket->getBasketSummary();
 
         $basketItemAmounts = [];
@@ -422,7 +497,7 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
             }
             $products[$addProductId]['oldam'] = $productAmount;
 
-            //If we already changed articles so they now exactly match existing ones,
+            //If we already changed articles, so they now exactly match existing ones,
             //we need to make sure we get the amounts correct
             if (isset($basketItemAmounts[$data['oldBasketItemId']])) {
                 $data['amount'] = $data['amount'] + $basketItemAmounts[$data['oldBasketItemId']];
@@ -430,7 +505,7 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
 
             $basketItem = $this->addItemToBasket($basket, $data, $errorDestination);
 
-            if (($basketItem instanceof \OxidEsales\Eshop\Application\Model\BasketItem)) {
+            if (($basketItem instanceof BasketItem)) {
                 $basketItemKey = $basketItem->getBasketItemKey();
                 if ($basketItemKey) {
                     if (! isset($basketItemAmounts[$basketItemKey])) {
@@ -463,7 +538,9 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      * @param string $sCallName    name of action ('tobasket', 'changebasket')
      * @param array  $aProductInfo data which comes from request when you press button "to basket"
      * @param array  $aBasketInfo  array returned by \OxidEsales\Eshop\Application\Model\Basket::getBasketSummary()
-     * @deprecated underscore prefix violates PSR12, will be renamed to "setLastCall" in next major
+     * @deprecated Use setLastCall() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override it;
+     *             new code, including new modules, MUST NOT call or override _setLastCall().
      */
     protected function _setLastCall($sCallName, $aProductInfo, $aBasketInfo) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -471,10 +548,29 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     }
 
     /**
+     * Setting last call data to session (data used by econda)
+     *
+     * @param string $sCallName    name of action ('tobasket', 'changebasket')
+     * @param array  $aProductInfo data which comes from request when you press button "to basket"
+     * @param array  $aBasketInfo  array returned by \OxidEsales\Eshop\Application\Model\Basket::getBasketSummary()
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _setLastCall(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make setLastCall() the canonical override target.
+     */
+    protected function setLastCall($sCallName, $aProductInfo, $aBasketInfo)
+    {
+        $this->_setLastCall($sCallName, $aProductInfo, $aBasketInfo);
+    }
+
+    /**
      * Setting last call function name (data used by econda)
      *
      * @param string $sCallName name of action ('tobasket', 'changebasket')
-     * @deprecated underscore prefix violates PSR12, will be renamed to "setLastCallFnc" in next major
+     * @deprecated Use setLastCallFnc() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override it;
+     *             new code, including new modules, MUST NOT call or override _setLastCallFnc().
      */
     protected function _setLastCallFnc($sCallName) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -482,10 +578,27 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     }
 
     /**
+     * Setting last call function name (data used by econda)
+     *
+     * @param string $sCallName name of action ('tobasket', 'changebasket')
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::setLastCallFnc() (not the deprecated _setLastCallFnc()) so downstream
+     *           overrides in the class chain are preserved. Template-method refactor tracked
+     *           in o3-shop/o3-shop#108.
+     */
+    protected function setLastCallFnc($sCallName)
+    {
+        $this->_setLastCallFnc($sCallName);
+    }
+
+    /**
      * Getting last call function name (data used by econda)
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getLastCallFnc" in next major
+     * @deprecated Use getLastCallFnc() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override it;
+     *             new code, including new modules, MUST NOT call or override _getLastCallFnc().
      */
     protected function _getLastCallFnc() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -493,14 +606,30 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     }
 
     /**
+     * Getting last call function name (data used by econda)
+     *
+     * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getLastCallFnc() (not the deprecated _getLastCallFnc()) so downstream
+     *           overrides in the class chain are preserved. Template-method refactor tracked
+     *           in o3-shop/o3-shop#108.
+     */
+    protected function getLastCallFnc()
+    {
+        return $this->_getLastCallFnc();
+    }
+
+    /**
      * Returns true if active root category was changed
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isRootCatChanged()
     {
         // in Basket
-        $oBasket = $this->getSession()->getBasket();
+        $oBasket = Registry::getSession()->getBasket();
         if ($oBasket->showCatChangeWarning()) {
             $oBasket->setCatChangeWarningState(false);
 
@@ -509,8 +638,8 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
 
         // in Category, only then category is empty ant not equal to default category
         $sDefCat = Registry::getConfig()->getActiveShop()->oxshops__oxdefcat->value;
-        $sActCat = Registry::getConfig()->getRequestParameter('cnid');
-        $oActCat = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+        $sActCat = Registry::getRequest()->getRequestEscapedParameter('cnid');
+        $oActCat = oxNew(Category::class);
         if ($sActCat && $sActCat != $sDefCat && $oActCat->load($sActCat)) {
             $sActRoot = $oActCat->oxcategories__oxrootid->value;
             if ($oBasket->getBasketRootCatId() && $sActRoot != $oBasket->getBasketRootCatId()) {
@@ -527,18 +656,18 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      * - if user clicked on "Proceed to checkout" - redirects to basket,
      * - if clicked "Continue shopping" - clear basket
      *
-     * @return mixed
+     * @return void|string
      */
     public function executeUserChoice()
     {
-        $this->dispatchEvent(new \OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\BasketChangedEvent($this));
+        $this->dispatchEvent(new BasketChangedEvent($this));
 
         // redirect to basket
-        if (Registry::getConfig()->getRequestParameter("tobasket")) {
-            return "basket";
+        if (Registry::getRequest()->getRequestEscapedParameter('tobasket')) {
+            return 'basket';
         } else {
             // clear basket
-            $this->getSession()->getBasket()->deleteBasket();
+            Registry::getSession()->getBasket()->deleteBasket();
             $this->getParent()->setRootCatChanged(false);
         }
     }
@@ -546,7 +675,7 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     /**
      * Deletes user basket object from session and saved one from DB if needed.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Basket $oBasket
+     * @param Basket $oBasket
      */
     protected function emptyBasket($oBasket)
     {
@@ -571,7 +700,7 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
 
         $return['persistentParameters'] = $this->getPersistedParameters($productInfo['persparam']);
         $return['override'] = isset($productInfo['override']) ? $productInfo['override'] : null;
-        $return['bundle'] = isset($productInfo['bundle']) ? true : false;
+        $return['bundle'] = isset($productInfo['bundle']);
         $return['oldBasketItemId'] = isset($productInfo['basketitemid']) ? $productInfo['basketitemid'] : null;
 
         return $return;
@@ -580,11 +709,14 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     /**
      * Add one item to basket. Handle eventual errors.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Basket $basket
-     * @param array                                      $itemData
-     * @param string                                     $errorDestination
+     * @param Basket $basket
+     * @param array $itemData
+     * @param string $errorDestination
      *
-     * @return null|oxBasketItem
+     * @return object
+     * @throws ArticleException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     protected function addItemToBasket($basket, $itemData, $errorDestination)
     {
@@ -603,7 +735,7 @@ class BasketComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
         } catch (OutOfStockException $exception) {
             $exception->setDestination($errorDestination);
             // #950 Change error destination to basket popup
-            if (!$errorDestination && $this->getConfig()->getConfigParam('iNewBasketItemMessage') == 2) {
+            if (!$errorDestination && Registry::getConfig()->getConfigParam('iNewBasketItemMessage') == 2) {
                 $errorDestination = 'popup';
             }
             Registry::getUtilsView()->addErrorToDisplay($exception, false, (bool) $errorDestination, $errorDestination);

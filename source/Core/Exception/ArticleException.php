@@ -95,9 +95,8 @@ class ArticleException extends \OxidEsales\Eshop\Core\Exception\StandardExceptio
      */
     public function getString()
     {
-        return __CLASS__ . '-' . parent::getString() . " Faulty Article --> " . $this->_sArticleNr . "\n";
+        return __CLASS__ . '-' . parent::getString() . ' Faulty Article --> ' . $this->_sArticleNr . "\n";
     }
-
 
     /**
      * Override of oxException::getValues()

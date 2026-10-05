@@ -21,10 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+
 /**
  * Admin selectlist list manager.
  */
-class CountryList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class CountryList extends AdminListController
 {
     /**
      * Name of chosen object class (default null).
@@ -59,12 +62,13 @@ class CountryList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
      * file "selectlist_list.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
         parent::render();
 
-        return "country_list.tpl";
+        return 'country_list.tpl';
     }
 
     /**
@@ -72,6 +76,7 @@ class CountryList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
      * undefined order behind the "active" countries.
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getListSorting()
     {
@@ -85,13 +90,34 @@ class CountryList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
     }
 
     /**
-     * Getter for the second sort field name (for getting the expected oreder out of the databse).
+     * Getter for the second sort field name (for getting the expected order out of the database).
      *
      * @return string The name of the field we want to be the second order by argument.
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getSecondSortFieldName" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getSecondSortFieldName()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getSecondSortFieldName() to the canonical override
+      *             target and retires _getSecondSortFieldName(); until then, _getSecondSortFieldName() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getSecondSortFieldName() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->sSecondDefSortField;
+    }
+
+    /**
+     * Getter for the second sort field name (for getting the expected order out of the database).
+     *
+     * @return string The name of the field we want to be the second order by argument.
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getSecondSortFieldName(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getSecondSortFieldName() the canonical override target.
+     */
+    protected function getSecondSortFieldName()
+    {
+        return $this->_getSecondSortFieldName();
     }
 }

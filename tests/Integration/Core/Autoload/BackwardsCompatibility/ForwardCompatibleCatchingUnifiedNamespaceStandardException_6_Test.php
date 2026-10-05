@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -22,7 +23,6 @@ namespace OxidEsales\EshopCommunity\Tests\Integration\Core\Autoload\BackwardsCom
 
 class ForwardCompatibleCatchingUnifiedNamespaceStandardException_6_Test extends \PHPUnit\Framework\TestCase
 {
-
     /**
      * Try to catch an \oxException when a given Exception is thrown
      *

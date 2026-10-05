@@ -26,7 +26,6 @@ use OxidEsales\TestingLibrary\UnitTestCase;
 
 class ExceptionTest extends UnitTestCase
 {
-
     // 1. testing constructor works .. ok, its a pseudo test ;-)
     public function testConstruct()
     {
@@ -49,19 +48,9 @@ class ExceptionTest extends UnitTestCase
         $message = 'Erik was here..';
         $testObject = oxNew(StandardException::class, $message);
 
-        try {
-            $testObject->debugOut(); // actuall test
-        } catch (Exception $e) {
-            // Lets try to delete an eventual left over file
-            unlink(OX_LOG_FILE);
-            $this->fail();
+        $testObject->debugOut();
 
-            return;
-        }
-        $file = file_get_contents(OX_LOG_FILE);
-        file_put_contents(OX_LOG_FILE, '');
-
-        $this->assertStringContainsString($message, $file);
+        $this->assertTrue($this->testLogHandler->hasErrorThatContains($message));
     }
 
     // Test set & get message

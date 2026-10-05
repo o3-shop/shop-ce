@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -86,7 +88,7 @@ class CSRFFrontendTest extends FrontendTestCase
             'fnc'        => 'tobasket',
             'aid'        => 'dc5ffdf380e15674b56dd562a7cb6aec',
             'anid'       => 'dc5ffdf380e15674b56dd562a7cb6aec',
-            'am'         => 1
+            'am'         => 1,
         ];
         $url = $this->_getShopUrl($data);
 

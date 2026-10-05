@@ -23,8 +23,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Codeception;
 
-use OxidEsales\Codeception\Page\Info\NewsletterSubscription;
 use OxidEsales\Codeception\Module\Translation\Translator;
+use OxidEsales\Codeception\Page\Info\NewsletterSubscription;
 
 final class NewsletterCest
 {
@@ -96,7 +96,6 @@ final class NewsletterCest
         $I->see(Translator::translate('MESSAGE_NEWSLETTER_SUBSCRIPTION_CANCELED'));
         $I->seeInDatabase('oxnewssubscribed', ['OXEMAIL' => $email, 'OXUNSUBSCRIBED !=' => '0000-00-00 00:00:00']);
     }
-
 
     public function subscribeForNewsletterDoubleOptInOff(AcceptanceTester $I)
     {

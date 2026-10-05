@@ -30,7 +30,7 @@ class TranslateFunctionLogic
      */
     public function getTranslation(array $params): string
     {
-        startProfile("smarty_function_oxmultilang");
+        startProfile('smarty_function_oxmultilang');
         $language = \OxidEsales\Eshop\Core\Registry::getLang();
         $config = \OxidEsales\Eshop\Core\Registry::getConfig();
         $activeShop = $config->getActiveShop();
@@ -70,7 +70,7 @@ class TranslateFunctionLogic
         } elseif ($showError) {
             $translation = 'ERROR: Translation for ' . $ident . ' not found!';
         }
-        stopProfile("smarty_function_oxmultilang");
+        stopProfile('smarty_function_oxmultilang');
 
         return $translation;
     }

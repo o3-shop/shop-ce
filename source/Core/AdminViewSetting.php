@@ -22,7 +22,6 @@ namespace OxidEsales\EshopCommunity\Core;
 
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Application\Model\RightsRolesElement;
-use OxidEsales\EshopCommunity\Application\Model\RightsRolesElementsList;
 
 class AdminViewSetting
 {
@@ -51,7 +50,7 @@ class AdminViewSetting
         $filterTypes = [RightsRolesElement::TYPE_READONLY, RightsRolesElement::TYPE_EDITABLE];
 
         $availableRestrictedViewElements = $this->filterListByTypes($restrictedViewElements, $filterTypes);
-        $availableRightElements  = $this->filterListByTypes($rightElements, $filterTypes);
+        $availableRightElements = $this->filterListByTypes($rightElements, $filterTypes);
 
         return count($availableRightElements) ?
             count($this->getDisplayableMenuItems($availableRestrictedViewElements, $availableRightElements, $xPath)) :
@@ -64,13 +63,11 @@ class AdminViewSetting
             array_intersect_key($availableRestrictedViewElements, $availableRightElements) :
             array_filter(
                 array_intersect_key($availableRestrictedViewElements, $availableRightElements),
-                function ($right, $menuId) use ($xPath)
-                {
-                    $node = $xPath->query('//*[@id="'.$menuId.'"]')->item(0);
+                function ($right, $menuId) use ($xPath) {
+                    $node = $xPath->query('//*[@id="' . $menuId . '"]')->item(0);
 
                     $depth = -2;
-                    while ($node != null)
-                    {
+                    while ($node != null) {
                         $depth++;
                         $node = $node->parentNode;
                     }
@@ -84,8 +81,7 @@ class AdminViewSetting
     public function getDepthInTree($node)
     {
         $depth = -1;
-        while ($node != null)
-        {
+        while ($node != null) {
             $depth++;
             $node = $node->parentNode;
         }
@@ -97,7 +93,7 @@ class AdminViewSetting
     {
         return array_filter(
             $list,
-            function($rightType) use ($rightTypes) {
+            function ($rightType) use ($rightTypes) {
                 return in_array($rightType, $rightTypes);
             }
         );

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -25,20 +26,19 @@ use PHPUnit\Framework\TestCase;
 
 class DateFormatHelperTest extends TestCase
 {
-
     /**
      * @return array
      */
     public function provider()
     {
         return [
-            ['%D %h %n %r %R %t %T', 1543850519, "%m/%d/%y %b 
- %I:%M:%S %p %H:%M 	 %H:%M:%S"],
-            ['%T %t %R %r %n %h %D', 1543850519, "%H:%M:%S 	 %H:%M %I:%M:%S %p 
- %b %m/%d/%y"],
-            ['%e', 691200, " 9"],
-            ['%l', 46800, " 2"],
-            ['foo', '', "foo"],
+            ['%D %h %n %r %R %t %T', 1543850519, '%m/%d/%y %b 
+ %I:%M:%S %p %H:%M 	 %H:%M:%S'],
+            ['%T %t %R %r %n %h %D', 1543850519, '%H:%M:%S 	 %H:%M %I:%M:%S %p 
+ %b %m/%d/%y'],
+            ['%e', 691200, ' 9'],
+            ['%l', 46800, ' 2'],
+            ['foo', '', 'foo'],
         ];
     }
 

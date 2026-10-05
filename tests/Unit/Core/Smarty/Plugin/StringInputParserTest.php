@@ -60,7 +60,7 @@ class StringInputParserTest extends TestCase
                 [
                     'abc',
                     [],
-                ]
+                ],
             ],
             [
                 'array(
@@ -99,7 +99,7 @@ class StringInputParserTest extends TestCase
                         'false' => false,
                         'true' => true,
                         'ucFirstTrue' => true,
-                    ]
+                    ],
                 ],
             ],
             [

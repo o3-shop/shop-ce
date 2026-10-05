@@ -21,32 +21,43 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use OxidEsales\Eshop\Core\DatabaseProvider;
-use oxRegistry;
-use oxDb;
-use oxField;
-use stdClass;
+use Exception;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\CategoryList;
+use OxidEsales\Eshop\Application\Model\File;
+use OxidEsales\Eshop\Application\Model\ManufacturerList;
+use OxidEsales\Eshop\Application\Model\VendorList;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
+use stdClass;
 
 /**
  * Admin article main manager.
- * Collects and updates (on user submit) article base parameters data ( such as
- * title, article No., short Description and etc.).
+ * Collects and updates (on user submit) article base parameters data (such as
+ * title, article No., short Description etc.).
  * Admin Menu: Manage Products -> Articles -> Main.
  */
-class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ArticleMain extends AdminDetailsController
 {
     /**
      * Loads article parameters and passes them to Smarty engine, returns
      * name of template file "article_main.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
         parent::render();
 
-        $this->getConfig()->setConfigParam('bl_perfLoadPrice', true);
+        Registry::getConfig()->setConfigParam('bl_perfLoadPrice', true);
 
         $oArticle = $this->createArticle();
         $oArticle->enablePriceLoad();
@@ -54,20 +65,20 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $this->_aViewData['edit'] = $oArticle;
 
         $sOxId = $this->getEditObjectId();
-        $sVoxId = $this->getConfig()->getRequestParameter("voxid");
-        $sOxParentId = $this->getConfig()->getRequestParameter("oxparentid");
+        $sVoxId = Registry::getRequest()->getRequestEscapedParameter('voxid');
+        $sParentId = Registry::getRequest()->getRequestEscapedParameter('oxparentid');
 
         // new variant ?
-        if (isset($sVoxId) && $sVoxId == "-1" && isset($sOxParentId) && $sOxParentId && $sOxParentId != "-1") {
-            $oParentArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-            $oParentArticle->load($sOxParentId);
-            $this->_aViewData["parentarticle"] = $oParentArticle;
-            $this->_aViewData["oxparentid"] = $sOxParentId;
+        if (isset($sVoxId) && $sVoxId == '-1' && isset($sParentId) && $sParentId && $sParentId != '-1') {
+            $oParentArticle = oxNew(Article::class);
+            $oParentArticle->load($sParentId);
+            $this->_aViewData['parentarticle'] = $oParentArticle;
+            $this->_aViewData['oxparentid'] = $sParentId;
 
-            $this->_aViewData["oxid"] = $sOxId = "-1";
+            $this->_aViewData['oxid'] = $sOxId = '-1';
         }
 
-        if ($sOxId && $sOxId != "-1") {
+        if ($sOxId && $sOxId != '-1') {
             // load object
             $oArticle = $this->updateArticle($oArticle, $sOxId);
 
@@ -80,11 +91,11 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
 
             // variant handling
             if ($oArticle->oxarticles__oxparentid->value) {
-                $oParentArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+                $oParentArticle = oxNew(Article::class);
                 $oParentArticle->load($oArticle->oxarticles__oxparentid->value);
-                $this->_aViewData["parentarticle"] = $oParentArticle;
-                $this->_aViewData["oxparentid"] = $oArticle->oxarticles__oxparentid->value;
-                $this->_aViewData["issubvariant"] = 1;
+                $this->_aViewData['parentarticle'] = $oParentArticle;
+                $this->_aViewData['oxparentid'] = $oArticle->oxarticles__oxparentid->value;
+                $this->_aViewData['issubvariant'] = 1;
             }
 
             // #381A
@@ -93,39 +104,42 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             //hook for modules
             $oArticle = $this->customizeArticleInformation($oArticle);
 
-            $aLang = array_diff(\OxidEsales\Eshop\Core\Registry::getLang()->getLanguageNames(), $oOtherLang);
+            $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         }
 
-        $this->_aViewData["editor"] = $this->_generateTextEditor(
-            "100%",
+        $this->_aViewData['editor'] = $this->_generateTextEditor(
+            '100%',
             300,
             $oArticle,
-            "oxarticles__oxlongdesc",
-            "details.tpl.css"
+            'oxarticles__oxlongdesc',
+            'details.tpl.css'
         );
-        $this->_aViewData["blUseTimeCheck"] = $this->getConfig()->getConfigParam('blUseTimeCheck');
+        $this->_aViewData['blUseTimeCheck'] = Registry::getConfig()->getConfigParam('blUseTimeCheck');
 
-        return "article_main.tpl";
+        return 'article_main.tpl';
     }
 
     /**
      * Returns string which must be edited by editor
      *
-     * @param \OxidEsales\Eshop\Core\Model\BaseModel $oObject object with field will be used for editing
+     * @param BaseModel $oObject object with field will be used for editing
      * @param string                                 $sField  name of editable field
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getEditValue" in next major
+     * @deprecated Use getEditValue() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getEditValue().
      */
     protected function _getEditValue($oObject, $sField) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -139,6 +153,24 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     }
 
     /**
+     * Returns string which must be edited by editor
+     *
+     * @param BaseModel $oObject object with field will be used for editing
+     * @param string                                 $sField  name of editable field
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getEditValue(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getEditValue() the canonical override target.
+     */
+    protected function getEditValue($oObject, $sField)
+    {
+        return $this->_getEditValue($oObject, $sField);
+    }
+
+    /**
      * Saves changes of article parameters.
      */
     public function save()
@@ -146,9 +178,9 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         parent::save();
 
         $oDb = DatabaseProvider::getDb();
-        $oConfig = $this->getConfig();
+        $oRequest = Registry::getRequest();
         $soxId = $this->getEditObjectId();
-        $aParams = $oConfig->getRequestParameter("editval");
+        $aParams = $oRequest->getRequestEscapedParameter('editval');
 
         // default values
         $aParams = $this->addDefaultValues($aParams);
@@ -158,10 +190,10 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             $aParams['oxarticles__oxvat'] = null;
         }
 
-        // varianthandling
-        $soxparentId = $oConfig->getRequestParameter("oxparentid");
-        if (isset($soxparentId) && $soxparentId && $soxparentId != "-1") {
-            $aParams['oxarticles__oxparentid'] = $soxparentId;
+        // variant-handling
+        $sParentId = $oRequest->getRequestEscapedParameter('oxparentid');
+        if (isset($sParentId) && $sParentId && $sParentId != '-1') {
+            $aParams['oxarticles__oxparentid'] = $sParentId;
         } else {
             unset($aParams['oxarticles__oxparentid']);
         }
@@ -169,7 +201,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $oArticle = $this->createArticle();
         $oArticle->setLanguage($this->_iEditLang);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oArticle->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxarticles__oxid'] = null;
@@ -187,19 +219,19 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         //article number handling, warns for artnum duplicates
         if (
             isset($aParams['oxarticles__oxartnum']) && strlen($aParams['oxarticles__oxartnum']) > 0 &&
-            $oConfig->getConfigParam('blWarnOnSameArtNums') &&
+            Registry::getConfig()->getConfigParam('blWarnOnSameArtNums') &&
             $oArticle->oxarticles__oxartnum->value != $aParams['oxarticles__oxartnum']
         ) {
-            $sSelect = "select oxid from " . getViewName('oxarticles');
-            $sSelect .= " where oxartnum = " . $oDb->quote($aParams['oxarticles__oxartnum']) . "";
-            $sSelect .= " and oxid != " . $oDb->quote($aParams['oxarticles__oxid']) . "";
+            $sSelect = 'select oxid from ' . Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
+            $sSelect .= ' where oxartnum = ' . $oDb->quote($aParams['oxarticles__oxartnum']);
+            $sSelect .= ' and oxid != ' . $oDb->quote($aParams['oxarticles__oxid']);
             if ($oArticle->assignRecord($sSelect)) {
-                $this->_aViewData["errorsavingatricle"] = 1;
+                $this->_aViewData['errorsavingatricle'] = 1;
             }
         }
 
         $oArticle->setLanguage(0);
-        //triming spaces from article title (M:876)
+        // trimming spaces from article title (M:876)
         if (isset($aParams['oxarticles__oxtitle'])) {
             $aParams['oxarticles__oxtitle'] = trim($aParams['oxarticles__oxtitle']);
         }
@@ -207,13 +239,13 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $oArticle->assign($aParams);
         $oArticle->setArticleLongDesc($this->_processLongDesc($aParams['oxarticles__oxlongdesc']));
         $oArticle->setLanguage($this->_iEditLang);
-        $oArticle = \OxidEsales\Eshop\Core\Registry::getUtilsFile()->processFiles($oArticle);
+        $oArticle = Registry::getUtilsFile()->processFiles($oArticle);
         $oArticle->save();
 
         // set oxid if inserted
-        if ($soxId == "-1") {
-            $sFastCat = $oConfig->getRequestParameter("art_category");
-            if ($sFastCat != "-1") {
+        if ($soxId == '-1') {
+            $sFastCat = $oRequest->getRequestEscapedParameter('art_category');
+            if ($sFastCat != '-1') {
                 $this->addToCategory($sFastCat, $oArticle->getId());
             }
         }
@@ -229,12 +261,15 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      * @param string $sValue value to fix
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "processLongDesc" in next major
+     * @deprecated Use processLongDesc() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _processLongDesc().
      */
     protected function _processLongDesc($sValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // TODO: the code below is redundant, optimize it, assignments should go smooth without conversions
-        // hack, if editor screws up text, htmledit tends to do so
+        // hack, if editor screws up text (htmledit tends to do so)
         $sValue = str_replace('&amp;nbsp;', '&nbsp;', $sValue);
         $sValue = str_replace('&amp;', '&', $sValue);
         $sValue = str_replace('&quot;', '"', $sValue);
@@ -246,39 +281,79 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     }
 
     /**
+     * Fixes html broken by html editor
+     *
+     * @param string $sValue value to fix
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _processLongDesc(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make processLongDesc() the canonical override target.
+     */
+    protected function processLongDesc($sValue)
+    {
+        return $this->_processLongDesc($sValue);
+    }
+
+    /**
      * Resets article categories counters
      *
      * @param string $sArticleId Article id
-     * @deprecated underscore prefix violates PSR12, will be renamed to "resetCategoriesCounter" in next major
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @deprecated Use resetCategoriesCounter() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _resetCategoriesCounter().
      */
     protected function _resetCategoriesCounter($sArticleId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oDb = DatabaseProvider::getDb();
-        $sQ = "select oxcatnid from oxobject2category where oxobjectid = :oxobjectid";
+        $sQ = 'select oxcatnid from oxobject2category where oxobjectid = :oxobjectid';
         $oRs = $oDb->select($sQ, [
-            ':oxobjectid' => $sArticleId
+            ':oxobjectid' => $sArticleId,
         ]);
-        if ($oRs !== false && $oRs->count() > 0) {
+        if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
-                $this->resetCounter("catArticle", $oRs->fields[0]);
+                $this->resetCounter('catArticle', $oRs->fields[0]);
                 $oRs->fetchRow();
             }
         }
     }
 
     /**
+     * Resets article categories counters
+     *
+     * @param string $sArticleId Article id
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::resetCategoriesCounter() (not the deprecated _resetCategoriesCounter())
+     *           so downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function resetCategoriesCounter($sArticleId)
+    {
+        $this->_resetCategoriesCounter($sArticleId);
+    }
+
+    /**
      * Add article to category.
      *
      * @param string $sCatID Category id
-     * @param string $sOXID  Article id
+     * @param string $sOXID Article id
+     * @throws Exception
      */
     public function addToCategory($sCatID, $sOXID)
     {
-        $base = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
-        $base->init("oxobject2category");
-        $base->oxobject2category__oxtime = new \OxidEsales\Eshop\Core\Field(0);
-        $base->oxobject2category__oxobjectid = new \OxidEsales\Eshop\Core\Field($sOXID);
-        $base->oxobject2category__oxcatnid = new \OxidEsales\Eshop\Core\Field($sCatID);
+        $base = oxNew(BaseModel::class);
+        $base->init('oxobject2category');
+        $base->oxobject2category__oxtime = new Field(0);
+        $base->oxobject2category__oxobjectid = new Field($sOXID);
+        $base->oxobject2category__oxcatnid = new Field($sCatID);
 
         $base = $this->updateBase($base);
 
@@ -288,18 +363,20 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * Copies article (with all parameters) to new articles.
      *
-     * @param string $sOldId    old product id (default null)
-     * @param string $sNewId    new product id (default null)
-     * @param string $sParentId product parent id
+     * @param null $sOldId old product id (default null)
+     * @param null $sNewId new product id (default null)
+     * @param null $sParentId product parent id
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function copyArticle($sOldId = null, $sNewId = null, $sParentId = null)
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         $sOldId = $sOldId ? $sOldId : $this->getEditObjectId();
-        $sNewId = $sNewId ? $sNewId : \OxidEsales\Eshop\Core\Registry::getUtilsObject()->generateUID();
+        $sNewId = $sNewId ? $sNewId : Registry::getUtilsObject()->generateUID();
 
-        $oArticle = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+        $oArticle = oxNew(BaseModel::class);
         $oArticle->init('oxarticles');
         if ($oArticle->load($sOldId)) {
             if ($myConfig->getConfigParam('blDisableDublArtOnCopy')) {
@@ -314,12 +391,12 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             }
 
             // setting oxinsert/oxtimestamp
-            $iNow = date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime());
-            $oArticle->oxarticles__oxinsert = new \OxidEsales\Eshop\Core\Field($iNow);
+            $iNow = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime());
+            $oArticle->oxarticles__oxinsert = new Field($iNow);
 
             // mantis#0001590: OXRATING and OXRATINGCNT not set to 0 when copying article
-            $oArticle->oxarticles__oxrating = new \OxidEsales\Eshop\Core\Field(0);
-            $oArticle->oxarticles__oxratingcnt = new \OxidEsales\Eshop\Core\Field(0);
+            $oArticle->oxarticles__oxrating = new Field(0);
+            $oArticle->oxarticles__oxratingcnt = new Field(0);
 
             $oArticle->setId($sNewId);
             $oArticle->save();
@@ -327,13 +404,13 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             //copy categories
             $this->_copyCategories($sOldId, $sNewId);
 
-            //atributes
+            //attributes
             $this->_copyAttributes($sOldId, $sNewId);
 
-            //sellist
+            //select-list
             $this->_copySelectlists($sOldId, $sNewId);
 
-            //crossseling
+            //cross-selling
             $this->_copyCrossseling($sOldId, $sNewId);
 
             //accessoire
@@ -342,7 +419,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             // #983A copying staffelpreis info
             $this->_copyStaffelpreis($sOldId, $sNewId);
 
-            //copy article extends (longdescription)
+            //copy article extends (long-description)
             $this->_copyArtExtends($sOldId, $sNewId);
 
             //files
@@ -350,15 +427,15 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
 
             $this->resetContentCache();
 
-            $myUtilsObject = \OxidEsales\Eshop\Core\Registry::getUtilsObject();
+            $myUtilsObject = Registry::getUtilsObject();
             $oDb = DatabaseProvider::getDb();
 
             //copy variants
-            $sQ = "select oxid from oxarticles where oxparentid = :oxparentid";
+            $sQ = 'select oxid from oxarticles where oxparentid = :oxparentid';
             $oRs = $oDb->select($sQ, [
-                ':oxparentid' => $sOldId
+                ':oxparentid' => $sOldId,
             ]);
-            if ($oRs !== false && $oRs->count() > 0) {
+            if ($oRs && $oRs->count() > 0) {
                 while (!$oRs->EOF) {
                     $this->copyArticle($oRs->fields[0], $myUtilsObject->generateUid(), $sNewId);
                     $oRs->fetchRow();
@@ -370,18 +447,18 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
                 $this->setEditObjectId($oArticle->getId());
 
                 //article number handling, warns for artnum duplicates
-                $sFncParameter = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('fnc');
+                $sFncParameter = Registry::getRequest()->getRequestEscapedParameter('fnc');
                 $sArtNumField = 'oxarticles__oxartnum';
                 if (
                     $myConfig->getConfigParam('blWarnOnSameArtNums') &&
                     $oArticle->$sArtNumField->value && $sFncParameter == 'copyArticle'
                 ) {
-                    $sSelect = "select oxid from " . $oArticle->getCoreTableName() .
-                               " where oxartnum = " . $oDb->quote($oArticle->$sArtNumField->value) .
-                               " and oxid != " . $oDb->quote($sNewId);
+                    $sSelect = 'select oxid from ' . $oArticle->getCoreTableName() .
+                               ' where oxartnum = ' . $oDb->quote($oArticle->$sArtNumField->value) .
+                               ' and oxid != ' . $oDb->quote($sNewId);
 
                     if ($oArticle->assignRecord($sSelect)) {
-                        $this->_aViewData["errorsavingatricle"] = 1;
+                        $this->_aViewData['errorsavingatricle'] = 1;
                     }
                 }
             }
@@ -391,21 +468,26 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * Copying category assignments
      *
-     * @param string $sOldId       Id from old article
-     * @param string $newArticleId Id from new article
-     * @deprecated underscore prefix violates PSR12, will be renamed to "copyCategories" in next major
+     * @param string $sOldId ID from old article
+     * @param string $newArticleId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @deprecated Use copyCategories() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _copyCategories().
      */
     protected function _copyCategories($sOldId, $newArticleId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myUtilsObject = \OxidEsales\Eshop\Core\Registry::getUtilsObject();
+        $myUtilsObject = Registry::getUtilsObject();
         $oDb = DatabaseProvider::getDb();
 
-        $sO2CView = getViewName('oxobject2category');
+        $sO2CView = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category');
         $sQ = "select oxcatnid, oxtime from {$sO2CView} where oxobjectid = :oxobjectid";
         $oRs = $oDb->select($sQ, [
-            ':oxobjectid' => $sOldId
+            ':oxobjectid' => $sOldId,
         ]);
-        if ($oRs !== false && $oRs->count() > 0) {
+        if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
                 $uniqueId = $myUtilsObject->generateUid();
                 $sCatId = $oRs->fields[0];
@@ -418,26 +500,59 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     }
 
     /**
+     * Copying category assignments
+     *
+     * @param string $sOldId ID from old article
+     * @param string $newArticleId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _copyCategories(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make copyCategories() the canonical override target.
+     */
+    protected function copyCategories($sOldId, $newArticleId)
+    {
+        $this->_copyCategories($sOldId, $newArticleId);
+    }
+
+    /**
      * Copying attributes assignments
      *
-     * @param string $sOldId Id from old article
-     * @param string $sNewId Id from new article
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyAttributes" in next major
      */
     protected function _copyAttributes($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myUtilsObject = \OxidEsales\Eshop\Core\Registry::getUtilsObject();
+        $this->copyAttributes($sOldId, $sNewId);
+    }
+
+    /**
+     * Copying attributes assignments
+     *
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function copyAttributes($sOldId, $sNewId)
+    {
+        $myUtilsObject = Registry::getUtilsObject();
         $oDb = DatabaseProvider::getDb();
 
-        $sQ = "select oxid from oxobject2attribute where oxobjectid = :oxobjectid";
+        $sQ = 'select oxid from oxobject2attribute where oxobjectid = :oxobjectid';
         $oRs = $oDb->select($sQ, [
-            ':oxobjectid' => $sOldId
+            ':oxobjectid' => $sOldId,
         ]);
-        if ($oRs !== false && $oRs->count() > 0) {
+        if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
                 // #1055A
-                $oAttr = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
-                $oAttr->init("oxobject2attribute");
+                $oAttr = oxNew(BaseModel::class);
+                $oAttr->init('oxobject2attribute');
                 $oAttr->load($oRs->fields[0]);
                 $oAttr->setId($myUtilsObject->generateUID());
                 $oAttr->oxobject2attribute__oxobjectid->setValue($sNewId);
@@ -450,28 +565,43 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * Copying files
      *
-     * @param string $sOldId Id from old article
-     * @param string $sNewId Id from new article
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyFiles" in next major
      */
     protected function _copyFiles($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myUtilsObject = \OxidEsales\Eshop\Core\Registry::getUtilsObject();
+        $this->copyFiles($sOldId, $sNewId);
+    }
+
+    /**
+     * Copying files
+     *
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function copyFiles($sOldId, $sNewId)
+    {
+        $myUtilsObject = Registry::getUtilsObject();
         $oDb = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
 
-        $sQ = "SELECT * FROM `oxfiles` WHERE `oxartid` = :oxartid";
+        $sQ = 'SELECT * FROM `oxfiles` WHERE `oxartid` = :oxartid';
         $oRs = $oDb->select($sQ, [
-            ':oxartid' => $sOldId
+            ':oxartid' => $sOldId,
         ]);
-        if ($oRs !== false && $oRs->count() > 0) {
+        if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
-                $oFile = oxNew(\OxidEsales\Eshop\Application\Model\File::class);
+                $oFile = oxNew(File::class);
                 $oFile->setId($myUtilsObject->generateUID());
-                $oFile->oxfiles__oxartid = new \OxidEsales\Eshop\Core\Field($sNewId);
-                $oFile->oxfiles__oxfilename = new \OxidEsales\Eshop\Core\Field($oRs->fields['OXFILENAME']);
-                $oFile->oxfiles__oxfilesize = new \OxidEsales\Eshop\Core\Field($oRs->fields['OXFILESIZE']);
-                $oFile->oxfiles__oxstorehash = new \OxidEsales\Eshop\Core\Field($oRs->fields['OXSTOREHASH']);
-                $oFile->oxfiles__oxpurchasedonly = new \OxidEsales\Eshop\Core\Field($oRs->fields['OXPURCHASEDONLY']);
+                $oFile->oxfiles__oxartid = new Field($sNewId);
+                $oFile->oxfiles__oxfilename = new Field($oRs->fields['OXFILENAME']);
+                $oFile->oxfiles__oxfilesize = new Field($oRs->fields['OXFILESIZE']);
+                $oFile->oxfiles__oxstorehash = new Field($oRs->fields['OXSTOREHASH']);
+                $oFile->oxfiles__oxpurchasedonly = new Field($oRs->fields['OXPURCHASEDONLY']);
                 $oFile->save();
                 $oRs->fetchRow();
             }
@@ -481,25 +611,40 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * Copying selectlists assignments
      *
-     * @param string $sOldId Id from old article
-     * @param string $sNewId Id from new article
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "copySelectlists" in next major
      */
     protected function _copySelectlists($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myUtilsObject = \OxidEsales\Eshop\Core\Registry::getUtilsObject();
+        $this->copySelectlists($sOldId, $sNewId);
+    }
+
+    /**
+     * Copying selectlists assignments
+     *
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function copySelectlists($sOldId, $sNewId)
+    {
+        $myUtilsObject = Registry::getUtilsObject();
         $oDb = DatabaseProvider::getDb();
 
-        $sQ = "select oxselnid from oxobject2selectlist where oxobjectid = :oxobjectid";
+        $sQ = 'select oxselnid from oxobject2selectlist where oxobjectid = :oxobjectid';
         $oRs = $oDb->select($sQ, [
-            ':oxobjectid' => $sOldId
+            ':oxobjectid' => $sOldId,
         ]);
-        if ($oRs !== false && $oRs->count() > 0) {
+        if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
                 $sUid = $myUtilsObject->generateUID();
                 $sId = $oRs->fields[0];
-                $sSql = "INSERT INTO oxobject2selectlist (oxid, oxobjectid, oxselnid) " .
-                        "VALUES (:oxid, :oxobjectid, :oxselnid)";
+                $sSql = 'INSERT INTO oxobject2selectlist (oxid, oxobjectid, oxselnid) ' .
+                        'VALUES (:oxid, :oxobjectid, :oxselnid)';
                 $oDb->execute($sSql, [
                     ':oxid' => $sUid,
                     ':oxobjectid' => $sNewId,
@@ -511,31 +656,46 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     }
 
     /**
-     * Copying crossseling assignments
+     * Copying cross-selling assignments
      *
-     * @param string $sOldId Id from old article
-     * @param string $sNewId Id from new article
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyCrossseling" in next major
      */
     protected function _copyCrossseling($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myUtilsObject = \OxidEsales\Eshop\Core\Registry::getUtilsObject();
+        $this->copyCrossseling($sOldId, $sNewId);
+    }
+
+    /**
+     * Copying cross-selling assignments
+     *
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function copyCrossseling($sOldId, $sNewId)
+    {
+        $myUtilsObject = Registry::getUtilsObject();
         $oDb = DatabaseProvider::getDb();
 
-        $sQ = "select oxobjectid from oxobject2article where oxarticlenid = :oxarticlenid";
+        $sQ = 'select oxobjectid from oxobject2article where oxarticlenid = :oxarticlenid';
         $oRs = $oDb->select($sQ, [
-            ':oxarticlenid' => $sOldId
+            ':oxarticlenid' => $sOldId,
         ]);
-        if ($oRs !== false && $oRs->count() > 0) {
+        if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
                 $sUid = $myUtilsObject->generateUID();
                 $sId = $oRs->fields[0];
-                $sSql = "INSERT INTO oxobject2article (oxid, oxobjectid, oxarticlenid) " .
-                        "VALUES (:oxid, :oxobjectid, :oxarticlenid)";
+                $sSql = 'INSERT INTO oxobject2article (oxid, oxobjectid, oxarticlenid) ' .
+                        'VALUES (:oxid, :oxobjectid, :oxarticlenid)';
                 $oDb->execute($sSql, [
                     ':oxid' => $sUid,
                     ':oxobjectid' => $sId,
-                    ':oxarticlenid' => $sNewId
+                    ':oxarticlenid' => $sNewId,
                 ]);
                 $oRs->fetchRow();
             }
@@ -545,29 +705,44 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * Copying accessoires assignments
      *
-     * @param string $sOldId Id from old article
-     * @param string $sNewId Id from new article
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyAccessoires" in next major
      */
     protected function _copyAccessoires($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myUtilsObject = \OxidEsales\Eshop\Core\Registry::getUtilsObject();
+        $this->copyAccessoires($sOldId, $sNewId);
+    }
+
+    /**
+     * Copying accessoires assignments
+     *
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function copyAccessoires($sOldId, $sNewId)
+    {
+        $myUtilsObject = Registry::getUtilsObject();
         $oDb = DatabaseProvider::getDb();
 
-        $sQ = "select oxobjectid from oxaccessoire2article where oxarticlenid = :oxarticlenid";
+        $sQ = 'select oxobjectid from oxaccessoire2article where oxarticlenid = :oxarticlenid';
         $oRs = $oDb->select($sQ, [
-            ':oxarticlenid' => $sOldId
+            ':oxarticlenid' => $sOldId,
         ]);
-        if ($oRs !== false && $oRs->count() > 0) {
+        if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
                 $sUId = $myUtilsObject->generateUid();
                 $sId = $oRs->fields[0];
-                $sSql = "INSERT INTO oxaccessoire2article (oxid, oxobjectid, oxarticlenid) " .
-                        "VALUES (:oxid, :oxobjectid, :oxarticlenid)";
+                $sSql = 'INSERT INTO oxaccessoire2article (oxid, oxobjectid, oxarticlenid) ' .
+                        'VALUES (:oxid, :oxobjectid, :oxarticlenid)';
                 $oDb->execute($sSql, [
                     ':oxid' => $sUId,
                     ':oxobjectid' => $sId,
-                    ':oxarticlenid' => $sNewId
+                    ':oxarticlenid' => $sNewId,
                 ]);
                 $oRs->fetchRow();
             }
@@ -577,20 +752,31 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * Copying staffelpreis assignments
      *
-     * @param string $sOldId Id from old article
-     * @param string $sNewId Id from new article
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyStaffelpreis" in next major
      */
     protected function _copyStaffelpreis($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sShopId = $this->getConfig()->getShopId();
-        $oPriceList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
-        $oPriceList->init("oxbase", "oxprice2article");
-        $sQ = "select * from oxprice2article where oxartid = :oxartid and oxshopid = :oxshopid " .
-              "and (oxamount > 0 or oxamountto > 0) order by oxamount ";
+        $this->copyStaffelpreis($sOldId, $sNewId);
+    }
+
+    /**
+     * Copying staffelpreis assignments
+     *
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
+     */
+    protected function copyStaffelpreis($sOldId, $sNewId)
+    {
+        $sShopId = Registry::getConfig()->getShopId();
+        $oPriceList = oxNew(ListModel::class);
+        $oPriceList->init('oxbase', 'oxprice2article');
+        $sQ = 'select * from oxprice2article where oxartid = :oxartid and oxshopid = :oxshopid ' .
+              'and (oxamount > 0 or oxamountto > 0) order by oxamount ';
         $oPriceList->selectString($sQ, [
             ':oxartid' => $sOldId,
-            ':oxshopid' => $sShopId
+            ':oxshopid' => $sShopId,
         ]);
         if ($oPriceList->count()) {
             foreach ($oPriceList as $oItem) {
@@ -604,14 +790,27 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * Copying article extends
      *
-     * @param string $sOldId Id from old article
-     * @param string $sNewId Id from new article
+     * @param string $sOldId - ID from old article
+     * @param string $sNewId - ID from new article
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyArtExtends" in next major
      */
     protected function _copyArtExtends($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oExt = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
-        $oExt->init("oxartextends");
+        $this->copyArtExtends($sOldId, $sNewId);
+    }
+
+    /**
+     * Copying article extends
+     *
+     * @param string $sOldId - ID from old article
+     * @param string $sNewId - ID from new article
+     * @throws Exception
+     */
+    protected function copyArtExtends($sOldId, $sNewId)
+    {
+        $oExt = oxNew(BaseModel::class);
+        $oExt->init('oxartextends');
         $oExt->load($sOldId);
         $oExt->setId($sNewId);
         $oExt->save();
@@ -647,38 +846,49 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      */
     protected function _formJumpList($oArticle, $oParentArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->formJumpList($oArticle, $oParentArticle);
+    }
+
+    /**
+     * Function forms article variants jump list.
+     *
+     * @param object $oArticle       article object
+     * @param object $oParentArticle article parent object
+     */
+    protected function formJumpList($oArticle, $oParentArticle)
+    {
         $aJumpList = [];
         //fetching parent article variants
         $sOxIdField = 'oxarticles__oxid';
         if (isset($oParentArticle)) {
-            $aJumpList[] = [$oParentArticle->$sOxIdField->value, $this->_getTitle($oParentArticle)];
-            $sEditLanguageParameter = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editlanguage");
+            $aJumpList[] = [$oParentArticle->$sOxIdField->value, $this->getTitle($oParentArticle)];
+            $sEditLanguageParameter = Registry::getRequest()->getRequestEscapedParameter('editlanguage');
             $oParentVariants = $oParentArticle->getAdminVariants($sEditLanguageParameter);
             if ($oParentVariants->count()) {
                 foreach ($oParentVariants as $oVar) {
-                    $aJumpList[] = [$oVar->$sOxIdField->value, " - " . $this->_getTitle($oVar)];
+                    $aJumpList[] = [$oVar->$sOxIdField->value, ' - ' . $this->getTitle($oVar)];
                     if ($oVar->$sOxIdField->value == $oArticle->$sOxIdField->value) {
                         $oVariants = $oArticle->getAdminVariants($sEditLanguageParameter);
                         if ($oVariants->count()) {
                             foreach ($oVariants as $oVVar) {
-                                $aJumpList[] = [$oVVar->$sOxIdField->value, " -- " . $this->_getTitle($oVVar)];
+                                $aJumpList[] = [$oVVar->$sOxIdField->value, ' -- ' . $this->getTitle($oVVar)];
                             }
                         }
                     }
                 }
             }
         } else {
-            $aJumpList[] = [$oArticle->$sOxIdField->value, $this->_getTitle($oArticle)];
+            $aJumpList[] = [$oArticle->$sOxIdField->value, $this->getTitle($oArticle)];
             //fetching this article variants data
-            $oVariants = $oArticle->getAdminVariants(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editlanguage"));
+            $oVariants = $oArticle->getAdminVariants(Registry::getRequest()->getRequestEscapedParameter('editlanguage'));
             if ($oVariants && $oVariants->count()) {
                 foreach ($oVariants as $oVar) {
-                    $aJumpList[] = [$oVar->$sOxIdField->value, " - " . $this->_getTitle($oVar)];
+                    $aJumpList[] = [$oVar->$sOxIdField->value, ' - ' . $this->getTitle($oVar)];
                 }
             }
         }
         if (count($aJumpList) > 1) {
-            $this->_aViewData["thisvariantlist"] = $aJumpList;
+            $this->_aViewData['thisvariantlist'] = $aJumpList;
         }
     }
 
@@ -692,6 +902,18 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      */
     protected function _getTitle($oObj) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getTitle($oObj);
+    }
+
+    /**
+     * Returns formed variant title
+     *
+     * @param object $oObj product object
+     *
+     * @return string
+     */
+    protected function getTitle($oObj)
+    {
         $sTitle = $oObj->oxarticles__oxtitle->value;
         if (!strlen($sTitle)) {
             $sTitle = $oObj->oxarticles__oxvarselect->value;
@@ -703,11 +925,11 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * Returns shop manufacturers list
      *
-     * @return oxmanufacturerlist
+     * @return ManufacturerList
      */
     public function getCategoryList()
     {
-        $oCatTree = oxNew(\OxidEsales\Eshop\Application\Model\CategoryList::class);
+        $oCatTree = oxNew(CategoryList::class);
         $oCatTree->loadList();
 
         return $oCatTree;
@@ -716,11 +938,11 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * Returns shop manufacturers list
      *
-     * @return oxmanufacturerlist
+     * @return ManufacturerList
      */
     public function getVendorList()
     {
-        $oVendorlist = oxNew(\OxidEsales\Eshop\Application\Model\VendorList::class);
+        $oVendorlist = oxNew(VendorList::class);
         $oVendorlist->loadVendorList();
 
         return $oVendorlist;
@@ -729,11 +951,11 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * Returns shop manufacturers list
      *
-     * @return oxmanufacturerlist
+     * @return ManufacturerList
      */
     public function getManufacturerList()
     {
-        $oManufacturerList = oxNew(\OxidEsales\Eshop\Application\Model\ManufacturerList::class);
+        $oManufacturerList = oxNew(ManufacturerList::class);
         $oManufacturerList->loadManufacturerList();
 
         return $oManufacturerList;
@@ -742,10 +964,10 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * Loads language for article.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle
+     * @param Article $oArticle
      * @param string                                      $sOxId
      *
-     * @return \OxidEsales\Eshop\Application\Model\Article
+     * @return Article
      */
     protected function updateArticle($oArticle, $sOxId)
     {
@@ -763,19 +985,20 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      * @param string $sTime
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     protected function formQueryForCopyingToCategory($newArticleId, $sUid, $sCatId, $sTime)
     {
         $oDb = DatabaseProvider::getDb();
-        return "insert into oxobject2category (oxid, oxobjectid, oxcatnid, oxtime) " .
-            "VALUES (" . $oDb->quote($sUid) . ", " . $oDb->quote($newArticleId) . ", " .
-            $oDb->quote($sCatId) . ", " . $oDb->quote($sTime) . ") ";
+        return 'insert into oxobject2category (oxid, oxobjectid, oxcatnid, oxtime) ' .
+            'VALUES (' . $oDb->quote($sUid) . ', ' . $oDb->quote($newArticleId) . ', ' .
+            $oDb->quote($sCatId) . ', ' . $oDb->quote($sTime) . ') ';
     }
 
     /**
-     * @param \OxidEsales\Eshop\Core\Model\BaseModel $base
+     * @param BaseModel $base
      *
-     * @return \OxidEsales\Eshop\Core\Model\BaseModel $base
+     * @return BaseModel $base
      */
     protected function updateBase($base)
     {
@@ -786,9 +1009,9 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      * Customize article data for rendering.
      * Intended to be used by modules.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $article
+     * @param Article $article
      *
-     * @return \OxidEsales\Eshop\Application\Model\Article
+     * @return Article
      */
     protected function customizeArticleInformation($article)
     {
@@ -796,13 +1019,13 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     }
 
     /**
-     * Save non standard article information if needed.
+     * Save non-standard article information if needed.
      * Intended to be used by modules.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $article
+     * @param object $article
      * @param array                                       $parameters
      *
-     * @return \OxidEsales\Eshop\Application\Model\Article
+     * @return object
      */
     protected function saveAdditionalArticleData($article, $parameters)
     {
@@ -810,12 +1033,10 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     }
 
     /**
-     * @return \OxidEsales\Eshop\Application\Model\Article
+     * @return Article
      */
     protected function createArticle()
     {
-        $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-
-        return $oArticle;
+        return oxNew(Article::class);
     }
 }

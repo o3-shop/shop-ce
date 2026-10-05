@@ -115,7 +115,7 @@ class Setup extends Core
     public function getCurrentStep()
     {
         if ($this->_iCurrStep === null) {
-            if (($this->_iCurrStep = $this->getInstance("Utilities")->getRequestVar("istep")) === null) {
+            if (($this->_iCurrStep = $this->getInstance('Utilities')->getRequestVar('istep')) === null) {
                 $this->_iCurrStep = $this->getStep('STEP_SYSTEMREQ');
             }
             $this->_iCurrStep = (int) $this->_iCurrStep;
@@ -152,8 +152,8 @@ class Setup extends Core
     public function alreadySetUp()
     {
         $blSetUp = false;
-        $sConfig = join("", file(getShopBasePath() . "config.inc.php"));
-        if (strpos($sConfig, "<dbHost>") === false) {
+        $sConfig = join('', file(getShopBasePath() . 'config.inc.php'));
+        if (strpos($sConfig, '<dbHost>') === false) {
             $blSetUp = true;
         }
 
@@ -169,8 +169,8 @@ class Setup extends Core
     {
         $blDeleteSetupDirectory = true;
 
-        $sConfig = join("", file(getShopBasePath() . "config.inc.php"));
-        if (strpos($sConfig, "this->blDelSetupDir = false;") !== false) {
+        $sConfig = join('', file(getShopBasePath() . 'config.inc.php'));
+        if (strpos($sConfig, 'this->blDelSetupDir = false;') !== false) {
             $blDeleteSetupDirectory = false;
         }
 

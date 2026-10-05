@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -22,12 +23,12 @@ namespace OxidEsales\EshopCommunity\Tests\Integration\Core\Module;
 
 use OxidEsales\Eshop\Core\FileCache;
 use OxidEsales\Eshop\Core\Module\Module;
+use OxidEsales\Eshop\Core\Module\ModuleSmartyPluginDirectories;
 use OxidEsales\Eshop\Core\Module\ModuleSmartyPluginDirectoryRepository;
 use OxidEsales\Eshop\Core\Module\ModuleVariablesLocator;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopIdCalculator;
 use OxidEsales\Eshop\Core\SubShopSpecificFileCache;
-use OxidEsales\Eshop\Core\Module\ModuleSmartyPluginDirectories;
 use OxidEsales\TestingLibrary\UnitTestCase;
 
 class ModuleSmartyPluginDirectoryRepositoryTest extends UnitTestCase

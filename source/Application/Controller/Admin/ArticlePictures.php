@@ -21,79 +21,85 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxField;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin article picture manager.
- * Collects information about article's used pictures, there is posibility to
+ * Collects information about article's used pictures, there is possibility to
  * upload any other picture, etc.
  * Admin Menu: Manage Products -> Articles -> Pictures.
  */
-class ArticlePictures extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ArticlePictures extends AdminDetailsController
 {
     /**
      * Loads article information - pictures, passes data to Smarty
      * engine, returns name of template file "article_pictures.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
         parent::render();
 
-        $this->_aViewData["edit"] = $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+        $this->_aViewData['edit'] = $oArticle = oxNew(Article::class);
 
         $soxId = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oArticle->load($soxId);
             $oArticle = $this->updateArticle($oArticle);
 
             // variant handling
             if ($oArticle->oxarticles__oxparentid->value) {
-                $oParentArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+                $oParentArticle = oxNew(Article::class);
                 $oParentArticle->load($oArticle->oxarticles__oxparentid->value);
-                $this->_aViewData["parentarticle"] = $oParentArticle;
-                $this->_aViewData["oxparentid"] = $oArticle->oxarticles__oxparentid->value;
+                $this->_aViewData['parentarticle'] = $oParentArticle;
+                $this->_aViewData['oxparentid'] = $oArticle->oxarticles__oxparentid->value;
             }
         }
 
-        $this->_aViewData["iPicCount"] = $this->getConfig()->getConfigParam('iPicCount');
+        $this->_aViewData['iPicCount'] = Registry::getConfig()->getConfigParam('iPicCount');
 
-        return "article_pictures.tpl";
+        return 'article_pictures.tpl';
     }
 
     /**
      * Saves (uploads) pictures to server.
      *
-     * @return mixed
+     * @return void
+     * @throws DatabaseConnectionException
      */
     public function save()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         if ($myConfig->isDemoShop()) {
             // disabling uploading pictures if this is demo shop
-            $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ExceptionToDisplay::class);
+            $oEx = oxNew(ExceptionToDisplay::class);
             $oEx->setMessage('ARTICLE_PICTURES_UPLOADISDISABLED');
-            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx, false);
+            Registry::getUtilsView()->addErrorToDisplay($oEx, false);
 
             return;
         }
 
         parent::save();
 
-        $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+        $oArticle = oxNew(Article::class);
         if ($oArticle->load($this->getEditObjectId())) {
-            $oArticle->assign(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval"));
-            \OxidEsales\Eshop\Core\Registry::getUtilsFile()->processFiles($oArticle);
+            $oArticle->assign(Registry::getRequest()->getRequestEscapedParameter('editval'));
+            Registry::getUtilsFile()->processFiles($oArticle);
 
             // Show that no new image added
-            if (\OxidEsales\Eshop\Core\Registry::getUtilsFile()->getNewFilesCounter() == 0) {
-                $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ExceptionToDisplay::class);
+            if (Registry::getUtilsFile()->getNewFilesCounter() == 0) {
+                $oEx = oxNew(ExceptionToDisplay::class);
                 $oEx->setMessage('NO_PICTURES_CHANGES');
-                \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx, false);
+                Registry::getUtilsView()->addErrorToDisplay($oEx, false);
             }
 
             $oArticle->save();
@@ -105,31 +111,32 @@ class ArticlePictures extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      * where master picture index is higher than currently deleted index.
      * Also deletes custom icon and thumbnail.
      *
-     * @return null
+     * @return void
+     * @throws DatabaseConnectionException
      */
     public function deletePicture()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         if ($myConfig->isDemoShop()) {
             // disabling uploading pictures if this is demo shop
-            $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ExceptionToDisplay::class);
+            $oEx = oxNew(ExceptionToDisplay::class);
             $oEx->setMessage('ARTICLE_PICTURES_UPLOADISDISABLED');
-            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx, false);
+            Registry::getUtilsView()->addErrorToDisplay($oEx, false);
 
             return;
         }
 
         $sOxId = $this->getEditObjectId();
-        $iIndex = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("masterPicIndex");
+        $iIndex = Registry::getRequest()->getRequestEscapedParameter('masterPicIndex');
 
-        $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+        $oArticle = oxNew(Article::class);
         $oArticle->load($sOxId);
 
-        if ($iIndex == "ICO") {
+        if ($iIndex == 'ICO') {
             // deleting main icon
             $this->_deleteMainIcon($oArticle);
-        } elseif ($iIndex == "TH") {
+        } elseif ($iIndex == 'TH') {
             // deleting thumbnail
             $this->_deleteThumbnail($oArticle);
         } else {
@@ -147,27 +154,30 @@ class ArticlePictures extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      * Deletes selected master picture and all pictures generated
      * from master picture
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle       article object
+     * @param Article $oArticle       article object
      * @param int                                         $iIndex         master picture index
      * @param bool                                        $blDeleteMaster if TRUE - deletes and unsets master image file
-     * @deprecated underscore prefix violates PSR12, will be renamed to "resetMasterPicture" in next major
+     * @deprecated Use resetMasterPicture() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _resetMasterPicture().
      */
     protected function _resetMasterPicture($oArticle, $iIndex, $blDeleteMaster = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($this->canResetMasterPicture($oArticle, $iIndex)) {
             if (!$oArticle->isDerived()) {
-                $oPicHandler = \OxidEsales\Eshop\Core\Registry::getPictureHandler();
+                $oPicHandler = Registry::getPictureHandler();
                 $oPicHandler->deleteArticleMasterPicture($oArticle, $iIndex, $blDeleteMaster);
             }
 
             if ($blDeleteMaster) {
                 //reseting master picture field
-                $oArticle->{"oxarticles__oxpic" . $iIndex} = new \OxidEsales\Eshop\Core\Field();
+                $oArticle->{'oxarticles__oxpic' . $iIndex} = new Field();
             }
 
             // cleaning oxzoom fields
-            if (isset($oArticle->{"oxarticles__oxzoom" . $iIndex})) {
-                $oArticle->{"oxarticles__oxzoom" . $iIndex} = new \OxidEsales\Eshop\Core\Field();
+            if (isset($oArticle->{'oxarticles__oxzoom' . $iIndex})) {
+                $oArticle->{'oxarticles__oxzoom' . $iIndex} = new Field();
             }
 
             if ($iIndex == 1) {
@@ -177,40 +187,118 @@ class ArticlePictures extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     }
 
     /**
+     * Deletes selected master picture and all pictures generated
+     * from master picture
+     *
+     * @param Article $oArticle       article object
+     * @param int                                         $iIndex         master picture index
+     * @param bool                                        $blDeleteMaster if TRUE - deletes and unsets master image file
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::resetMasterPicture() (not the deprecated _resetMasterPicture()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function resetMasterPicture($oArticle, $iIndex, $blDeleteMaster = false)
+    {
+        $this->_resetMasterPicture($oArticle, $iIndex, $blDeleteMaster);
+    }
+
+    /**
      * Deletes main icon file
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle article object
-     * @deprecated underscore prefix violates PSR12, will be renamed to "deleteMainIcon" in next major
+     * @param Article $oArticle article object
+     * @deprecated Use deleteMainIcon() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _deleteMainIcon().
      */
     protected function _deleteMainIcon($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($this->canDeleteMainIcon($oArticle)) {
             if (!$oArticle->isDerived()) {
-                $oPicHandler = \OxidEsales\Eshop\Core\Registry::getPictureHandler();
+                $oPicHandler = Registry::getPictureHandler();
                 $oPicHandler->deleteMainIcon($oArticle);
             }
 
             //reseting field
-            $oArticle->oxarticles__oxicon = new \OxidEsales\Eshop\Core\Field();
+            $oArticle->oxarticles__oxicon = new Field();
+        }
+    }
+
+    /**
+     * Deletes main icon file
+     *
+     * @param Article $oArticle article object
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _deleteMainIcon(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make deleteMainIcon() the canonical override target.
+     */
+    protected function deleteMainIcon($oArticle)
+    {
+        $this->_deleteMainIcon($oArticle);
+    }
+
+    /**
+     * Deletes thumbnail file
+     *
+     * @param Article $oArticle article object
+     * @deprecated Use deleteThumbnail() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _deleteThumbnail().
+     */
+    protected function _deleteThumbnail($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        if ($this->canDeleteThumbnail($oArticle)) {
+            if (!$oArticle->isDerived()) {
+                $oPicHandler = Registry::getPictureHandler();
+                $oPicHandler->deleteThumbnail($oArticle);
+            }
+
+            //reseting field
+            $oArticle->oxarticles__oxthumb = new Field();
         }
     }
 
     /**
      * Deletes thumbnail file
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle article object
-     * @deprecated underscore prefix violates PSR12, will be renamed to "deleteThumbnail" in next major
+     * @param Article $oArticle article object
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _deleteThumbnail(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make deleteThumbnail() the canonical override target.
      */
-    protected function _deleteThumbnail($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function deleteThumbnail($oArticle)
     {
-        if ($this->canDeleteThumbnail($oArticle)) {
-            if (!$oArticle->isDerived()) {
-                $oPicHandler = \OxidEsales\Eshop\Core\Registry::getPictureHandler();
-                $oPicHandler->deleteThumbnail($oArticle);
-            }
+        $this->_deleteThumbnail($oArticle);
+    }
 
-            //reseting field
-            $oArticle->oxarticles__oxthumb = new \OxidEsales\Eshop\Core\Field();
+    /**
+     * Cleans up article custom fields oxicon and oxthumb. If there is custom
+     * icon or thumb picture, leaves records untouched.
+     *
+     * @param Article $oArticle article object
+     * @deprecated Use cleanupCustomFields() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _cleanupCustomFields().
+     */
+    protected function _cleanupCustomFields($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $sIcon = $oArticle->oxarticles__oxicon->value;
+        $sThumb = $oArticle->oxarticles__oxthumb->value;
+
+        if ($sIcon == 'nopic.jpg') {
+            $oArticle->oxarticles__oxicon = new Field();
+        }
+
+        if ($sThumb == 'nopic.jpg') {
+            $oArticle->oxarticles__oxthumb = new Field();
         }
     }
 
@@ -218,29 +306,24 @@ class ArticlePictures extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      * Cleans up article custom fields oxicon and oxthumb. If there is custom
      * icon or thumb picture, leaves records untouched.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle article object
-     * @deprecated underscore prefix violates PSR12, will be renamed to "cleanupCustomFields" in next major
+     * @param Article $oArticle article object
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::cleanupCustomFields() (not the deprecated _cleanupCustomFields())
+     *           so downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _cleanupCustomFields($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function cleanupCustomFields($oArticle)
     {
-        $sIcon = $oArticle->oxarticles__oxicon->value;
-        $sThumb = $oArticle->oxarticles__oxthumb->value;
-
-        if ($sIcon == "nopic.jpg") {
-            $oArticle->oxarticles__oxicon = new \OxidEsales\Eshop\Core\Field();
-        }
-
-        if ($sThumb == "nopic.jpg") {
-            $oArticle->oxarticles__oxthumb = new \OxidEsales\Eshop\Core\Field();
-        }
+        $this->_cleanupCustomFields($oArticle);
     }
 
     /**
      * Method is used for overloading to update article object.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle
+     * @param Article $oArticle
      *
-     * @return \OxidEsales\Eshop\Application\Model\Article
+     * @return Article
      */
     protected function updateArticle($oArticle)
     {
@@ -250,20 +333,20 @@ class ArticlePictures extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     /**
      * Checks if possible to reset master picture.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle
+     * @param Article $oArticle
      * @param int                                         $masterPictureIndex
      *
      * @return bool
      */
     protected function canResetMasterPicture($oArticle, $masterPictureIndex)
     {
-        return (bool) $oArticle->{"oxarticles__oxpic" . $masterPictureIndex}->value;
+        return (bool) $oArticle->{'oxarticles__oxpic' . $masterPictureIndex}->value;
     }
 
     /**
      * Checks if possible to delete main icon of article.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle
+     * @param Article $oArticle
      *
      * @return bool
      */
@@ -275,7 +358,7 @@ class ArticlePictures extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     /**
      * Checks if possible to delete thumbnail of article.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle
+     * @param Article $oArticle
      *
      * @return bool
      */

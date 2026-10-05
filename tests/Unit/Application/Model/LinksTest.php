@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,10 +18,11 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
-use \oxDb;
+use oxDb;
+use oxField;
 
 class LinksTest extends \OxidTestCase
 {
@@ -34,7 +36,7 @@ class LinksTest extends \OxidTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->_oxLinks = oxNew("oxlinks", getViewName('oxlinks'));
+        $this->_oxLinks = oxNew('oxlinks', getViewName('oxlinks'));
         $this->_oxLinks->setId('testlink');
         $this->_oxLinks->oxlinks__oxurl = new oxField('http://www.oxid-esales.com', oxField::T_RAW);
         $this->_oxLinks->Save();
@@ -57,7 +59,7 @@ class LinksTest extends \OxidTestCase
      */
     public function testLoad()
     {
-        $oLink = oxNew("oxlinks", getViewName('oxlinks'));
+        $oLink = oxNew('oxlinks', getViewName('oxlinks'));
         $oLink->load($this->_oxLinks->getId());
         $this->assertEquals('http://www.oxid-esales.com', $oLink->oxlinks__oxurl->value);
     }
@@ -67,7 +69,7 @@ class LinksTest extends \OxidTestCase
      */
     public function testDescWithHtmlEntity()
     {
-        $oLink = oxNew("oxlinks", getViewName('oxlinks'));
+        $oLink = oxNew('oxlinks', getViewName('oxlinks'));
         $oLink->load($this->_oxLinks->getId());
         $oLink->oxlinks__oxurldesc = new oxField('Link&, &amp;, !@#$%^&*%$$&@\'.,;p"äüßö', oxField::T_RAW);
         $this->_oxLinks->Save();

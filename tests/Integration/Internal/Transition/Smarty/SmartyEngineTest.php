@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -27,7 +29,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class SmartyEngineTest extends \PHPUnit\Framework\TestCase
 {
-
     public function testExists()
     {
         $template = $this->getTemplateDirectory() . 'smartyTemplate.tpl';

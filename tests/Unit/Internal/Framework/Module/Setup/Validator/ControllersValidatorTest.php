@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -22,12 +24,12 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\Setup\V
 
 use OxidEsales\EshopCommunity\Internal\Framework\Config\Dao\ShopConfigurationSettingDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Config\DataObject\ShopConfigurationSetting;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Exception\ControllersDuplicationModuleConfigurationException;
-use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator\ControllersValidator;
-use PHPUnit\Framework\TestCase;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\Controller;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Exception\ControllersDuplicationModuleConfigurationException;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator\ControllersValidator;
+use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -48,7 +50,7 @@ final class ControllersValidatorTest extends TestCase
         $shopConfigurationSetting->setValue(
             [
                 'moduleId' => [
-                    'alreadyActiveModuleControllerName' => 'alreadyActiveModuleControllerNamepace'
+                    'alreadyActiveModuleControllerName' => 'alreadyActiveModuleControllerNamepace',
                 ],
             ]
         );

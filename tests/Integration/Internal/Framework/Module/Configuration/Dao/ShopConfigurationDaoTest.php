@@ -23,8 +23,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\Configuration\Dao;
 
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Storage\FileStorageFactoryInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopConfigurationDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataMapper\{
     ModuleConfiguration\ModuleSettingsDataMapper
@@ -33,6 +31,8 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ShopConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ShopConfigurationNotFoundException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\Setting;
+use OxidEsales\EshopCommunity\Internal\Framework\Storage\FileStorageFactoryInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 use OxidEsales\EshopCommunity\Tests\Integration\Internal\ContainerTrait;
 use PHPUnit\Framework\TestCase;
@@ -172,7 +172,7 @@ final class ShopConfigurationDaoTest extends TestCase
         $storage = $fileStorageFactory->create(
             $this->get(BasicContextInterface::class)->getProjectConfigurationDirectory() . '/shops/1.yaml'
         );
-        $storage->save(["test" => "test"]);
+        $storage->save(['test' => 'test']);
 
         $shopConfigurationDao = $this->get(ShopConfigurationDaoInterface::class);
 
@@ -189,7 +189,7 @@ final class ShopConfigurationDaoTest extends TestCase
         $storage = $fileStorageFactory->create(
             $this->get(BasicContextInterface::class)->getProjectConfigurationDirectory() . '/environment/1.yaml'
         );
-        $storage->save(["test" => "test"]);
+        $storage->save(['test' => 'test']);
 
         $this->expectException(InvalidConfigurationException::class);
         $shopConfigurationDao->get(1);
@@ -224,9 +224,9 @@ final class ShopConfigurationDaoTest extends TestCase
                 $this->testModuleId => [
                     ModuleSettingsDataMapper::MAPPING_KEY => [
                         $this->testedSetting => ['value' => $this->newValue],
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ]);
     }
 

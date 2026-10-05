@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,18 +18,18 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \Exception;
-use \oxField;
-use \oxTestModules;
+use Exception;
+use oxField;
+use oxTestModules;
 
 /**
  * Testing User_Payment class
  */
 class UserPaymentTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      *
@@ -47,14 +48,14 @@ class UserPaymentTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserPayment::class, array("getSelUserPayment", "getPaymentId", "getPaymentTypes", "getUser", "getUserPayments", "_allowAdminEdit"));
-        $oView->expects($this->once())->method('getSelUserPayment')->will($this->returnValue("getSelUserPayment"));
-        $oView->expects($this->once())->method('getPaymentId')->will($this->returnValue("getPaymentId"));
-        $oView->expects($this->once())->method('getPaymentTypes')->will($this->returnValue("getPaymentTypes"));
-        $oView->expects($this->once())->method('getUser')->will($this->returnValue("getUser"));
-        $oView->expects($this->once())->method('getUserPayments')->will($this->returnValue("getUserPayments"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserPayment::class, ['getSelUserPayment', 'getPaymentId', 'getPaymentTypes', 'getUser', 'getUserPayments', '_allowAdminEdit']);
+        $oView->expects($this->once())->method('getSelUserPayment')->will($this->returnValue('getSelUserPayment'));
+        $oView->expects($this->once())->method('getPaymentId')->will($this->returnValue('getPaymentId'));
+        $oView->expects($this->once())->method('getPaymentTypes')->will($this->returnValue('getPaymentTypes'));
+        $oView->expects($this->once())->method('getUser')->will($this->returnValue('getUser'));
+        $oView->expects($this->once())->method('getUserPayments')->will($this->returnValue('getUserPayments'));
         $oView->expects($this->once())->method('_allowAdminEdit')->will($this->returnValue(false));
-        $this->assertEquals("user_payment.tpl", $oView->render());
+        $this->assertEquals('user_payment.tpl', $oView->render());
         $aViewData = $oView->getViewData();
         $this->assertTrue(isset($aViewData['edit']));
         $this->assertTrue(isset($aViewData['oxpaymentid']));
@@ -74,21 +75,21 @@ class UserPaymentTest extends \OxidTestCase
         oxTestModules::addFunction('oxUtils', 'assignValuesToText', '{}');
         oxTestModules::addFunction('oxuserpayment', 'save', '{ throw new Exception( "save" ); }');
 
-        $this->setRequestParameter("oxid", "testId");
-        $this->setRequestParameter("editval", array("oxuserpayments__oxid" => "-1"));
-        $this->setRequestParameter("dynvalue", "testId");
+        $this->setRequestParameter('oxid', 'testId');
+        $this->setRequestParameter('editval', ['oxuserpayments__oxid' => '-1']);
+        $this->setRequestParameter('dynvalue', 'testId');
 
         try {
-            $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserPayment::class, array("_allowAdminEdit"));
+            $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserPayment::class, ['_allowAdminEdit']);
             $oView->expects($this->once())->method('_allowAdminEdit')->will($this->returnValue(true));
             $oView->save();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "Error in user_payment::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'Error in user_payment::save()');
 
             return;
         }
 
-        $this->fail("Error in user_payment::save()");
+        $this->fail('Error in user_payment::save()');
     }
 
     /**
@@ -101,20 +102,20 @@ class UserPaymentTest extends \OxidTestCase
         oxTestModules::addFunction('oxuserpayment', 'load', '{ return true; }');
         oxTestModules::addFunction('oxuserpayment', 'delete', '{ throw new Exception( "delete" ); }');
 
-        $this->setRequestParameter("oxid", "testId");
-        $this->setRequestParameter("editval", array("oxuserpayments__oxid" => "testId"));
+        $this->setRequestParameter('oxid', 'testId');
+        $this->setRequestParameter('editval', ['oxuserpayments__oxid' => 'testId']);
 
         try {
-            $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserPayment::class, array("_allowAdminEdit"));
+            $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserPayment::class, ['_allowAdminEdit']);
             $oView->expects($this->once())->method('_allowAdminEdit')->will($this->returnValue(true));
             $oView->delPayment();
         } catch (Exception $oExcp) {
-            $this->assertEquals("delete", $oExcp->getMessage(), "Error in user_payment::delPayment()");
+            $this->assertEquals('delete', $oExcp->getMessage(), 'Error in user_payment::delPayment()');
 
             return;
         }
 
-        $this->fail("Error in user_payment::delPayment()");
+        $this->fail('Error in user_payment::delPayment()');
     }
 
     /**
@@ -125,7 +126,7 @@ class UserPaymentTest extends \OxidTestCase
     public function testGetUser()
     {
         $this->setRequestParameter('oxid', 'oxdefaultadmin');
-        $oUserView = oxNew("user_payment");
+        $oUserView = oxNew('user_payment');
         $oUser = $oUserView->getUser();
         $this->assertEquals('oxdefaultadmin', $oUser->getId());
     }
@@ -138,7 +139,7 @@ class UserPaymentTest extends \OxidTestCase
     public function testGetPaymentId()
     {
         $this->setRequestParameter('oxpaymentid', 'oxidinvoice');
-        $oUserView = oxNew("user_payment");
+        $oUserView = oxNew('user_payment');
         $this->assertEquals('oxidinvoice', $oUserView->getPaymentId());
     }
 
@@ -150,7 +151,7 @@ class UserPaymentTest extends \OxidTestCase
     public function testGetPaymentIdNotSelected()
     {
         $this->setRequestParameter('oxpaymentid', null);
-        $oUserView = oxNew("user_payment");
+        $oUserView = oxNew('user_payment');
         $this->assertEquals(-1, $oUserView->getPaymentId());
     }
 
@@ -164,10 +165,10 @@ class UserPaymentTest extends \OxidTestCase
         $this->setRequestParameter('oxpaymentid', null);
         $oUserPayment = oxNew('oxUserPayment');
         $oUserPayment->oxuserpayments__oxid = new oxField('oxidinvoice');
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array('getUserPayments'));
-        $oUser->expects($this->once())->method('getUserPayments')->will($this->returnValue(array($oUserPayment)));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['getUserPayments']);
+        $oUser->expects($this->once())->method('getUserPayments')->will($this->returnValue([$oUserPayment]));
         $oUserView = $this->getProxyClass('user_payment');
-        $oUserView->setNonPublicVar("_oActiveUser", $oUser);
+        $oUserView->setNonPublicVar('_oActiveUser', $oUser);
         $this->assertEquals('oxidinvoice', $oUserView->getPaymentId());
     }
 
@@ -202,7 +203,7 @@ class UserPaymentTest extends \OxidTestCase
         $payments = $oPaymentList->getArray();
         $paymentsIds = '';
         foreach ($payments as $payment) {
-            $paymentsIds .= $payment->getId() ."\n";
+            $paymentsIds .= $payment->getId() . "\n";
         }
 
         $this->assertEquals(5, $oPaymentList->count(), $paymentsIds);
@@ -216,7 +217,7 @@ class UserPaymentTest extends \OxidTestCase
      */
     public function testGetPaymentTypesInOtherLang()
     {
-        oxTestModules::addFunction("oxLang", "getTplLanguage", "{ return 1; }");
+        oxTestModules::addFunction('oxLang', 'getTplLanguage', '{ return 1; }');
         $oUserView = $this->getProxyClass('user_payment');
         $oPaymentList = $oUserView->getPaymentTypes();
         $blIsLoaded = false;
@@ -242,7 +243,7 @@ class UserPaymentTest extends \OxidTestCase
         $oUpay->oxuserpayments__oxpaymentsid = new oxField('oxidinvoice', oxField::T_RAW);
         $oUpay->save();
         $oUserView = $this->getProxyClass('user_payment');
-        $oUserView->setNonPublicVar("_sPaymentId", '_testOxId');
+        $oUserView->setNonPublicVar('_sPaymentId', '_testOxId');
         $oPayment = $oUserView->getSelUserPayment();
         $this->assertEquals('_testOxId', $oPayment->getId());
     }
@@ -262,7 +263,7 @@ class UserPaymentTest extends \OxidTestCase
         $oUpay->save();
         $this->setRequestParameter('oxid', 'oxdefaultadmin');
         $oUserView = $this->getProxyClass('user_payment');
-        $oUserView->setNonPublicVar("_sPaymentId", '_testOxId');
+        $oUserView->setNonPublicVar('_sPaymentId', '_testOxId');
         $oPaymentList = $oUserView->getUserPayments();
         $this->assertEquals(1, $oPaymentList->count());
         $blIsLoaded = false;
@@ -289,9 +290,9 @@ class UserPaymentTest extends \OxidTestCase
         $oUpay->oxuserpayments__oxpaymentsid = new oxField('oxidinvoice', oxField::T_RAW);
         $oUpay->save();
         $this->setRequestParameter('oxid', 'oxdefaultadmin');
-        oxTestModules::addFunction("oxLang", "getTplLanguage", "{ return 1; }");
+        oxTestModules::addFunction('oxLang', 'getTplLanguage', '{ return 1; }');
         $oUserView = $this->getProxyClass('user_payment');
-        $oUserView->setNonPublicVar("_sPaymentId", '_testOxId');
+        $oUserView->setNonPublicVar('_sPaymentId', '_testOxId');
         $oPaymentList = $oUserView->getUserPayments();
         $blIsLoaded = false;
         foreach ($oPaymentList as $oPayment) {

@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
+
 /**
  * Admin news manager.
  * Returns template, that arranges two other templates ("news_list.tpl"
@@ -28,7 +30,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
  * Admin Menu: Customer Info -> News.
  * @deprecated 6.5.6 "News" feature will be removed completely
  */
-class AdminNews extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class AdminNews extends AdminController
 {
     /**
      * Current class template name.

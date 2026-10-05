@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: brutto
  * Price view mode:  brutto
@@ -20,16 +21,16 @@
  * https://bugs.oxid-esales.com/view.php?id=4425
  * @bug #4425
  */
-$aData = array(
-    'articles' => array(
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
                 'oxid'                     => '4425',
                 'oxprice'                  => 879,
                 'amount'                   => 1,
-        ),
-    ),
-    'discounts' => array(
-        0 => array(
+        ],
+    ],
+    'discounts' => [
+        0 => [
                 'oxid'         => 'discount10euro',
                 'oxaddsum'     => 10,
                 'oxaddsumtype' => 'abs',
@@ -38,27 +39,27 @@ $aData = array(
                 'oxprice' => 0,
                 'oxpriceto' => 0,
                 'oxactive' => 1,
-                'oxarticles' => array( 4425 ),
+                'oxarticles' => [ 4425 ],
                 'oxsort' => 10,
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-                '4425' => array( '869,00', '869,00' ),
-        ),
-        'totals' => array(
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+                '4425' => [ '869,00', '869,00' ],
+        ],
+        'totals' => [
                 'totalBrutto' => '869,00',
                 'totalNetto'  => '730,25',
-                'vats' => array(
+                'vats' => [
                         '19' => '138,75',
-                ),
-                'grandTotal'  => '869,00'
-        ),
-    ),
-    'options' => array(
-            'config' => array(
+                ],
+                'grandTotal'  => '869,00',
+        ],
+    ],
+    'options' => [
+            'config' => [
                 'blEnterNetPrice' => false,
-                'blShowNetPrice' => false
-            ),
-    )
-);
+                'blShowNetPrice' => false,
+            ],
+    ],
+];

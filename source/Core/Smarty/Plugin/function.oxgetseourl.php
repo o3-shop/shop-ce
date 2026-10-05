@@ -19,7 +19,6 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-
 /**
  * Smarty function
  * -------------------------------------------------------------
@@ -36,7 +35,7 @@ function smarty_function_oxgetseourl($params, &$smarty)
 {
     $sOxid = isset($params['oxid']) ? $params['oxid'] : null;
     $sType = isset($params['type']) ? $params['type'] : null;
-    $sUrl  = $sIdent = isset($params['ident']) ? $params['ident'] : null;
+    $sUrl = $sIdent = isset($params['ident']) ? $params['ident'] : null;
 
     // requesting specified object SEO url
     if ($sType) {
@@ -47,7 +46,7 @@ function smarty_function_oxgetseourl($params, &$smarty)
             $sUrl = $oObject->getLink();
         } elseif ($sOxid) {
             //minimising aricle object loading
-            if (strtolower($sType) == "oxarticle") {
+            if (strtolower($sType) == 'oxarticle') {
                 $oObject->disablePriceLoad();
                 $oObject->setNoVariantLoading(true);
             }

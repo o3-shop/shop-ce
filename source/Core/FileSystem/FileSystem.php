@@ -21,6 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Core\FileSystem;
 
+use InvalidArgumentException;
+use RuntimeException;
+
 /**
  * Wrapper for actions related to file system.
  *
@@ -54,5 +57,182 @@ class FileSystem
     public function isReadable($filePath)
     {
         return (is_file($filePath) && is_readable($filePath));
+    }
+
+    /**
+     * Creates a directory if it does not already exist.
+     * Ensures the resulting path stays within the allowed base directory.
+     *
+     * The base directory defines the security boundary — the resolved target path
+     * must be located within it, otherwise an InvalidArgumentException is thrown.
+     * This prevents path traversal attacks (e.g., via "../" segments or symlinks).
+     *
+     * The base directory must already exist in the filesystem. It is resolved via
+     * realpath() to its canonical form before comparison.
+     *
+     * Typical base directories in the O3-Shop context:
+     *
+     *   - INSTALLATION_ROOT_PATH Project root (where composer.json and vendor/ live)
+     *   - OX_BASE_PATH           Shop source directory (source/)
+     *   - $config->getConfigParam('sShopDir')    Same as OX_BASE_PATH, with trailing slash
+     *   - $config->getConfigParam('sCompileDir') Tmp/cache/Smarty compilation directory
+     *
+     * @param string $path    The directory path to create.
+     * @param string $baseDir The allowed root directory that acts as a security boundary.
+     *                        Must already exist. The target path must resolve to a
+     *                        location within this directory.
+     * @param int    $mode    The permissions for the directory (default: 0755).
+     *
+     * @return bool True if the directory exists or was successfully created.
+     *
+     * @throws InvalidArgumentException If the path is empty, the base directory
+     *                                   does not exist, or the resolved path
+     *                                   escapes the base directory.
+     * @throws RuntimeException         If the path exists but is not a directory,
+     *                                   or if creation fails.
+     */
+    public function createDirIfNotExists(string $path, string $baseDir, int $mode = 0755): bool
+    {
+        $this->validatePath($path);
+
+        if (is_dir($path)) {
+            return true;
+        }
+
+        $this->assertNotExistingFile($path);
+
+        $normalised = $this->normalizePath($path);
+        $this->assertWithinBaseDir($normalised, $baseDir);
+        $this->makeDirectory($normalised, $mode);
+
+        return true;
+    }
+
+    /**
+     * @param string $path
+     *
+     * @throws InvalidArgumentException If the path is empty.
+     */
+    private function validatePath(string $path): void
+    {
+        if (trim($path) === '') {
+            throw new InvalidArgumentException('Directory path must not be empty.');
+        }
+    }
+
+    /**
+     * @param string $path
+     *
+     * @throws RuntimeException If the path exists but is not a directory.
+     */
+    private function assertNotExistingFile(string $path): void
+    {
+        if (file_exists($path)) {
+            throw new RuntimeException(
+                sprintf('Path "%s" exists but is not a directory.', $path)
+            );
+        }
+    }
+
+    /**
+     * Normalizes directory separators and strips trailing separators.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    private function normalizePath(string $path): string
+    {
+        return rtrim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path), DIRECTORY_SEPARATOR);
+    }
+
+    /**
+     * Resolves the target path against its deepest existing ancestor and
+     * verifies it stays within the allowed base directory.
+     *
+     * @param string $path
+     * @param string $baseDir
+     *
+     * @throws InvalidArgumentException If the base directory does not exist,
+     *                                   the path cannot be resolved, or the
+     *                                   resolved path escapes the base directory.
+     */
+    private function assertWithinBaseDir(string $path, string $baseDir): void
+    {
+        $resolvedBase = realpath($baseDir);
+        if ($resolvedBase === false) {
+            throw new InvalidArgumentException(
+                sprintf('Base directory "%s" does not exist.', $baseDir)
+            );
+        }
+        $resolvedBase = rtrim($resolvedBase, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+
+        $resolvedPath = $this->resolveNonExistentPath($path);
+
+        if (strpos($resolvedPath . DIRECTORY_SEPARATOR, $resolvedBase) !== 0) {
+            throw new InvalidArgumentException(
+                sprintf('Path "%s" is outside the allowed base directory "%s".', $path, $baseDir)
+            );
+        }
+    }
+
+    /**
+     * Resolves a path that does not yet exist by walking up to the deepest
+     * existing ancestor, calling realpath() on that, and re-appending the
+     * remaining segments.
+     *
+     * @param string $path
+     *
+     * @return string
+     *
+     * @throws InvalidArgumentException If no existing ancestor can be resolved.
+     */
+    private function resolveNonExistentPath(string $path): string
+    {
+        $existing = $path;
+        $tail = '';
+
+        while (!file_exists($existing)) {
+            $tail = DIRECTORY_SEPARATOR . basename($existing) . $tail;
+            $parent = dirname($existing);
+            if ($parent === $existing) {
+                break;
+            }
+            $existing = $parent;
+        }
+
+        $resolvedExisting = realpath($existing);
+        if ($resolvedExisting === false) {
+            throw new InvalidArgumentException(
+                sprintf('Cannot resolve path "%s".', $path)
+            );
+        }
+
+        return $resolvedExisting . $tail;
+    }
+
+    /**
+     * Creates the directory recursively.
+     *
+     * Handles the race condition where another process creates the directory
+     * between our existence check and the mkdir call.
+     *
+     * @param string $path
+     * @param int    $mode
+     *
+     * @throws RuntimeException If the directory could not be created.
+     */
+    private function makeDirectory(string $path, int $mode): void
+    {
+        clearstatcache(true, $path);
+
+        if (!@mkdir($path, $mode, true) && !is_dir($path)) {
+            $lastError = error_get_last();
+            $message = $lastError['message'] ?? 'unknown error';
+
+            throw new RuntimeException(
+                sprintf('Directory "%s" could not be created: %s', $path, $message)
+            );
+        }
     }
 }

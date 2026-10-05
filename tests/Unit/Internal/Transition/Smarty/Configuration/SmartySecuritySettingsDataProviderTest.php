@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -18,7 +20,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Smarty\Configuration;
+namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Transition\Smarty\Configuration;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Smarty\Configuration\SmartySecuritySettingsDataProvider;
 use OxidEsales\EshopCommunity\Internal\Framework\Smarty\SmartyContextInterface;
@@ -38,7 +40,7 @@ class SmartySecuritySettingsDataProviderTest extends \PHPUnit\Framework\TestCase
                 'IF_FUNCS' => ['XML_ELEMENT_NODE', 'is_int'],
                 'MODIFIER_FUNCS' => ['round', 'floor', 'trim', 'implode', 'is_array', 'getimagesize'],
                 'ALLOW_CONSTANTS' => true,
-            ]
+            ],
         ];
 
         $this->assertEquals($settings, $dataProvider->getSecuritySettings());

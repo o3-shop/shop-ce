@@ -32,6 +32,6 @@ class CrossSelling extends \OxidEsales\Eshop\Core\GenericImport\ImportObject\Imp
     /** @var array List of database key fields (i.e. oxid). */
     protected $keyFieldList = [
         'OXARTICLENID' => 'OXARTICLENID',
-        'OXOBJECTID'   => 'OXOBJECTID'
+        'OXOBJECTID'   => 'OXOBJECTID',
     ];
 }

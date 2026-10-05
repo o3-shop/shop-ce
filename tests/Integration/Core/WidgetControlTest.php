@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -35,7 +36,7 @@ class WidgetControlTest extends UnitTestCase
         $originalDebugMode = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)->getVar('iDebug');
         /** Set iDebug to 1, so the exception will be rethrown */
         \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)->setVar('iDebug', 1);
-        $_SERVER["REQUEST_METHOD"] = 'POST';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
 
         $wasExceptionThrown = false;
         try {

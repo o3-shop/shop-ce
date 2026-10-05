@@ -1,0 +1,17 @@
+; Active step-debugging config. Toggled on/off via `./docker.sh xdebug on|off`.
+; This .dist template is copied to zz-xdebug-debug.ini (loaded by PHP via
+; PHP_INI_SCAN_DIR). PHP only loads files ending in .ini, so this template is inert.
+; Intentionally NOT including 'develop': on PHP 8.2 the old Doctrine DBAL 2.x /
+; Smarty stack emits tens of thousands of Deprecated notices per request, and
+; 'develop' streams every one to the IDE as an error notification — flooding the
+; debug session and triggering bogus "path mapping" warnings for vendor/ files.
+; Step debugging needs only 'debug'. Coverage kept so test coverage still works.
+xdebug.mode=debug,coverage
+; 'trigger' (not 'yes'): debugging only starts when a request carries an
+; XDEBUG_TRIGGER (the "Xdebug Helper" browser extension, ?XDEBUG_TRIGGER=1, or the
+; env var for CLI). With 'yes' EVERY page request AND every CLI command (oe-console,
+; composer, even `php -r`) opens a session the IDE can grab and freeze — unusable here.
+xdebug.start_with_request=trigger
+xdebug.client_host=host.docker.internal
+xdebug.client_port=9003
+xdebug.log=/tmp/xdebug.log

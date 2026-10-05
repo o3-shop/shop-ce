@@ -23,7 +23,6 @@ namespace OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic;
 
 class AddUrlParametersLogic
 {
-
     /**
      * Add additional parameters to SEO url
      *
@@ -38,7 +37,7 @@ class AddUrlParametersLogic
         // removing empty parameters
         $sDynParams = $sDynParams ? $oStr->preg_replace(['/^\?/', '/^\&(amp;)?$/'], '', $sDynParams) : false;
         if ($sDynParams) {
-            $sUrl .= ((strpos($sUrl, '?') !== false) ? "&amp;" : "?") . $sDynParams;
+            $sUrl .= ((strpos($sUrl, '?') !== false) ? '&amp;' : '?') . $sDynParams;
         }
 
         return \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->processSeoUrl($sUrl);

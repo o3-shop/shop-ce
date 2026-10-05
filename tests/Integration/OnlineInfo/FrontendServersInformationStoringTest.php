@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\OnlineInfo;
 
 /**
@@ -38,7 +40,7 @@ class FrontendServersInformationStoringTest extends \OxidEsales\TestingLibrary\U
      */
     public function testUpdateAppServerInformationNewAppServer()
     {
-        $currentTime = \OxidEsales\Eshop\Core\Registry::get("oxUtilsDate")->getTime();
+        $currentTime = \OxidEsales\Eshop\Core\Registry::get('oxUtilsDate')->getTime();
 
         $service = $this->getApplicationServerServiceObject($currentTime);
         $service->updateAppServerInformationInFrontend();
@@ -55,7 +57,7 @@ class FrontendServersInformationStoringTest extends \OxidEsales\TestingLibrary\U
      */
     public function testUpdateAppServerInformationAppServerExists()
     {
-        $currentTime = \OxidEsales\Eshop\Core\Registry::get("oxUtilsDate")->getTime();
+        $currentTime = \OxidEsales\Eshop\Core\Registry::get('oxUtilsDate')->getTime();
 
         $this->storeAppServer1Information(($currentTime - (11 * 3600)));
 
@@ -74,7 +76,7 @@ class FrontendServersInformationStoringTest extends \OxidEsales\TestingLibrary\U
      */
     public function testUpdateAppServerInformationUpdateAppServerData()
     {
-        $currentTime = \OxidEsales\Eshop\Core\Registry::get("oxUtilsDate")->getTime();
+        $currentTime = \OxidEsales\Eshop\Core\Registry::get('oxUtilsDate')->getTime();
 
         $this->storeAppServer1Information(($currentTime - (25 * 3600)));
 
@@ -97,7 +99,7 @@ class FrontendServersInformationStoringTest extends \OxidEsales\TestingLibrary\U
      */
     public function testUpdateAppServerInformationAddAppServer()
     {
-        $currentTime = \OxidEsales\Eshop\Core\Registry::get("oxUtilsDate")->getTime();
+        $currentTime = \OxidEsales\Eshop\Core\Registry::get('oxUtilsDate')->getTime();
 
         $this->storeAppServer2Information($currentTime);
 
@@ -117,7 +119,7 @@ class FrontendServersInformationStoringTest extends \OxidEsales\TestingLibrary\U
      */
     public function testUpdateAppServerInformationIfOneIsNotActiveAppServer()
     {
-        $currentTime = \OxidEsales\Eshop\Core\Registry::get("oxUtilsDate")->getTime();
+        $currentTime = \OxidEsales\Eshop\Core\Registry::get('oxUtilsDate')->getTime();
 
         $this->storeAppServer2Information(($currentTime - (25 * 3600)));
 
@@ -136,7 +138,7 @@ class FrontendServersInformationStoringTest extends \OxidEsales\TestingLibrary\U
      */
     public function testUpdateAppServerInformationIfOneIsOutdatedAppServer()
     {
-        $currentTime = \OxidEsales\Eshop\Core\Registry::get("oxUtilsDate")->getTime();
+        $currentTime = \OxidEsales\Eshop\Core\Registry::get('oxUtilsDate')->getTime();
 
         $this->storeAppServer2Information(($currentTime - (75 * 3600)));
 
@@ -172,26 +174,26 @@ class FrontendServersInformationStoringTest extends \OxidEsales\TestingLibrary\U
     private function storeAppServer1Information($timestamp)
     {
         $config = $this->getConfig();
-        $appServer = array(
+        $appServer = [
             'id'                => 'serverNameHash1',
             'timestamp'         => $timestamp,
             'ip'                => '127.0.0.1',
             'lastFrontendUsage' => '',
-            'lastAdminUsage'    => 'adminUsageTimestampUpdated'
-        );
+            'lastAdminUsage'    => 'adminUsageTimestampUpdated',
+        ];
         $config->saveSystemConfigParameter('arr', 'aServersData_serverNameHash1', $appServer);
     }
 
     private function storeAppServer2Information($timestamp)
     {
         $config = $this->getConfig();
-        $appServer = array(
+        $appServer = [
             'id'                => 'serverNameHash2',
             'timestamp'         => $timestamp,
             'ip'                => '127.0.0.1',
             'lastFrontendUsage' => '',
-            'lastAdminUsage'    => 'adminUsageTimestampUpdated'
-        );
+            'lastAdminUsage'    => 'adminUsageTimestampUpdated',
+        ];
         $config->saveSystemConfigParameter('arr', 'aServersData_serverNameHash2', $appServer);
     }
 }

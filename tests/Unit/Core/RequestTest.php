@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 use OxidEsales\EshopCommunity\Core\Request;
@@ -74,7 +76,7 @@ class RequestTest extends \OxidTestCase
      */
     public function testGetRequestUrl()
     {
-        $_SERVER["REQUEST_METHOD"] = 'GET';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = 'test.php?param1=value1&param2=value2';
 
         $request = oxNew(Request::class);
@@ -86,7 +88,7 @@ class RequestTest extends \OxidTestCase
      */
     public function testGetRequestUrlEmptyParams()
     {
-        $_SERVER["REQUEST_METHOD"] = 'GET';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = $sUri = '/shop/';
 
         $request = oxNew(Request::class);
@@ -98,7 +100,7 @@ class RequestTest extends \OxidTestCase
      */
     public function testGetRequestUrlSubfolder()
     {
-        $_SERVER["REQUEST_METHOD"] = 'GET';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['SCRIPT_URI'] = '/shop/?cl=details';
 
         $request = oxNew(Request::class);
@@ -111,7 +113,7 @@ class RequestTest extends \OxidTestCase
     public function testGetRequestUrl_removingSID()
     {
         $request = oxNew(Request::class);
-        $_SERVER["REQUEST_METHOD"] = 'GET';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = 'test.php?param1=value1&sid=zzz&sysid=vvv&param2=ttt';
         $this->assertEquals('index.php?param1=value1&amp;sysid=vvv&amp;param2=ttt', $request->getRequestUrl());
 
@@ -130,7 +132,7 @@ class RequestTest extends \OxidTestCase
     {
         $oVar = new stdClass();
         $oVar->xxx = 'yyy';
-        $aVar = array('&\\o<x>i"\'d' . chr(0));
+        $aVar = ['&\\o<x>i"\'d' . chr(0)];
         $sVar = '&\\o<x>i"\'d' . chr(0);
         $request = oxNew(Request::class);
 
@@ -138,7 +140,7 @@ class RequestTest extends \OxidTestCase
         $this->assertEquals($oVar, $request->checkParamSpecialChars($oVar));
 
         // array items comes fixed
-        $this->assertEquals(array("&amp;&#092;o&lt;x&gt;i&quot;&#039;d"), $request->checkParamSpecialChars($aVar));
+        $this->assertEquals(['&amp;&#092;o&lt;x&gt;i&quot;&#039;d'], $request->checkParamSpecialChars($aVar));
 
         // string comes fixed
         $this->assertEquals('&amp;&#092;o&lt;x&gt;i&quot;&#039;d', $request->checkParamSpecialChars($sVar));
@@ -150,8 +152,8 @@ class RequestTest extends \OxidTestCase
      */
     public function testCheckParamSpecialCharsForArray()
     {
-        $values = array('first' => 'first char &', 'second' => 'second char &', 'third' => 'third char &');
-        $aRaw = array('first', 'third');
+        $values = ['first' => 'first char &', 'second' => 'second char &', 'third' => 'third char &'];
+        $aRaw = ['first', 'third'];
 
         $result = oxNew(Request::class)->checkParamSpecialChars($values, $aRaw);
 
@@ -167,16 +169,16 @@ class RequestTest extends \OxidTestCase
      */
     public function testCheckParamSpecialCharsAlsoFixesArrayKeys()
     {
-        $test = array(
-            array(
-                'data'   => array('asd&' => 'a%&'),
-                'result' => array('asd&amp;' => 'a%&amp;'),
-            ),
-            array(
+        $test = [
+            [
+                'data'   => ['asd&' => 'a%&'],
+                'result' => ['asd&amp;' => 'a%&amp;'],
+            ],
+            [
                 'data'   => 'asd&',
                 'result' => 'asd&amp;',
-            )
-        );
+            ],
+        ];
         $request = oxNew(Request::class);
         foreach ($test as $check) {
             $this->assertEquals($check['result'], $request->checkParamSpecialChars($check['data']));
@@ -188,12 +190,12 @@ class RequestTest extends \OxidTestCase
      */
     public function providerCheckParamSpecialChars_newLineExist_newLineChanged()
     {
-        return array(
-            array("\r", '&#13;'),
-            array("\n", '&#10;'),
-            array("\r\n", '&#13;&#10;'),
-            array("\n\r", '&#10;&#13;'),
-        );
+        return [
+            ["\r", '&#13;'],
+            ["\n", '&#10;'],
+            ["\r\n", '&#13;&#10;'],
+            ["\n\r", '&#10;&#13;'],
+        ];
     }
 
     /**
@@ -202,18 +204,18 @@ class RequestTest extends \OxidTestCase
     public function testCheckParamSpecialChars_newLineExist_newLineChanged($sNewLineCharacter, $sEscapedNewLineCharacter)
     {
         $oVar = new stdClass();
-        $oVar->xxx = "text" . $sNewLineCharacter;
-        $aVar = array("text" . $sNewLineCharacter);
-        $sVar = "text" . $sNewLineCharacter;
+        $oVar->xxx = 'text' . $sNewLineCharacter;
+        $aVar = ['text' . $sNewLineCharacter];
+        $sVar = 'text' . $sNewLineCharacter;
 
         $request = oxNew(Request::class);
         // object must came back the same
         $this->assertEquals($oVar, $request->checkParamSpecialChars($oVar));
 
         // array items comes fixed
-        $this->assertEquals(array("text" . $sEscapedNewLineCharacter), $request->checkParamSpecialChars($aVar));
+        $this->assertEquals(['text' . $sEscapedNewLineCharacter], $request->checkParamSpecialChars($aVar));
 
         // string comes fixed
-        $this->assertEquals("text" . $sEscapedNewLineCharacter, $request->checkParamSpecialChars($sVar));
+        $this->assertEquals('text' . $sEscapedNewLineCharacter, $request->checkParamSpecialChars($sVar));
     }
 }

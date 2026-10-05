@@ -1,4 +1,5 @@
 <?php
+
 /*
 /**
  * Price enter mode: brutto
@@ -12,38 +13,38 @@
  * Discounts: 2 item discount
  * Short description: test added from selenium test (testFewItmDiscounts);Is testing few Itm discount for products
  */
-$aData = array(
+$aData = [
     // Articles
-    'articles' => array(
-        0 => array(
+    'articles' => [
+        0 => [
             // oxarticles db fields
             'oxid'                     => 1000,
             'oxprice'                  => 50.00,
             'oxvat'                    => 5,
             // Amount in basket
             'amount'                   => 1,
-        ),
-        1 => array(
+        ],
+        1 => [
             // oxarticles db fields
             'oxid'                     => 1003,
             'oxprice'                  => 50.00,
             'oxvat'                    => 5,
             // Amount in basket
           //  'amount'                   => 1,
-        ),
-        2 => array(
+        ],
+        2 => [
             // oxarticles db fields
             'oxid'                     => 1002,
             'oxprice'                  => 50.00,
             'oxvat'                    => 5,
             // Amount in basket
            // 'amount'                   => 1,
-        ),
-    ),
+        ],
+    ],
     // Discounts
-    'discounts' => array(
+    'discounts' => [
         // oxdiscount DB fields
-        0 => array(
+        0 => [
             'oxid'         => 'testitmdiscount',
             'oxshopid' => 1,
             'oxaddsum'     => 0,
@@ -56,11 +57,11 @@ $aData = array(
             'oxitmartid' => 1003,
             'oxitmamount' => 1,
             'oxitmmultiple' => 0,
-            'oxarticles' => array( 1000 ),
+            'oxarticles' => [ 1000 ],
             'oxsort' => 10,
-        ),
+        ],
                 // oxdiscount DB fields
-        1 => array(
+        1 => [
             'oxid'         => 'testitmdiscounts',
             'oxshopid' => 1,
             'oxaddsum'     => 0,
@@ -73,28 +74,28 @@ $aData = array(
             'oxitmartid' => 1002,
             'oxitmamount' => 1,
             'oxitmmultiple' => 0,
-            'oxarticles' => array( 1000 ),
+            'oxarticles' => [ 1000 ],
             'oxsort' => 20,
-        ),
-    ),
+        ],
+    ],
     // TEST EXPECTATIONS
-    'expected' => array(
+    'expected' => [
         // Article expected prices: ARTICLE ID => ( Unit price, Total Price )
-        'articles' => array(
-             1000 => array( '50,00', '50,00' ),
-             1003 => array( '0,00', '0,00' ),
-             1002=> array( '0,00', '0,00' ),
-        ),
+        'articles' => [
+             1000 => [ '50,00', '50,00' ],
+             1003 => [ '0,00', '0,00' ],
+             1002=> [ '0,00', '0,00' ],
+        ],
         // Expectations of other totals
-        'totals' => array(
+        'totals' => [
             // Total BRUTTO
             'totalBrutto' => '50,00',
             // Total NETTO
             'totalNetto'  => '47,62',
             // Total VAT amount: vat% => total cost
-            'vats' => array(
-                5 => '2,38'
-            ),
+            'vats' => [
+                5 => '2,38',
+            ],
             // Total discount amounts: discount id => total cost
          //   'discounts' => array (
                 // Expectation for special discount with specified ID
@@ -102,14 +103,14 @@ $aData = array(
        //     ),
 
             // GRAND TOTAL
-            'grandTotal'  => '50,00'
-        ),
-    ),
-        'options' => array(
-                'config' => array(
+            'grandTotal'  => '50,00',
+        ],
+    ],
+        'options' => [
+                'config' => [
                         'blEnterNetPrice' => false,
                         'blShowNetPrice' => false,
-                ),
+                ],
                 'activeCurrencyRate' => 1,
-        ),
-);
+        ],
+];

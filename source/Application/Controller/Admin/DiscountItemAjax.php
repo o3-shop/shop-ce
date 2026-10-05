@@ -21,12 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class manages discount articles
  */
-class DiscountItemAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class DiscountItemAjax extends ListComponentAjax
 {
     /**
      * Columns array
@@ -42,35 +45,43 @@ class DiscountItemAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
             ['oxmpn', 'oxarticles', 0, 0, 0],
             ['oxprice', 'oxarticles', 0, 0, 0],
             ['oxstock', 'oxarticles', 0, 0, 0],
-            ['oxid', 'oxarticles', 0, 0, 1]
+            ['oxid', 'oxarticles', 0, 0, 1],
         ],
-         'container2' => [
-             ['oxartnum', 'oxarticles', 1, 0, 0],
-             ['oxtitle', 'oxarticles', 1, 1, 0],
-             ['oxean', 'oxarticles', 1, 0, 0],
-             ['oxmpn', 'oxarticles', 0, 0, 0],
-             ['oxprice', 'oxarticles', 0, 0, 0],
-             ['oxstock', 'oxarticles', 0, 0, 0],
-             ['oxitmartid', 'oxdiscount', 0, 0, 1]
-         ]
+        'container2' => [
+            ['oxartnum', 'oxarticles', 1, 0, 0],
+            ['oxtitle', 'oxarticles', 1, 1, 0],
+            ['oxean', 'oxarticles', 1, 0, 0],
+            ['oxmpn', 'oxarticles', 0, 0, 0],
+            ['oxprice', 'oxarticles', 0, 0, 0],
+            ['oxstock', 'oxarticles', 0, 0, 0],
+            ['oxitmartid', 'oxdiscount', 0, 0, 1],
+        ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
+     * @throws DatabaseConnectionException
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oConfig = $this->getConfig();
+        $oConfig = Registry::getConfig();
+        $oRequest = Registry::getRequest();
 
-        $sArticleTable = $this->_getViewName('oxarticles');
-        $sO2CView = $this->_getViewName('oxobject2category');
-        $sDiscTable = $this->_getViewName('oxdiscount');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sOxid = $oConfig->getRequestParameter('oxid');
-        $sSynchOxid = $oConfig->getRequestParameter('synchoxid');
+        $sArticleTable = $this->getViewName('oxarticles');
+        $sO2CView = $this->getViewName('oxobject2category');
+        $sDiscTable = $this->getViewName('oxdiscount');
+        $oDb = DatabaseProvider::getDb();
+        $sOxid = $oRequest->getRequestEscapedParameter('oxid');
+        $sSynchOxid = $oRequest->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sOxid && $sSynchOxid) {
@@ -78,9 +89,9 @@ class DiscountItemAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
             $sQAdd .= $oConfig->getConfigParam('blVariantsSelection') ? '' : "and $sArticleTable.oxparentid = '' ";
 
             //#6027
-            //if we have variants then depending on config option the parent may be non buyable
+            //if we have variants then depending on config option the parent may be non-buyable
             //when the checkbox is checked, blVariantParentBuyable is true.
-            $sQAdd .= $oConfig->getConfigParam('blVariantParentBuyable') ?  '' : "and $sArticleTable.oxvarcount = 0";
+            $sQAdd .= $oConfig->getConfigParam('blVariantParentBuyable') ? '' : "and $sArticleTable.oxvarcount = 0";
         } else {
             // selected category ?
             if ($sSynchOxid && $sOxid != $sSynchOxid) {
@@ -88,10 +99,7 @@ class DiscountItemAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
                 $sQAdd .= $oConfig->getConfigParam('blVariantsSelection') ? "($sArticleTable.oxid=$sO2CView.oxobjectid or $sArticleTable.oxparentid=$sO2CView.oxobjectid)" : " $sArticleTable.oxid=$sO2CView.oxobjectid ";
                 $sQAdd .= " where $sO2CView.oxcatnid = " . $oDb->quote($sOxid) . " and $sArticleTable.oxid is not null ";
                 //#6027
-                $sQAdd .= $oConfig->getConfigParam('blVariantParentBuyable') ?  '' : " and $sArticleTable.oxvarcount = 0";
-
-                // resetting
-                $sId = null;
+                $sQAdd .= $oConfig->getConfigParam('blVariantParentBuyable') ? '' : " and $sArticleTable.oxvarcount = 0";
             } else {
                 $sQAdd = " from $sDiscTable left join $sArticleTable on $sArticleTable.oxid=$sDiscTable.oxitmartid ";
                 $sQAdd .= " where $sDiscTable.oxid = " . $oDb->quote($sOxid) . " and $sDiscTable.oxitmartid != '' ";
@@ -115,17 +123,33 @@ class DiscountItemAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
     }
 
     /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
+     */
+    protected function getQuery()
+    {
+        return $this->_getQuery();
+    }
+
+    /**
      * Removes selected article (articles) from discount list
      */
     public function removeDiscArt()
     {
-        $soxId = $this->getConfig()->getRequestParameter('oxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $aChosenArt = $this->_getActionIds('oxdiscount.oxitmartid');
         if (is_array($aChosenArt)) {
             $sQ = "update oxdiscount set oxitmartid = '' where oxid = :oxid and oxitmartid = :oxitmartid";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($sQ, [
+            DatabaseProvider::getDb()->execute($sQ, [
                 ':oxid' => $soxId,
-                ':oxitmartid' => reset($aChosenArt)
+                ':oxitmartid' => reset($aChosenArt),
             ]);
         }
     }
@@ -136,35 +160,56 @@ class DiscountItemAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
     public function addDiscArt()
     {
         $aChosenArt = $this->_getActionIds('oxarticles.oxid');
-        $soxId = $this->getConfig()->getRequestParameter('synchoxid');
-        if ($soxId && $soxId != "-1" && is_array($aChosenArt)) {
-            $sQ = "update oxdiscount set oxitmartid = :oxitmartid where oxid = :oxid";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($sQ, [
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
+        if ($soxId && $soxId != '-1' && is_array($aChosenArt)) {
+            $sQ = 'update oxdiscount set oxitmartid = :oxitmartid where oxid = :oxid';
+            DatabaseProvider::getDb()->execute($sQ, [
                 ':oxitmartid' => reset($aChosenArt),
-                ':oxid' => $soxId
+                ':oxid' => $soxId,
             ]);
         }
     }
 
     /**
      * Formats and returns chunk of SQL query string with definition of
-     * fields to load from DB. Adds subselect to get variant title from parent article
+     * fields to load from DB. Adds sub-select to get variant title from parent article
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQueryCols" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getQueryCols()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQueryCols() to the canonical override
+      *             target and retires _getQueryCols(); until then, _getQueryCols() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQueryCols() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $queryForIdColumns = $this->getQueryForIdentifierColumns();
 
         return sprintf(
-            " %s%s%s ",
+            ' %s%s%s ',
             $this->getQueryForVisibleColumns(),
             $queryForIdColumns ? ', ' : '',
             $queryForIdColumns
         );
     }
 
+    /**
+     * Formats and returns chunk of SQL query string with definition of
+     * fields to load from DB. Adds sub-select to get variant title from parent article
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQueryCols(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQueryCols() the canonical override target.
+     */
+    protected function getQueryCols()
+    {
+        return $this->_getQueryCols();
+    }
 
     private function getQueryForVisibleColumns(): string
     {
@@ -172,7 +217,7 @@ class DiscountItemAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
         $languageSuffix = $this->getLanguageSuffix();
         $selectVariantsEnabled = Registry::getConfig()->getConfigParam('blVariantsSelection');
         foreach ($this->_getVisibleColNames() as $key => [$columnName, $tableName]) {
-            $view = $this->_getViewName($tableName);
+            $view = $this->getViewName($tableName);
             if ($selectVariantsEnabled && $columnName === 'oxtitle') {
                 $query .= sprintf(
                     ' IF( %s.%s != \'\', %1$s.%2$s, CONCAT((select oxart.%2$s from %1$s as oxart where oxart.oxid = %1$s.oxparentid),\', \',%1$s.oxvarselect%s)) as _%s',
@@ -193,7 +238,7 @@ class DiscountItemAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
     {
         $query = '';
         foreach ($this->_getIdentColNames() as $key => [$columnName, $tableName]) {
-            $view = $this->_getViewName($tableName);
+            $view = $this->getViewName($tableName);
             $query .= "{$view}.{$columnName} as _{$key}";
             $query .= ', ';
         }

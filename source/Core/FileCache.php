@@ -29,7 +29,7 @@ namespace OxidEsales\EshopCommunity\Core;
 class FileCache
 {
     /** Cache file prefix */
-    const CACHE_FILE_PREFIX = "config";
+    public const CACHE_FILE_PREFIX = 'config';
 
     /**
      * Returns cached item value by given key.
@@ -69,7 +69,7 @@ class FileCache
         $fileName = $this->getCacheFilePath($key);
         $cacheDirectory = $this->getCacheDir();
 
-        $tmpFile = $cacheDirectory . "/" . basename($fileName) . uniqid('.temp', true) . '.txt';
+        $tmpFile = $cacheDirectory . '/' . basename($fileName) . uniqid('.temp', true) . '.txt';
         file_put_contents($tmpFile, serialize($value), LOCK_EX);
 
         rename($tmpFile, $fileName);
@@ -80,8 +80,8 @@ class FileCache
      */
     public static function clearCache()
     {
-        $tempDirectory = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)->getVar("sCompileDir");
-        $mask = $tempDirectory . "/" . self::CACHE_FILE_PREFIX . ".*.txt";
+        $tempDirectory = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)->getVar('sCompileDir');
+        $mask = $tempDirectory . '/' . self::CACHE_FILE_PREFIX . '.*.txt';
         $files = glob($mask);
         if (is_array($files)) {
             foreach ($files as $file) {
@@ -101,7 +101,7 @@ class FileCache
      */
     protected function getCacheFilePath($key)
     {
-        return $this->getCacheDir() . "/" . $this->getCacheFileName($key);
+        return $this->getCacheDir() . '/' . $this->getCacheFileName($key);
     }
 
     /**
@@ -111,7 +111,7 @@ class FileCache
      */
     protected function getCacheDir()
     {
-        return \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)->getVar("sCompileDir");
+        return \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)->getVar('sCompileDir');
     }
 
     /**

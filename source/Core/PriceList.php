@@ -121,7 +121,6 @@ class PriceList
         return $aVatValues;
     }
 
-
     /**
      * Return prices separated to different array elements depending on VAT
      *
@@ -180,7 +179,6 @@ class PriceList
 
         return $dProportionalVat;
     }
-
 
     /**
      * Add an oxPrice object to prices array

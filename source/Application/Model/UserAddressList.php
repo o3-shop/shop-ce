@@ -21,12 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Class oxUserAddressList
  */
-class UserAddressList extends \OxidEsales\Eshop\Core\Model\ListModel
+class UserAddressList extends ListModel
 {
     /**
      * Call parent class constructor
@@ -43,7 +45,7 @@ class UserAddressList extends \OxidEsales\Eshop\Core\Model\ListModel
      */
     public function load($sUserId)
     {
-        $sViewName = getViewName('oxcountry');
+        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxcountry');
         $oBaseObject = $this->getBaseObject();
         $sSelectFields = $oBaseObject->getSelectFields();
 
@@ -53,7 +55,7 @@ class UserAddressList extends \OxidEsales\Eshop\Core\Model\ListModel
                 LEFT JOIN {$sViewName} AS oxcountry ON oxaddress.oxcountryid = oxcountry.oxid
                 WHERE oxaddress.oxuserid = :oxuserid";
         $this->selectString($sSelect, [
-            ':oxuserid' => $sUserId
+            ':oxuserid' => $sUserId,
         ]);
     }
 }

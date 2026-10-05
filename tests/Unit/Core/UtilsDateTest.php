@@ -38,24 +38,24 @@ class UtilsDateTest extends \OxidTestCase
         $this->assertNull($oUtilsDate->formatDBDate(false));
         $this->assertNotNull($oUtilsDate->formatDBDate(true));
 
-        $aDates[] = array("14.11.2008", "2008-11-14", false);
-        $aDates[] = array("2007-07-20 12:02:07", "2007-07-20 12:02:07", true);
-        $aDates[] = array("2007-07-20", "2007-07-20", true);
-        $aDates[] = array("-", "0000-00-00", false);
-        $aDates[] = array("-", "0000-00-00 00:00:00", false);
-        $aDates[] = array("0000-00-00 00:00:00", "-", false);
-        $aDates[] = array("19.08.2007", "19.08.2007", false);
-        $aDates[] = array("2007-08-20", "20.08.2007", true);
-        $aDates[] = array("19.08.2007 12:02:07", "19.08.2007 12:02:07", false);
-        $aDates[] = array("2007-08-19 12:02:07", "19.08.2007 12:02:07", true);
-        $aDates[] = array("2007-08-19", "19.08.2007", true);
-        $aDates[] = array("2007-08-19 12:02:07", "19.08.2007 12:02:07", true);
-        $aDates[] = array("22.03.2003 10:04:09", "20030322100409", false);
-        $aDates[] = array("2003-03-22 10:04:09", "20030322100409", true);
-        $aDates[] = array("22.03.2003", "20030322", false);
-        $aDates[] = array("2003-03-22", "20030322", true);
-        $aDates[] = array(date("d.m.Y"), "simpleDateFormat", false);
-        $aDates[] = array(date("Y-m-d"), "simpleDateFormat", true);
+        $aDates[] = ['14.11.2008', '2008-11-14', false];
+        $aDates[] = ['2007-07-20 12:02:07', '2007-07-20 12:02:07', true];
+        $aDates[] = ['2007-07-20', '2007-07-20', true];
+        $aDates[] = ['-', '0000-00-00', false];
+        $aDates[] = ['-', '0000-00-00 00:00:00', false];
+        $aDates[] = ['0000-00-00 00:00:00', '-', false];
+        $aDates[] = ['19.08.2007', '19.08.2007', false];
+        $aDates[] = ['2007-08-20', '20.08.2007', true];
+        $aDates[] = ['19.08.2007 12:02:07', '19.08.2007 12:02:07', false];
+        $aDates[] = ['2007-08-19 12:02:07', '19.08.2007 12:02:07', true];
+        $aDates[] = ['2007-08-19', '19.08.2007', true];
+        $aDates[] = ['2007-08-19 12:02:07', '19.08.2007 12:02:07', true];
+        $aDates[] = ['22.03.2003 10:04:09', '20030322100409', false];
+        $aDates[] = ['2003-03-22 10:04:09', '20030322100409', true];
+        $aDates[] = ['22.03.2003', '20030322', false];
+        $aDates[] = ['2003-03-22', '20030322', true];
+        $aDates[] = [date('d.m.Y'), 'simpleDateFormat', false];
+        $aDates[] = [date('Y-m-d'), 'simpleDateFormat', true];
 
         foreach ($aDates as $aDate) {
             list($sResult, $sInput, $blForce) = $aDate;
@@ -177,14 +177,14 @@ class UtilsDateTest extends \OxidTestCase
         $sUSADateTimePMMySQL = '2007-08-01 23:56:25';
 
         // standard
-        $this->assertTrue($this->convertDBDateTimeTest("", $sZeroTimeStandard));
+        $this->assertTrue($this->convertDBDateTimeTest('', $sZeroTimeStandard));
 
         // mySQL compatible
-        $this->assertTrue($this->convertDBDateTimeTest("", $sZeroTimeMySQL, true));
+        $this->assertTrue($this->convertDBDateTimeTest('', $sZeroTimeMySQL, true));
 
         // format date
-        $this->assertTrue($this->convertDBDateTimeTest("", $sZeroFormattedDate, true, true));
-        $this->assertTrue($this->convertDBDateTimeTest("", $sZeroFormattedDate, false, true));
+        $this->assertTrue($this->convertDBDateTimeTest('', $sZeroFormattedDate, true, true));
+        $this->assertTrue($this->convertDBDateTimeTest('', $sZeroFormattedDate, false, true));
 
         // ISO
         $this->assertTrue($this->convertDBDateTimeTest($sDateTime, $sDateTimeStandard));
@@ -221,13 +221,13 @@ class UtilsDateTest extends \OxidTestCase
      * @param bool    skip
      * @return bool
      */
-    protected function convertDBDateTimeTest($sInput = "", $sExpected = "", $blMysql = false, $blFormatDate = false)
+    protected function convertDBDateTimeTest($sInput = '', $sExpected = '', $blMysql = false, $blFormatDate = false)
     {
         $oConvObject = new oxField();
         if (!empty($sInput)) {
             $oConvObject = new oxField($sInput, oxField::T_RAW);
             $oConvObject->fldmax_length = strlen($sInput);
-            $oConvObject->fldtype = "datetime";
+            $oConvObject->fldtype = 'datetime';
         }
         Registry::getUtilsDate()->convertDBDateTime($oConvObject, $blMysql, $blFormatDate);
         //echo "\nReturned: ->".$oConvObject->value."<-\nExpected: ->".$sExpected.'<-';
@@ -302,7 +302,7 @@ class UtilsDateTest extends \OxidTestCase
         if (($iTimeStamp = mktime(10, 55, 12, 1, 30, 1871)) === false) {
             $iTimeStamp = 0;
         }
-        $sZeroDateTime = date("Y-m-d H:i:s", $iTimeStamp);
+        $sZeroDateTime = date('Y-m-d H:i:s', $iTimeStamp);
         $this->assertTrue($this->convertDBTimestampTest($sZeroTimeStamp, $sZeroDateTime));
     }
 
@@ -315,7 +315,7 @@ class UtilsDateTest extends \OxidTestCase
      * @param bool    skip
      * @return bool
      */
-    protected function convertDBTimestampTest($sInput = "", $sExpected = "", $blToTimeStamp = false, $blSkip = false)
+    protected function convertDBTimestampTest($sInput = '', $sExpected = '', $blToTimeStamp = false, $blSkip = false)
     {
         $myConfig = $this->getConfig();
 
@@ -387,7 +387,7 @@ class UtilsDateTest extends \OxidTestCase
      * @param bool    skip
      * @return bool
      */
-    protected function convertDBDateTest($sInput = "", $sExpected = "", $blToTimeStamp = false)
+    protected function convertDBDateTest($sInput = '', $sExpected = '', $blToTimeStamp = false)
     {
         $oConvObject = new oxField();
         if (!empty($sInput)) {
@@ -410,10 +410,10 @@ class UtilsDateTest extends \OxidTestCase
         $oObject = new stdclass();
 
         $oxUtilsDate = $this->getProxyClass('oxUtilsDate');
-        $oxUtilsDate->UNITsetDefaultDateTimeValue($oObject, "ISO", "ISO", false);
+        $oxUtilsDate->UNITsetDefaultDateTimeValue($oObject, 'ISO', 'ISO', false);
 
-        $this->assertEquals("0000-00-00 00:00:00", $oObject->value);
-        $this->assertEquals(strlen("0000-00-00 00:00:00"), $oObject->fldmax_length);
+        $this->assertEquals('0000-00-00 00:00:00', $oObject->value);
+        $this->assertEquals(strlen('0000-00-00 00:00:00'), $oObject->fldmax_length);
     }
 
     /**
@@ -423,14 +423,14 @@ class UtilsDateTest extends \OxidTestCase
     {
         $oObject = new stdclass();
 
-        $aDateMatches = array(05, 14, 1981,);
-        $aDFields = array(0, 1, 2);
+        $aDateMatches = [05, 14, 1981,];
+        $aDFields = [0, 1, 2];
 
         $oxUtilsDate = $this->getProxyClass('oxUtilsDate');
-        $oxUtilsDate->UNITsetDate($oObject, "Y-m-d", $aDFields, $aDateMatches);
+        $oxUtilsDate->UNITsetDate($oObject, 'Y-m-d', $aDFields, $aDateMatches);
 
-        $this->assertEquals("1981-05-14", $oObject->value);
-        $this->assertEquals(strlen("1981-05-14"), $oObject->fldmax_length);
+        $this->assertEquals('1981-05-14', $oObject->value);
+        $this->assertEquals(strlen('1981-05-14'), $oObject->fldmax_length);
     }
 
     /**
@@ -440,25 +440,25 @@ class UtilsDateTest extends \OxidTestCase
     {
         $oObject = new stdclass();
 
-        $aDateMatches = array(05, 14, 1981,);
-        $aDFields = array(0, 1, 2);
+        $aDateMatches = [05, 14, 1981,];
+        $aDFields = [0, 1, 2];
 
-        $aTimeMatches = array(12, 12, 12);
-        $aTFields = array(0, 1, 2);
+        $aTimeMatches = [12, 12, 12];
+        $aTFields = [0, 1, 2];
 
         $oxUtilsDate = $this->getProxyClass('oxUtilsDate');
         $oxUtilsDate->UNITformatCorrectTimeValue(
             $oObject,
-            "Y-m-d",
-            "H:i:s",
+            'Y-m-d',
+            'H:i:s',
             $aDateMatches,
             $aTimeMatches,
             $aTFields,
             $aDFields
         );
 
-        $this->assertEquals("1981-05-14 12:12:12", $oObject->value);
-        $this->assertEquals(strlen("1981-05-14 12:12:12"), $oObject->fldmax_length);
+        $this->assertEquals('1981-05-14 12:12:12', $oObject->value);
+        $this->assertEquals(strlen('1981-05-14 12:12:12'), $oObject->fldmax_length);
     }
 
     /**
@@ -519,11 +519,11 @@ class UtilsDateTest extends \OxidTestCase
 
     public function providerShiftServerTime()
     {
-        return array(
-            array(2),
-            array(0),
-            array(null),
-        );
+        return [
+            [2],
+            [0],
+            [null],
+        ];
     }
 
     /**

@@ -1,0 +1,78 @@
+name: migration-e2e
+
+# End-to-end verification that an OXID 6.4.3 CE demodata database migrates to a
+# development o3-shop across the supported {DB engine} x {PHP version} matrix
+# (o3-shop/o3-shop#206, Phase 3 of #152). Each cell runs the self-contained
+# driver, which spins up its own throwaway DB + PHP containers.
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_version:
+        description: 'o3-shop COMPOSER_ROOT_VERSION to migrate to'
+        default: 'dev-b-1.7'
+        required: false
+  pull_request:
+    # Heavy job — only run it when migration-relevant paths change.
+    paths:
+      - 'source/migration/**'
+      - 'source/Internal/Domain/Migration/**'
+      - 'tests/Migration/e2e/**'
+      - '.github/workflows/migration-e2e.yml'
+  push:
+    tags:
+      - '*'          # every tag
+
+concurrency:
+  group: migration-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  matrix:
+    name: "${{ matrix.db }} · PHP ${{ matrix.php }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        db: ['mariadb:10.11', 'mysql:8.0']
+        php: ['7.4', '8.0', '8.1', '8.2']
+    env:
+      DB_IMAGE: ${{ matrix.db }}
+      PHP_VERSION: ${{ matrix.php }}
+      # workflow_dispatch supplies target_version; pull_request falls back to the b-1.7 dev line.
+      TARGET_VERSION: ${{ github.event.inputs.target_version || 'dev-b-1.7' }}
+      # Stable container-name prefix so each phase step reuses the same containers
+      # (each matrix cell runs on its own runner VM, so a fixed value can't collide).
+      MIGRATION_E2E_RUN: o3mig-ci
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Start database
+        run: bash tests/Migration/e2e/run-migration-e2e.sh start-db
+
+      - name: Load OXID 6.4.3 fixture
+        run: bash tests/Migration/e2e/run-migration-e2e.sh load-fixture
+
+      - name: Provision PHP + copy o3-shop tree
+        run: bash tests/Migration/e2e/run-migration-e2e.sh provision
+
+      - name: Install o3-shop (composer, ${{ env.TARGET_VERSION }})
+        run: bash tests/Migration/e2e/run-migration-e2e.sh install
+
+      - name: Configure shop
+        run: bash tests/Migration/e2e/run-migration-e2e.sh configure
+
+      - name: Migrate + regenerate views
+        run: bash tests/Migration/e2e/run-migration-e2e.sh migrate
+
+      - name: Verify (oe:migrate:verify)
+        run: bash tests/Migration/e2e/run-migration-e2e.sh verify
+
+      - name: App smoke asserts
+        run: bash tests/Migration/e2e/run-migration-e2e.sh asserts
+
+      - name: Cleanup
+        if: always()
+        run: bash tests/Migration/e2e/run-migration-e2e.sh cleanup

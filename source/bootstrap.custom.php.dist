@@ -1,0 +1,66 @@
+<?php
+
+/**
+ * This file is part of O3-Shop.
+ *
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
+ *
+ * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
+ * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
+ */
+
+/**
+ * Local / environment-specific bootstrap overrides.
+ *
+ * HOW TO USE
+ *   Copy this file to "bootstrap.custom.php" (same directory). The concrete
+ *   file is gitignored and never committed, so local and CI/staging setups can
+ *   diverge without touching tracked core files.
+ *
+ * WHEN IT RUNS
+ *   bootstrap.custom.php is required at the very END of source/bootstrap.php,
+ *   after all core services are in place. At this point you can rely on:
+ *     - the composer autoloader (vendor/autoload.php)
+ *     - the shop ConfigFile in the Registry
+ *     - the registered ExitHandler
+ *     - oxNew() and all overridable functions
+ *     - the default session ini_set() values (you may override them below)
+ *
+ * The examples below are intentionally commented out, so copying this file
+ * verbatim is a safe no-op. Uncomment and adapt what you need.
+ */
+
+/*
+ * Example 1: register or override a service in the DI container.
+ *
+ * use OxidEsales\EshopCommunity\Internal\Framework\DependencyInjection\ContainerFactory;
+ *
+ * $container = ContainerFactory::getInstance()->getContainer();
+ * // ... interact with the container as needed for your local setup ...
+ */
+
+/*
+ * Example 2: enable a developer error handler such as Whoops.
+ *
+ * if (class_exists(\Whoops\Run::class)) {
+ *     $whoops = new \Whoops\Run();
+ *     $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler());
+ *     $whoops->register();
+ * }
+ */
+
+/*
+ * Example 3: tweak PHP ini settings for local debugging.
+ *
+ * ini_set('display_errors', '1');
+ * error_reporting(E_ALL);
+ */

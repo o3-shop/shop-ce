@@ -21,12 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
+use OxidEsales\Eshop\Application\Model\Manufacturer;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\SeoEncoder;
 
 /**
  * Seo encoder base
  */
-class SeoEncoderManufacturer extends \OxidEsales\Eshop\Core\SeoEncoder
+class SeoEncoderManufacturer extends SeoEncoder
 {
     /**
      * Root manufacturer uri cache
@@ -39,7 +43,13 @@ class SeoEncoderManufacturer extends \OxidEsales\Eshop\Core\SeoEncoder
      * Returns target "extension" (/)
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getUrlExtension" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getUrlExtension()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getUrlExtension() to the canonical override
+      *             target and retires _getUrlExtension(); until then, _getUrlExtension() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getUrlExtension() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -47,9 +57,24 @@ class SeoEncoderManufacturer extends \OxidEsales\Eshop\Core\SeoEncoder
     }
 
     /**
+     * Returns target "extension" (/)
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getUrlExtension(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getUrlExtension() the canonical override target.
+     */
+    protected function getUrlExtension()
+    {
+        return $this->_getUrlExtension();
+    }
+
+    /**
      * Returns part of SEO url excluding path
      *
-     * @param \OxidEsales\Eshop\Application\Model\Manufacturer $oManufacturer manufacturer object
+     * @param Manufacturer $oManufacturer manufacturer object
      * @param int                                              $iLang         language
      * @param bool                                             $blRegenerate  if TRUE forces seo url regeneration
      *
@@ -64,14 +89,14 @@ class SeoEncoderManufacturer extends \OxidEsales\Eshop\Core\SeoEncoder
         if ($blRegenerate || !($sSeoUrl = $this->_loadFromDb('oxmanufacturer', $oManufacturer->getId(), $iLang))) {
             if ($iLang != $oManufacturer->getLanguage()) {
                 $sId = $oManufacturer->getId();
-                $oManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
+                $oManufacturer = oxNew(Manufacturer::class);
                 $oManufacturer->loadInLang($iLang, $sId);
             }
 
             $sSeoUrl = '';
             if ($oManufacturer->getId() != 'root') {
                 if (!isset($this->_aRootManufacturerUri[$iLang])) {
-                    $oRootManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
+                    $oRootManufacturer = oxNew(Manufacturer::class);
                     $oRootManufacturer->loadInLang($iLang, 'root');
                     $this->_aRootManufacturerUri[$iLang] = $this->getManufacturerUri($oRootManufacturer, $iLang);
                 }
@@ -91,7 +116,7 @@ class SeoEncoderManufacturer extends \OxidEsales\Eshop\Core\SeoEncoder
     /**
      * Returns Manufacturer SEO url for specified page
      *
-     * @param \OxidEsales\Eshop\Application\Model\Manufacturer $manufacturer Manufacturer object
+     * @param Manufacturer $manufacturer Manufacturer object
      * @param int                                              $pageNumber   Number of the page which should be prepared.
      * @param int                                              $languageId   Language id.
      * @param bool                                             $isFixed      Fixed url marker (default is null).
@@ -119,7 +144,7 @@ class SeoEncoderManufacturer extends \OxidEsales\Eshop\Core\SeoEncoder
     /**
      * Encodes manufacturer category URLs into SEO format
      *
-     * @param \OxidEsales\Eshop\Application\Model\Manufacturer $oManufacturer Manufacturer object
+     * @param Manufacturer $oManufacturer Manufacturer object
      * @param int                                              $iLang         language
      *
      * @return string
@@ -136,19 +161,21 @@ class SeoEncoderManufacturer extends \OxidEsales\Eshop\Core\SeoEncoder
     /**
      * Deletes manufacturer seo entry
      *
-     * @param \OxidEsales\Eshop\Application\Model\Manufacturer $oManufacturer Manufacturer object
+     * @param Manufacturer $oManufacturer Manufacturer object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function onDeleteManufacturer($oManufacturer)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $oDb->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxmanufacturer'", [
-            ':oxobjectid' => $oManufacturer->getId()
+            ':oxobjectid' => $oManufacturer->getId(),
         ]);
-        $oDb->execute("delete from oxobject2seodata where oxobjectid = :oxobjectid", [
-            ':oxobjectid' => $oManufacturer->getId()
+        $oDb->execute('delete from oxobject2seodata where oxobjectid = :oxobjectid', [
+            ':oxobjectid' => $oManufacturer->getId(),
         ]);
-        $oDb->execute("delete from oxseohistory where oxobjectid = :oxobjectid", [
-            ':oxobjectid' => $oManufacturer->getId()
+        $oDb->execute('delete from oxseohistory where oxobjectid = :oxobjectid', [
+            ':oxobjectid' => $oManufacturer->getId(),
         ]);
     }
 
@@ -159,16 +186,40 @@ class SeoEncoderManufacturer extends \OxidEsales\Eshop\Core\SeoEncoder
      * @param int    $iLang     language id
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getAltUri" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getAltUri()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getAltUri() to the canonical override
+      *             target and retires _getAltUri(); until then, _getAltUri() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getAltUri($sObjectId, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sSeoUrl = null;
-        $oManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
+        $oManufacturer = oxNew(Manufacturer::class);
         if ($oManufacturer->loadInLang($iLang, $sObjectId)) {
             $sSeoUrl = $this->getManufacturerUri($oManufacturer, $iLang, true);
         }
 
         return $sSeoUrl;
+    }
+
+    /**
+     * Returns alternative uri used while updating seo
+     *
+     * @param string $sObjectId object id
+     * @param int    $iLang     language id
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getAltUri(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getAltUri() the canonical override target.
+     */
+    protected function getAltUri($sObjectId, $iLang)
+    {
+        return $this->_getAltUri($sObjectId, $iLang);
     }
 }

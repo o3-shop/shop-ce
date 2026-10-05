@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -34,7 +35,7 @@ return [
                 'OXALLOWOTHERSERIES' => 0,
                 'OXALLOWUSEANOTHER' => 0,
                 'OXMINIMUMVALUE' => 45.00,
-                'OXCALCULATEONCE' => 1
+                'OXCALCULATEONCE' => 1,
             ],
             'oxvouchers' => [
                 [
@@ -42,8 +43,8 @@ return [
                     'OXRESERVED' => 0,
                     'OXVOUCHERNR' => '123123',
                     'OXVOUCHERSERIEID' => 'testvoucher4',
-                    'OXID' => 'testcoucher011'
-                ]
-            ]
-        ]
+                    'OXID' => 'testcoucher011',
+                ],
+            ],
+        ],
 ];

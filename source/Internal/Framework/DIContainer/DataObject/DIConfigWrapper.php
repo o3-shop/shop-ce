@@ -29,9 +29,9 @@ use Psr\Container\ContainerInterface;
 
 class DIConfigWrapper
 {
-    const SERVICE_SECTION = 'services';
-    const RESOURCE_KEY = 'resource';
-    const IMPORTS_SECTION = 'imports';
+    public const SERVICE_SECTION = 'services';
+    public const RESOURCE_KEY = 'resource';
+    public const IMPORTS_SECTION = 'imports';
 
     private $sectionDefaults = [self::SERVICE_SECTION => ['_defaults' => ['public' => false, 'autowire' => true]]];
 

@@ -21,6 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component\Widget;
 
+use OxidEsales\Eshop\Application\Model\ArticleList;
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Actions widget.
  * Access actions in tpl.
@@ -44,13 +47,13 @@ class Actions extends \OxidEsales\Eshop\Application\Component\Widget\WidgetContr
     /**
      * Returns article list with action articles
      *
-     * @return object
+     * @return void|object
      */
     public function getAction()
     {
         $actionId = $this->getViewParameter('action');
         if ($actionId && $this->_getLoadActionsParam()) {
-            $artList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+            $artList = oxNew(ArticleList::class);
             $artList->loadActionArticles($actionId);
             if ($artList->count()) {
                 return $artList;
@@ -62,24 +65,42 @@ class Actions extends \OxidEsales\Eshop\Application\Component\Widget\WidgetContr
      * Returns if actions are ON
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getLoadActionsParam" in next major
+     * @deprecated Use getLoadActionsParam() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _getLoadActionsParam().
      */
     protected function _getLoadActionsParam() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $this->_blLoadActions = $this->getConfig()->getConfigParam('bl_perfLoadAktion');
+        $this->_blLoadActions = Registry::getConfig()->getConfigParam('bl_perfLoadAktion');
 
         return $this->_blLoadActions;
     }
 
     /**
-     * Returns action name
+     * Returns if actions are ON
      *
      * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getLoadActionsParam() (not the deprecated _getLoadActionsParam())
+     *           so downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getLoadActionsParam()
+    {
+        return $this->_getLoadActionsParam();
+    }
+
+    /**
+     * Returns action name
+     *
+     * @return void|string
      */
     public function getActionName()
     {
         $actionId = $this->getViewParameter('action');
-        $action   = oxNew(\OxidEsales\Eshop\Application\Model\Actions::class);
+        $action = oxNew(\OxidEsales\Eshop\Application\Model\Actions::class);
         if ($action->load($actionId)) {
             return $action->oxactions__oxtitle->value;
         }

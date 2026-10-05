@@ -21,16 +21,27 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxFileCheckerResult;
+use Exception;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Diagnostics;
+use OxidEsales\Eshop\Application\Model\DiagnosticsOutput;
+use OxidEsales\Eshop\Application\Model\FileChecker;
+use OxidEsales\Eshop\Application\Model\FileCheckerResult;
+use OxidEsales\Eshop\Application\Model\FileCollector;
+use OxidEsales\Eshop\Application\Model\SmartyRenderer;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Module\Module;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ShopConfigurationDaoBridgeInterface;
+use OxidEsales\Facts\Facts;
 
 /**
  * Checks Version of System files.
  * Admin Menu: Service -> Version Checker -> Main.
  */
-class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class DiagnosticsMain extends AdminDetailsController
 {
     /**
      * error tag
@@ -77,8 +88,14 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     /**
      * Error status getter
      *
-     * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "hasError" in next major
+     * @return bool
+     * @deprecated Transitional during #107. Modules SHOULD override _hasError()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes hasError() to the canonical override
+      *             target and retires _hasError(); until then, _hasError() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _hasError() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -88,30 +105,65 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     /**
      * Error status getter
      *
+     * @return bool
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _hasError(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make hasError() the canonical override target.
+     */
+    protected function hasError()
+    {
+        return $this->_hasError();
+    }
+
+    /**
+     * Error status getter
+     *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getErrorMessage" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getErrorMessage()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getErrorMessage() to the canonical override
+      *             target and retires _getErrorMessage(); until then, _getErrorMessage() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getErrorMessage() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->_sErrorMessage;
     }
 
+    /**
+     * Error status getter
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getErrorMessage(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getErrorMessage() the canonical override target.
+     */
+    protected function getErrorMessage()
+    {
+        return $this->_getErrorMessage();
+    }
 
     /**
-     * Calls parent costructor and initializes checker object
+     * Calls parent constructor and initializes checker object
      *
      */
     public function __construct()
     {
         parent::__construct();
 
-        $this->_sShopDir = $this->getConfig()->getConfigParam('sShopDir');
-        $this->_oOutput = oxNew(\OxidEsales\Eshop\Application\Model\DiagnosticsOutput::class);
-        $this->_oRenderer = oxNew(\OxidEsales\Eshop\Application\Model\SmartyRenderer::class);
+        $this->_sShopDir = Registry::getConfig()->getConfigParam('sShopDir');
+        $this->_oOutput = oxNew(DiagnosticsOutput::class);
+        $this->_oRenderer = oxNew(SmartyRenderer::class);
     }
 
     /**
-     * Loads oxversioncheck class.
+     * Loads version-check class.
      *
      * @return string
      */
@@ -123,23 +175,24 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
             $this->_aViewData['sErrorMessage'] = $this->_getErrorMessage();
         }
 
-        return "diagnostics_form.tpl";
+        return 'diagnostics_form.tpl';
     }
 
     /**
      * Gets list of files to be checked
      *
+     * @return array list of shop files to be checked
+     * @throws Exception
      * @deprecated since v6.3 (2018-06-04); This functionality will be removed completely.
      *
-     * @return array list of shop files to be checked
      */
     protected function _getFilesToCheck() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oDiagnostics = oxNew(\OxidEsales\Eshop\Application\Model\Diagnostics::class);
+        $oDiagnostics = oxNew(Diagnostics::class);
         $aFilePathList = $oDiagnostics->getFileCheckerPathList();
         $aFileExtensionList = $oDiagnostics->getFileCheckerExtensionList();
 
-        $oFileCollector = oxNew(\OxidEsales\Eshop\Application\Model\FileCollector::class);
+        $oFileCollector = oxNew(FileCollector::class);
         $oFileCollector->setBaseDirectory($this->_sShopDir);
 
         foreach ($aFilePathList as $sPath) {
@@ -158,17 +211,18 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      *
      * @param array $aFileList array list of files to be checked
      *
+     * @return null|FileCheckerResult
+     * @throws Exception
      * @deprecated since v6.3 (2018-06-04); This functionality will be removed completely.
      *
-     * @return null|oxFileCheckerResult
      */
     protected function _checkOxidFiles($aFileList) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oFileChecker = oxNew(\OxidEsales\Eshop\Application\Model\FileChecker::class);
+        $oFileChecker = oxNew(FileChecker::class);
         $oFileChecker->setBaseDirectory($this->_sShopDir);
-        $oFileChecker->setVersion($this->getConfig()->getVersion());
-        $oFileChecker->setEdition($this->getConfig()->getEdition());
-        $oFileChecker->setRevision($this->getConfig()->getRevision());
+        $oFileChecker->setVersion(Registry::getConfig()->getVersion());
+        $oFileChecker->setEdition((new Facts())->getEdition());
+        $oFileChecker->setRevision(Registry::getConfig()->getRevision());
 
         if (!$oFileChecker->init()) {
             $this->_blError = true;
@@ -177,7 +231,7 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
             return null;
         }
 
-        $oFileCheckerResult = oxNew(\OxidEsales\Eshop\Application\Model\FileCheckerResult::class);
+        $oFileCheckerResult = oxNew(FileCheckerResult::class);
 
         $blListAllFiles = ($this->getParam('listAllFiles') == 'listAllFiles');
         $oFileCheckerResult->setListAllFiles($blListAllFiles);
@@ -193,36 +247,38 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     /**
      * Returns body of file check report
      *
-     * @param \OxidEsales\Eshop\Application\Model\FileCheckerResult $oFileCheckerResult mixed file checker result object
-     *
-     * @deprecated since v6.3 (2018-06-04); This functionality will be removed completely.
+     * @param FileCheckerResult $oFileCheckerResult mixed file checker result object
      *
      * @return string body of report
+     * @throws Exception
+     * @deprecated since v6.3 (2018-06-04); This functionality will be removed completely.
+     *
      */
     protected function _getFileCheckReport($oFileCheckerResult) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aViewData = [
-            "sVersion"       => $this->getConfig()->getVersion(),
-            "sEdition"       => $this->getConfig()->getEdition(),
-            "sRevision"      => $this->getConfig()->getRevision(),
-            "aResultSummary" => $oFileCheckerResult->getResultSummary(),
-            "aResultOutput"  => $oFileCheckerResult->getResult(),
+            'sVersion'       => Registry::getConfig()->getVersion(),
+            'sEdition'       => (new Facts())->getEdition(),
+            'sRevision'      => Registry::getConfig()->getRevision(),
+            'aResultSummary' => $oFileCheckerResult->getResultSummary(),
+            'aResultOutput'  => $oFileCheckerResult->getResult(),
         ];
 
-        return $this->_oRenderer->renderTemplate("version_checker_result.tpl", $aViewData);
+        return $this->_oRenderer->renderTemplate('version_checker_result.tpl', $aViewData);
     }
 
     /**
      * Checks system file versions
      *
      * @return void
+     * @throws Exception
      */
     public function startDiagnostics()
     {
-        $sReport = "";
+        $sReport = '';
 
         $aDiagnosticsResult = $this->_runBasicDiagnostics();
-        $sReport .= $this->_oRenderer->renderTemplate("diagnostics_main.tpl", $aDiagnosticsResult);
+        $sReport .= $this->_oRenderer->renderTemplate('diagnostics_main.tpl', $aDiagnosticsResult);
 
         /**
          * @deprecated since v6.3 (2018-06-04); This functionality will be removed completely.
@@ -249,17 +305,25 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      * Shop and module details, database health, php parameters, server information
      *
      * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "runBasicDiagnostics" in next major
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @deprecated Transitional during #107. Modules SHOULD override _runBasicDiagnostics()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes runBasicDiagnostics() to the canonical override
+      *             target and retires _runBasicDiagnostics(); until then, _runBasicDiagnostics() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _runBasicDiagnostics() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aViewData = [];
-        $oDiagnostics = oxNew(\OxidEsales\Eshop\Application\Model\Diagnostics::class);
+        $oDiagnostics = oxNew(Diagnostics::class);
 
-        $oDiagnostics->setShopLink(\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('sShopURL'));
-        $oDiagnostics->setEdition(\OxidEsales\Eshop\Core\Registry::getConfig()->getFullEdition());
-        $oDiagnostics->setVersion(\OxidEsales\Eshop\Core\Registry::getConfig()->getVersion());
-        $oDiagnostics->setRevision(\OxidEsales\Eshop\Core\Registry::getConfig()->getRevision());
+        $oDiagnostics->setShopLink(Registry::getConfig()->getConfigParam('sShopURL'));
+        $oDiagnostics->setEdition(Registry::getConfig()->getFullEdition());
+        $oDiagnostics->setVersion(Registry::getConfig()->getVersion());
+        $oDiagnostics->setRevision(Registry::getConfig()->getRevision());
 
         /**
          * Shop
@@ -289,7 +353,7 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
 
         /**
          * PHP info
-         * Fetches a hand full of php configuration parameters and collects their values.
+         * Fetches a handful of php configuration parameters and collects their values.
          */
         if ($this->getParam('oxdiag_frm_php')) {
             $aViewData['oxdiag_frm_php'] = true;
@@ -317,12 +381,32 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     }
 
     /**
+     * Performs main system diagnostic.
+     * Shop and module details, database health, php parameters, server information
+     *
+     * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _runBasicDiagnostics(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make runBasicDiagnostics() the canonical override target.
+     */
+    protected function runBasicDiagnostics()
+    {
+        return $this->_runBasicDiagnostics();
+    }
+
+    /**
      * Downloads result of system file check
      */
     public function downloadResultFile()
     {
         $this->_oOutput->downloadResultFile();
-        exit(0);
+        \OxidEsales\Eshop\Core\Registry::get(
+            \OxidEsales\Eshop\Core\ExitHandlerInterface::class
+        )->exit(0);
     }
 
     /**
@@ -333,17 +417,17 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     public function getSupportContactForm()
     {
         $aLinks = [
-            "de" => "https://community.o3-shop.com/",
-            "en" => "https://community.o3-shop.com/"
+            'de' => 'https://community.o3-shop.com/',
+            'en' => 'https://community.o3-shop.com/',
         ];
 
-        $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
+        $oLang = Registry::getLang();
         $aLanguages = $oLang->getLanguageArray();
         $iLangId = $oLang->getTplLanguage();
         $sLangCode = $aLanguages[$iLangId]->abbr;
 
         if (!array_key_exists($sLangCode, $aLinks)) {
-            $sLangCode = "de";
+            $sLangCode = 'de';
         }
 
         return $aLinks[$sLangCode];
@@ -358,7 +442,7 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      */
     public function getParam($sParam)
     {
-        return $this->getConfig()->getRequestParameter($sParam);
+        return Registry::getRequest()->getRequestEscapedParameter($sParam);
     }
 
     /**

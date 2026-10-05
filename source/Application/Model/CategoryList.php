@@ -21,8 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
 use Exception;
+use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Application\Model\ContentList;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Category list manager.
@@ -30,7 +36,7 @@ use Exception;
  * list structure.
  *
  */
-class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
+class CategoryList extends ListModel
 {
     /**
      * List Object class name
@@ -88,7 +94,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      */
     public function __construct($sObjectsInListName = 'oxcategory')
     {
-        $this->_blHideEmpty = $this->getConfig()->getConfigParam('blDontShowEmptyCategories');
+        $this->_blHideEmpty = Registry::getConfig()->getConfigParam('blDontShowEmptyCategories');
         parent::__construct($sObjectsInListName);
     }
 
@@ -186,11 +192,12 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * constructs the sql string to get the category list
      *
-     * @param bool   $blReverse list loading order, true for tree, false for simple list (optional, default false)
-     * @param array  $aColumns  required column names (optional)
-     * @param string $sOrder    order by string (optional)
+     * @param bool $blReverse list loading order, true for tree, false for simple list (optional, default false)
+     * @param null $aColumns required column names (optional)
+     * @param null $sOrder order by string (optional)
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSelectString" in next major
      */
     protected function _getSelectString($blReverse = false, $aColumns = null, $sOrder = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -200,7 +207,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
 
         //excluding long desc
         if (!$this->isAdmin() && !$this->_blHideEmpty && !$this->getLoadFull()) {
-            $oCat = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+            $oCat = oxNew(Category::class);
             if (!($this->_sActCat && $oCat->load($this->_sActCat) && $oCat->oxcategories__oxrootid->value)) {
                 $oCat = null;
                 $this->_sActCat = null;
@@ -225,9 +232,10 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      * constructs the sql snippet responsible for depth optimizations,
      * loads only selected category's siblings
      *
-     * @param \OxidEsales\Eshop\Application\Model\Category $oCat selected category
+     * @param Category $oCat selected category
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getDepthSqlSnippet" in next major
      */
     protected function _getDepthSqlSnippet($oCat) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -238,7 +246,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
         // load complete tree of active category, if it exists
         if ($oCat) {
             // select children here, siblings will be selected from union
-            $sDepthSnippet .= " or ($sViewName.oxparentid = " . \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quote($oCat->oxcategories__oxid->value) . ")";
+            $sDepthSnippet .= " or ($sViewName.oxparentid = " . DatabaseProvider::getDb()->quote($oCat->oxcategories__oxid->value) . ')';
         }
 
         // load 1'st category level (roots)
@@ -259,12 +267,13 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * returns sql snippet for union of select category's and its upper level
      * siblings of the same root (siblings of the category, and parents and
-     * grandparents etc)
+     * grandparents etc.)
      *
-     * @param \OxidEsales\Eshop\Application\Model\Category $oCat     current category object
-     * @param array                                        $aColumns required column names (optional)
+     * @param Category $oCat current category object
+     * @param null $aColumns required column names (optional)
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getDepthSqlUnion" in next major
      */
     protected function _getDepthSqlUnion($oCat, $aColumns = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -275,24 +284,26 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
 
         $sViewName = $this->getBaseObject()->getViewName();
 
-        return "UNION SELECT " . $this->_getSqlSelectFieldsForTree('maincats', $aColumns)
-               . " FROM oxcategories AS subcats"
+        return 'UNION SELECT ' . $this->_getSqlSelectFieldsForTree('maincats', $aColumns)
+               . ' FROM oxcategories AS subcats'
                . " LEFT JOIN $sViewName AS maincats on maincats.oxparentid = subcats.oxparentid"
-               . " WHERE subcats.oxrootid = " . \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quote($oCat->oxcategories__oxrootid->value)
-               . " AND subcats.oxleft <= " . (int) $oCat->oxcategories__oxleft->value
-               . " AND subcats.oxright >= " . (int) $oCat->oxcategories__oxright->value;
+               . ' WHERE subcats.oxrootid = ' . DatabaseProvider::getDb()->quote($oCat->oxcategories__oxrootid->value)
+               . ' AND subcats.oxleft <= ' . (int) $oCat->oxcategories__oxleft->value
+               . ' AND subcats.oxright >= ' . (int) $oCat->oxcategories__oxright->value;
     }
 
     /**
      * Get data from db
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadFromDb" in next major
      */
     protected function _loadFromDb() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sSql = $this->_getSelectString(false, null, 'oxparentid, oxsort, oxtitle');
-        $aData = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC)->getAll($sSql);
+        $aData = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll($sSql);
 
         return $aData;
     }
@@ -312,10 +323,11 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      * adding content categories and building tree structure.
      *
      * @param string $sActCat Active category (default null)
+     * @throws DatabaseConnectionException
      */
     public function buildTree($sActCat)
     {
-        startProfile("buildTree");
+        startProfile('buildTree');
 
         $this->_sActCat = $sActCat;
         $this->load();
@@ -338,19 +350,20 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
             $this->_ppBuildTree();
         }
 
-        stopProfile("buildTree");
+        stopProfile('buildTree');
     }
 
     /**
      * set full category object in tree
      *
      * @param string $sId category id
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "ppLoadFullCategory" in next major
      */
     protected function _ppLoadFullCategory($sId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (isset($this->_aArray[$sId])) {
-            $oNewCat = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+            $oNewCat = oxNew(Category::class);
             if ($oNewCat->load($sId)) {
                 // replace aArray object with fully loaded category
                 $this->_aArray[$sId] = $oNewCat;
@@ -402,7 +415,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Getter for active category
      *
-     * @return \OxidEsales\Eshop\Application\Model\Category
+     * @return Category|void
      */
     public function getClickCat()
     {
@@ -414,7 +427,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Getter for active root category
      *
-     * @return array of oxCategory
+     * @return array|void array of oxCategory
      */
     public function getClickRoot()
     {
@@ -429,7 +442,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      */
     protected function _ppRemoveInactiveCategories() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        // Collect all items which must be remove
+        // Collect all items which must be removed
         $aRemoveList = [];
         foreach ($this->_aArray as $sId => $oCat) {
             if ($oCat->oxcategories__oxppremove->value) {
@@ -466,7 +479,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Category list postprocessing routine, responsible for generation of active category path
      *
-     * @return null
+     * @return void
      * @deprecated underscore prefix violates PSR12, will be renamed to "ppAddPathInfo" in next major
      */
     protected function _ppAddPathInfo() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -495,7 +508,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
     protected function _ppAddContentCategories() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // load content pages for adding them into menu tree
-        $oContentList = oxNew(\OxidEsales\Eshop\Application\Model\ContentList::class);
+        $oContentList = oxNew(ContentList::class);
         $oContentList->loadCatMenues();
 
         foreach ($oContentList as $sCatId => $aContent) {
@@ -506,7 +519,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
     }
 
     /**
-     * Category list postprocessing routine, responsible building an sorting of hierarchical category tree
+     * Category list postprocessing routine, responsible building a sorting of hierarchical category tree
      * @deprecated underscore prefix violates PSR12, will be renamed to "ppBuildTree" in next major
      */
     protected function _ppBuildTree() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -556,9 +569,9 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      * @return array $aTree
      * @deprecated underscore prefix violates PSR12, will be renamed to "addDepthInfo" in next major
      */
-    protected function _addDepthInfo($aTree, $oCat, $sDepth = "") // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _addDepthInfo($aTree, $oCat, $sDepth = '') // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sDepth .= "-";
+        $sDepth .= '-';
         $oCat->oxcategories__oxtitle->setValue($sDepth . ' ' . $oCat->oxcategories__oxtitle->value);
         $aTree[$oCat->getId()] = $oCat;
         $aSubCats = $oCat->getSubCats();
@@ -574,13 +587,15 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Rebuilds nested sets information by updating oxLeft and oxRight category attributes, from oxParentId
      *
-     * @param bool   $blVerbose Set to true for output the update status for user,
-     * @param string $sShopID   the shop id
+     * @param bool $blVerbose Set to true for output the update status for user,
+     * @param null $sShopID the shop id
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function updateCategoryTree($blVerbose = true, $sShopID = null)
     {
         // Only called from admin and admin mode reads from master (see ESDEV-3804 and ESDEV-3822).
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $database = DatabaseProvider::getDb();
         $database->startTransaction();
 
         try {
@@ -591,9 +606,9 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
 
             // Get all root categories
             $rs = $database->select("select oxid, oxtitle from oxcategories where oxparentid = 'oxrootid' and $sWhere order by oxsort", false);
-            if ($rs != false && $rs->count() > 0) {
+            if ($rs && $rs->count() > 0) {
                 while (!$rs->EOF) {
-                    $this->_aUpdateInfo[] = "<b>Processing : " . $rs->fields[1] . "</b>(" . $rs->fields[0] . ")<br>";
+                    $this->_aUpdateInfo[] = '<b>Processing : ' . $rs->fields[1] . '</b>(' . $rs->fields[0] . ')<br>';
                     if ($blVerbose) {
                         echo next($this->_aUpdateInfo);
                     }
@@ -644,37 +659,39 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Recursively updates root nodes, this method is used (only) in updateCategoryTree()
      *
-     * @param string $oxRootId rootid of tree
-     * @param bool   $isRoot   is the current node root?
+     * @param string $oxRootId root-ID of tree
+     * @param bool $isRoot is the current node root?
      * @param string $thisRoot the id of the root
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "updateNodes" in next major
      */
     protected function _updateNodes($oxRootId, $isRoot, $thisRoot) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // Called from inside a transaction so master is picked automatically (see ESDEV-3804 and ESDEV-3822).
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $database = DatabaseProvider::getDb();
 
         if ($isRoot) {
             $thisRoot = $oxRootId;
         }
 
         // Get sub categories of root categories
-        $database->execute("update oxcategories set oxrootid = :oxrootid where oxparentid = :oxparentid", [
+        $database->execute('update oxcategories set oxrootid = :oxrootid where oxparentid = :oxparentid', [
             ':oxrootid' => $thisRoot,
-            ':oxparentid' => $oxRootId
+            ':oxparentid' => $oxRootId,
         ]);
-        $rs = $database->select("select oxid, oxparentid from oxcategories where oxparentid = :oxparentid order by oxsort", [
-            ':oxparentid' => $oxRootId
+        $rs = $database->select('select oxid, oxparentid from oxcategories where oxparentid = :oxparentid order by oxsort', [
+            ':oxparentid' => $oxRootId,
         ]);
         // If there are sub categories
-        if ($rs != false && $rs->count() > 0) {
+        if ($rs && $rs->count() > 0) {
             while (!$rs->EOF) {
                 $parentId = $rs->fields[1];
                 $actOxid = $rs->fields[0];
 
                 // Get the data of the parent category to the current Cat
-                $rs3 = $database->select("select oxrootid, oxright from oxcategories where oxid = :oxid", [
-                    ':oxid' => $parentId
+                $rs3 = $database->select('select oxrootid, oxright from oxcategories where oxid = :oxid', [
+                    ':oxid' => $parentId,
                 ]);
                 while (!$rs3->EOF) {
                     $parentOxRootId = $rs3->fields[0];
@@ -682,31 +699,31 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
                     $rs3->fetchRow();
                 }
 
-                $query = "update oxcategories set oxleft = oxleft + 2
+                $query = 'update oxcategories set oxleft = oxleft + 2
                           where oxrootid = :oxrootid and
                                 oxleft > :parentRight and
                                 oxright >= :parentRight and
-                                oxid != :oxid";
+                                oxid != :oxid';
                 $database->execute($query, [
                     ':oxrootid' => $parentOxRootId,
                     ':parentRight' => $parentRight,
-                    ':oxid' => $actOxid
+                    ':oxid' => $actOxid,
                 ]);
 
-                $query = "update oxcategories set oxright = oxright + 2
+                $query = 'update oxcategories set oxright = oxright + 2
                           where oxrootid = :oxrootid and
                                 oxright >= :oxright and
-                                oxid != :oxid";
+                                oxid != :oxid';
                 $database->execute($query, [
                     ':oxrootid' => $parentOxRootId,
                     ':oxright' => $parentRight,
-                    ':oxid' => $actOxid
+                    ':oxid' => $actOxid,
                 ]);
 
-                $query = "update oxcategories set oxleft = :parentRight, oxright = (:parentRight + 1) where oxid = :oxid";
+                $query = 'update oxcategories set oxleft = :parentRight, oxright = (:parentRight + 1) where oxid = :oxid';
                 $database->execute($query, [
                     ':parentRight' => $parentRight,
-                    ':oxid' => $actOxid
+                    ':oxid' => $actOxid,
                 ]);
                 $this->_updateNodes($actOxid, false, $thisRoot);
                 $rs->fetchRow();
@@ -719,7 +736,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param string $sName variable name
      *
-     * @return string
+     * @return array
      */
     public function __get($sName)
     {
@@ -727,7 +744,6 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
             case 'aPath':
             case 'aFullPath':
                 return $this->getPath();
-                break;
         }
         return parent::__get($sName);
     }

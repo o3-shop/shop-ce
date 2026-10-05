@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,18 +18,17 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 use OxidEsales\EshopCommunity\Application\Model\DeliverySet;
-
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for DeliverySet_Payment class
  */
 class DeliverySetPaymentTest extends \OxidTestCase
 {
-
     /**
      * DeliverySet_Payment::Render() test case
      *
@@ -36,8 +36,8 @@ class DeliverySetPaymentTest extends \OxidTestCase
      */
     public function testRender()
     {
-        oxTestModules::addFunction("oxdeliveryset", "isDerived", "{return true;}");
-        $this->setRequestParameter("oxid", "testId");
+        oxTestModules::addFunction('oxdeliveryset', 'isDerived', '{return true;}');
+        $this->setRequestParameter('oxid', 'testId');
 
         // testing..
         $oView = oxNew('DeliverySet_Payment');
@@ -55,13 +55,13 @@ class DeliverySetPaymentTest extends \OxidTestCase
      */
     public function testRenderNoRealObjectId()
     {
-        $this->setRequestParameter("oxid", "-1");
+        $this->setRequestParameter('oxid', '-1');
 
         // testing..
         $oView = oxNew('DeliverySet_Payment');
         $this->assertEquals('deliveryset_payment.tpl', $oView->render());
         $aViewData = $oView->getViewData();
         $this->assertTrue(isset($aViewData['oxid']));
-        $this->assertEquals("-1", $aViewData['oxid']);
+        $this->assertEquals('-1', $aViewData['oxid']);
     }
 }

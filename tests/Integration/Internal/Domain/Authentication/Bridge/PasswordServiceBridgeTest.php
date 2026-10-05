@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -18,7 +20,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Password\Bridge;
+namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Domain\Authentication\Bridge;
 
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface;
@@ -84,7 +86,7 @@ class PasswordServiceBridgeTest extends TestCase
     /**
      * @return ContainerInterface
      */
-    private function getContainer() : ContainerInterface
+    private function getContainer(): ContainerInterface
     {
         $factory = ContainerFactory::getInstance();
 

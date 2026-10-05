@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,20 +18,18 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use oxDb;
+use oxField;
 use OxidEsales\EshopCommunity\Application\Model\OrderFileList;
-
-use \oxField;
-use \oxDb;
-use \oxRegistry;
 
 /**
  * Tests for Order_Article class
  */
 class OrderDownloadsTest extends \OxidTestCase
 {
-
     /**
      * Initialize the fixture.
      *
@@ -60,10 +59,10 @@ class OrderDownloadsTest extends \OxidTestCase
         $oArticle->save();
 
         //set order
-        $oOrder = oxNew("oxOrder");
+        $oOrder = oxNew('oxOrder');
         $oOrder->setId('_testOrderId1');
         $oOrder->oxorder__oxshopid = new oxField($myConfig->getShopId(), oxField::T_RAW);
-        $oOrder->oxorder__oxuserid = new oxField("_testUserId", oxField::T_RAW);
+        $oOrder->oxorder__oxuserid = new oxField('_testUserId', oxField::T_RAW);
         $oOrder->oxorder__oxbillcountryid = new oxField('10', oxField::T_RAW);
         $oOrder->oxorder__oxdelcountryid = new oxField('11', oxField::T_RAW);
         $oOrder->oxorder__oxdeltype = new oxField('_testDeliverySetId', oxField::T_RAW);
@@ -93,12 +92,12 @@ class OrderDownloadsTest extends \OxidTestCase
      */
     public function testGetEditObject()
     {
-        $this->setRequestParameter("oxid", null);
+        $this->setRequestParameter('oxid', null);
 
         $oView = oxNew('Order_Downloads');
         $this->assertNull($oView->getEditObject());
 
-        $this->setRequestParameter("oxid", "_testOrderId1");
+        $this->setRequestParameter('oxid', '_testOrderId1');
 
         $oView = oxNew('Order_Downloads');
         $oOrderFiles = $oView->getEditObject();
@@ -112,7 +111,7 @@ class OrderDownloadsTest extends \OxidTestCase
      */
     public function testGetProductList()
     {
-        $this->setRequestParameter("oxorderfileid", "_testOrderFile");
+        $this->setRequestParameter('oxorderfileid', '_testOrderFile');
         oxDb::getDB()->execute(
             'insert into oxorderfiles set oxid="_testOrderFile", oxfileid="fileId", oxmaxdownloadcount="10", oxlinkexpirationtime="24",
                                     oxdownloadexpirationtime="12", oxvaliduntil="2011-10-20 12:12:00", oxdownloadcount="2", oxfirstdownload="2011-10-10", oxlastdownload="2011-10-20"'
@@ -125,7 +124,7 @@ class OrderDownloadsTest extends \OxidTestCase
         $oView->resetDownloadLink();
 
         $oOrderFile = oxNew('oxOrderFile');
-        $oOrderFile->load("_testOrderFile");
+        $oOrderFile->load('_testOrderFile');
         $this->assertEquals('0', $oOrderFile->oxorderfiles__oxdownloadcount->value);
         $this->assertTrue($oOrderFile->oxorderfiles__oxvaliduntil->value >= $sDate);
         $this->assertEquals('0000-00-00 00:00:00', $oOrderFile->oxorderfiles__oxfirstdownload->value);

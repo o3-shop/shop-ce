@@ -21,13 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxField;
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Application\Model\Shop;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class controls article assignment to attributes
  */
-class ShopDefaultCategoryAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class ShopDefaultCategoryAjax extends ListComponentAjax
 {
     /**
      * Columns array
@@ -35,23 +38,23 @@ class ShopDefaultCategoryAjax extends \OxidEsales\Eshop\Application\Controller\A
      * @var array
      */
     protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
-        ['oxtitle', 'oxcategories', 1, 1, 0],
-        ['oxdesc', 'oxcategories', 1, 1, 0],
-        ['oxid', 'oxcategories', 0, 0, 0],
-        ['oxid', 'oxcategories', 0, 0, 1]
-    ]
+            ['oxtitle', 'oxcategories', 1, 1, 0],
+            ['oxdesc', 'oxcategories', 1, 1, 0],
+            ['oxid', 'oxcategories', 0, 0, 0],
+            ['oxid', 'oxcategories', 0, 0, 1],
+        ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oCat = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-        $oCat->setLanguage(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('editlanguage'));
+        $oCat = oxNew(Category::class);
+        $oCat->setLanguage(Registry::getRequest()->getRequestEscapedParameter('editlanguage'));
 
         $sCategoriesTable = $oCat->getViewName();
 
@@ -59,28 +62,28 @@ class ShopDefaultCategoryAjax extends \OxidEsales\Eshop\Application\Controller\A
     }
 
     /**
-     * Removing article from corssselling list
+     * Removing article from cross-selling list
      */
     public function unassignCat()
     {
-        $sShopId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $oShop = oxNew(\OxidEsales\Eshop\Application\Model\Shop::class);
+        $sShopId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $oShop = oxNew(Shop::class);
         if ($oShop->load($sShopId)) {
-            $oShop->oxshops__oxdefcat = new \OxidEsales\Eshop\Core\Field('');
+            $oShop->oxshops__oxdefcat = new Field('');
             $oShop->save();
         }
     }
 
     /**
-     * Adding article to corssselling list
+     * Adding article to cross-selling list
      */
     public function assignCat()
     {
-        $sChosenCat = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxcatid');
-        $sShopId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $oShop = oxNew(\OxidEsales\Eshop\Application\Model\Shop::class);
+        $sChosenCat = Registry::getRequest()->getRequestEscapedParameter('oxcatid');
+        $sShopId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $oShop = oxNew(Shop::class);
         if ($oShop->load($sShopId)) {
-            $oShop->oxshops__oxdefcat = new \OxidEsales\Eshop\Core\Field($sChosenCat);
+            $oShop->oxshops__oxdefcat = new Field($sChosenCat);
             $oShop->save();
         }
     }

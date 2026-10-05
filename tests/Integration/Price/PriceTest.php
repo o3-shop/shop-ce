@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,11 +18,12 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Price;
 
 use oxDb;
 
-require_once __DIR__. '/BasketConstruct.php';
+require_once __DIR__ . '/BasketConstruct.php';
 
 /**
  * Shop price calculation test
@@ -34,10 +36,10 @@ require_once __DIR__. '/BasketConstruct.php';
 class PriceTest extends BaseTestCase
 {
     /** @var array Test case directories. */
-    private $testCasesDirectory = "testcases/price";
+    private $testCasesDirectory = 'testcases/price';
 
     /** @var array If specified, runs only these test cases. */
-    private $testCases = array();
+    private $testCases = [];
 
     /**
      * Initialize the fixture.
@@ -62,17 +64,17 @@ class PriceTest extends BaseTestCase
     protected function resetDatabase()
     {
         $database = oxDb::getDb();
-        $database->execute("TRUNCATE oxarticles");
-        $database->execute("TRUNCATE oxdiscount");
-        $database->execute("TRUNCATE oxobject2discount");
-        $database->execute("TRUNCATE oxprice2article");
-        $tables = $database->getCol("SHOW TABLES");
+        $database->execute('TRUNCATE oxarticles');
+        $database->execute('TRUNCATE oxdiscount');
+        $database->execute('TRUNCATE oxobject2discount');
+        $database->execute('TRUNCATE oxprice2article');
+        $tables = $database->getCol('SHOW TABLES');
         if (in_array('oxfield2shop', $tables)) {
-            $database->execute("TRUNCATE oxfield2shop");
+            $database->execute('TRUNCATE oxfield2shop');
         }
-        $database->execute("TRUNCATE oxuser");
-        $database->execute("TRUNCATE oxobject2group");
-        $database->execute("TRUNCATE oxgroups");
+        $database->execute('TRUNCATE oxuser');
+        $database->execute('TRUNCATE oxobject2group');
+        $database->execute('TRUNCATE oxgroups');
     }
 
     /**
@@ -82,7 +84,7 @@ class PriceTest extends BaseTestCase
      */
     public function providerPrice()
     {
-        $directoriesToScan = array($this->testCasesDirectory . '/community/');
+        $directoriesToScan = [$this->testCasesDirectory . '/community/'];
         return $this->getTestCases($directoriesToScan, $this->testCases);
     }
 
@@ -96,7 +98,7 @@ class PriceTest extends BaseTestCase
     public function testPrice($aTestCase)
     {
         if (isset($aTestCase['skipped']) && $aTestCase['skipped'] == 1) {
-            $this->markTestSkipped("testcase is skipped");
+            $this->markTestSkipped('testcase is skipped');
         }
 
         // gather data from test case
@@ -108,7 +110,7 @@ class PriceTest extends BaseTestCase
         $iActiveShopId = $oConstruct->createShop($aTestCase['shop'] ?? null);
 
         // create user if specified
-        $oUser = $oConstruct->createObj($aTestCase['user'] ?? null, "oxuser", "oxuser");
+        $oUser = $oConstruct->createObj($aTestCase['user'] ?? null, 'oxuser', 'oxuser');
 
         // create group and assign
         $oConstruct->createGroup($aTestCase['group'] ?? null);

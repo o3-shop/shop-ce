@@ -33,7 +33,6 @@ use OxidEsales\Eshop\Core\Module\Module as EshopModule;
  */
 class ModuleSmartyPluginDirectories
 {
-
     /**
      * @var EshopModule
      *

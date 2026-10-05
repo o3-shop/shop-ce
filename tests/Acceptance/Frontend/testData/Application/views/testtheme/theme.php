@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -21,11 +22,11 @@
 /**
  * Theme Information
  */
-$aTheme = array(
+$aTheme = [
     'id'           => 'testtheme',
     'title'        => 'testtheme',
     'description'  => 'Test theme by OXID eSales AG',
     'thumbnail'    => 'theme.jpg',
     'version'      => '1.4',
     'author'       => 'OXID',
-);
+];

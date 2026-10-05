@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,11 +18,11 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller;
 
+use oxField;
 use OxidEsales\EshopCommunity\Application\Controller\AccountNoticeListController;
-use \oxField;
-
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
@@ -30,7 +31,6 @@ use PHPUnit\Framework\MockObject\MockObject;
  */
 class AccountNoticeListControllerTest extends \OxidTestCase
 {
-
     /**
      * Testing AccountNoticeListController::getSimilarRecommLists()
      *
@@ -38,17 +38,17 @@ class AccountNoticeListControllerTest extends \OxidTestCase
      */
     public function testGetSimilarRecommListIds()
     {
-        $sArrayKey = "articleId";
-        $aArrayKeys = array($sArrayKey);
-        $aNoticeProdList = array($sArrayKey => "zyyy");
+        $sArrayKey = 'articleId';
+        $aArrayKeys = [$sArrayKey];
+        $aNoticeProdList = [$sArrayKey => 'zyyy'];
 
         /** @var \OxidEsales\EshopCommunity\Application\Controller\AccountNoticeListController|MockObject $oSearch */
-        $oSearch = $this->getMock(AccountNoticeListController::class, array("getNoticeProductList"));
-        $oSearch->expects($this->once())->method("getNoticeProductList")->will($this->returnValue($aNoticeProdList));
+        $oSearch = $this->getMock(AccountNoticeListController::class, ['getNoticeProductList']);
+        $oSearch->expects($this->once())->method('getNoticeProductList')->will($this->returnValue($aNoticeProdList));
         $this->assertEquals(
             $aArrayKeys,
             $oSearch->getSimilarRecommListIds(),
-            "getSimilarRecommListIds() should return array of keys from result of getNoticeProductList()"
+            'getSimilarRecommListIds() should return array of keys from result of getNoticeProductList()'
         );
     }
 
@@ -60,8 +60,8 @@ class AccountNoticeListControllerTest extends \OxidTestCase
     public function testGetSimilarProductsEmptyProductList()
     {
         /** @var \OxidEsales\EshopCommunity\Application\Controller\AccountNoticeListController|MockObject $oView */
-        $oView = $this->getMock(AccountNoticeListController::class, array("getNoticeProductList"));
-        $oView->expects($this->any())->method('getNoticeProductList')->will($this->returnValue(array()));
+        $oView = $this->getMock(AccountNoticeListController::class, ['getNoticeProductList']);
+        $oView->expects($this->any())->method('getNoticeProductList')->will($this->returnValue([]));
         $this->assertNull($oView->getSimilarProducts());
     }
 
@@ -72,13 +72,13 @@ class AccountNoticeListControllerTest extends \OxidTestCase
      */
     public function testGetSimilarProducts()
     {
-        $oProduct = $this->getMock(\OxidEsales\Eshop\Application\Model\ArticleList::class, array("getSimilarProducts"));
-        $oProduct->expects($this->any())->method('getSimilarProducts')->will($this->returnValue("testSimilarProducts"));
+        $oProduct = $this->getMock(\OxidEsales\Eshop\Application\Model\ArticleList::class, ['getSimilarProducts']);
+        $oProduct->expects($this->any())->method('getSimilarProducts')->will($this->returnValue('testSimilarProducts'));
 
         /** @var AccountNoticeListController|MockObject $oView */
-        $oView = $this->getMock(AccountNoticeListController::class, array("getNoticeProductList"));
-        $oView->expects($this->any())->method('getNoticeProductList')->will($this->returnValue(array($oProduct)));
-        $this->assertEquals("testSimilarProducts", $oView->getSimilarProducts());
+        $oView = $this->getMock(AccountNoticeListController::class, ['getNoticeProductList']);
+        $oView->expects($this->any())->method('getNoticeProductList')->will($this->returnValue([$oProduct]));
+        $this->assertEquals('testSimilarProducts', $oView->getSimilarProducts());
     }
 
     /**
@@ -89,7 +89,7 @@ class AccountNoticeListControllerTest extends \OxidTestCase
     public function testGetNoticeProductListNoSessionUser()
     {
         /** @var \OxidEsales\EshopCommunity\Application\Controller\AccountNoticeListController|MockObject $oView */
-        $oView = $this->getMock(AccountNoticeListController::class, array("getUser"));
+        $oView = $this->getMock(AccountNoticeListController::class, ['getUser']);
         $oView->expects($this->any())->method('getUser')->will($this->returnValue(false));
         $this->assertNull($oView->getNoticeProductList());
     }
@@ -101,16 +101,16 @@ class AccountNoticeListControllerTest extends \OxidTestCase
      */
     public function testGetNoticeProductList()
     {
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, array("getArticles"));
-        $oBasket->expects($this->once())->method('getArticles')->will($this->returnValue("articles"));
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getArticles']);
+        $oBasket->expects($this->once())->method('getArticles')->will($this->returnValue('articles'));
 
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array("getBasket"));
-        $oUser->expects($this->once())->method('getBasket')->with($this->equalTo("noticelist"))->will($this->returnValue($oBasket));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['getBasket']);
+        $oUser->expects($this->once())->method('getBasket')->with($this->equalTo('noticelist'))->will($this->returnValue($oBasket));
 
         /** @var \OxidEsales\EshopCommunity\Application\Controller\AccountNoticeListController|MockObject $oView */
-        $oView = $this->getMock(AccountNoticeListController::class, array("getUser"));
+        $oView = $this->getMock(AccountNoticeListController::class, ['getUser']);
         $oView->expects($this->any())->method('getUser')->will($this->returnValue($oUser));
-        $this->assertEquals("articles", $oView->getNoticeProductList());
+        $this->assertEquals('articles', $oView->getNoticeProductList());
     }
 
     /**
@@ -121,7 +121,7 @@ class AccountNoticeListControllerTest extends \OxidTestCase
     public function testRenderNoUser()
     {
         /** @var \OxidEsales\EshopCommunity\Application\Controller\AccountNoticeListController|MockObject $oView */
-        $oView = $this->getMock(AccountNoticeListController::class, array("getUser"));
+        $oView = $this->getMock(AccountNoticeListController::class, ['getUser']);
         $oView->expects($this->any())->method('getUser')->will($this->returnValue(false));
         $this->assertEquals('page/account/login.tpl', $oView->render());
     }
@@ -134,10 +134,10 @@ class AccountNoticeListControllerTest extends \OxidTestCase
     public function testRender()
     {
         $oUser = oxNew('oxuser');
-        $oUser->oxuser__oxpassword = new oxField("testPassword");
+        $oUser->oxuser__oxpassword = new oxField('testPassword');
 
         /** @var \OxidEsales\EshopCommunity\Application\Controller\AccountNoticeListController|MockObject $oView */
-        $oView = $this->getMock(AccountNoticeListController::class, array("getUser"));
+        $oView = $this->getMock(AccountNoticeListController::class, ['getUser']);
         $oView->expects($this->any())->method('getUser')->will($this->returnValue($oUser));
         $this->assertEquals('page/account/noticelist.tpl', $oView->render());
     }
@@ -165,6 +165,6 @@ class AccountNoticeListControllerTest extends \OxidTestCase
 
         $aParams = $oAccNoticeList->getNavigationParams();
 
-        $this->assertEquals('testId', $aParams['anid'], "Should have correct anid navigation parameter");
+        $this->assertEquals('testId', $aParams['anid'], 'Should have correct anid navigation parameter');
     }
 }

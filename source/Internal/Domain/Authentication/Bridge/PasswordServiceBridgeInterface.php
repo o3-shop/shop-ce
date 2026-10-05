@@ -36,7 +36,6 @@ interface PasswordServiceBridgeInterface
      */
     public function hash(string $password): string;
 
-
     /**
      * @param string $passwordHash
      *

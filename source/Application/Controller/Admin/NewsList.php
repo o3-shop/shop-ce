@@ -21,13 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+
 /**
  * Admin news list manager.
  * Performs collection and managing (such as filtering or deleting) function.
  * Admin Menu: Customer Info -> News.
  * @deprecated 6.5.6 "News" feature will be removed completely
  */
-class NewsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class NewsList extends AdminListController
 {
     /**
      * Current class template name.
@@ -55,17 +58,18 @@ class NewsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListC
      *
      * @var string
      */
-    protected $_sDefSortField = "oxdate";
+    protected $_sDefSortField = 'oxdate';
 
     /**
      * Returns sorting fields array
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getListSorting()
     {
         $aSorting = parent::getListSorting();
-        if (isset($aSorting["oxnews"][$this->_sDefSortField])) {
+        if (isset($aSorting['oxnews'][$this->_sDefSortField])) {
             $this->_blDesc = true;
         }
 

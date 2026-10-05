@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: bruto
  * Price view mode:  brutto
@@ -15,37 +16,37 @@
  *  2. Delivery -
  *  3. TS +
  */
-$aData = array(
-    'articles' => array(
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
             'oxid'                     => 111,
             'oxprice'                  => 24.95,
             'oxvat'                    => 19,
             'amount'                   => 1,
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-             111 => array( '24,95', '24,95' ),
-        ),
-        'totals' => array(
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+             111 => [ '24,95', '24,95' ],
+        ],
+        'totals' => [
             'totalBrutto' => '24,95',
             'totalNetto'  => '20,97',
-            'vats' => array(
-                19 => '3,98'
-            ),
-            'grandTotal'  => '24,95'
-        ),
-    ),
-    'options' => array(
-        'config' => array(
+            'vats' => [
+                19 => '3,98',
+            ],
+            'grandTotal'  => '24,95',
+        ],
+    ],
+    'options' => [
+        'config' => [
                 'blEnterNetPrice' => false,
                 'blShowNetPrice' => false,
                 'blShowVATForWrapping' => true,
                 'blShowVATForPayCharge' => true,
                 'blShowVATForDelivery' => true,
                 'sAdditionalServVATCalcMethod' => 'biggest_net',
-        ),
+        ],
         'activeCurrencyRate' => 1.00,
-    ),
-);
+    ],
+];

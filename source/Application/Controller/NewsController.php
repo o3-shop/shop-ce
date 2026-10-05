@@ -21,17 +21,19 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxRegistry;
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\NewsList;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Shop news window.
  * Arranges news texts. O3-Shop -> (click on News box on left side).
  * @deprecated 6.5.6 "News" feature will be removed completely
  */
-class NewsController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class NewsController extends FrontendController
 {
     /**
-     * Newslist
+     * NewsList
      *
      * @var object
      */
@@ -50,7 +52,6 @@ class NewsController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
      */
     protected $_blBargainAction = true;
 
-
     /**
      * Page navigation
      *
@@ -66,7 +67,7 @@ class NewsController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
     protected $_iCntPages = null;
 
     /**
-     * Template variable getter. Returns newslist
+     * Template variable getter. Returns newsList
      *
      * @return object
      */
@@ -75,10 +76,10 @@ class NewsController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
         if ($this->_oNewsList === null) {
             $this->_oNewsList = false;
 
-            $iPerPage = (int) $this->getConfig()->getConfigParam('iNrofCatArticles');
+            $iPerPage = (int) Registry::getConfig()->getConfigParam('iNrofCatArticles');
             $iPerPage = $iPerPage ? $iPerPage : 10;
 
-            $oActNews = oxNew(\OxidEsales\Eshop\Application\Model\NewsList::class);
+            $oActNews = oxNew(NewsList::class);
 
             if ($iCnt = $oActNews->getCount()) {
                 $this->_iCntPages = ceil($iCnt / $iPerPage);
@@ -90,7 +91,6 @@ class NewsController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
         return $this->_oNewsList;
     }
 
-
     /**
      * Returns Bread Crumb - you are here page1/page2/page3...
      *
@@ -101,11 +101,11 @@ class NewsController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
         $aPaths = [];
         $aPath = [];
 
-        $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
+        $oLang = Registry::getLang();
         $iBaseLanguage = $oLang->getBaseLanguage();
         $sTranslatedString = $oLang->translateString('LATEST_NEWS_AND_UPDATES_AT', $iBaseLanguage, false);
 
-        $aPath['title'] = $sTranslatedString . ' ' . $this->getConfig()->getActiveShop()->oxshops__oxname->value;
+        $aPath['title'] = $sTranslatedString . ' ' . Registry::getConfig()->getActiveShop()->oxshops__oxname->value;
         $aPath['link'] = $this->getLink();
 
         $aPaths[] = $aPath;
@@ -135,10 +135,10 @@ class NewsController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
      */
     public function getTitle()
     {
-        $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
+        $oLang = Registry::getLang();
         $iBaseLanguage = $oLang->getBaseLanguage();
         $sTranslatedString = $oLang->translateString('LATEST_NEWS_AND_UPDATES_AT', $iBaseLanguage, false);
 
-        return $sTranslatedString . ' ' . $this->getConfig()->getActiveShop()->oxshops__oxname->value;
+        return $sTranslatedString . ' ' . Registry::getConfig()->getActiveShop()->oxshops__oxname->value;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,18 +18,18 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
+use oxArticleHelper;
+use oxDb;
+use oxdeliverylist;
+use oxField;
 use OxidEsales\EshopCommunity\Application\Model\Delivery;
-use \oxArticleHelper;
-use \oxdeliverylist;
-use \oxDb;
-use \oxField;
 use OxidEsales\EshopCommunity\Core\ShopIdCalculator;
-use \oxRegistry;
-use \oxTestModules;
-use \oxUser;
-use \PHPUnit\Framework\MockObject\MockObject as MockObject;
+use oxRegistry;
+use oxUser;
+use PHPUnit\Framework\MockObject\MockObject as MockObject;
 
 class oxDeliveryListTestClass extends oxdeliverylist
 {
@@ -88,23 +89,22 @@ class oxDb_noActiveSnippetInDeliveryList extends oxDb
     }
 }
 
-
 class DeliverylistTest extends \OxidTestCase
 {
     /** @var oxUser */
     protected $_oUser;
 
     /** @var array */
-    protected $_aTestProducts = array();
+    protected $_aTestProducts = [];
 
     /** @var array  */
-    protected $_aCategories = array();
+    protected $_aCategories = [];
 
     /** @var array  */
-    protected $_aDeliverySets = array();
+    protected $_aDeliverySets = [];
 
     /** @var array  */
-    protected $_aDeliveries = array();
+    protected $_aDeliveries = [];
 
     /**
      * Initialize the fixture.
@@ -121,7 +121,7 @@ class DeliverylistTest extends \OxidTestCase
         // inserting some demo data
 
         //set default user
-        $this->_oUser = oxNew("oxUser");
+        $this->_oUser = oxNew('oxUser');
         $this->_oUser->setId('_testUserId');
         $this->_oUser->oxuser__oxactive = new oxField('1', oxField::T_RAW);
         $this->_oUser->save();
@@ -165,7 +165,7 @@ class DeliverylistTest extends \OxidTestCase
 
         //3. insert test articles
         for ($i = 1; $i <= 3; $i++) {
-            $oArticle = oxNew("oxArticle");
+            $oArticle = oxNew('oxArticle');
             $oArticle->setId('_testArticleId' . $i);
             $oArticle->oxarticles__oxtitle = new oxField('testArticle' . $i, oxField::T_RAW);
             $oArticle->oxarticles__oxartnum = new oxField(1000 + $i, oxField::T_RAW);
@@ -257,12 +257,12 @@ class DeliverylistTest extends \OxidTestCase
     public function testGetDeliveryListWithSomeWrongData()
     {
         $oBasket = oxNew('oxBasket');
-        $oBasket->addToBasket("1126", 1);
-        $oBasket->addToBasket("1672", 1);
+        $oBasket->addToBasket('1126', 1);
+        $oBasket->addToBasket('1672', 1);
         $oBasket->calculateBasket();
 
         $oUser = oxNew('oxUser');
-        $oUser->load("oxdefaultadmin");
+        $oUser->load('oxdefaultadmin');
 
         $oDelList = oxNew('oxDeliveryList');
         $oDelList = $oDelList->getDeliveryList($oBasket, $oUser);
@@ -275,27 +275,27 @@ class DeliverylistTest extends \OxidTestCase
 
         // adding garbage
         $oGarbage = oxNew('oxBase');
-        $oGarbage->init("oxobject2delivery");
-        $oGarbage->setId("_testoxobject2delivery1");
+        $oGarbage->init('oxobject2delivery');
+        $oGarbage->setId('_testoxobject2delivery1');
         $oGarbage->oxobject2delivery__oxdeliveryid = new oxField($oDelivery->getId());
-        $oGarbage->oxobject2delivery__oxobjectid = new oxField("yyy");
-        $oGarbage->oxobject2delivery__oxtype = new oxField("oxcountry");
+        $oGarbage->oxobject2delivery__oxobjectid = new oxField('yyy');
+        $oGarbage->oxobject2delivery__oxtype = new oxField('oxcountry');
         $oGarbage->save();
 
         $oGarbage = oxNew('oxBase');
-        $oGarbage->init("oxobject2delivery");
-        $oGarbage->setId("_testoxobject2delivery2");
+        $oGarbage->init('oxobject2delivery');
+        $oGarbage->setId('_testoxobject2delivery2');
         $oGarbage->oxobject2delivery__oxdeliveryid = new oxField($oDelivery->getId());
-        $oGarbage->oxobject2delivery__oxobjectid = new oxField("yyy");
-        $oGarbage->oxobject2delivery__oxtype = new oxField("oxuser");
+        $oGarbage->oxobject2delivery__oxobjectid = new oxField('yyy');
+        $oGarbage->oxobject2delivery__oxtype = new oxField('oxuser');
         $oGarbage->save();
 
         $oGarbage = oxNew('oxBase');
-        $oGarbage->init("oxobject2delivery");
-        $oGarbage->setId("_testoxobject2delivery3");
+        $oGarbage->init('oxobject2delivery');
+        $oGarbage->setId('_testoxobject2delivery3');
         $oGarbage->oxobject2delivery__oxdeliveryid = new oxField($oDelivery->getId());
-        $oGarbage->oxobject2delivery__oxobjectid = new oxField("yyy");
-        $oGarbage->oxobject2delivery__oxtype = new oxField("oxgroups");
+        $oGarbage->oxobject2delivery__oxobjectid = new oxField('yyy');
+        $oGarbage->oxobject2delivery__oxtype = new oxField('oxgroups');
         $oGarbage->save();
 
         $oDelList = oxNew('oxDeliveryList');
@@ -314,7 +314,7 @@ class DeliverylistTest extends \OxidTestCase
                 break;
             }
         }
-        $this->assertTrue($blFound, "Error, delivery not found");
+        $this->assertTrue($blFound, 'Error, delivery not found');
     }
 
     public function testHasDeliveries()
@@ -354,7 +354,7 @@ class DeliverylistTest extends \OxidTestCase
     public function testOxDeliveryList()
     {
         /** @var oxDeliveryList|MockObject $oList */
-        $oList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliveryList::class, array('setHomeCountry'));
+        $oList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliveryList::class, ['setHomeCountry']);
         $oList->expects($this->once())->method('setHomeCountry');
         $oList->__construct();
 
@@ -368,7 +368,7 @@ class DeliverylistTest extends \OxidTestCase
     public function testSetHomeCountry()
     {
         $oList = $this->getProxyClass('oxDeliveryList');
-        $oList->setHomeCountry(array('something'));
+        $oList->setHomeCountry(['something']);
         $this->assertEquals('something', $oList->getNonPublicVar('_sHomeCountry'));
     }
 
@@ -386,12 +386,12 @@ class DeliverylistTest extends \OxidTestCase
     public function testGetListWithoutUserAndCountry()
     {
         $oList = $this->getProxyClass('oxDeliveryList');
-        $oList->setHomeCountry(array('_testHomeCountryId'));
+        $oList->setHomeCountry(['_testHomeCountryId']);
         $oList->UNITgetList(null, null, '_testDeliverySetId');
 
         $this->assertEquals('_testHomeCountryId_testDeliverySetId', $oList->getNonPublicVar('_sUserId'));
         $this->assertEquals(
-            array('_testDeliveryId3', '_testDeliveryId2', '_testDeliveryId1'),
+            ['_testDeliveryId3', '_testDeliveryId2', '_testDeliveryId1'],
             array_keys($oList->aList)
         );
     }
@@ -412,7 +412,7 @@ class DeliverylistTest extends \OxidTestCase
         // testing with demo deliveries
         $this->assertEquals($this->_oUser->getId() . 'a7c40f631fc920687.20179984oxidstandard', $oList->getNonPublicVar('_sUserId'));
         $this->assertEquals(
-            array('1b842e734b62a4775.45738618', '1b842e73470578914.54719298'),
+            ['1b842e734b62a4775.45738618', '1b842e73470578914.54719298'],
             array_keys($oList->aList)
         );
     }
@@ -424,12 +424,12 @@ class DeliverylistTest extends \OxidTestCase
     public function testGetListExecTestWithUser()
     {
         /** @var oxUser|MockObject $oUser */
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array('getId', 'getActiveCountry'));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['getId', 'getActiveCountry']);
         $oUser->expects($this->once())->method('getId')->will($this->returnValue('xxx'));
         $oUser->expects($this->once())->method('getActiveCountry')->will($this->returnValue('yyy'));
 
         /** @var oxDeliveryList|MockObject $oList */
-        $oList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliveryList::class, array('getUser', '_getFilterSelect', 'selectString', 'rewind'));
+        $oList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliveryList::class, ['getUser', '_getFilterSelect', 'selectString', 'rewind']);
         $oList->expects($this->once())->method('getUser')->will($this->returnValue($oUser));
         $oList->expects($this->once())->method('_getFilterSelect');
         $oList->expects($this->once())->method('selectString');
@@ -445,7 +445,7 @@ class DeliverylistTest extends \OxidTestCase
     public function testGetListExecTestNoUser()
     {
         /** @var oxDeliveryList|MockObject $oList */
-        $oList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliveryList::class, array('getUser', 'selectString', 'rewind'));
+        $oList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliveryList::class, ['getUser', 'selectString', 'rewind']);
         $oList->expects($this->once())->method('getUser')->will($this->returnValue(null));
         $oList->expects($this->once())->method('selectString');
         $oList->expects($this->once())->method('rewind');
@@ -473,7 +473,7 @@ class DeliverylistTest extends \OxidTestCase
 
         $this->assertEquals(3, $oDList->count());
         $this->assertEquals(
-            array('_testDeliveryId1', '_testDeliveryId2', '_testDeliveryId3'),
+            ['_testDeliveryId1', '_testDeliveryId2', '_testDeliveryId3'],
             array_keys($oDList->aList)
         );
     }
@@ -491,7 +491,7 @@ class DeliverylistTest extends \OxidTestCase
 
         $this->assertEquals(3, $oDList->count());
         $this->assertEquals(
-            array('_testDeliveryId1', '_testDeliveryId2', '_testDeliveryId3'),
+            ['_testDeliveryId1', '_testDeliveryId2', '_testDeliveryId3'],
             array_keys($oDList->aList)
         );
 
@@ -502,7 +502,7 @@ class DeliverylistTest extends \OxidTestCase
         $oDList->getList($this->_oUser, null, '_testDeliverySetId');
         $this->assertEquals(3, $oDList->count());
         $this->assertEquals(
-            array('_testDeliveryId1', '_testDeliveryId2', '_testDeliveryId3'),
+            ['_testDeliveryId1', '_testDeliveryId2', '_testDeliveryId3'],
             array_keys($oDList->aList)
         );
     }
@@ -535,9 +535,9 @@ class DeliverylistTest extends \OxidTestCase
         $sTestSQ = $oDList->_getFilterSelect(null, null, null);
 
         //cleaning spaces, tabs and so on...
-        $aSearch = array("/\s+/", "/\t+/", "/\r+/", "/\n+/");
-        $sQ = strtolower(preg_replace($aSearch, " ", $sQ));
-        $sTestSQ = strtolower(preg_replace($aSearch, " ", $sTestSQ));
+        $aSearch = ["/\s+/", "/\t+/", "/\r+/", "/\n+/"];
+        $sQ = strtolower(preg_replace($aSearch, ' ', $sQ));
+        $sTestSQ = strtolower(preg_replace($aSearch, ' ', $sTestSQ));
 
         $this->assertEquals($sQ, $sTestSQ);
     }
@@ -570,8 +570,8 @@ class DeliverylistTest extends \OxidTestCase
         $sTestSQ = $oDList->_getFilterSelect(null, '_testCountryId', null);
 
         //cleaning spaces, tabs and so on...
-        $aSearch = array("/\s+/", "/\t+/", "/\r+/", "/\n+/");
-        $aReplace = array(" ", " ", " ", " ");
+        $aSearch = ["/\s+/", "/\t+/", "/\r+/", "/\n+/"];
+        $aReplace = [' ', ' ', ' ', ' '];
         $sQ = strtolower(preg_replace($aSearch, $aReplace, $sQ));
         $sTestSQ = strtolower(preg_replace($aSearch, $aReplace, $sTestSQ));
 
@@ -607,8 +607,8 @@ class DeliverylistTest extends \OxidTestCase
         $sTestSQ = $oDList->_getFilterSelect($this->_oUser, '_testCountryId', '_testDeliverySetId');
 
         //cleaning spaces, tabs and so on...
-        $aSearch = array("/\s+/", "/\t+/", "/\r+/", "/\n+/");
-        $aReplace = array(" ", " ", " ", " ");
+        $aSearch = ["/\s+/", "/\t+/", "/\r+/", "/\n+/"];
+        $aReplace = [' ', ' ', ' ', ' '];
         $sQ = strtolower(preg_replace($aSearch, $aReplace, $sQ));
         $sTestSQ = strtolower(preg_replace($aSearch, $aReplace, $sTestSQ));
 
@@ -646,8 +646,8 @@ class DeliverylistTest extends \OxidTestCase
         $sTestSQ = $oDList->_getFilterSelect($this->_oUser, '_testCountryId', '_testDeliverySetId');
 
         //cleaning spaces, tabs and so on...
-        $aSearch = array("/\s+/", "/\t+/", "/\r+/", "/\n+/");
-        $aReplace = array(" ", " ", " ", " ");
+        $aSearch = ["/\s+/", "/\t+/", "/\r+/", "/\n+/"];
+        $aReplace = [' ', ' ', ' ', ' '];
         $sQ = strtolower(preg_replace($aSearch, $aReplace, $sQ));
         $sTestSQ = strtolower(preg_replace($aSearch, $aReplace, $sTestSQ));
 
@@ -659,7 +659,7 @@ class DeliverylistTest extends \OxidTestCase
      */
     public function testGetDeliveryList()
     {
-        $basketItem = oxNew("oxBasketItem");
+        $basketItem = oxNew('oxBasketItem');
         $basketItem->init('_testArticleId1', 2);
 
         $oPrice = oxNew('oxPrice');
@@ -670,17 +670,17 @@ class DeliverylistTest extends \OxidTestCase
         $aBasketContents[] = $basketItem;
         $aBasketContents[] = $basketItem;
 
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, array('getContents'));
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getContents']);
         $oBasket->expects($this->any())
             ->method('getContents')
             ->will($this->returnValue($aBasketContents));
 
-        $oDList = oxNew("oxDeliveryList");
+        $oDList = oxNew('oxDeliveryList');
         $aList = $oDList->getDeliveryList($oBasket, null, null, '_testDeliverySetId');
 
         $this->assertEquals(3, count($aList));
         $this->assertEquals(
-            array('_testDeliveryId3', '_testDeliveryId2', '_testDeliveryId1'),
+            ['_testDeliveryId3', '_testDeliveryId2', '_testDeliveryId1'],
             array_keys($aList)
         );
     }
@@ -692,7 +692,7 @@ class DeliverylistTest extends \OxidTestCase
         $oDelivery->oxdelivery__oxfinalize = new oxField(1, oxField::T_RAW);
         $oDelivery->save();
 
-        $basketItem = oxNew("oxBasketItem");
+        $basketItem = oxNew('oxBasketItem');
         $basketItem->init('_testArticleId1', 2);
 
         $oPrice = oxNew('oxPrice');
@@ -703,24 +703,24 @@ class DeliverylistTest extends \OxidTestCase
         $aBasketContents[] = $basketItem;
         $aBasketContents[] = $basketItem;
 
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, array('getContents'));
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getContents']);
         $oBasket->expects($this->any())
             ->method('getContents')
             ->will($this->returnValue($aBasketContents));
 
-        $oDList = oxNew("oxDeliveryList");
+        $oDList = oxNew('oxDeliveryList');
         $aList = $oDList->getDeliveryList($oBasket, null, null, '_testDeliverySetId');
 
         $this->assertEquals(2, count($aList));
         $this->assertEquals(
-            array('_testDeliveryId3', '_testDeliveryId2'),
+            ['_testDeliveryId3', '_testDeliveryId2'],
             array_keys($aList)
         );
     }
 
     public function testGetDeliveryListFittingDeliveriesSets()
     {
-        $basketItem = oxNew("oxBasketItem");
+        $basketItem = oxNew('oxBasketItem');
         $basketItem->init('_testArticleId1', 2);
 
         $oPrice = oxNew('oxPrice');
@@ -731,12 +731,12 @@ class DeliverylistTest extends \OxidTestCase
         $aBasketContents[] = $basketItem;
         $aBasketContents[] = $basketItem;
 
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, array('getContents'));
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getContents']);
         $oBasket->expects($this->any())
             ->method('getContents')
             ->will($this->returnValue($aBasketContents));
 
-        $oDList = oxNew("oxDeliveryList");
+        $oDList = oxNew('oxDeliveryList');
         $oDList->setCollectFittingDeliveriesSets(true);
         $aList = $oDList->getDeliveryList($oBasket, null, null, '_testDeliverySetId');
 
@@ -747,7 +747,7 @@ class DeliverylistTest extends \OxidTestCase
     public function testGetDeliveryListNoDelFound()
     {
         $this->cleanUpTable('oxdelivery');
-        $oDList = oxNew("oxDeliveryList");
+        $oDList = oxNew('oxDeliveryList');
         $aList = $oDList->getDeliveryList(oxNew('oxBasket'), oxNew('oxuser'), 'somecountry', null);
 
         $this->assertEquals(0, count($aList));
@@ -769,7 +769,7 @@ class DeliverylistTest extends \OxidTestCase
         $oObject2Delivery->save();
 
         // add same article to basket
-        $basketItem = oxNew("oxBasketItem");
+        $basketItem = oxNew('oxBasketItem');
         $basketItem->init('_testArticleId1', 2);
 
         $oPrice = oxNew('oxPrice');
@@ -780,17 +780,17 @@ class DeliverylistTest extends \OxidTestCase
         $aBasketContents[] = $basketItem;
         $aBasketContents[] = $basketItem;
 
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, array('getContents'));
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getContents']);
         $oBasket->expects($this->any())
             ->method('getContents')
             ->will($this->returnValue($aBasketContents));
 
-        $oDList = oxNew("oxDeliveryList");
+        $oDList = oxNew('oxDeliveryList');
         $aList = $oDList->getDeliveryList($oBasket, null, null, '_testDeliverySetId');
 
         $this->assertEquals(3, count($aList));
         $this->assertEquals(
-            array('_testDeliveryId3', '_testDeliveryId2', '_testDeliveryId1'),
+            ['_testDeliveryId3', '_testDeliveryId2', '_testDeliveryId1'],
             array_keys($aList)
         );
     }
@@ -817,7 +817,7 @@ class DeliverylistTest extends \OxidTestCase
         $oObject2Delivery->save();
 
         // add same article to basket
-        $basketItem = oxNew("oxBasketItem");
+        $basketItem = oxNew('oxBasketItem');
         $basketItem->init('_testArticleId1', 2);
 
         $oPrice = oxNew('oxPrice');
@@ -828,17 +828,17 @@ class DeliverylistTest extends \OxidTestCase
         $aBasketContents[] = $basketItem;
         $aBasketContents[] = $basketItem;
 
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, array('getContents'));
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getContents']);
         $oBasket->expects($this->any())
             ->method('getContents')
             ->will($this->returnValue($aBasketContents));
 
-        $oDList = oxNew("oxDeliveryList");
+        $oDList = oxNew('oxDeliveryList');
         $aList = $oDList->getDeliveryList($oBasket, null, null, '_testDeliverySetId');
 
         $this->assertEquals(3, count($aList));
         $this->assertEquals(
-            array('_testDeliveryId3', '_testDeliveryId2', '_testDeliveryId1'),
+            ['_testDeliveryId3', '_testDeliveryId2', '_testDeliveryId1'],
             array_keys($aList)
         );
     }
@@ -859,7 +859,7 @@ class DeliverylistTest extends \OxidTestCase
         $oObject2Delivery->save();
 
         // add different article to basket
-        $basketItem = oxNew("oxBasketItem");
+        $basketItem = oxNew('oxBasketItem');
         $basketItem->init('_testArticleId2', 2);
 
         $oPrice = oxNew('oxPrice');
@@ -870,17 +870,17 @@ class DeliverylistTest extends \OxidTestCase
         $aBasketContents[] = $basketItem;
         $aBasketContents[] = $basketItem;
 
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, array('getContents'));
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getContents']);
         $oBasket->expects($this->any())
             ->method('getContents')
             ->will($this->returnValue($aBasketContents));
 
-        $oDList = oxNew("oxDeliveryList");
+        $oDList = oxNew('oxDeliveryList');
         $aList = $oDList->getDeliveryList($oBasket, null, null, '_testDeliverySetId');
 
         $this->assertEquals(2, count($aList));
         $this->assertEquals(
-            array('_testDeliveryId3', '_testDeliveryId2'),
+            ['_testDeliveryId3', '_testDeliveryId2'],
             array_keys($aList)
         );
     }
@@ -901,7 +901,7 @@ class DeliverylistTest extends \OxidTestCase
         $oObject2Delivery->save();
 
         // add same article to basket (belongs to category)
-        $basketItem = oxNew("oxBasketItem");
+        $basketItem = oxNew('oxBasketItem');
         $basketItem->init('_testArticleId1', 2);
 
         $oPrice = oxNew('oxPrice');
@@ -912,18 +912,18 @@ class DeliverylistTest extends \OxidTestCase
         $aBasketContents[] = $basketItem;
         $aBasketContents[] = $basketItem;
 
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, array('getContents'));
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getContents']);
         $oBasket->expects($this->any())
             ->method('getContents')
             ->will($this->returnValue($aBasketContents));
 
-        $oDList = oxNew("oxDeliveryList");
+        $oDList = oxNew('oxDeliveryList');
         $oDList->setCollectFittingDeliveriesSets(false);
         $aList = $oDList->getDeliveryList($oBasket, null, null, '_testDeliverySetId');
 
         $this->assertEquals(3, count($aList));
         $this->assertEquals(
-            array('_testDeliveryId3', '_testDeliveryId2', '_testDeliveryId1'),
+            ['_testDeliveryId3', '_testDeliveryId2', '_testDeliveryId1'],
             array_keys($aList)
         );
     }
@@ -954,10 +954,10 @@ class DeliverylistTest extends \OxidTestCase
         $oObject2Delivery->save();
 
         // add same article to basket (belongs to category)
-        $basketItem = oxNew("oxBasketItem");
+        $basketItem = oxNew('oxBasketItem');
         $basketItem->init('_testArticleId1', 2);
 
-        $_oBasketItem2 = oxNew("oxBasketItem");
+        $_oBasketItem2 = oxNew('oxBasketItem');
         $_oBasketItem2->init('1126', 2);
 
         $oPrice = oxNew('oxPrice');
@@ -968,18 +968,18 @@ class DeliverylistTest extends \OxidTestCase
         $aBasketContents[] = $basketItem;
         $aBasketContents[] = $_oBasketItem2;
 
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, array('getContents'));
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getContents']);
         $oBasket->expects($this->any())
             ->method('getContents')
             ->will($this->returnValue($aBasketContents));
 
-        $oDList = oxNew("oxDeliveryList");
+        $oDList = oxNew('oxDeliveryList');
         $oDList->setCollectFittingDeliveriesSets(false);
         $aList = $oDList->getDeliveryList($oBasket, null, null, '_testDeliverySetId');
 
         $this->assertEquals(2, count($aList));
         $this->assertEquals(
-            array('_testDeliveryId2', '_testDeliveryId1'),
+            ['_testDeliveryId2', '_testDeliveryId1'],
             array_keys($aList)
         );
     }
@@ -1003,7 +1003,7 @@ class DeliverylistTest extends \OxidTestCase
         $oObject2Delivery->save();
 
         // add same article to basket (belongs to category)
-        $basketItem = oxNew("oxBasketItem");
+        $basketItem = oxNew('oxBasketItem');
         $basketItem->init('_testArticleId1', 2);
 
         $oPrice = oxNew('oxPrice');
@@ -1014,17 +1014,17 @@ class DeliverylistTest extends \OxidTestCase
         $aBasketContents[] = $basketItem;
         $aBasketContents[] = $basketItem;
 
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, array('getContents'));
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getContents']);
         $oBasket->expects($this->any())
             ->method('getContents')
             ->will($this->returnValue($aBasketContents));
 
-        $oDList = oxNew("oxDeliveryList");
+        $oDList = oxNew('oxDeliveryList');
         $aList = $oDList->getDeliveryList($oBasket, null, null, '_testDeliverySetId');
 
         $this->assertEquals(2, count($aList));
         $this->assertEquals(
-            array('_testDeliveryId3', '_testDeliveryId2'),
+            ['_testDeliveryId3', '_testDeliveryId2'],
             array_keys($aList)
         );
     }
@@ -1043,7 +1043,7 @@ class DeliverylistTest extends \OxidTestCase
         // so first delivery should be skipped
 
         // add same article to basket (belongs to category)
-        $basketItem = oxNew("oxBasketItem");
+        $basketItem = oxNew('oxBasketItem');
         $basketItem->init('_testArticleId1', 2);
 
         $oPrice = oxNew('oxPrice');
@@ -1054,17 +1054,17 @@ class DeliverylistTest extends \OxidTestCase
         $aBasketContents[] = $basketItem;
         $aBasketContents[] = $basketItem;
 
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, array('getContents'));
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getContents']);
         $oBasket->expects($this->any())
             ->method('getContents')
             ->will($this->returnValue($aBasketContents));
 
-        $oDList = oxNew("oxDeliveryList");
+        $oDList = oxNew('oxDeliveryList');
         $aList = $oDList->getDeliveryList($oBasket, null, null, '_testDeliverySetId');
 
         $this->assertEquals(2, count($aList));
         $this->assertEquals(
-            array('_testDeliveryId3', '_testDeliveryId2'),
+            ['_testDeliveryId3', '_testDeliveryId2'],
             array_keys($aList)
         );
     }
@@ -1077,7 +1077,7 @@ class DeliverylistTest extends \OxidTestCase
         $oUser = oxNew('oxUser');
         $oUser->setId('testUserId');
 
-        $oDList = oxNew("oxDeliveryList");
+        $oDList = oxNew('oxDeliveryList');
         $oDList->setUser($oUser);
         $this->assertEquals('testUserId', $oDList->getUser()->getId());
     }
@@ -1090,11 +1090,11 @@ class DeliverylistTest extends \OxidTestCase
         $sQ = "INSERT INTO `oxdelivery`
                (OXID, OXSHOPID, OXACTIVE, OXACTIVEFROM, OXACTIVETO, OXTITLE, OXTITLE_1, OXTITLE_2, OXTITLE_3, OXADDSUMTYPE, OXADDSUM, OXDELTYPE, OXPARAM, OXPARAMEND, OXFIXED, OXSORT, OXFINALIZE, OXTIMESTAMP)
                VALUES
-               ('b763e957be61108f8.80080127', ".ShopIdCalculator::BASE_SHOP_ID.", 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'Test Bestellwert Inland unter � 40,00 = � 2,60', '', '', '', 'abs', 2.6, 'p', 10, 39.99, 0, 9999, 1, NOW()),
-               ('3033e968fb5b30930.92732498', ".ShopIdCalculator::BASE_SHOP_ID.", 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'Test Bestellwert Inland �ber � 40,00 = portofrei', '', '', '', 'abs', 0, 'p', 40, 1000000, 0, 9999, 1, NOW()),
-               ('a713e96c15c7bf3c7.45279281', ".ShopIdCalculator::BASE_SHOP_ID.", 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'Test Mindermengenzuschlag bis � 10,00 = � 3,50', '', '', '', 'abs', 3.5, 'p', 0, 9.99, 0, 9999, 1, NOW()),
-               ('a713e96c1aeaefa75.74010807', ".ShopIdCalculator::BASE_SHOP_ID.", 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'Test Bestellwert europ. Ausland pauschal EURO 6,00', '', '', '', 'abs', 6, 'p', 0, 5000, 0, 9999, 1, NOW()),
-               ('bdd46f9f2455153b9.22318118', ".ShopIdCalculator::BASE_SHOP_ID.", 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'Test Bestellwert au�ereurop. Ausland EURO 9,50', '', '', '', 'abs', 9.5, 'a', 0, 5000, 0, 9999, 1, NOW())";
+               ('b763e957be61108f8.80080127', " . ShopIdCalculator::BASE_SHOP_ID . ", 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'Test Bestellwert Inland unter � 40,00 = � 2,60', '', '', '', 'abs', 2.6, 'p', 10, 39.99, 0, 9999, 1, NOW()),
+               ('3033e968fb5b30930.92732498', " . ShopIdCalculator::BASE_SHOP_ID . ", 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'Test Bestellwert Inland �ber � 40,00 = portofrei', '', '', '', 'abs', 0, 'p', 40, 1000000, 0, 9999, 1, NOW()),
+               ('a713e96c15c7bf3c7.45279281', " . ShopIdCalculator::BASE_SHOP_ID . ", 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'Test Mindermengenzuschlag bis � 10,00 = � 3,50', '', '', '', 'abs', 3.5, 'p', 0, 9.99, 0, 9999, 1, NOW()),
+               ('a713e96c1aeaefa75.74010807', " . ShopIdCalculator::BASE_SHOP_ID . ", 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'Test Bestellwert europ. Ausland pauschal EURO 6,00', '', '', '', 'abs', 6, 'p', 0, 5000, 0, 9999, 1, NOW()),
+               ('bdd46f9f2455153b9.22318118', " . ShopIdCalculator::BASE_SHOP_ID . ", 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'Test Bestellwert au�ereurop. Ausland EURO 9,50', '', '', '', 'abs', 9.5, 'a', 0, 5000, 0, 9999, 1, NOW())";
         oxDb::getDb()->execute($sQ);
         $sQ = "INSERT INTO `oxdel2delset`
                (OXID, OXDELID, OXDELSETID, OXTIMESTAMP)
@@ -1111,7 +1111,7 @@ class DeliverylistTest extends \OxidTestCase
         $sQ = "INSERT INTO `oxdeliveryset`
                (OXID, OXSHOPID, OXACTIVE, OXACTIVEFROM, OXACTIVETO, OXTITLE, OXTITLE_1, OXTITLE_2, OXTITLE_3, OXPOS, OXTIMESTAMP)
                VALUES
-               ('b3b46b74d3894f9f5.62965460', ".ShopIdCalculator::BASE_SHOP_ID.", 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'Test DHL/DPD Inland', 'DHL/DPD Inland', '', '', 0, NOW())";
+               ('b3b46b74d3894f9f5.62965460', " . ShopIdCalculator::BASE_SHOP_ID . ", 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'Test DHL/DPD Inland', 'DHL/DPD Inland', '', '', 0, NOW())";
         oxDb::getDb()->execute($sQ);
         $sQ = "INSERT INTO `oxobject2delivery`
                (OXID, OXDELIVERYID, OXOBJECTID, OXTYPE, OXTIMESTAMP)
@@ -1134,7 +1134,7 @@ class DeliverylistTest extends \OxidTestCase
 
         $this->assertEquals(3, $oDList->count());
         $this->assertEquals(
-            array('_testDeliveryId1', '_testDeliveryId2', '_testDeliveryId3'),
+            ['_testDeliveryId1', '_testDeliveryId2', '_testDeliveryId3'],
             array_keys($oDList->aList)
         );
     }
@@ -1144,7 +1144,7 @@ class DeliverylistTest extends \OxidTestCase
      */
     public function testLoadDeliveryListForProduct()
     {
-        $oDList = oxNew("oxDeliveryList");
+        $oDList = oxNew('oxDeliveryList');
         $oDList->loadDeliveryListForProduct($this->_aTestProducts[0]);
         $this->assertEquals(7, $oDList->count());
     }

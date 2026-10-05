@@ -20,7 +20,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-class AdminRights extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
+
+class AdminRights extends AdminController
 {
     /**
      * Current class template name.

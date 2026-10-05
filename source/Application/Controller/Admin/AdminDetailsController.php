@@ -21,14 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
 use OxidEsales\Eshop\Application\Controller\TextEditorHandler;
+use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Application\Model\CategoryList;
 use OxidEsales\Eshop\Core\Field;
-use OxidEsales\Eshop\Core\ShopVersion;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin selectlist list manager.
  */
-class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class AdminDetailsController extends AdminController
 {
     /**
      * Global editor object.
@@ -44,20 +48,23 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     protected function getDocumentationLanguageId()
     {
-        $language = \OxidEsales\Eshop\Core\Registry::getLang();
+        $language = Registry::getLang();
         $languageAbbr = $language->getLanguageAbbr($language->getTplLanguage());
 
-        return $languageAbbr === "de" ? 0 : 1;
+        return $languageAbbr === 'de' ? 0 : 1;
     }
 
     /**
      * Returns string which must be edited by editor.
      *
-     * @param \OxidEsales\Eshop\Core\Model\BaseModel $oObject object used for editing
+     * @param BaseModel $oObject object used for editing
      * @param string                                 $sField  name of editable field
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getEditValue" in next major
+     * @deprecated Use getEditValue() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getEditValue().
      */
     protected function _getEditValue($oObject, $sField) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -77,24 +84,62 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
     }
 
     /**
+     * Returns string which must be edited by editor.
+     *
+     * @param BaseModel $oObject object used for editing
+     * @param string                                 $sField  name of editable field
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getEditValue(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getEditValue() the canonical override target.
+     */
+    protected function getEditValue($oObject, $sField)
+    {
+        return $this->_getEditValue($oObject, $sField);
+    }
+
+    /**
      * Processes edit value.
      *
      * @param string $sValue string to process
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "processEditValue" in next major
+     * @deprecated Use processEditValue() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override
+     *             _processEditValue().
      */
     protected function _processEditValue($sValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // A. replace ONLY if long description is not processed by smarty, or users will not be able to
         // store smarty tags ([{$shop->currenthomedir}]/[{$oViewConf->getCurrentHomeDir()}]) in long
         // descriptions, which are filled dynamically
-        if (!$this->getConfig()->getConfigParam('bl_perfParseLongDescinSmarty')) {
+        if (!Registry::getConfig()->getConfigParam('bl_perfParseLongDescinSmarty')) {
             $aReplace = ['[{$shop->currenthomedir}]', '[{$oViewConf->getCurrentHomeDir()}]'];
-            $sValue = str_replace($aReplace, $this->getConfig()->getCurrentShopURL(false), $sValue);
+            $sValue = str_replace($aReplace, Registry::getConfig()->getCurrentShopURL(false), $sValue);
         }
 
         return $sValue;
+    }
+
+    /**
+     * Processes edit value.
+     *
+     * @param string $sValue string to process
+     *
+     * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::processEditValue() (not the deprecated _processEditValue()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function processEditValue($sValue)
+    {
+        return $this->_processEditValue($sValue);
     }
 
     /**
@@ -102,7 +147,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      *
      * @param int                                    $width  editor width
      * @param int                                    $height editor height
-     * @param \OxidEsales\Eshop\Core\Model\BaseModel $object object passed to editor
+     * @param BaseModel $object object passed to editor
      * @param string                                 $field  object field which content is passed to editor
      *
      * @deprecated since v6.0 (2017-06-29); Please use TextEditorHandler::renderPlainTextEditor() method.
@@ -123,31 +168,18 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      *
      * @param int                                    $width      editor width
      * @param int                                    $height     editor height
-     * @param \OxidEsales\Eshop\Core\Model\BaseModel $object     object passed to editor
+     * @param BaseModel $object     object passed to editor
      * @param string                                 $field      object field which content is passed to editor
      * @param string                                 $stylesheet stylesheet to use in editor
      *
-     * @deprecated since v6.0 (2017-06-29); Please use generateTextEditor() method.
+     * @deprecated Use generateTextEditor() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it (originally deprecated v6.0, 2017-06-29); new code,
+     *             including new modules, MUST NOT call or override _generateTextEditor().
      *
      * @return string Editor output
      */
     protected function _generateTextEditor($width, $height, $object, $field, $stylesheet = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->generateTextEditor($width, $height, $object, $field, $stylesheet);
-    }
-
-    /**
-     * Generates Text editor html code.
-     *
-     * @param int                                    $width      editor width
-     * @param int                                    $height     editor height
-     * @param \OxidEsales\Eshop\Core\Model\BaseModel $object     object passed to editor
-     * @param string                                 $field      object field which content is passed to editor
-     * @param string                                 $stylesheet stylesheet to use in editor
-     *
-     * @return string Editor output
-     */
-    protected function generateTextEditor($width, $height, $object, $field, $stylesheet = null)
     {
         $objectValue = $this->_getEditValue($object, $field);
 
@@ -155,6 +187,27 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
         $this->configureTextEditorHandler($textEditorHandler, $object, $field, $stylesheet);
 
         return $textEditorHandler->renderTextEditor($width, $height, $objectValue, $field);
+    }
+
+    /**
+     * Generates Text editor html code.
+     *
+     * @param int                                    $width      editor width
+     * @param int                                    $height     editor height
+     * @param BaseModel $object     object passed to editor
+     * @param string                                 $field      object field which content is passed to editor
+     * @param string                                 $stylesheet stylesheet to use in editor
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::generateTextEditor() (not the deprecated _generateTextEditor()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     *
+     * @return string Editor output
+     */
+    protected function generateTextEditor($width, $height, $object, $field, $stylesheet = null)
+    {
+        return $this->_generateTextEditor($width, $height, $object, $field, $stylesheet);
     }
 
     /**
@@ -192,14 +245,17 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      * @param bool   $blForceNonCache Set to true to disable caching
      * @param int    $iTreeShopId     tree shop id
      *
-     * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "createCategoryTree" in next major
+     * @return object
+     * @deprecated Use createCategoryTree() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _createCategoryTree().
      */
     protected function _createCategoryTree($sTplVarName, $sEditCatId = '', $blForceNonCache = false, $iTreeShopId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // caching category tree, to load it once, not many times
         if (!isset($this->oCatTree) || $blForceNonCache) {
-            $this->oCatTree = oxNew(\OxidEsales\Eshop\Application\Model\CategoryList::class);
+            $this->oCatTree = oxNew(CategoryList::class);
             $this->oCatTree->setShopID($iTreeShopId);
 
             // setting language
@@ -217,7 +273,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
         }
 
         // add first fake category for not assigned articles
-        $oRoot = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+        $oRoot = oxNew(Category::class);
         $oRoot->oxcategories__oxtitle = new Field('--');
 
         $oCatTree->assign(array_merge(['' => $oRoot], $oCatTree->getArray()));
@@ -226,6 +282,26 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
         $this->_aViewData[$sTplVarName] = $oCatTree;
 
         return $oCatTree;
+    }
+
+    /**
+     * Function creates category tree for select list used in "Category main", "Article extend" etc.
+     *
+     * @param string $sTplVarName     name of template variable where is stored category tree
+     * @param string $sEditCatId      ID of category witch we are editing
+     * @param bool   $blForceNonCache Set to true to disable caching
+     * @param int    $iTreeShopId     tree shop id
+     *
+     * @return object
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::createCategoryTree() (not the deprecated _createCategoryTree()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function createCategoryTree($sTplVarName, $sEditCatId = '', $blForceNonCache = false, $iTreeShopId = null)
+    {
+        return $this->_createCategoryTree($sTplVarName, $sEditCatId, $blForceNonCache, $iTreeShopId);
     }
 
     /**
@@ -239,9 +315,12 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      * @param int    $iTreeShopId     tree shop id
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getCategoryTree" in next major
+     * @deprecated Use getCategoryTree() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override
+     *             _getCategoryTree().
      */
-    protected function _getCategoryTree( // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _getCategoryTree(// phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
         $sTplVarName,
         $sSelectedCatId,
         $sEditCatId = '',
@@ -275,12 +354,39 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
     }
 
     /**
+     * Function creates category tree for select list used in "Category main", "Article extend" etc.
+     * Returns ID of selected category if available.
+     *
+     * @param string $sTplVarName     name of template variable where is stored category tree
+     * @param string $sSelectedCatId  ID of category witch was selected in select list
+     * @param string $sEditCatId      ID of category witch we are editing
+     * @param bool   $blForceNonCache Set to true to disable caching
+     * @param int    $iTreeShopId     tree shop id
+     *
+     * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getCategoryTree() (not the deprecated _getCategoryTree()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getCategoryTree(
+        $sTplVarName,
+        $sSelectedCatId,
+        $sEditCatId = '',
+        $blForceNonCache = false,
+        $iTreeShopId = null
+    ) {
+        return $this->_getCategoryTree($sTplVarName, $sSelectedCatId, $sEditCatId, $blForceNonCache, $iTreeShopId);
+    }
+
+    /**
      * Updates object folder parameters.
      */
     public function changeFolder()
     {
-        $sFolder = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('setfolder');
-        $sFolderClass = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('folderclass');
+        $sFolder = Registry::getRequest()->getRequestEscapedParameter('setfolder');
+        $sFolderClass = Registry::getRequest()->getRequestEscapedParameter('folderclass');
 
         if ($sFolderClass == 'oxcontent' && $sFolder == 'CMSFOLDER_NONE') {
             $sFolder = '';
@@ -297,7 +403,10 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      * Sets-up navigation parameters.
      *
      * @param string $sNode active view id
-     * @deprecated underscore prefix violates PSR12, will be renamed to "setupNavigation" in next major
+     * @deprecated Use setupNavigation() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _setupNavigation().
      */
     protected function _setupNavigation($sNode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -314,10 +423,31 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
     }
 
     /**
+     * Sets-up navigation parameters.
+     *
+     * @param string $sNode active view id
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::setupNavigation() (not the deprecated _setupNavigation()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function setupNavigation($sNode)
+    {
+        $this->_setupNavigation($sNode);
+    }
+
+    /**
      * Resets count of vendor/manufacturer category items.
      *
      * @param array $aIds to reset type => id
-     * @deprecated underscore prefix violates PSR12, will be renamed to "resetCounts" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _resetCounts()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes resetCounts() to the canonical override
+      *             target and retires _resetCounts(); until then, _resetCounts() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _resetCounts($aIds) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -325,14 +455,29 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
             foreach ($aResetInfo as $sResetId => $iPos) {
                 switch ($sType) {
                     case 'vendor':
-                        $this->resetCounter("vendorArticle", $sResetId);
+                        $this->resetCounter('vendorArticle', $sResetId);
                         break;
                     case 'manufacturer':
-                        $this->resetCounter("manufacturerArticle", $sResetId);
+                        $this->resetCounter('manufacturerArticle', $sResetId);
                         break;
                 }
             }
         }
+    }
+
+    /**
+     * Resets count of vendor/manufacturer category items.
+     *
+     * @param array $aIds to reset type => id
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _resetCounts(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make resetCounts() the canonical override target.
+     */
+    protected function resetCounts($aIds)
+    {
+        $this->_resetCounts($aIds);
     }
 
     /**
@@ -342,7 +487,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      *
      * @param TextEditorHandler $textEditorHandler
      * @param mixed             $editedObject      The object we want to edit, either type of
-     *                                             \OxidEsales\Eshop\Core\BaseModel if you want to persist or anything
+     *                                             BaseModel if you want to persist or anything
      *                                             else
      * @param string            $field             The input field we want to edit
      * @param string            $stylesheet        The name of the CSS file
@@ -364,8 +509,6 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     protected function createTextEditorHandler()
     {
-        $textEditorHandler = oxNew(TextEditorHandler::class);
-
-        return $textEditorHandler;
+        return oxNew(TextEditorHandler::class);
     }
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -22,13 +24,13 @@ namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\
 
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopConfigurationDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\Event;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ShopConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleActivationServiceInterface;
 use OxidEsales\EshopCommunity\Tests\Integration\Internal\ContainerTrait;
 use OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\TestData\TestModule\ModuleEvents;
 use OxidEsales\TestingLibrary\Services\Library\DatabaseRestorer\DatabaseRestorer;
 use PHPUnit\Framework\TestCase;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\Event;
 
 /**
  * @internal
@@ -101,7 +103,6 @@ class ModuleEventsTest extends TestCase
 
         $this->assertSame('Method onActivate was called', $eventMessage);
     }
-
 
     public function testDeactivationEventWasExecuted()
     {

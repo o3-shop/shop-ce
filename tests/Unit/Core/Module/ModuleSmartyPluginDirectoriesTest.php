@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Module;
 
 use OxidEsales\Eshop\Core\Module\Module;
@@ -79,13 +81,12 @@ class ModuleSmartyPluginDirectoriesTest extends \OxidEsales\TestingLibrary\UnitT
         $this->assertEquals(
             [
                 $moduleIdModule1 => $directoriesModule1,
-                $moduleIdModule2 => $directoriesModule2
+                $moduleIdModule2 => $directoriesModule2,
             ],
             $moduleSmartyPluginDirectories->getWithRelativePath(),
             'The method add does not append the module smarty plugin directories correctly.'
         );
     }
-
 
     /**
      * ModuleSmartyPluginDirectories::remove() removes all module smarty plugin directories
@@ -123,7 +124,7 @@ class ModuleSmartyPluginDirectoriesTest extends \OxidEsales\TestingLibrary\UnitT
         $this->assertEquals(
             [
                 $moduleIdModule1 => $directoriesModule1,
-                $moduleIdModule3 => $directoriesModule3
+                $moduleIdModule3 => $directoriesModule3,
             ],
             $moduleSmartyPluginDirectories->getWithRelativePath(),
             'The method add does not delete the module smarty plugin directories correctly.'
@@ -185,7 +186,7 @@ class ModuleSmartyPluginDirectoriesTest extends \OxidEsales\TestingLibrary\UnitT
             'anotherModuleId' => [
                 '/Smarty/Plugin',
                 'Smarty/Plugin/OxidEshopPackage/',
-            ]
+            ],
         ];
 
         $moduleSmartyPluginDirectories = $this->getModuleSmartyPluginDirectories();
@@ -196,7 +197,6 @@ class ModuleSmartyPluginDirectoriesTest extends \OxidEsales\TestingLibrary\UnitT
             $moduleSmartyPluginDirectories->getWithRelativePath()
         );
     }
-
 
     /**
      * @return ModuleSmartyPluginDirectories
@@ -218,16 +218,16 @@ class ModuleSmartyPluginDirectoriesTest extends \OxidEsales\TestingLibrary\UnitT
         $modules = [
             [
                 'directories' => ['/Smarty/Plugin1', 'Smarty/Plugin2/'],
-                'id' => 'oemodule1'
+                'id' => 'oemodule1',
             ],
             [
                 'directories' => [['/Smarty/PluginModule2']],
-                'id' => 'oemodule2'
+                'id' => 'oemodule2',
             ],
             [
                 'directories' => ['Smarty/AnotherDir1', 'Smarty/AnotherDir2', 'Smarty/AnotherDir3'],
-                'id' => 'oemodule3'
-            ]
+                'id' => 'oemodule3',
+            ],
         ];
         return $modules[$moduleNumber];
     }

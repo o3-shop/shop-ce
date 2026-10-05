@@ -1,0 +1,26 @@
+services:
+  _defaults:
+    autowire: true
+    public: false
+
+  OxidEsales\EshopCommunity\Internal\Domain\Migration\Repository\ExecutedMigrationsRepositoryInterface:
+    class: OxidEsales\EshopCommunity\Internal\Domain\Migration\Repository\ExecutedMigrationsRepository
+
+  OxidEsales\EshopCommunity\Internal\Domain\Migration\Service\MigrationStateServiceInterface:
+    class: OxidEsales\EshopCommunity\Internal\Domain\Migration\Service\MigrationStateService
+
+  OxidEsales\EshopCommunity\Internal\Domain\Migration\Service\DatabaseViewsInspectorInterface:
+    class: OxidEsales\EshopCommunity\Internal\Domain\Migration\Service\DatabaseViewsInspector
+
+  OxidEsales\EshopCommunity\Internal\Domain\Migration\Service\ComposerLockInspectorInterface:
+    class: OxidEsales\EshopCommunity\Internal\Domain\Migration\Service\ComposerLockInspector
+
+  OxidEsales\EshopCommunity\Internal\Domain\Migration\Command\MigrationStatusCommand:
+    class: OxidEsales\EshopCommunity\Internal\Domain\Migration\Command\MigrationStatusCommand
+    tags:
+      - { name: 'console.command', command: 'oe:migrate:status' }
+
+  OxidEsales\EshopCommunity\Internal\Domain\Migration\Command\MigrationVerifyCommand:
+    class: OxidEsales\EshopCommunity\Internal\Domain\Migration\Command\MigrationVerifyCommand
+    tags:
+      - { name: 'console.command', command: 'oe:migrate:verify' }

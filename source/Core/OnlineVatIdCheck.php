@@ -21,11 +21,11 @@
 
 namespace OxidEsales\EshopCommunity\Core;
 
-use stdClass;
 use DOMDocument;
 use Exception;
 use SoapClient;
 use SoapFault;
+use stdClass;
 
 /**
  * Online VAT id checker class.
@@ -50,13 +50,13 @@ class OnlineVatIdCheck extends \OxidEsales\Eshop\Core\CompanyVatInChecker
      * How many times to retry check if server is busy
      *
      */
-    const BUSY_RETRY_CNT = 1;
+    public const BUSY_RETRY_CNT = 1;
 
     /**
      * How much to wait between retries (in micro seconds)
      *
      */
-    const BUSY_RETRY_WAITUSEC = 500000;
+    public const BUSY_RETRY_WAITUSEC = 500000;
 
     /**
      * Wsdl url
@@ -111,7 +111,7 @@ class OnlineVatIdCheck extends \OxidEsales\Eshop\Core\CompanyVatInChecker
         \OxidEsales\Eshop\Core\Registry::getLogger()->warning($sErrStr, [
             'file' => $sErrFile,
             'line' => $iErrLine,
-            'code' => $iErrNo
+            'code' => $iErrNo,
         ]);
 
         return true;
@@ -175,7 +175,7 @@ class OnlineVatIdCheck extends \OxidEsales\Eshop\Core\CompanyVatInChecker
             'MS_UNAVAILABLE',
             'TIMEOUT',
         ];
-        
+
         if ($this->_isServiceAvailable()) {
             $iTryMoreCnt = self::BUSY_RETRY_CNT;
 
@@ -189,7 +189,7 @@ class OnlineVatIdCheck extends \OxidEsales\Eshop\Core\CompanyVatInChecker
             do {
                 try {
                     //connection_timeout = how long we should wait to CONNECT to wsdl server
-                    $oSoapClient = new SoapClient($this->getWsdlUrl(), ["connection_timeout" => 5]);
+                    $oSoapClient = new SoapClient($this->getWsdlUrl(), ['connection_timeout' => 5]);
                     $this->setError('');
                     $oRes = $oSoapClient->checkVat($oCheckVat);
                     $iTryMoreCnt = 0;
@@ -208,7 +208,7 @@ class OnlineVatIdCheck extends \OxidEsales\Eshop\Core\CompanyVatInChecker
 
             return (bool) $oRes->valid;
         } else {
-            $this->setError("SERVICE_UNREACHABLE");
+            $this->setError('SERVICE_UNREACHABLE');
 
             return false;
         }
@@ -222,7 +222,7 @@ class OnlineVatIdCheck extends \OxidEsales\Eshop\Core\CompanyVatInChecker
     public function getWsdlUrl()
     {
         // overriding wsdl url
-        if (($sWsdl = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam("sVatIdCheckInterfaceWsdl"))) {
+        if (($sWsdl = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('sVatIdCheckInterfaceWsdl'))) {
             $this->_sWsdl = $sWsdl;
         }
 

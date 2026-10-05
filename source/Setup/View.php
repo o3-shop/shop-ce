@@ -94,7 +94,7 @@ class View extends Core
      */
     private function getPathToTemplateFileName($templateFileName)
     {
-        return implode(DIRECTORY_SEPARATOR, [__DIR__, "tpl", $templateFileName]);
+        return implode(DIRECTORY_SEPARATOR, [__DIR__, 'tpl', $templateFileName]);
     }
 
     /**
@@ -152,7 +152,7 @@ class View extends Core
      */
     public function getText($sTextId, $blPrint = true)
     {
-        $sText = $this->getInstance("Language")->getText($sTextId);
+        $sText = $this->getInstance('Language')->getText($sTextId);
 
         return $blPrint ? print($sText) : $sText;
     }
@@ -166,7 +166,7 @@ class View extends Core
      */
     public function getSid($blPrint = true)
     {
-        $sSid = $this->getInstance("Session")->getSid();
+        $sSid = $this->getInstance('Session')->getSid();
 
         return $blPrint ? print($sSid) : $sSid;
     }
@@ -209,7 +209,7 @@ class View extends Core
      */
     public function getSetupStep($sStepId, $blPrint = true)
     {
-        $sStep = $this->getInstance("Setup")->getStep($sStepId);
+        $sStep = $this->getInstance('Setup')->getStep($sStepId);
 
         return $blPrint ? print($sStep) : $sStep;
     }
@@ -221,7 +221,7 @@ class View extends Core
      */
     public function getNextSetupStep()
     {
-        return $this->getInstance("Setup")->getNextStep();
+        return $this->getInstance('Setup')->getNextStep();
     }
 
     /**
@@ -231,7 +231,7 @@ class View extends Core
      */
     public function getCurrentSetupStep()
     {
-        return $this->getInstance("Setup")->getCurrentStep();
+        return $this->getInstance('Setup')->getCurrentStep();
     }
 
     /**
@@ -241,7 +241,7 @@ class View extends Core
      */
     public function getSetupSteps()
     {
-        return $this->getInstance("Setup")->getSteps();
+        return $this->getInstance('Setup')->getSteps();
     }
 
     /**
@@ -257,15 +257,15 @@ class View extends Core
     public function isDeletedSetup($aSetupConfig, $aDemoConfig)
     {
         /** @var Utilities $oUtils */
-        $oUtils = $this->getInstance("Utilities");
+        $oUtils = $this->getInstance('Utilities');
         $sPath = getShopBasePath();
 
         if (!isset($aDemoConfig['dbiDemoData']) || $aDemoConfig['dbiDemoData'] != '1') {
             // "/generated" cleanup
-            $oUtils->removeDir($sPath . "out/pictures/generated", true);
+            $oUtils->removeDir($sPath . 'out/pictures/generated', true);
 
             // "/master" cleanup, leaving nopic
-            $oUtils->removeDir($sPath . "out/pictures/master", true, 1, ["nopic.jpg"]);
+            $oUtils->removeDir($sPath . 'out/pictures/master', true, 1, ['nopic.jpg']);
         }
 
         if (isset($aSetupConfig['blDelSetupDir']) && $aSetupConfig['blDelSetupDir']) {

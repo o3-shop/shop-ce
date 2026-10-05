@@ -30,7 +30,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class EventLoggingSubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var LoggerInterface
      */
@@ -60,7 +59,7 @@ class EventLoggingSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            ServicesYamlConfigurationErrorEvent::class => 'logConfigurationError'
+            ServicesYamlConfigurationErrorEvent::class => 'logConfigurationError',
         ];
     }
 }

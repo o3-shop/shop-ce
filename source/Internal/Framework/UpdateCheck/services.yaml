@@ -1,0 +1,7 @@
+services:
+  OxidEsales\EshopCommunity\Internal\Framework\UpdateCheck\UpdateCheckServiceInterface:
+    class: OxidEsales\EshopCommunity\Internal\Framework\UpdateCheck\UpdateCheckService
+    public: true
+    arguments:
+      $shopConfigurationDaoBridge: '@OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ShopConfigurationDaoBridgeInterface'
+      $moduleActivationBridge: '@OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActivationBridgeInterface'

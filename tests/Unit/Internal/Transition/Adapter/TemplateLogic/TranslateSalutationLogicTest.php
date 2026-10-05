@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -28,7 +29,6 @@ use OxidEsales\TestingLibrary\UnitTestCase;
  */
 class TranslateSalutationLogicTest extends UnitTestCase
 {
-
     /** @var TranslateSalutationLogic */
     private $translateSalutationLogic;
 
@@ -48,7 +48,7 @@ class TranslateSalutationLogicTest extends UnitTestCase
             ['MR', 0, 'Herr'],
             ['MRS', 0, 'Frau'],
             ['MR', 1, 'Mr'],
-            ['MRS', 1, 'Mrs']
+            ['MRS', 1, 'Mrs'],
         ];
     }
 

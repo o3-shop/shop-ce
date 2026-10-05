@@ -92,7 +92,7 @@ class ModuleTemplateBlockPathFormatter
         if (basename($fileName) === $fileName) {
             // for 4.5 modules, since 4.6 insert in oxtplblocks the full file name
             if (substr($fileName, -4) !== '.tpl') {
-                $fileName = $fileName . ".tpl";
+                $fileName = $fileName . '.tpl';
             }
 
             $fileName = "out/blocks/$fileName";

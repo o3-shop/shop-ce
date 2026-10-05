@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 use oxField;
@@ -31,7 +33,7 @@ class SuperConfigTest extends \OxidTestCase
         $oConfig = $this->getConfig();
         $this->assertEquals($oConfig, $oOxSuperCfg->getConfig());
 
-        $config = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getConfigParam'));
+        $config = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
         $config->expects($this->once())->method('getConfigParam')->will($this->returnValue(true));
         $oOxSuperCfg->setConfig($config);
         $this->assertTrue($oOxSuperCfg->getConfig()->getConfigParam('xxx'));
@@ -44,7 +46,7 @@ class SuperConfigTest extends \OxidTestCase
         $oSession = oxRegistry::getSession();
         $this->assertEquals($oSession, $oOxSuperCfg->getSession());
 
-        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getId'));
+        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getId']);
         $oSession->expects($this->once())->method('getId')->will($this->returnValue('xxx'));
         $oOxSuperCfg->setSession($oSession);
         $this->assertEquals('xxx', $oOxSuperCfg->getSession()->getId());

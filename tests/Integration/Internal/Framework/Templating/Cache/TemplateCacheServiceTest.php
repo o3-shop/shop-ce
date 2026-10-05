@@ -5,8 +5,8 @@ namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Templat
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\Cache\TemplateCacheService;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContext;
 use OxidEsales\EshopCommunity\Tests\Integration\Internal\ContainerTrait;
-use Symfony\Component\Filesystem\Filesystem;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\PathUtil\Path;
 
 final class TemplateCacheServiceTest extends TestCase
@@ -30,7 +30,7 @@ final class TemplateCacheServiceTest extends TestCase
     {
         $this->filesystem->dumpFile(
             Path::join($this->templateCacheDirectory, 'sample.tpl.php'),
-            ""
+            ''
         );
 
         parent::tearDown();
@@ -60,13 +60,13 @@ final class TemplateCacheServiceTest extends TestCase
         $templates = [
             'notice.tpl.php',
             'errors.tpl.php',
-            'success.tpl.php'
+            'success.tpl.php',
         ];
 
         foreach ($templates as $template) {
             $this->filesystem->dumpFile(
                 Path::join($this->templateCacheDirectory, $template),
-                ""
+                ''
             );
         }
 

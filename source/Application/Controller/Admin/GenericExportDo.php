@@ -21,41 +21,46 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\DynamicExportBaseController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInterface;
 
 /**
  * General export class.
  */
-class GenericExportDo extends \OxidEsales\Eshop\Application\Controller\Admin\DynamicExportBaseController
+class GenericExportDo extends DynamicExportBaseController
 {
     /**
      * Export class name
      *
      * @var string
      */
-    public $sClassDo = "genExport_do";
+    public $sClassDo = 'genExport_do';
 
     /**
      * Export ui class name
      *
      * @var string
      */
-    public $sClassMain = "genExport_main";
+    public $sClassMain = 'genExport_main';
 
     /**
      * Export file name
      *
      * @var string
      */
-    public $sExportFileName = "genexport";
+    public $sExportFileName = 'genexport';
 
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = "dynbase_do.tpl";
+    protected $_sThisTemplate = 'dynbase_do.tpl';
 
     /**
      * Does Export line by line on position iCnt
@@ -63,25 +68,28 @@ class GenericExportDo extends \OxidEsales\Eshop\Application\Controller\Admin\Dyn
      * @param integer $iCnt export position
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function nextTick($iCnt)
     {
         $iExportedItems = $iCnt;
         $blContinue = false;
         if ($oArticle = $this->getOneArticle($iCnt, $blContinue)) {
-            $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
+            $myConfig = Registry::getConfig();
             $context = [
-                "sCustomHeader" => \OxidEsales\Eshop\Core\Registry::getSession()->getVariable("sExportCustomHeader"),
-                "linenr"        => $iCnt,
-                "article"       => $oArticle,
-                "spr"           => $myConfig->getConfigParam('sCSVSign'),
-                "encl"          => $myConfig->getConfigParam('sGiCsvFieldEncloser')
+                'sCustomHeader' => Registry::getSession()->getVariable('sExportCustomHeader'),
+                'linenr'        => $iCnt,
+                'article'       => $oArticle,
+                'spr'           => $myConfig->getConfigParam('sCSVSign'),
+                'encl'          => $myConfig->getConfigParam('sGiCsvFieldEncloser'),
             ];
             $context['oxEngineTemplateId'] = $this->getViewId();
 
             $this->write(
                 $this->getRenderer()->renderTemplate(
-                    "genexport.tpl",
+                    'genexport.tpl',
                     $context
                 )
             );
@@ -113,8 +121,8 @@ class GenericExportDo extends \OxidEsales\Eshop\Application\Controller\Admin\Dyn
     {
         $sLine = $this->removeSID($sLine);
 
-        $sLine = str_replace(["\r\n", "\n"], "", $sLine);
-        $sLine = str_replace("<br>", "\n", $sLine);
+        $sLine = str_replace(["\r\n", "\n"], '', $sLine);
+        $sLine = str_replace('<br>', "\n", $sLine);
 
         fwrite($this->fpFile, $sLine . "\n");
     }

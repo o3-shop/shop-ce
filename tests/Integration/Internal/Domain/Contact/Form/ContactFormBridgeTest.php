@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -21,9 +23,9 @@
 namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Domain\Contact\Form;
 
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Form\FormInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FormConfigurationInterface;
-use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface;
 
 class ContactFormBridgeTest extends \PHPUnit\Framework\TestCase
 {

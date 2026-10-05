@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,11 +18,11 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
 class FileCheckerResultTest extends \OxidTestCase
 {
-
     /**
      * Test data constructor
      *
@@ -34,13 +35,13 @@ class FileCheckerResultTest extends \OxidTestCase
      */
     protected function _getResultArray($sResult, $sFile, $sColor, $sMessage)
     {
-        return array(
-            "result"  => $sResult,
-            "ok"      => $sResult == "OK",
-            "file"    => $sFile,
-            "color"   => $sColor,
-            "message" => $sMessage
-        );
+        return [
+            'result'  => $sResult,
+            'ok'      => $sResult == 'OK',
+            'file'    => $sFile,
+            'color'   => $sColor,
+            'message' => $sMessage,
+        ];
     }
 
     /**
@@ -50,7 +51,7 @@ class FileCheckerResultTest extends \OxidTestCase
      */
     public function testGetListAllFiles()
     {
-        $oCheckerResult = oxNew("oxFileCheckerResult");
+        $oCheckerResult = oxNew('oxFileCheckerResult');
 
         $oCheckerResult->setListAllFiles(true);
         $this->assertTrue($oCheckerResult->getListAllFiles());
@@ -66,25 +67,25 @@ class FileCheckerResultTest extends \OxidTestCase
     {
         $oFileCheckerResult = oxNew('oxFileCheckerResult');
 
-        $aResult1 = $this->_getResultArray("OK", "file1.php", "green", "File ok");
+        $aResult1 = $this->_getResultArray('OK', 'file1.php', 'green', 'File ok');
         $oFileCheckerResult->addResult($aResult1);
 
-        $aResult2 = $this->_getResultArray("OK", "file2.php", "green", "File ok");
+        $aResult2 = $this->_getResultArray('OK', 'file2.php', 'green', 'File ok');
         $oFileCheckerResult->addResult($aResult2);
 
-        $aResult3 = $this->_getResultArray("OK", "file3.php", "green", "File ok");
+        $aResult3 = $this->_getResultArray('OK', 'file3.php', 'green', 'File ok');
         $oFileCheckerResult->addResult($aResult3);
 
         $aResultSummary = $oFileCheckerResult->getResultSummary();
 
-        $aExpectedResultSummary = array(
+        $aExpectedResultSummary = [
             'OK'              => 3,
             'VERSIONMISMATCH' => 0,
             'UNKNOWN'         => 0,
             'MODIFIED'        => 0,
             'FILES'           => 3,
             'SHOP_OK'         => true,
-        );
+        ];
 
         $this->assertEquals($aExpectedResultSummary, $aResultSummary);
     }
@@ -96,30 +97,30 @@ class FileCheckerResultTest extends \OxidTestCase
     {
         $oFileCheckerResult = oxNew('oxFileCheckerResult');
 
-        $aResult1 = $this->_getResultArray("OK", "file1.php", "green", "File ok");
+        $aResult1 = $this->_getResultArray('OK', 'file1.php', 'green', 'File ok');
         $oFileCheckerResult->addResult($aResult1);
 
-        $aResult2 = $this->_getResultArray("VERSIONMISMATCH", "file2.php", "red", "File not ok");
+        $aResult2 = $this->_getResultArray('VERSIONMISMATCH', 'file2.php', 'red', 'File not ok');
         $oFileCheckerResult->addResult($aResult2);
         $oFileCheckerResult->addResult($aResult2);
 
-        $aResult3 = $this->_getResultArray("UNKNOWN", "file3.php", "gray", "File not ok");
+        $aResult3 = $this->_getResultArray('UNKNOWN', 'file3.php', 'gray', 'File not ok');
         $oFileCheckerResult->addResult($aResult3);
 
-        $aResult4 = $this->_getResultArray("MODIFIED", "file4.php", "blue", "File not ok");
+        $aResult4 = $this->_getResultArray('MODIFIED', 'file4.php', 'blue', 'File not ok');
         $oFileCheckerResult->addResult($aResult4);
         $oFileCheckerResult->addResult($aResult4);
 
         $aResultSummary = $oFileCheckerResult->getResultSummary();
 
-        $aExpectedResultSummary = array(
+        $aExpectedResultSummary = [
             'OK'              => 1,
             'VERSIONMISMATCH' => 2,
             'UNKNOWN'         => 1,
             'MODIFIED'        => 2,
             'FILES'           => 6,
             'SHOP_OK'         => false,
-        );
+        ];
 
         $this->assertEquals($aExpectedResultSummary, $aResultSummary);
     }
@@ -131,22 +132,22 @@ class FileCheckerResultTest extends \OxidTestCase
     {
         $oFileCheckerResult = oxNew('oxFileCheckerResult');
         $oFileCheckerResult->setListAllFiles(false);
-        $aExpectedResult = array();
+        $aExpectedResult = [];
 
-        $aResult1 = $this->_getResultArray("OK", "file1.php", "green", "File ok");
+        $aResult1 = $this->_getResultArray('OK', 'file1.php', 'green', 'File ok');
         $oFileCheckerResult->addResult($aResult1);
 
-        $aResult2 = $this->_getResultArray("VERSIONMISMATCH", "file2.php", "red", "File not ok");
+        $aResult2 = $this->_getResultArray('VERSIONMISMATCH', 'file2.php', 'red', 'File not ok');
         $oFileCheckerResult->addResult($aResult2);
         $oFileCheckerResult->addResult($aResult2);
         $aExpectedResult[] = $aResult2;
         $aExpectedResult[] = $aResult2;
 
-        $aResult3 = $this->_getResultArray("UNKNOWN", "file3.php", "gray", "File not ok");
+        $aResult3 = $this->_getResultArray('UNKNOWN', 'file3.php', 'gray', 'File not ok');
         $oFileCheckerResult->addResult($aResult3);
         $aExpectedResult[] = $aResult3;
 
-        $aResult4 = $this->_getResultArray("MODIFIED", "file4.php", "blue", "File not ok");
+        $aResult4 = $this->_getResultArray('MODIFIED', 'file4.php', 'blue', 'File not ok');
         $oFileCheckerResult->addResult($aResult4);
         $oFileCheckerResult->addResult($aResult4);
         $aExpectedResult[] = $aResult4;
@@ -164,23 +165,23 @@ class FileCheckerResultTest extends \OxidTestCase
     {
         $oFileCheckerResult = oxNew('oxFileCheckerResult');
         $oFileCheckerResult->setListAllFiles(true);
-        $aExpectedResult = array();
+        $aExpectedResult = [];
 
-        $aResult1 = $this->_getResultArray("OK", "file1.php", "green", "File ok");
+        $aResult1 = $this->_getResultArray('OK', 'file1.php', 'green', 'File ok');
         $oFileCheckerResult->addResult($aResult1);
         $aExpectedResult[] = $aResult1;
 
-        $aResult2 = $this->_getResultArray("VERSIONMISMATCH", "file2.php", "red", "File not ok");
+        $aResult2 = $this->_getResultArray('VERSIONMISMATCH', 'file2.php', 'red', 'File not ok');
         $oFileCheckerResult->addResult($aResult2);
         $oFileCheckerResult->addResult($aResult2);
         $aExpectedResult[] = $aResult2;
         $aExpectedResult[] = $aResult2;
 
-        $aResult3 = $this->_getResultArray("UNKNOWN", "file3.php", "gray", "File not ok");
+        $aResult3 = $this->_getResultArray('UNKNOWN', 'file3.php', 'gray', 'File not ok');
         $oFileCheckerResult->addResult($aResult3);
         $aExpectedResult[] = $aResult3;
 
-        $aResult4 = $this->_getResultArray("MODIFIED", "file4.php", "blue", "File not ok");
+        $aResult4 = $this->_getResultArray('MODIFIED', 'file4.php', 'blue', 'File not ok');
         $oFileCheckerResult->addResult($aResult4);
         $oFileCheckerResult->addResult($aResult4);
         $aExpectedResult[] = $aResult4;

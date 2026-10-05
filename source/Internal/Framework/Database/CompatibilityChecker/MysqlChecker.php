@@ -51,6 +51,6 @@ class MysqlChecker implements MysqlCheckerInterface, DatabaseCheckerInterface
             version_compare($this->version, '5.8', '<')
             ||
             version_compare($this->version, '8.0', '>=') &&
-            version_compare($this->version, '8.1', '<');
+            version_compare($this->version, '10.0', '<');
     }
 }

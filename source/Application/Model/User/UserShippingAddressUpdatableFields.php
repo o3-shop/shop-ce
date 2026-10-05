@@ -60,7 +60,7 @@ class UserShippingAddressUpdatableFields extends AbstractUpdatableFields
             'OXFON',
             'OXFAX',
             'OXSAL',
-            'OXTIMESTAMP'
+            'OXTIMESTAMP',
         ];
     }
 }

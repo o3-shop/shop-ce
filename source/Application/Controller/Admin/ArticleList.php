@@ -21,9 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
 use OxidEsales\Eshop\Application\Model\Article;
-use oxRegistry;
-use oxDb;
+use OxidEsales\Eshop\Application\Model\CategoryList;
+use OxidEsales\Eshop\Application\Model\ManufacturerList;
+use OxidEsales\Eshop\Application\Model\VendorList;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Admin article list manager.
@@ -31,7 +38,7 @@ use oxDb;
  * deletion of articles, etc.
  * Admin Menu: Manage Products -> Articles.
  */
-class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class ArticleList extends AdminListController
 {
     /**
      * Name of chosen object class (default null).
@@ -52,10 +59,8 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
      */
     private function getServerDateTime()
     {
-        $sDateTimeAsTimestamp = \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime();
-        $sDateTime = \OxidEsales\Eshop\Core\Registry::getUtilsDate()->formatDBTimestamp($sDateTimeAsTimestamp);
-
-        return $sDateTime;
+        $sDateTimeAsTimestamp = Registry::getUtilsDate()->getTime();
+        return Registry::getUtilsDate()->formatDBTimestamp($sDateTimeAsTimestamp);
     }
 
     /**
@@ -88,15 +93,16 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
      * returns name of template file "article_list.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
-        $myConfig = $this->getConfig();
-        $sPwrSearchFld = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("pwrsearchfld");
-        $sPwrSearchFld = $sPwrSearchFld ? strtolower($sPwrSearchFld) : "oxtitle";
+        $myConfig = Registry::getConfig();
+        $sPwrSearchFld = Registry::getRequest()->getRequestEscapedParameter('pwrsearchfld');
+        $sPwrSearchFld = $sPwrSearchFld ? strtolower($sPwrSearchFld) : 'oxtitle';
 
         $sDateTime = $this->getServerDateTime();
-        $blUseTimeCheck = $this->getConfig()->getConfigParam('blUseTimeCheck');
+        $blUseTimeCheck = Registry::getConfig()->getConfigParam('blUseTimeCheck');
         $oArticle = null;
         $oList = $this->getItemList();
         if ($oList) {
@@ -105,12 +111,12 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
 
                 // formatting view
                 if (!$myConfig->getConfigParam('blSkipFormatConversion')) {
-                    if ($oArticle->$sFieldName->fldtype == "datetime") {
-                        \OxidEsales\Eshop\Core\Registry::getUtilsDate()->convertDBDateTime($oArticle->$sFieldName);
-                    } elseif ($oArticle->$sFieldName->fldtype == "timestamp") {
-                        \OxidEsales\Eshop\Core\Registry::getUtilsDate()->convertDBTimestamp($oArticle->$sFieldName);
-                    } elseif ($oArticle->$sFieldName->fldtype == "date") {
-                        \OxidEsales\Eshop\Core\Registry::getUtilsDate()->convertDBDate($oArticle->$sFieldName);
+                    if ($oArticle->$sFieldName->fldtype == 'datetime') {
+                        Registry::getUtilsDate()->convertDBDateTime($oArticle->$sFieldName);
+                    } elseif ($oArticle->$sFieldName->fldtype == 'timestamp') {
+                        Registry::getUtilsDate()->convertDBTimestamp($oArticle->$sFieldName);
+                    } elseif ($oArticle->$sFieldName->fldtype == 'date') {
+                        Registry::getUtilsDate()->convertDBDate($oArticle->$sFieldName);
                     }
                 }
 
@@ -126,33 +132,33 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
         if (!$oArticle && $oList) {
             $oArticle = $oList->getBaseObject();
         }
-        $this->_aViewData["pwrsearchfields"] = $oArticle ? $this->getSearchFields() : null;
-        $this->_aViewData["pwrsearchfld"] = strtoupper($sPwrSearchFld);
+        $this->_aViewData['pwrsearchfields'] = $oArticle ? $this->getSearchFields() : null;
+        $this->_aViewData['pwrsearchfld'] = strtoupper($sPwrSearchFld);
 
         $aFilter = $this->getListFilter();
-        if (isset($aFilter["oxarticles"][$sPwrSearchFld])) {
-            $this->_aViewData["pwrsearchinput"] = $aFilter["oxarticles"][$sPwrSearchFld];
+        if (isset($aFilter['oxarticles'][$sPwrSearchFld])) {
+            $this->_aViewData['pwrsearchinput'] = $aFilter['oxarticles'][$sPwrSearchFld];
         }
 
         $sType = '';
         $sValue = '';
 
-        $sArtCat = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("art_category");
-        if ($sArtCat && strstr($sArtCat, "@@") !== false) {
-            list($sType, $sValue) = explode("@@", $sArtCat);
+        $sArtCat = Registry::getRequest()->getRequestEscapedParameter('art_category');
+        if ($sArtCat && strstr($sArtCat, '@@') !== false) {
+            list($sType, $sValue) = explode('@@', $sArtCat);
         }
-        $this->_aViewData["art_category"] = $sArtCat;
+        $this->_aViewData['art_category'] = $sArtCat;
 
-        // parent categorie tree
-        $this->_aViewData["cattree"] = $this->getCategoryList($sType, $sValue);
+        // parent category tree
+        $this->_aViewData['cattree'] = $this->getCategoryList($sType, $sValue);
 
         // manufacturer list
-        $this->_aViewData["mnftree"] = $this->getManufacturerlist($sType, $sValue);
+        $this->_aViewData['mnftree'] = $this->getManufacturerlist($sType, $sValue);
 
         // vendor list
-        $this->_aViewData["vndtree"] = $this->getVendorList($sType, $sValue);
+        $this->_aViewData['vndtree'] = $this->getVendorList($sType, $sValue);
 
-        return "article_list.tpl";
+        return 'article_list.tpl';
     }
 
     /**
@@ -163,14 +169,14 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
     public function getSearchFields()
     {
         $aSkipFields = [
-            "oxblfixedprice",
-            "oxvarselect",
-            "oxamitemid",
-            "oxamtaskid",
-            "oxpixiexport",
-            "oxpixiexported"
+            'oxblfixedprice',
+            'oxvarselect',
+            'oxamitemid',
+            'oxamtaskid',
+            'oxpixiexport',
+            'oxpixiexported',
         ];
-        $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+        $oArticle = oxNew(Article::class);
 
         return array_diff($oArticle->getFieldNames(), $aSkipFields);
     }
@@ -181,12 +187,12 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
      * @param string $sType  active list type
      * @param string $sValue active list item id
      *
-     * @return \OxidEsales\Eshop\Application\Model\CategoryList
+     * @return CategoryList
      */
     public function getCategoryList($sType, $sValue)
     {
-        /** @var \OxidEsales\Eshop\Application\Model\CategoryList $oCatTree parent category tree */
-        $oCatTree = oxNew(\OxidEsales\Eshop\Application\Model\CategoryList::class);
+        /** @var CategoryList $oCatTree parent category tree */
+        $oCatTree = oxNew(CategoryList::class);
         $oCatTree->loadList();
         if ($sType === 'cat') {
             foreach ($oCatTree as $oCategory) {
@@ -206,11 +212,11 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
      * @param string $sType  active list type
      * @param string $sValue active list item id
      *
-     * @return oxManufacturerList
+     * @return ManufacturerList
      */
     public function getManufacturerList($sType, $sValue)
     {
-        $oMnfTree = oxNew(\OxidEsales\Eshop\Application\Model\ManufacturerList::class);
+        $oMnfTree = oxNew(ManufacturerList::class);
         $oMnfTree->loadManufacturerList();
         if ($sType === 'mnf') {
             foreach ($oMnfTree as $oManufacturer) {
@@ -230,11 +236,11 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
      * @param string $sType  active list type
      * @param string $sValue active list item id
      *
-     * @return oxVendorList
+     * @return VendorList
      */
     public function getVendorList($sType, $sValue)
     {
-        $oVndTree = oxNew(\OxidEsales\Eshop\Application\Model\VendorList::class);
+        $oVndTree = oxNew(VendorList::class);
         $oVndTree->loadVendorList();
         if ($sType === 'vnd') {
             foreach ($oVndTree as $oVendor) {
@@ -251,40 +257,49 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
     /**
      * Builds and returns SQL query string.
      *
-     * @param object $oListObject list main object
+     * @param null $listObject list main object
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "buildSelectString" in next major
+     * @throws DatabaseConnectionException
+     * @deprecated Use buildSelectString() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _buildSelectString().
      */
-    protected function _buildSelectString($oListObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _buildSelectString($listObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sQ = parent::_buildSelectString($oListObject);
+        // NOTE: call parent::_buildSelectString() (not parent::buildSelectString()) to avoid
+        // infinite recursion through the parent's delegate. Restores baseline (ebe86dc0) call
+        // shape. See o3-shop/o3-shop#107 remediation.
+        $sQ = parent::_buildSelectString($listObject);
         if ($sQ) {
-            $sTable = getViewName("oxarticles");
+            $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
             $sQ .= " and $sTable.oxparentid = '' ";
 
             $sType = false;
-            $sArtCat = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("art_category");
-            if ($sArtCat && strstr($sArtCat, "@@") !== false) {
-                list($sType, $sValue) = explode("@@", $sArtCat);
+            $sValue = '';
+
+            $sArtCat = Registry::getRequest()->getRequestEscapedParameter('art_category');
+            if ($sArtCat && strstr($sArtCat, '@@') !== false) {
+                list($sType, $sValue) = explode('@@', $sArtCat);
             }
 
             switch ($sType) {
                 // add category
                 case 'cat':
-                    $oStr = getStr();
-                    $sViewName = getViewName("oxobject2category");
+                    $oStr = Str::getStr();
+                    $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category');
                     $sInsert = "from $sTable left join {$sViewName} on {$sTable}.oxid = {$sViewName}.oxobjectid " .
-                               "where {$sViewName}.oxcatnid = " . \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quote($sValue) . " and ";
+                               "where {$sViewName}.oxcatnid = " . DatabaseProvider::getDb()->quote($sValue) . ' and ';
                     $sQ = $oStr->preg_replace("/from\s+$sTable\s+where/i", $sInsert, $sQ);
                     break;
-                // add category
+                    // add category
                 case 'mnf':
-                    $sQ .= " and $sTable.oxmanufacturerid = " . \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quote($sValue);
+                    $sQ .= " and $sTable.oxmanufacturerid = " . DatabaseProvider::getDb()->quote($sValue);
                     break;
-                // add vendor
+                    // add vendor
                 case 'vnd':
-                    $sQ .= " and $sTable.oxvendorid = " . \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quote($sValue);
+                    $sQ .= " and $sTable.oxvendorid = " . DatabaseProvider::getDb()->quote($sValue);
                     break;
             }
         }
@@ -293,9 +308,28 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
     }
 
     /**
+     * Builds and returns SQL query string.
+     *
+     * @param null $listObject list main object
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::buildSelectString() (not the deprecated _buildSelectString()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function buildSelectString($listObject = null)
+    {
+        return $this->_buildSelectString($listObject);
+    }
+
+    /**
      * Builds and returns array of SQL WHERE conditions.
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function buildWhere()
     {
@@ -303,9 +337,9 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
         $this->_aWhere = parent::buildWhere();
 
         // adding folder check
-        $sFolder = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('folder');
+        $sFolder = Registry::getRequest()->getRequestEscapedParameter('folder');
         if ($sFolder && $sFolder != '-1') {
-            $this->_aWhere[getViewName("oxarticles") . ".oxfolder"] = $sFolder;
+            $this->_aWhere[Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles') . '.oxfolder'] = $sFolder;
         }
 
         return $this->_aWhere;
@@ -317,7 +351,7 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
     public function deleteEntry()
     {
         $sOxId = $this->getEditObjectId();
-        $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+        $oArticle = oxNew(Article::class);
         if ($sOxId && $oArticle->load($sOxId)) {
             parent::deleteEntry();
         }

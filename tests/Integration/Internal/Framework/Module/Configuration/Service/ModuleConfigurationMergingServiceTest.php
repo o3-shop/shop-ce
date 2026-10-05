@@ -25,6 +25,7 @@ namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\
 
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ClassExtensionsChain;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\ClassExtension;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ShopConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Service\{
     ModuleConfigurationMergingServiceInterface
@@ -32,7 +33,6 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Service\{
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\Setting;
 use OxidEsales\EshopCommunity\Tests\Integration\Internal\ContainerTrait;
 use PHPUnit\Framework\TestCase;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\ClassExtension;
 
 final class ModuleConfigurationMergingServiceTest extends TestCase
 {
@@ -153,7 +153,7 @@ final class ModuleConfigurationMergingServiceTest extends TestCase
         $classExtension = [
             'shopClass1' => 'extension1ToStayInNewModuleConfiguration',
             'shopClass2' => 'extension5',
-            'shopClass5' => 'extension6'
+            'shopClass5' => 'extension6',
         ];
 
         foreach ($classExtension as $namespace => $moduleExtension) {
@@ -176,7 +176,7 @@ final class ModuleConfigurationMergingServiceTest extends TestCase
                 'shopClass1' => ['someOtherExtension1', 'extension1ToStayInNewModuleConfiguration'],
                 'shopClass2' => ['someOtherExtension2', 'extension5', 'someOtherExtension3'],
                 'shopClass3' => ['someOtherExtension4'],
-                'shopClass5' => ['extension6']
+                'shopClass5' => ['extension6'],
             ],
             $shopConfiguration->getClassExtensionsChain()->getChain()
         );
@@ -192,7 +192,7 @@ final class ModuleConfigurationMergingServiceTest extends TestCase
                 'name'     => 'existingValueIsTaken1',
                 'group'    => 'oldGroup',
                 'type'     => 'int',
-                'position' => '100500'
+                'position' => '100500',
             ],
             [
                 'name'     => 'withTypeToChange',
@@ -203,7 +203,7 @@ final class ModuleConfigurationMergingServiceTest extends TestCase
             [
                 'name'     => 'existingValueIsTaken2',
                 'type'     => 'str',
-                'position' => '100500'
+                'position' => '100500',
             ],
             [
                 'name'        => 'existingValueIsTaken3',
@@ -216,14 +216,14 @@ final class ModuleConfigurationMergingServiceTest extends TestCase
                 'type'        => 'select',
                 'constraints' => ['1', '2'],
                 'position'    => '100500',
-                'value'       => '2'
+                'value'       => '2',
             ],
             [
                 'name'     => 'completeNewOne',
                 'type'     => 'string',
                 'position' => '100500',
-                'value'    => 'myValue'
-            ]
+                'value'    => 'myValue',
+            ],
         ];
 
         foreach ($moduleSettings as $settingData) {
@@ -292,19 +292,19 @@ final class ModuleConfigurationMergingServiceTest extends TestCase
                     'group'    => 'oldGroup',
                     'type'     => 'int',
                     'position' => '100500',
-                    'value'    => '1'
+                    'value'    => '1',
                 ],
                 [
                     'name'     => 'withTypeToChange',
                     'type'     => 'bool',
                     'position' => '100500',
-                    'value'    => 'true'
+                    'value'    => 'true',
                 ],
                 [
                     'name'     => 'existingValueIsTaken2',
                     'type'     => 'str',
                     'position' => '100500',
-                    'value'    => 'keep'
+                    'value'    => 'keep',
                 ],
                 [
                     'name'        => 'existingValueIsTaken3',
@@ -324,8 +324,8 @@ final class ModuleConfigurationMergingServiceTest extends TestCase
                     'name'     => 'completeNewOne',
                     'type'     => 'string',
                     'position' => '100500',
-                    'value'    => 'myValue'
-                ]
+                    'value'    => 'myValue',
+                ],
             ],
             $settings
         );
@@ -364,7 +364,7 @@ final class ModuleConfigurationMergingServiceTest extends TestCase
             'shopClass1'            => 'extension1ToStayInNewModuleConfiguration',
             'shopClass2'            => 'extension2ToBeChanged',
             'shopClass3'            => 'extension3ToBeDeleted',
-            'shopClass4ToBeDeleted' => 'extension4ToBeDeleted'
+            'shopClass4ToBeDeleted' => 'extension4ToBeDeleted',
         ];
 
         foreach ($classExtension as $namespace => $moduleExtension) {
@@ -416,7 +416,7 @@ final class ModuleConfigurationMergingServiceTest extends TestCase
                     'type'     => 'str',
                     'position' => '100500',
                     'value'    => 'myValue1',
-                ]
+                ],
             ];
 
         foreach ($moduleSettings as $settingData) {
@@ -446,7 +446,7 @@ final class ModuleConfigurationMergingServiceTest extends TestCase
             'shopClass1'            => ['someOtherExtension1', 'extension1ToStayInNewModuleConfiguration'],
             'shopClass2'            => ['someOtherExtension2', 'extension2ToBeChanged', 'someOtherExtension3'],
             'shopClass3'            => ['extension3ToBeDeleted', 'someOtherExtension4'],
-            'shopClass4ToBeDeleted' => ['extension4ToBeDeleted']
+            'shopClass4ToBeDeleted' => ['extension4ToBeDeleted'],
         ]);
 
         $shopConfiguration = new ShopConfiguration();

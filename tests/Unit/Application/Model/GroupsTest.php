@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,21 +18,22 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxfield;
-use \oxDb;
-use \oxRegistry;
+use oxDb;
+use oxfield;
+use oxRegistry;
 
 /**
  * Testing oxgroups class
  */
 class GroupsTest extends \OxidTestCase
 {
-    protected $_aAdd = array('oxobject2delivery' => array('oxobjectid', ''),
-                             'oxobject2discount' => array('oxobjectid', ''),
-                             'oxobject2group'    => array('oxgroupsid', ''),
-                             'oxobject2payment'  => array('oxobjectid', ''));
+    protected $_aAdd = ['oxobject2delivery' => ['oxobjectid', ''],
+                             'oxobject2discount' => ['oxobjectid', ''],
+                             'oxobject2group'    => ['oxgroupsid', ''],
+                             'oxobject2payment'  => ['oxobjectid', '']];
 
     /**
      * Initialize the fixture.

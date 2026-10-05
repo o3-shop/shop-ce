@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,14 +18,11 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Setup;
 
 require_once getShopBasePath() . '/Setup/functions.php';
 
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Edition\EditionPathProvider;
-use OxidEsales\EshopCommunity\Core\Edition\EditionRootPathProvider;
-use OxidEsales\EshopCommunity\Core\Edition\EditionSelector;
 use OxidEsales\EshopCommunity\Core\ShopIdCalculator;
 use OxidEsales\EshopCommunity\Core\ShopVersion;
 use OxidEsales\EshopCommunity\Setup\Core;
@@ -43,8 +41,8 @@ class SetupTest extends \OxidTestCase
         $core = new Core();
         /** @var Setup $oSetup */
         $oSetup = $core->getInstance('Setup');
-        $oSetup->setTitle("testTitle");
-        $this->assertEquals("testTitle", $oSetup->getTitle());
+        $oSetup->setTitle('testTitle');
+        $this->assertEquals('testTitle', $oSetup->getTitle());
     }
 
     /**
@@ -55,8 +53,8 @@ class SetupTest extends \OxidTestCase
         $core = new Core();
         /** @var Setup $oSetup */
         $oSetup = $core->getInstance('Setup');
-        $oSetup->setMessage("testTMessage");
-        $this->assertEquals("testTMessage", $oSetup->getMessage());
+        $oSetup->setMessage('testTMessage');
+        $this->assertEquals('testTMessage', $oSetup->getMessage());
     }
 
     /**
@@ -64,14 +62,14 @@ class SetupTest extends \OxidTestCase
      */
     public function testGetCurrentStep()
     {
-        $oUtils = $this->getMock("Utilities", array("getRequestVar"));
-        $oUtils->expects($this->once())->method("getRequestVar")->with($this->equalTo('istep'))->will($this->returnValue(null));
+        $oUtils = $this->getMock('Utilities', ['getRequestVar']);
+        $oUtils->expects($this->once())->method('getRequestVar')->with($this->equalTo('istep'))->will($this->returnValue(null));
 
         $core = new Core();
         $oSetup = $core->getInstance('Setup');
-        $oSetup = $this->getMock(get_class($oSetup), array("getInstance", "getStep"));
-        $oSetup->expects($this->once())->method("getInstance")->with($this->equalTo('Utilities'))->will($this->returnValue($oUtils));
-        $oSetup->expects($this->once())->method("getStep")->will($this->returnValue(1));
+        $oSetup = $this->getMock(get_class($oSetup), ['getInstance', 'getStep']);
+        $oSetup->expects($this->once())->method('getInstance')->with($this->equalTo('Utilities'))->will($this->returnValue($oUtils));
+        $oSetup->expects($this->once())->method('getStep')->will($this->returnValue(1));
         $this->assertEquals(1, $oSetup->getCurrentStep());
     }
 
@@ -83,8 +81,8 @@ class SetupTest extends \OxidTestCase
         $core = new Core();
         /** @var Setup $oSetup */
         $oSetup = $core->getInstance('Setup');
-        $oSetup->setNextStep("testStep");
-        $this->assertEquals("testStep", $oSetup->getNextStep());
+        $oSetup->setNextStep('testStep');
+        $this->assertEquals('testStep', $oSetup->getNextStep());
     }
 
     /**
@@ -140,8 +138,8 @@ class SetupTest extends \OxidTestCase
         $core = new Core();
         /** @var Setup $oSetup */
         $oSetup = $core->getInstance('Setup');
-        $this->assertEquals(100, $oSetup->getStep("STEP_SYSTEMREQ"));
-        $this->assertNull($oSetup->getStep("TESTID"));
+        $this->assertEquals(100, $oSetup->getStep('STEP_SYSTEMREQ'));
+        $this->assertNull($oSetup->getStep('TESTID'));
     }
 
     /**

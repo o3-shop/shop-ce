@@ -47,8 +47,11 @@ $this->dbUnixSocket = null;                         // unix domain socket, optio
 $this->sShopURL     = $_ENV['O3SHOP_CONF_SHOPURL']; // Shop base url, required
 $this->sSSLShopURL  = $_ENV['O3SHOP_CONF_SSLSHOPURL'];  // Shop SSL url, optional
 $this->sAdminSSLURL = $_ENV['O3SHOP_CONF_ADMINSSLURL']; // Shop Admin SSL url, optional
+// Development only: accept self-signed SSL certificates for the setup mod_rewrite self-probe. Default off; never enable in production.
+$this->blAllowSelfSignedCertificates = filter_var($_ENV['O3SHOP_CONF_ALLOWSELFSIGNEDCERTIFICATES'] ?? false, FILTER_VALIDATE_BOOLEAN);
 $this->sShopDir     = $_ENV['O3SHOP_CONF_SHOPDIR'];
 $this->sCompileDir  = $_ENV['O3SHOP_CONF_COMPILEDIR'];
+$this->sLogDir = $_ENV['O3SHOP_CONF_LOG_DIR'];
 
 /**
  * Force shop edition. Shop edition can still be forced here.
@@ -74,7 +77,7 @@ $this->sO3SHOPPHP = "o3shop.php";
 /**
  * String PSR3 log level Psr\Log\LogLevel
  */
-$this->sLogLevel = 'error';
+$this->sLogLevel = $_ENV['O3SHOP_CONF_LOG_LEVEL'];
 
 /**
  * Log all modifications performed in Admin

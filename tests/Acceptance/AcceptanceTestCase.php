@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -20,9 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Acceptance;
 
-use \OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Edition\EditionSelector;
-use OxidEsales\TestingLibrary\TestSqlPathProvider;
+use OxidEsales\Eshop\Core\Registry;
 
 abstract class AcceptanceTestCase extends \OxidEsales\TestingLibrary\AcceptanceTestCase
 {
@@ -38,8 +37,8 @@ abstract class AcceptanceTestCase extends \OxidEsales\TestingLibrary\AcceptanceT
 
         //Suppress check for new module versions on every admin login
         if ($this->preventModuleVersionNotify) {
-            $aParams = array("type" => "bool", "value" => true);
-            $this->callShopSC("oxConfig", null, null, array('preventModuleVersionNotify' => $aParams));
+            $aParams = ['type' => 'bool', 'value' => true];
+            $this->callShopSC('oxConfig', null, null, ['preventModuleVersionNotify' => $aParams]);
         }
 
         $this->activateTheme('azure');

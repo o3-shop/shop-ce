@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,11 +18,12 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
-use \oxDb;
-use \oxRegistry;
+use oxDb;
+use oxField;
+use oxRegistry;
 
 /**
  * Testing oxvoucherserie class
@@ -39,7 +41,7 @@ class VoucherserieTest extends \OxidTestCase
     {
         parent::setUp();
         $myConfig = $this->getConfig();
-        $this->_aIds = array();
+        $this->_aIds = [];
 
         // percental
         $oSerie = oxNew('oxvoucherserie');
@@ -98,7 +100,7 @@ class VoucherserieTest extends \OxidTestCase
     protected function _addAdditionalInfo()
     {
         $myUtils = oxRegistry::getUtils();
-        $aGroupsToAdd = array('oxidsmallcust', 'oxidmiddlecust', 'oxidgoodcust');
+        $aGroupsToAdd = ['oxidsmallcust', 'oxidmiddlecust', 'oxidgoodcust'];
 
         foreach ($this->_aIds as $sOxid) {
             // assigning groups
@@ -262,7 +264,7 @@ class VoucherserieTest extends \OxidTestCase
 
             $aGroups = $oSerie->setUserGroups();
 
-            $aGroupsToAdd = array('oxidsmallcust' => 0, 'oxidmiddlecust' => 1, 'oxidgoodcust' => 2);
+            $aGroupsToAdd = ['oxidsmallcust' => 0, 'oxidmiddlecust' => 1, 'oxidgoodcust' => 2];
 
             // same groups as assigned initially ?
             foreach ($aGroups as $oGroup) {
@@ -279,7 +281,6 @@ class VoucherserieTest extends \OxidTestCase
             }
         }
     }
-
 
     /**
      * Test removing user groups relations
@@ -378,7 +379,7 @@ class VoucherserieTest extends \OxidTestCase
             }
 
             // Create new used voucher
-            $oNewVoucher = oxNew("oxvoucher");
+            $oNewVoucher = oxNew('oxvoucher');
             $oNewVoucher->oxvouchers__oxvouchernr = new oxField('_test_' . $sOxid);
             $oNewVoucher->oxvouchers__oxvoucherserieid = new oxField($sOxid);
             $oNewVoucher->oxvouchers__oxdateused = new oxField(date('Y-m-d'));
@@ -407,7 +408,7 @@ class VoucherserieTest extends \OxidTestCase
             }
 
             // Create new used voucher
-            $oNewVoucher = oxNew("oxvoucher");
+            $oNewVoucher = oxNew('oxvoucher');
             $oNewVoucher->oxvouchers__oxvouchernr = new oxField('_test_' . $sOxid);
             $oNewVoucher->oxvouchers__oxvoucherserieid = new oxField($sOxid);
             $oNewVoucher->oxvouchers__oxorderid = new oxField(oxRegistry::getUtilsObject()->generateUID());

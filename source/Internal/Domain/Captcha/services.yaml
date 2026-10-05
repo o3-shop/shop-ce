@@ -1,0 +1,26 @@
+services:
+    _defaults:
+        autowire: true
+        public: false
+
+    OxidEsales\EshopCommunity\Internal\Domain\Captcha\Provider\NullCaptchaProvider: ~
+
+    OxidEsales\EshopCommunity\Internal\Domain\Captcha\Provider\CaptchaProviderLocator:
+        public: true
+        arguments:
+            $providers: !tagged oxid.captcha.provider
+            $nullProvider: '@OxidEsales\EshopCommunity\Internal\Domain\Captcha\Provider\NullCaptchaProvider'
+
+    OxidEsales\EshopCommunity\Internal\Domain\Captcha\Configuration\CaptchaConfigurationInterface:
+        class: OxidEsales\EshopCommunity\Internal\Domain\Captcha\Configuration\CaptchaConfiguration
+        public: true
+
+    OxidEsales\EshopCommunity\Internal\Domain\Captcha\Consent\CaptchaConsentInterface:
+        class: OxidEsales\EshopCommunity\Internal\Domain\Captcha\Consent\ConfigBasedCaptchaConsent
+
+    OxidEsales\EshopCommunity\Internal\Domain\Captcha\Form\CaptchaFormRegistry:
+        public: true
+
+    OxidEsales\EshopCommunity\Internal\Domain\Captcha\CaptchaServiceInterface:
+        class: OxidEsales\EshopCommunity\Internal\Domain\Captcha\CaptchaService
+        public: true

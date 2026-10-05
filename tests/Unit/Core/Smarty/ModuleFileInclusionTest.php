@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,10 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Smarty;
 
-use \testModuleInclusion_parent;
-use \oxRegistry;
+use oxRegistry;
 
 /**
  * test for situation:
@@ -32,31 +33,30 @@ use \oxRegistry;
  */
 class ModuleFileInclusionTest extends \OxidTestCase
 {
-
     /**
      * test main scenario
      */
     public function testModuleInclusion()
     {
         $wrapper = $this->getVfsStreamWrapper();
-        oxRegistry::get("oxConfigFile")->setVar("sShopDir", $wrapper->getRootPath());
-        $wrapper->createStructure(array(
-            'modules' => array(
-                'testmoduleinclusion.php' => "<?php
+        oxRegistry::get('oxConfigFile')->setVar('sShopDir', $wrapper->getRootPath());
+        $wrapper->createStructure([
+            'modules' => [
+                'testmoduleinclusion.php' => '<?php
                     class testmoduleinclusion extends testmoduleinclusion_parent {
                         public function sayHi() {
-                            return \"Hi!\";
+                            return "Hi!";
                         }
-                    }"
-            )
-        ));
+                    }',
+            ],
+        ]);
 
-        \OxidEsales\Eshop\Core\Registry::getUtilsObject()->setModuleVar('aModules', array('oxarticle' => 'testmoduleinclusion'));
+        \OxidEsales\Eshop\Core\Registry::getUtilsObject()->setModuleVar('aModules', ['oxarticle' => 'testmoduleinclusion']);
 
         $oTestMod = oxNew('testModuleInclusion');
-        $this->assertEquals("Hi!", $oTestMod->sayHi());
+        $this->assertEquals('Hi!', $oTestMod->sayHi());
 
         $oTestArt = oxNew('oxArticle');
-        $this->assertEquals("Hi!", $oTestArt->sayHi());
+        $this->assertEquals('Hi!', $oTestArt->sayHi());
     }
 }

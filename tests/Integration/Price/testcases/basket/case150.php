@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Price enter mode: Brutto;
  * Price view mode: Brutto;
@@ -19,46 +20,46 @@
  * Brutto-Brutto mode.
  * From basketCalc.csv: VII order.
  */
-$aData = array(
-    'articles' => array(
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
                 'oxid'                     => 9200,
                 'oxprice'                  => 47.62,
                 'oxvat'                    => 0,
                 'amount'                   => 1,
-        ),
-        1 => array(
+        ],
+        1 => [
                 'oxid'                     => 9201,
                 'oxprice'                  => 91.82,
                 'oxvat'                    => 0,
                 'amount'                   => 1,
-        ),
-        2 => array(
+        ],
+        2 => [
                 'oxid'                     => 9207,
                 'oxprice'                  => 63.03,
                 'oxvat'                    => 0,
                 'amount'                   => 1,
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-                 9200 => array( '47,62', '47,62' ),
-                 9201 => array( '91,82', '91,82' ),
-                 9207 => array( '63,03', '63,03' ),
-        ),
-        'totals' => array(
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+                 9200 => [ '47,62', '47,62' ],
+                 9201 => [ '91,82', '91,82' ],
+                 9207 => [ '63,03', '63,03' ],
+        ],
+        'totals' => [
                 'totalBrutto' => '202,47',
                 'totalNetto'  => '202,47',
-                'vats' => array(
+                'vats' => [
                         0 => '0,00',
-                ),
-                'grandTotal'  => '202,47'
-        ),
-    ),
-    'options' => array(
-        'config' => array(
+                ],
+                'grandTotal'  => '202,47',
+        ],
+    ],
+    'options' => [
+        'config' => [
             'blEnterNetPrice' => false,
-            'blShowNetPrice' => false
-        ),
-    ),
-);
+            'blShowNetPrice' => false,
+        ],
+    ],
+];

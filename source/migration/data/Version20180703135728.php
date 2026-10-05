@@ -21,8 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Migrations;
 
-use Doctrine\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\AbstractMigration;
 use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\ConfigFile;
 use OxidEsales\Facts\Facts;

@@ -21,8 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component;
 
+use Exception;
+use OxidEsales\Eshop\Application\Model\ContentList;
+use OxidEsales\Eshop\Core\Controller\BaseController;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 
 /**
  * Transparent shop utilities class.
@@ -31,7 +33,7 @@ use oxRegistry;
  *
  * @subpackage oxcmp
  */
-class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
+class UtilsComponent extends BaseController
 {
     /**
      * Marking object as component
@@ -56,43 +58,66 @@ class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
         $blOverride = false,
         $blBundle = false
     ) {
-        // only if enabled and not search engine..
-        if ($this->getViewConfig()->getShowCompareList() && !Registry::getUtils()->isSearchEngine()) {
-            // #657 special treatment if we want to put on comparelist
-            $blAddCompare = Registry::getConfig()->getRequestParameter('addcompare');
-            $blRemoveCompare = Registry::getConfig()->getRequestParameter('removecompare');
-            $sProductId = $sProductId ? $sProductId : Registry::getConfig()->getRequestParameter('aid');
-            if (($blAddCompare || $blRemoveCompare) && $sProductId) {
-                // toggle state in session array
-                $aItems = Registry::getSession()->getVariable('aFiltcompproducts');
-                if ($blAddCompare && !isset($aItems[$sProductId])) {
-                    $aItems[$sProductId] = true;
-                }
+        $view = $this->getParent();
 
-                if ($blRemoveCompare) {
-                    unset($aItems[$sProductId]);
-                }
+        if ($view === null) {
+            return;
+        }
 
-                Registry::getSession()->setVariable('aFiltcompproducts', $aItems);
-                $oParentView = $this->getParent();
+        $viewConfig = method_exists($view, 'getViewConfig') ? $view->getViewConfig() : null;
 
-                // #843C there was problem then field "blIsOnComparisonList" was not set to article object
-                if (($oProduct = $oParentView->getViewProduct())) {
-                    if (isset($aItems[$oProduct->getId()])) {
-                        $oProduct->setOnComparisonList(true);
-                    } else {
-                        $oProduct->setOnComparisonList(false);
-                    }
-                }
+        if ($viewConfig === null
+            || !method_exists($viewConfig, 'getShowCompareList')
+            || !$viewConfig->getShowCompareList()
+        ) {
+            return;
+        }
 
-                $aViewProds = $oParentView->getViewProductList();
-                if (is_array($aViewProds) && count($aViewProds)) {
-                    foreach ($aViewProds as $oProduct) {
-                        if (isset($aItems[$oProduct->getId()])) {
-                            $oProduct->setOnComparisonList(true);
-                        } else {
-                            $oProduct->setOnComparisonList(false);
-                        }
+        if (Registry::getUtils()->isSearchEngine()) {
+            return;
+        }
+
+        $config = Registry::getConfig();
+        $blAddCompare = $config->getRequestParameter('addcompare');
+        $blRemoveCompare = $config->getRequestParameter('removecompare');
+        $sProductId = $sProductId ?: $config->getRequestParameter('aid');
+
+        if ((!$blAddCompare && !$blRemoveCompare) || !$sProductId) {
+            return;
+        }
+
+        $session = Registry::getSession();
+        $aItems = $session->getVariable('aFiltcompproducts');
+
+        if (!is_array($aItems)) {
+            $aItems = [];
+        }
+
+        if ($blAddCompare && !isset($aItems[$sProductId])) {
+            $aItems[$sProductId] = true;
+        }
+
+        if ($blRemoveCompare) {
+            unset($aItems[$sProductId]);
+        }
+
+        $session->setVariable('aFiltcompproducts', $aItems);
+
+        // Update in-memory product flags so templates show the correct
+        // comparison-list state without requiring a page reload.
+        if (method_exists($view, 'getViewProduct')) {
+            $oProduct = $view->getViewProduct();
+            if ($oProduct !== null && method_exists($oProduct, 'getId')) {
+                $oProduct->setOnComparisonList(isset($aItems[$oProduct->getId()]));
+            }
+        }
+
+        if (method_exists($view, 'getViewProductList')) {
+            $aViewProds = $view->getViewProductList();
+            if (is_array($aViewProds)) {
+                foreach ($aViewProds as $oProduct) {
+                    if (method_exists($oProduct, 'getId')) {
+                        $oProduct->setOnComparisonList(isset($aItems[$oProduct->getId()]));
                     }
                 }
             }
@@ -100,14 +125,13 @@ class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     }
 
     /**
-     * If session user is set loads user noticelist (\OxidEsales\Eshop\Application\Model\User::GetBasket())
+     * If session user is set loads user notice-list (\OxidEsales\Eshop\Application\Model\User::GetBasket())
      * and adds article to it.
      *
      * @param string $sProductId Product/article ID (default null)
-     * @param double $dAmount    amount of good (default null)
-     * @param array  $aSel       product selection list (default null)
-     *
-     * @return bool
+     * @param double $dAmount amount of good (default null)
+     * @param array $aSel product selection list (default null)
+     * @throws Exception
      */
     public function toNoticeList($sProductId = null, $dAmount = null, $aSel = null)
     {
@@ -123,10 +147,9 @@ class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      * adds article to it.
      *
      * @param string $sProductId Product/article ID (default null)
-     * @param double $dAmount    amount of good (default null)
-     * @param array  $aSel       product selection list (default null)
-     *
-     * @return false
+     * @param double $dAmount amount of good (default null)
+     * @param array $aSel product selection list (default null)
+     * @throws Exception
      */
     public function toWishList($sProductId = null, $dAmount = null, $aSel = null)
     {
@@ -143,24 +166,31 @@ class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     /**
      * Adds chosen product to defined user list. if amount is 0, item is removed from the list
      *
-     * @param string $sListType  user product list type
+     * @param string $sListType user product list type
      * @param string $sProductId product id
-     * @param double $dAmount    product amount
-     * @param array  $aSel       product selection list
-     * @deprecated underscore prefix violates PSR12, will be renamed to "toList" in next major
+     * @param double $dAmount product amount
+     * @param array $aSel product selection list
+     * @throws Exception
+     * @deprecated Transitional during #107. Modules SHOULD override _toList()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes toList() to the canonical override
+      *             target and retires _toList(); until then, _toList() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _toList($sListType, $sProductId, $dAmount, $aSel) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // only if user is logged in
         if ($oUser = $this->getUser()) {
-            $sProductId = ($sProductId) ? $sProductId : Registry::getConfig()->getRequestParameter('itmid');
-            $sProductId = ($sProductId) ? $sProductId : Registry::getConfig()->getRequestParameter('aid');
-            $dAmount = isset($dAmount) ? $dAmount : Registry::getConfig()->getRequestParameter('am');
-            $aSel = $aSel ? $aSel : Registry::getConfig()->getRequestParameter('sel');
+            $sProductId = ($sProductId) ? $sProductId : Registry::getRequest()->getRequestEscapedParameter('itmid');
+            $sProductId = ($sProductId) ? $sProductId : Registry::getRequest()->getRequestEscapedParameter('aid');
+            $dAmount = isset($dAmount) ? $dAmount : Registry::getRequest()->getRequestEscapedParameter('am');
+            $aSel = $aSel ? $aSel : Registry::getRequest()->getRequestEscapedParameter('sel');
 
             // processing amounts
             $dAmount = str_replace(',', '.', $dAmount);
-            if (!$this->getConfig()->getConfigParam('blAllowUnevenAmounts')) {
+            if (!Registry::getConfig()->getConfigParam('blAllowUnevenAmounts')) {
                 $dAmount = round((string) $dAmount);
             }
 
@@ -169,13 +199,67 @@ class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
 
             // recalculate basket count
             $oBasket->getItemCount(true);
+
+            Registry::getLogger()->debug('toList: listType=' . $sListType . ' productId=' . $sProductId . ' amount=' . $dAmount);
+
+            // push the updated in-list state onto any article objects already loaded in the view,
+            // so the heart icon reflects the change without a DB re-query (mirrors toCompareList())
+            $blInList = ($dAmount != 0);
+            if (!$blInList) {
+                // article was removed from this list — check if it is still in the other list
+                $otherList = ($sListType === 'noticelist') ? 'wishlist' : 'noticelist';
+                foreach ($oUser->getBasket($otherList)->getItems() as $oItem) {
+                    if ($oItem->oxuserbasketitems__oxartid->value === $sProductId) {
+                        $blInList = true;
+                        break;
+                    }
+                }
+            }
+            Registry::getLogger()->debug('toList: blInList=' . ($blInList ? 'true' : 'false'));
+
+            $oParentView = $this->getParent();
+            if ($oParentView) {
+                if (($oProduct = $oParentView->getViewProduct()) && $oProduct->getId() === $sProductId) {
+                    Registry::getLogger()->debug('toList: setIsInList on viewProduct id=' . $oProduct->getId());
+                    $oProduct->setIsInList($blInList);
+                }
+                $aViewProds = $oParentView->getViewProductList();
+                Registry::getLogger()->debug('toList: viewProductList count=' . (is_array($aViewProds) ? count($aViewProds) : 0));
+                if (is_array($aViewProds)) {
+                    foreach ($aViewProds as $oProduct) {
+                        if ($oProduct->getId() === $sProductId) {
+                            Registry::getLogger()->debug('toList: setIsInList on listProduct id=' . $oProduct->getId());
+                            $oProduct->setIsInList($blInList);
+                        }
+                    }
+                }
+            }
         }
+    }
+
+    /**
+     * Adds chosen product to defined user list. if amount is 0, item is removed from the list
+     *
+     * @param string $sListType user product list type
+     * @param string $sProductId product id
+     * @param double $dAmount product amount
+     * @param array $aSel product selection list
+     * @throws Exception
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _toList(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make toList() the canonical override target.
+     */
+    protected function toList($sListType, $sProductId, $dAmount, $aSel)
+    {
+        return $this->_toList($sListType, $sProductId, $dAmount, $aSel);
     }
 
     /**
      *  Set view data, call parent::render
      *
-     * @return null
+     * @return void
      */
     public function render()
     {
@@ -184,10 +268,8 @@ class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
         $oParentView = $this->getParent();
 
         // add content for main menu
-        $oContentList = oxNew(\OxidEsales\Eshop\Application\Model\ContentList::class);
+        $oContentList = oxNew(ContentList::class);
         $oContentList->loadMainMenulist();
         $oParentView->setMenueList($oContentList);
-
-        return;
     }
 }

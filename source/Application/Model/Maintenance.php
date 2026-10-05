@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Application\Model\ArticleList;
+
 /**
  * Maintenance task handler. Maintenance tasks are called periodically, by cronTab (configure on your needs)
  *
@@ -28,11 +30,11 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 class Maintenance
 {
     /**
-     * Executes maintenance tasks. Currently calls oxArticleList::updateUpcomingPrices()
+     * Executes maintenance tasks. Currently, calls oxArticleList::updateUpcomingPrices()
      */
     public function execute()
     {
         // updating upcoming prices
-        oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class)->updateUpcomingPrices(true);
+        oxNew(ArticleList::class)->updateUpcomingPrices(true);
     }
 }

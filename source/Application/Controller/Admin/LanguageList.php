@@ -21,14 +21,19 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxDb;
 use Exception;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\DbMetaDataHandler;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin selectlist list manager.
  */
-class LanguageList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class LanguageList extends AdminListController
 {
     /**
      * Default sorting parameter.
@@ -47,11 +52,11 @@ class LanguageList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminL
     /**
      * Checks for Malladmin rights
      *
-     * @return null
+     * @return void
      */
     public function deleteEntry()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $sOxId = $this->getEditObjectId();
 
         $aLangData['params'] = $myConfig->getConfigParam('aLanguageParams');
@@ -63,9 +68,9 @@ class LanguageList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminL
 
         // preventing deleting main language with base id = 0
         if ($iBaseId == 0) {
-            $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ExceptionToDisplay::class);
+            $oEx = oxNew(ExceptionToDisplay::class);
             $oEx->setMessage('LANGUAGE_DELETINGMAINLANG_WARNING');
-            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx);
+            Registry::getUtilsView()->addErrorToDisplay($oEx);
 
             return;
         }
@@ -82,7 +87,7 @@ class LanguageList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminL
         $myConfig->saveShopConfVar('arr', 'aLanguageURLs', $aLangData['urls']);
         $myConfig->saveShopConfVar('arr', 'aLanguageSSLURLs', $aLangData['sslUrls']);
 
-        //if deleted language was default, setting defalt lang to 0
+        //if deleted language was default, setting default lang to 0
         if ($iBaseId == $myConfig->getConfigParam('sDefaultLang')) {
             $myConfig->saveShopConfVar('str', 'sDefaultLang', 0);
         }
@@ -93,32 +98,40 @@ class LanguageList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminL
      * file "selectlist_list.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
         parent::render();
         $this->_aViewData['mylist'] = $this->_getLanguagesList();
 
-        return "language_list.tpl";
+        return 'language_list.tpl';
     }
 
     /**
      * Collects shop languages list.
      *
      * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getLanguagesList" in next major
+     * @throws DatabaseConnectionException
+     * @deprecated Transitional during #107. Modules SHOULD override _getLanguagesList()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getLanguagesList() to the canonical override
+      *             target and retires _getLanguagesList(); until then, _getLanguagesList() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getLanguagesList() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $aLangParams = $this->getConfig()->getConfigParam('aLanguageParams');
-        $aLanguages = \OxidEsales\Eshop\Core\Registry::getLang()->getLanguageArray();
-        $sDefaultLang = $this->getConfig()->getConfigParam('sDefaultLang');
+        $aLangParams = Registry::getConfig()->getConfigParam('aLanguageParams');
+        $aLanguages = Registry::getLang()->getLanguageArray();
+        $sDefaultLang = Registry::getConfig()->getConfigParam('sDefaultLang');
 
         foreach ($aLanguages as $sKey => $sValue) {
             $sOxId = $sValue->oxid;
-            $aLanguages[$sKey]->active = (!isset($aLangParams[$sOxId]["active"])) ? 1 : $aLangParams[$sOxId]["active"];
-            $aLanguages[$sKey]->default = ($aLangParams[$sOxId]["baseId"] == $sDefaultLang) ? true : false;
-            $aLanguages[$sKey]->sort = $aLangParams[$sOxId]["sort"];
+            $aLanguages[$sKey]->active = (!isset($aLangParams[$sOxId]['active'])) ? 1 : $aLangParams[$sOxId]['active'];
+            $aLanguages[$sKey]->default = (bool)($aLangParams[$sOxId]['baseId'] == $sDefaultLang);
+            $aLanguages[$sKey]->sort = $aLangParams[$sOxId]['sort'];
         }
 
         if (is_array($aLangParams)) {
@@ -146,14 +159,36 @@ class LanguageList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminL
     }
 
     /**
+     * Collects shop languages list.
+     *
+     * @return array
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getLanguagesList(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getLanguagesList() the canonical override target.
+     */
+    protected function getLanguagesList()
+    {
+        return $this->_getLanguagesList();
+    }
+
+    /**
      * Callback function for sorting languages objects. Sorts array according
      * 'sort' parameter
      *
      * @param object $oLang1 language object
      * @param object $oLang2 language object
      *
-     * @return bool
-     * @deprecated underscore prefix violates PSR12, will be renamed to "sortLanguagesCallback" in next major
+     * @return int
+     * @deprecated Transitional during #107. Modules SHOULD override _sortLanguagesCallback()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes sortLanguagesCallback() to the canonical override
+      *             target and retires _sortLanguagesCallback(); until then, _sortLanguagesCallback() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _sortLanguagesCallback($oLang1, $oLang2) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -169,11 +204,38 @@ class LanguageList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminL
     }
 
     /**
+     * Callback function for sorting languages objects. Sorts array according
+     * 'sort' parameter
+     *
+     * @param object $oLang1 language object
+     * @param object $oLang2 language object
+     *
+     * @return int
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _sortLanguagesCallback(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make sortLanguagesCallback() the canonical override target.
+     */
+    protected function sortLanguagesCallback($oLang1, $oLang2)
+    {
+        return $this->_sortLanguagesCallback($oLang1, $oLang2);
+    }
+
+    /**
      * Resets all multilanguage fields with specific language id
      * to default value in all tables.
      *
      * @param string $iLangId language ID
-     * @deprecated underscore prefix violates PSR12, will be renamed to "resetMultiLangDbFields" in next major
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @deprecated Transitional during #107. Modules SHOULD override _resetMultiLangDbFields()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes resetMultiLangDbFields() to the canonical override
+      *             target and retires _resetMultiLangDbFields(); until then, _resetMultiLangDbFields() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _resetMultiLangDbFields($iLangId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -181,22 +243,40 @@ class LanguageList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminL
 
         //skipping reseting language with id = 0
         if ($iLangId) {
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->startTransaction();
+            DatabaseProvider::getDb()->startTransaction();
 
             try {
-                $oDbMeta = oxNew(\OxidEsales\Eshop\Core\DbMetaDataHandler::class);
+                $oDbMeta = oxNew(DbMetaDataHandler::class);
                 $oDbMeta->resetLanguage($iLangId);
 
-                \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->commitTransaction();
+                DatabaseProvider::getDb()->commitTransaction();
             } catch (Exception $oEx) {
                 // if exception, rollBack everything
-                \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->rollbackTransaction();
+                DatabaseProvider::getDb()->rollbackTransaction();
 
                 //show warning
-                $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ExceptionToDisplay::class);
+                $oEx = oxNew(ExceptionToDisplay::class);
                 $oEx->setMessage('LANGUAGE_ERROR_RESETING_MULTILANG_FIELDS');
-                \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx);
+                Registry::getUtilsView()->addErrorToDisplay($oEx);
             }
         }
+    }
+
+    /**
+     * Resets all multilanguage fields with specific language id
+     * to default value in all tables.
+     *
+     * @param string $iLangId language ID
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _resetMultiLangDbFields(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make resetMultiLangDbFields() the canonical override target.
+     */
+    protected function resetMultiLangDbFields($iLangId)
+    {
+        $this->_resetMultiLangDbFields($iLangId);
     }
 }

@@ -39,7 +39,7 @@ final class ModuleSettingsCest
 
         $adminPanel = $I->loginAdmin();
         $moduleList = $adminPanel->openModules();
-        $module =  $moduleList->selectModule('Codeception test module #1');
+        $module = $moduleList->selectModule('Codeception test module #1');
         $module->openModuleTab('Settings');
 
         $I->click($I->see('Empty Settings Group'));

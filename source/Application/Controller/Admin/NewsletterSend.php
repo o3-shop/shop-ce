@@ -21,17 +21,22 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxDb;
-use oxField;
-use oxAdminDetails;
+use OxidEsales\Eshop\Application\Controller\Admin\NewsletterSelection;
+use OxidEsales\Eshop\Application\Model\Newsletter;
+use OxidEsales\Eshop\Application\Model\Remark;
+use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * @deprecated Functionality for Newsletter management will be removed.
  * Newsletter sending manager.
  * Performs sending of newsletter to selected user groups.
  */
-class NewsletterSend extends \OxidEsales\Eshop\Application\Controller\Admin\NewsletterSelection
+class NewsletterSend extends NewsletterSelection
 {
     /**
      * Mail sending errors array
@@ -46,40 +51,42 @@ class NewsletterSend extends \OxidEsales\Eshop\Application\Controller\Admin\News
      * file "newsletter_send.tpl"/"newsletter_done.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
-        oxAdminDetails::render();
+        AdminDetailsController::render();
 
         // calculating
         $iUserCount = $this->getUserCount();
 
-        $iStart = (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("iStart");
+        $iStart = (int) Registry::getRequest()->getRequestEscapedParameter('iStart');
 
-        $oNewsletter = oxNew(\OxidEsales\Eshop\Application\Model\Newsletter::class);
+        $oNewsletter = oxNew(Newsletter::class);
         $oNewsletter->load($this->getEditObjectId());
         $oNewsletterGroups = $oNewsletter->getGroups();
 
         // send emails....
-        $oDB = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
-        $sQGroups = " ( oxobject2group.oxgroupsid in ( ";
+        $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
+        $sQGroups = ' ( oxobject2group.oxgroupsid in ( ';
         $blSep = false;
         foreach ($oNewsletterGroups as $sInGroup) {
             $sSearchKey = $sInGroup->oxgroups__oxid->value;
             if ($blSep) {
-                $sQGroups .= ",";
+                $sQGroups .= ',';
             }
             $sQGroups .= $oDB->quote($sSearchKey);
             $blSep = true;
         }
-        $sQGroups .= ") )";
+        $sQGroups .= ') )';
 
         // no group selected
         if (!$blSep) {
-            $sQGroups = " oxobject2group.oxobjectid is null ";
+            $sQGroups = ' oxobject2group.oxobjectid is null ';
         }
 
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         $iSendCnt = 0;
         $iMaxCnt = (int) $myConfig->getConfigParam('iCntofMails');
@@ -94,46 +101,46 @@ class NewsletterSend extends \OxidEsales\Eshop\Application\Controller\Admin\News
            group by oxnewssubscribed.oxemail";
 
         $oRs = $oDB->selectLimit($sQ, 100, $iStart, [
-            ':oxshopid' => $sShopId
+            ':oxshopid' => $sShopId,
         ]);
         $blContinue = ($oRs != false && $oRs->count() > 0);
 
         if ($blContinue) {
             $blLoadAction = $myConfig->getConfigParam('bl_perfLoadAktion');
             while (!$oRs->EOF && $iSendCnt < $iMaxCnt) {
-                if ($oRs->fields['oxemailfailed'] != "1") {
+                if ($oRs->fields['oxemailfailed'] != '1') {
                     $sUserId = $oRs->fields['oxuserid'];
                     $iSendCnt++;
 
                     // must check if such user is in DB
                     // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-                    if (!\OxidEsales\Eshop\Core\DatabaseProvider::getMaster()->getOne("select oxid from oxuser where oxid = :oxid", [':oxid' => $sUserId])) {
+                    if (!DatabaseProvider::getMaster()->getOne('select oxid from oxuser where oxid = :oxid', [':oxid' => $sUserId])) {
                         $sUserId = null;
                     }
 
                     // #559
                     if (!isset($sUserId) || !$sUserId) {
                         // there is no user object so we fake one
-                        $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
-                        $oUser->oxuser__oxusername = new \OxidEsales\Eshop\Core\Field($oRs->fields['oxemail']);
-                        $oUser->oxuser__oxsal = new \OxidEsales\Eshop\Core\Field($oRs->fields['oxsal']);
-                        $oUser->oxuser__oxfname = new \OxidEsales\Eshop\Core\Field($oRs->fields['oxfname']);
-                        $oUser->oxuser__oxlname = new \OxidEsales\Eshop\Core\Field($oRs->fields['oxlname']);
+                        $oUser = oxNew(User::class);
+                        $oUser->oxuser__oxusername = new Field($oRs->fields['oxemail']);
+                        $oUser->oxuser__oxsal = new Field($oRs->fields['oxsal']);
+                        $oUser->oxuser__oxfname = new Field($oRs->fields['oxfname']);
+                        $oUser->oxuser__oxlname = new Field($oRs->fields['oxlname']);
                         $oNewsletter->prepare($oUser, $blLoadAction);
                     } else {
                         $oNewsletter->prepare($sUserId, $blLoadAction);
                     }
 
-                    if ($oNewsletter->send($iSendCnt)) {
+                    if ($oNewsletter->send()) {
                         // add user history
-                        $oRemark = oxNew(\OxidEsales\Eshop\Application\Model\Remark::class);
-                        $oRemark->oxremark__oxtext = new \OxidEsales\Eshop\Core\Field($oNewsletter->getPlainText());
-                        $oRemark->oxremark__oxparentid = new \OxidEsales\Eshop\Core\Field($sUserId);
-                        $oRemark->oxremark__oxshopid = new \OxidEsales\Eshop\Core\Field($sShopId);
-                        $oRemark->oxremark__oxtype = new \OxidEsales\Eshop\Core\Field("n");
+                        $oRemark = oxNew(Remark::class);
+                        $oRemark->oxremark__oxtext = new Field($oNewsletter->getPlainText());
+                        $oRemark->oxremark__oxparentid = new Field($sUserId);
+                        $oRemark->oxremark__oxshopid = new Field($sShopId);
+                        $oRemark->oxremark__oxtype = new Field('n');
                         $oRemark->save();
                     } else {
-                        $this->_aMailErrors[] = "problem sending to : " . $oRs->fields['oxemail'];
+                        $this->_aMailErrors[] = 'problem sending to : ' . $oRs->fields['oxemail'];
                     }
                 }
 
@@ -143,18 +150,18 @@ class NewsletterSend extends \OxidEsales\Eshop\Application\Controller\Admin\News
         }
 
         $iSend = $iSendCnt + (ceil($iStart / $iMaxCnt) - 1) * $iMaxCnt;
-        $iSend = $iSend > $iUserCount ? $iUserCount : $iSend;
+        $iSend = min($iSend, $iUserCount);
 
-        $this->_aViewData["iStart"] = $iStart;
-        $this->_aViewData["iSend"] = $iSend;
+        $this->_aViewData['iStart'] = $iStart;
+        $this->_aViewData['iSend'] = $iSend;
 
         // end ?
         if ($blContinue) {
-            return "newsletter_send.tpl";
+            return 'newsletter_send.tpl';
         } else {
             $this->resetUserCount();
 
-            return "newsletter_done.tpl";
+            return 'newsletter_done.tpl';
         }
     }
 
@@ -162,13 +169,14 @@ class NewsletterSend extends \OxidEsales\Eshop\Application\Controller\Admin\News
      * Returns count of users assigned to active newsletter receiver group
      *
      * @return int
+     * @throws DatabaseConnectionException
      */
     public function getUserCount()
     {
-        $iCnt = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable("iUserCount");
+        $iCnt = Registry::getSession()->getVariable('iUserCount');
         if ($iCnt === null) {
             $iCnt = parent::getUserCount();
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("iUserCount", $iCnt);
+            Registry::getSession()->setVariable('iUserCount', $iCnt);
         }
 
         return $iCnt;
@@ -179,7 +187,7 @@ class NewsletterSend extends \OxidEsales\Eshop\Application\Controller\Admin\News
      */
     public function resetUserCount()
     {
-        \OxidEsales\Eshop\Core\Registry::getSession()->deleteVariable("iUserCount");
+        Registry::getSession()->deleteVariable('iUserCount');
         $this->_iUserCount = null;
     }
 
@@ -197,7 +205,13 @@ class NewsletterSend extends \OxidEsales\Eshop\Application\Controller\Admin\News
      * Overrides parent method to pass referred id
      *
      * @param string $sNode referred id
-     * @deprecated underscore prefix violates PSR12, will be renamed to "setupNavigation" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _setupNavigation()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes setupNavigation() to the canonical override
+      *             target and retires _setupNavigation(); until then, _setupNavigation() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _setupNavigation($sNode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -217,8 +231,23 @@ class NewsletterSend extends \OxidEsales\Eshop\Application\Controller\Admin\News
         // default tab
         $this->_aViewData['default_edit'] = $myAdminNavig->getActiveTab($sNode, $this->_iDefEdit);
 
-        // passign active tab number
+        // passing active tab number
         $this->_aViewData['actedit'] = $iActTab;
+    }
+
+    /**
+     * Overrides parent method to pass referred id
+     *
+     * @param string $sNode referred id
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _setupNavigation(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make setupNavigation() the canonical override target.
+     */
+    protected function setupNavigation($sNode)
+    {
+        $this->_setupNavigation($sNode);
     }
 
     /**

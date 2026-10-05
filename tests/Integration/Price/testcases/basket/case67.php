@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: bruto
  * Price view mode:  brutto
@@ -18,17 +19,17 @@
  *
  * Case: 0004680: Discount recalculation fails on basket refresh
  */
-$aData = array(
-    'articles' => array(
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
                 'oxid'                     => '_testProduct',
                 'oxprice'                  => 10.00,
                 'oxvat'                    => 19,
                 'amount'                   => 36,
-        ),
-    ),
-    'discounts' => array(
-        0 => array(
+        ],
+    ],
+    'discounts' => [
+        0 => [
                 'oxid'         => 'basket_0',
                 'oxaddsum'     => 6.00,
                 'oxaddsumtype' => '%',
@@ -39,8 +40,8 @@ $aData = array(
                 'oxactive' => 1,
                 //'oxarticles' => array( 111 ),
                 'oxsort' => 10,
-        ),
-        1 => array(
+        ],
+        1 => [
                 'oxid'         => 'basket_1',
                 'oxaddsum'     => 9.00,
                 'oxaddsumtype' => '%',
@@ -50,8 +51,8 @@ $aData = array(
                 'oxpriceto' => 299,
                 'oxactive' => 1,
                 'oxsort' => 20,
-        ),
-        2 => array(
+        ],
+        2 => [
                 'oxid'         => 'basket_2',
                 'oxaddsum'     => 12.00,
                 'oxaddsumtype' => '%',
@@ -61,31 +62,30 @@ $aData = array(
                 'oxpriceto' => 99999,
                 'oxactive' => 1,
                 'oxsort' => 30,
-        ),
+        ],
+    ],
 
-    ),
-
-    'expected' => array(
-        'articles' => array(
-                 '_testProduct' => array( '10,00', '360,00' ),
-        ),
-        'totals' => array(
+    'expected' => [
+        'articles' => [
+                 '_testProduct' => [ '10,00', '360,00' ],
+        ],
+        'totals' => [
                 'totalBrutto' => '360,00',
                 'totalNetto'  => '266,22',
-                'vats' => array(
+                'vats' => [
                     19 => '50,58',
-                ),
-                'discounts' => array(
+                ],
+                'discounts' => [
                     'basket_2' => '43,20',
-                ),
-                'grandTotal'  => '316,80'
-        ),
-    ),
-    'options' => array(
-        'config' => array(
+                ],
+                'grandTotal'  => '316,80',
+        ],
+    ],
+    'options' => [
+        'config' => [
                 'blEnterNetPrice' => false,
                 'blShowNetPrice' => false,
-        ),
+        ],
         'activeCurrencyRate' => 1,
-    ),
-);
+    ],
+];

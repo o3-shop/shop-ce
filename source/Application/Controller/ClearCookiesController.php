@@ -21,13 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AllCookiesRemovedEvent;
 
 /**
  * CMS - loads pages and displays it
  */
-class ClearCookiesController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class ClearCookiesController extends FrontendController
 {
     /**
      * Current view template

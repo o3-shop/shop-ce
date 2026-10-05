@@ -1,4 +1,5 @@
 <?php
+
 /*
 /**
  * Price enter mode: brutto
@@ -12,30 +13,30 @@
  * Discounts: 2 item discount
  * Short description: test added from selenium test (testFrontendItmDiscounts) ;Is testing one Itm discount for products (special case according Mantis#320)
  */
-$aData = array(
+$aData = [
     // Articles
-    'articles' => array(
-        0 => array(
+    'articles' => [
+        0 => [
             // oxarticles db fields
             'oxid'                     => 1000,
             'oxprice'                  => 50.00,
             'oxvat'                    => 5,
             // Amount in basket
             'amount'                   => 5,
-        ),
-        1 => array(
+        ],
+        1 => [
             // oxarticles db fields
             'oxid'                     => 1003,
             'oxprice'                  => 50.00,
             'oxvat'                    => 5,
             // Amount in basket
           //  'amount'                   => 1,
-        ),
-    ),
+        ],
+    ],
     // Discounts
-    'discounts' => array(
+    'discounts' => [
         // oxdiscount DB fields
-        0 => array(
+        0 => [
             'oxid'         => 'testitmdiscount',
             'oxshopid' => 1,
             'oxaddsum'     => 0,
@@ -48,11 +49,10 @@ $aData = array(
             'oxitmartid' => 1003,
             'oxitmamount' => 1,
             'oxitmmultiple' => 0,
-            'oxarticles' => array( 1000 ),
+            'oxarticles' => [ 1000 ],
             'oxsort' => 10,
-
-        ),
-        1 => array(
+        ],
+        1 => [
             // Discount 10% on 200 Euro or more
             'oxid'         => 'testdiscountfrom200',
             'oxshopid' => 1,
@@ -64,40 +64,40 @@ $aData = array(
             'oxpriceto'=> 999999,
             'oxactive' => 1,
             'oxsort' => 20,
-        ),
-    ),
+        ],
+    ],
     // TEST EXPECTATIONS
-    'expected' => array(
+    'expected' => [
         // Article expected prices: ARTICLE ID => ( Unit price, Total Price )
-        'articles' => array(
-             1000 => array( '50,00', '250,00' ),
-             1003 => array( '0,00', '0,00' ),
-        ),
+        'articles' => [
+             1000 => [ '50,00', '250,00' ],
+             1003 => [ '0,00', '0,00' ],
+        ],
         // Expectations of other totals
-        'totals' => array(
+        'totals' => [
             // Total BRUTTO
             'totalBrutto' => '250,00',
             // Total NETTO
             'totalNetto'  => '214,29',
             // Total VAT amount: vat% => total cost
-            'vats' => array(
-                5 => '10,71'
-            ),
+            'vats' => [
+                5 => '10,71',
+            ],
             // Total discount amounts: discount id => total cost
-            'discounts' => array(
+            'discounts' => [
                 // Expectation for special discount with specified ID
                 'testdiscountfrom200' => '25,00',
-            ),
+            ],
 
             // GRAND TOTAL
-            'grandTotal'  => '225,00'
-        ),
-    ),
-       'options' => array(
-            'config' => array(
+            'grandTotal'  => '225,00',
+        ],
+    ],
+       'options' => [
+            'config' => [
                 'blEnterNetPrice' => false,
                 'blShowNetPrice' => false,
-            ),
+            ],
                 'activeCurrencyRate' => 1,
-        ),
-);
+        ],
+];

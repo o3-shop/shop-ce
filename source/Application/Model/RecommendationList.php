@@ -22,10 +22,19 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use Exception;
-use oxDb;
-use oxRegistry;
-use oxList;
-use oxField;
+use OxidEsales\Eshop\Application\Model\ArticleList;
+use OxidEsales\Eshop\Application\Model\Review;
+use OxidEsales\Eshop\Application\Model\SeoEncoderRecomm;
+use OxidEsales\Eshop\Core\Contract\IUrl;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Recommendation list manager class.
@@ -33,7 +42,7 @@ use oxField;
  * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
  *
  */
-class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implements \OxidEsales\Eshop\Core\Contract\IUrl
+class RecommendationList extends BaseModel implements IUrl
 {
     /**
      * Current object class name
@@ -45,7 +54,7 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
     /**
      * Article list
      *
-     * @var string
+     * @var ListModel
      */
     protected $_oArticles = null;
 
@@ -75,11 +84,12 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
     /**
      * Returns list of recommendation list items
      *
-     * @param integer $iStart        start for sql limit
-     * @param integer $iNrofArticles nr of items per page
-     * @param bool    $blReload      if TRUE forces to reload list
+     * @param null $iStart start for sql limit
+     * @param null $iNrofArticles nr of items per page
+     * @param bool $blReload if TRUE forces to reload list
      *
-     * @return \OxidEsales\Eshop\Core\Model\ListModel
+     * @return ListModel
+     * @throws DatabaseConnectionException
      */
     public function getArticles($iStart = null, $iNrofArticles = null, $blReload = false)
     {
@@ -88,7 +98,7 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
             return $this->_oArticles;
         }
 
-        $this->_oArticles = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+        $this->_oArticles = oxNew(ArticleList::class);
 
         if ($iStart !== null && $iNrofArticles !== null) {
             $this->_oArticles->setSqlLimit($iStart, $iNrofArticles);
@@ -104,13 +114,14 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
      * Returns count of recommendation list items
      *
      * @return integer
+     * @throws DatabaseConnectionException
      */
     public function getArtCount()
     {
         $iCnt = 0;
         $sSelect = $this->_getArticleSelect();
         if ($sSelect) {
-            $iCnt = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sSelect);
+            $iCnt = DatabaseProvider::getDb()->getOne($sSelect);
         }
 
         return $iCnt;
@@ -124,7 +135,7 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
      */
     protected function _getArticleSelect() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sArtView = getViewName('oxarticles');
+        $sArtView = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
         $sSelect = "select count(distinct $sArtView.oxid) from oxobject2list ";
         $sSelect .= "left join $sArtView on oxobject2list.oxobjectid = $sArtView.oxid ";
         $sSelect .= "where (oxobject2list.oxlistid = '" . $this->getId() . "') ";
@@ -135,11 +146,12 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
     /**
      * returns first article from this list's article list
      *
-     * @return oxArticle
+     * @return Article
+     * @throws DatabaseConnectionException
      */
     public function getFirstArticle()
     {
-        $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+        $oArtList = oxNew(ArticleList::class);
         $oArtList->setSqlLimit(0, 1);
         $oArtList->loadRecommArticles($this->getId(), $this->_sArticlesFilter);
         $oArtList->rewind();
@@ -150,9 +162,11 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
     /**
      * Removes articles from the recommlist and deletes list
      *
-     * @param string $sOXID Object ID(default null)
+     * @param null $sOXID Object ID(default null)
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($sOXID = null)
     {
@@ -164,10 +178,10 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
         }
 
         if (($blDelete = parent::delete($sOXID))) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $oDb = DatabaseProvider::getDb();
             // cleaning up related data
-            $oDb->execute("delete from oxobject2list where oxlistid = :oxlistid", [
-                ':oxlistid' => $sOXID
+            $oDb->execute('delete from oxobject2list where oxlistid = :oxlistid', [
+                ':oxlistid' => $sOXID,
             ]);
             $this->onDelete();
         }
@@ -181,6 +195,7 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
      * @param string $sOXID Object ID
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getArtDescription($sOXID)
     {
@@ -188,13 +203,13 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
             return false;
         }
 
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $sSelect = 'select oxdesc from oxobject2list 
             where oxlistid = :oxlistid and oxobjectid = :oxobjectid';
 
         return $oDb->getOne($sSelect, [
             ':oxlistid' => $this->getId(),
-            ':oxobjectid' => $sOXID
+            ':oxobjectid' => $sOXID,
         ]);
     }
 
@@ -203,17 +218,19 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
      *
      * @param string $sOXID Object ID
      *
-     * @return bool
+     * @return int|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function removeArticle($sOXID)
     {
         if ($sOXID) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $sQ = "delete from oxobject2list where oxobjectid = :oxobjectid and oxlistid = :oxlistid";
+            $oDb = DatabaseProvider::getDb();
+            $sQ = 'delete from oxobject2list where oxobjectid = :oxobjectid and oxlistid = :oxlistid';
 
             return $oDb->execute($sQ, [
                 ':oxobjectid' => $sOXID,
-                ':oxlistid' => $this->getId()
+                ':oxlistid' => $this->getId(),
             ]);
         }
     }
@@ -233,24 +250,24 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
         $blAdd = false;
         if ($sOXID) {
             // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804 and ESDEV-3822).
-            $database = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
+            $database = DatabaseProvider::getMaster(DatabaseProvider::FETCH_MODE_ASSOC);
 
-            $sql = "select oxid from oxobject2list 
+            $sql = 'select oxid from oxobject2list 
                 where oxobjectid = :oxobjectid 
-                    and oxlistid = :oxlistid";
+                    and oxlistid = :oxlistid';
             $params = [
                 ':oxobjectid' => $sOXID,
-                ':oxlistid' => $this->getId()
+                ':oxlistid' => $this->getId(),
             ];
 
             if (!$database->getOne($sql, $params)) {
-                $sUid = \OxidEsales\Eshop\Core\Registry::getUtilsObject()->generateUID();
-                $sQ = "insert into oxobject2list (oxid, oxobjectid, oxlistid, oxdesc) values (:oxid, :oxobjectid, :oxlistid, :oxdesc)";
+                $sUid = Registry::getUtilsObject()->generateUID();
+                $sQ = 'insert into oxobject2list (oxid, oxobjectid, oxlistid, oxdesc) values (:oxid, :oxobjectid, :oxlistid, :oxdesc)';
                 $blAdd = $database->execute($sQ, [
                     ':oxid' => $sUid,
                     ':oxobjectid' => $sOXID,
                     ':oxlistid' => $this->getId(),
-                    ':oxdesc' => $sDesc
+                    ':oxdesc' => $sDesc,
                 ]);
             }
         }
@@ -266,33 +283,34 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
      *
      * @param array $aArticleIds Object IDs
      *
-     * @return \OxidEsales\Eshop\Core\Model\ListModel
+     * @return ListModel|void
+     * @throws DatabaseConnectionException
      */
     public function getRecommListsByIds($aArticleIds)
     {
         if (is_array($aArticleIds) && count($aArticleIds)) {
             startProfile(__FUNCTION__);
 
-            $sIds = implode(",", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aArticleIds));
+            $sIds = implode(',', DatabaseProvider::getDb()->quoteArray($aArticleIds));
 
-            $oRecommList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
+            $oRecommList = oxNew(ListModel::class);
             $oRecommList->init('oxrecommlist');
 
-            $iCnt = $this->getConfig()->getConfigParam('iNrofCrossellArticles');
+            $iCnt = Registry::getConfig()->getConfigParam('iNrofCrossellArticles');
 
             $oRecommList->setSqlLimit(0, $iCnt);
 
-            $sSelect = "SELECT distinct lists.* FROM oxobject2list AS o2l_lists";
-            $sSelect .= " LEFT JOIN oxobject2list AS o2l_count ON o2l_lists.oxlistid = o2l_count.oxlistid";
-            $sSelect .= " LEFT JOIN oxrecommlists as lists ON o2l_lists.oxlistid = lists.oxid";
+            $sSelect = 'SELECT distinct lists.* FROM oxobject2list AS o2l_lists';
+            $sSelect .= ' LEFT JOIN oxobject2list AS o2l_count ON o2l_lists.oxlistid = o2l_count.oxlistid';
+            $sSelect .= ' LEFT JOIN oxrecommlists as lists ON o2l_lists.oxlistid = lists.oxid';
             $sSelect .= " WHERE o2l_lists.oxobjectid IN ( $sIds ) and lists.oxshopid = :oxshopid";
-            $sSelect .= " GROUP BY lists.oxid order by (";
-            $sSelect .= " SELECT count( order1.oxobjectid ) FROM oxobject2list AS order1";
+            $sSelect .= ' GROUP BY lists.oxid order by (';
+            $sSelect .= ' SELECT count( order1.oxobjectid ) FROM oxobject2list AS order1';
             $sSelect .= " WHERE order1.oxobjectid IN ( $sIds ) AND o2l_lists.oxlistid = order1.oxlistid";
-            $sSelect .= " ) DESC, count( lists.oxid ) DESC";
+            $sSelect .= ' ) DESC, count( lists.oxid ) DESC';
 
             $oRecommList->selectString($sSelect, [
-                ':oxshopid' => $this->getConfig()->getShopId()
+                ':oxshopid' => Registry::getConfig()->getShopId(),
             ]);
 
             stopProfile(__FUNCTION__);
@@ -313,19 +331,20 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
      * loads first articles to recomm list also ordering them and clearing not usable list objects
      * ordering priorities:
      *     1. first show articles from our search
-     *     2. do not shown articles as 1st, which are shown in other recomm lists as 1st
+     *     2. do not show articles as 1st, which are shown in other recomm lists as 1st
      *
-     * @param \OxidEsales\Eshop\Core\Model\ListModel $oRecommList recommendation list
-     * @param array                                  $aIds        article ids
+     * @param ListModel $oRecommList recommendation list
+     * @param array $aIds article ids
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadFirstArticles" in next major
      */
-    protected function _loadFirstArticles(\OxidEsales\Eshop\Core\Model\ListModel $oRecommList, $aIds) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _loadFirstArticles(ListModel $oRecommList, $aIds) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $aIds = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aIds);
-        $sIds = implode(", ", $aIds);
+        $aIds = DatabaseProvider::getDb()->quoteArray($aIds);
+        $sIds = implode(', ', $aIds);
 
         $aPrevIds = [];
-        $sArtView = getViewName('oxarticles');
+        $sArtView = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
         foreach ($oRecommList as $key => $oRecomm) {
             if (count($aPrevIds)) {
                 $sNegateSql = " AND $sArtView.oxid not in ( '" . implode("','", $aPrevIds) . "' ) ";
@@ -334,7 +353,7 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
             }
             $sArticlesFilter = "$sNegateSql ORDER BY $sArtView.oxid in ( $sIds ) desc";
             $oRecomm->setArticlesFilter($sArticlesFilter);
-            $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+            $oArtList = oxNew(ArticleList::class);
             $oArtList->setSqlLimit(0, 1);
             $oArtList->loadRecommArticles($oRecomm->getId(), $sArticlesFilter);
 
@@ -344,7 +363,7 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
                 $sId = $oArticle->getId();
                 $aPrevIds[$sId] = $sId;
                 unset($aIds[$sId]);
-                $sIds = implode(", ", $aIds);
+                $sIds = implode(', ', $aIds);
             } else {
                 unset($oRecommList[$key]);
             }
@@ -356,20 +375,21 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
      *
      * @param string $sSearchStr Search string
      *
-     * @return object oxlist with oxrecommlist objects
+     * @return object|void oxlist with oxrecommlist objects
+     * @throws DatabaseConnectionException
      */
     public function getSearchRecommLists($sSearchStr)
     {
         if ($sSearchStr) {
             // sets active page
-            $iActPage = (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('pgNr');
+            $iActPage = (int) Registry::getRequest()->getRequestEscapedParameter('pgNr');
             $iActPage = ($iActPage < 0) ? 0 : $iActPage;
 
             // load only lists which we show on screen
-            $iNrofCatArticles = $this->getConfig()->getConfigParam('iNrofCatArticles');
+            $iNrofCatArticles = Registry::getConfig()->getConfigParam('iNrofCatArticles');
             $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 10;
 
-            $oRecommList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
+            $oRecommList = oxNew(ListModel::class);
             $oRecommList->init('oxrecommlist');
             $sSelect = $this->_getSearchSelect($sSearchStr);
             $oRecommList->setSqlLimit($iNrofCatArticles * $iActPage, $iNrofCatArticles);
@@ -385,6 +405,7 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
      * @param string $sSearchStr Search string
      *
      * @return int
+     * @throws DatabaseConnectionException
      */
     public function getSearchRecommListCount($sSearchStr)
     {
@@ -393,7 +414,7 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
         if ($sSelect) {
             $sPartial = substr($sSelect, strpos($sSelect, ' from '));
             $sSelect = "select count( distinct rl.oxid ) $sPartial ";
-            $iCnt = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sSelect);
+            $iCnt = DatabaseProvider::getDb()->getOne($sSelect);
         }
 
         return $iCnt;
@@ -405,15 +426,16 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
      * @param string $sSearchStr Search string
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSearchSelect" in next major
      */
     protected function _getSearchSelect($sSearchStr) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $iShopId = $this->getConfig()->getShopId();
-        $sSearchStrQuoted = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quote("%$sSearchStr%");
+        $iShopId = Registry::getConfig()->getShopId();
+        $sSearchStrQuoted = DatabaseProvider::getDb()->quote("%$sSearchStr%");
 
-        $sSelect = "select distinct rl.* from oxrecommlists as rl";
-        $sSelect .= " inner join oxobject2list as o2l on o2l.oxlistid = rl.oxid";
+        $sSelect = 'select distinct rl.* from oxrecommlists as rl';
+        $sSelect .= ' inner join oxobject2list as o2l on o2l.oxlistid = rl.oxid';
         $sSelect .= " where ( rl.oxtitle like $sSearchStrQuoted or rl.oxdesc like $sSearchStrQuoted";
         $sSelect .= " or o2l.oxdesc like $sSearchStrQuoted ) and rl.oxshopid = '$iShopId'";
 
@@ -424,24 +446,26 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
      * Calculates and saves product rating average
      *
      * @param integer $iRating new rating value
+     * @throws Exception
      */
     public function addToRatingAverage($iRating)
     {
         $dOldRating = $this->oxrecommlists__oxrating->value;
         $dOldCnt = $this->oxrecommlists__oxratingcnt->value;
-        $this->oxrecommlists__oxrating = new \OxidEsales\Eshop\Core\Field(($dOldRating * $dOldCnt + $iRating) / ($dOldCnt + 1), \OxidEsales\Eshop\Core\Field::T_RAW);
-        $this->oxrecommlists__oxratingcnt = new \OxidEsales\Eshop\Core\Field($dOldCnt + 1, \OxidEsales\Eshop\Core\Field::T_RAW);
+        $this->oxrecommlists__oxrating = new Field(($dOldRating * $dOldCnt + $iRating) / ($dOldCnt + 1), Field::T_RAW);
+        $this->oxrecommlists__oxratingcnt = new Field($dOldCnt + 1, Field::T_RAW);
         $this->save();
     }
 
     /**
      * Collects user written reviews about an article.
      *
-     * @return \OxidEsales\Eshop\Core\Model\ListModel
+     * @return ListModel
+     * @throws DatabaseConnectionException
      */
     public function getReviews()
     {
-        $oReview = oxNew(\OxidEsales\Eshop\Application\Model\Review::class);
+        $oReview = oxNew(Review::class);
         $oRevs = $oReview->loadList('oxrecommlist', $this->getId());
         //if no review found, return null
         if ($oRevs->count() < 1) {
@@ -461,7 +485,7 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
      */
     public function getBaseSeoLink($iLang, $iPage = 0)
     {
-        $oEncoder = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderRecomm::class);
+        $oEncoder = Registry::get(SeoEncoderRecomm::class);
         if (!$iPage) {
             return $oEncoder->getRecommUrl($this, $iLang);
         }
@@ -479,10 +503,10 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
     public function getLink($iLang = null)
     {
         if ($iLang === null) {
-            $iLang = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
+            $iLang = Registry::getLang()->getBaseLanguage();
         }
 
-        if (!\OxidEsales\Eshop\Core\Registry::getUtils()->seoIsActive()) {
+        if (!Registry::getUtils()->seoIsActive()) {
             return $this->getStdLink($iLang);
         }
 
@@ -504,10 +528,10 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
     public function getStdLink($iLang = null, $aParams = [])
     {
         if ($iLang === null) {
-            $iLang = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
+            $iLang = Registry::getLang()->getBaseLanguage();
         }
 
-        return \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->processUrl($this->getBaseStdLink($iLang), true, $aParams, $iLang);
+        return Registry::getUtilsUrl()->processUrl($this->getBaseStdLink($iLang), true, $aParams, $iLang);
     }
 
     /**
@@ -524,10 +548,10 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
         $sUrl = '';
         if ($blFull) {
             //always returns shop url, not admin
-            $sUrl = $this->getConfig()->getShopUrl($iLang, false);
+            $sUrl = Registry::getConfig()->getShopUrl($iLang, false);
         }
 
-        return $sUrl . "index.php?cl=recommlist" . ($blAddId ? "&amp;recommid=" . $this->getId() : "");
+        return $sUrl . 'index.php?cl=recommlist' . ($blAddId ? '&amp;recommid=' . $this->getId() : '');
     }
 
     /**
@@ -543,12 +567,13 @@ class RecommendationList extends \OxidEsales\Eshop\Core\Model\BaseModel implemen
     /**
      * Save this Object to database, insert or update as needed.
      *
-     * @return mixed
+     * @return bool|string|null
+     * @throws Exception
      */
     public function save()
     {
         if (!$this->oxrecommlists__oxtitle->value) {
-            throw oxNew(\OxidEsales\Eshop\Core\Exception\ObjectException::class, 'EXCEPTION_RECOMMLIST_NOTITLE');
+            throw oxNew(ObjectException::class, 'EXCEPTION_RECOMMLIST_NOTITLE');
         }
         $this->onSave();
 

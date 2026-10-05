@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,13 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Admin;
 
 use oxBasket;
 use oxDb;
 use oxField;
 use OxidEsales\Eshop\Application\Model\Order;
-use OxidEsales\Eshop\Core\UtilsObject;
 use oxOrder;
 use oxRegistry;
 
@@ -32,12 +33,12 @@ class OrderRecalculationTest extends \OxidTestCase
     /**
      * Make a copy of Stewart+Brown Shirt Kisser Fish parent and variant L violet for testing
      */
-    const SOURCE_ARTICLE_ID = '6b6d966c899dd9977e88f842f67eb751';
-    const SOURCE_ARTICLE_PARENT_ID = '6b6099c305f591cb39d4314e9a823fc1';
+    public const SOURCE_ARTICLE_ID = '6b6d966c899dd9977e88f842f67eb751';
+    public const SOURCE_ARTICLE_PARENT_ID = '6b6099c305f591cb39d4314e9a823fc1';
 
-    const TEST_ARTICLE_PRICE = 11.90;
+    public const TEST_ARTICLE_PRICE = 11.90;
 
-    const TESTVOUCHER_ID_PREFIX = 'testvoucher_relative_';
+    public const TESTVOUCHER_ID_PREFIX = 'testvoucher_relative_';
 
     /**
      * Generated oxids for test article, user, order, discount and vouchers
@@ -90,7 +91,7 @@ class OrderRecalculationTest extends \OxidTestCase
         oxRegistry::getSession()->delBasket();
         oxRegistry::getSession()->deleteVariable('_newitem');
         oxRegistry::getSession()->setVariable('sess_challenge', $this->originalSessionChallenge);
-        $_POST = array();
+        $_POST = [];
 
         parent::tearDown();
     }
@@ -101,27 +102,27 @@ class OrderRecalculationTest extends \OxidTestCase
      */
     public function providerPlaceOrderWithoutVouchersTriggerRecalculateOrderMain()
     {
-        $data = array();
+        $data = [];
 
-        $editValues                = array(
+        $editValues = [
             'oxorder__oxordernr'   => '123',
             'oxorder__oxbillnr'    => '321',
             'oxorder__oxdiscount'  => '0',
             'oxorder__oxpaid'      => date('Y-m-d H:i:s'),
             'oxorder__oxtrackcode' => 'tracking_code',
-            'oxorder__oxdelcost'   => '0'
-        );
+            'oxorder__oxdelcost'   => '0',
+        ];
         $data['no_recalculate'][0] = $editValues;
         $data['no_recalculate'][1] = $editValues['oxorder__oxdiscount'];
 
-        $editValues = array(
+        $editValues = [
             'oxorder__oxordernr'   => '123',
             'oxorder__oxbillnr'    => '321',
             'oxorder__oxdiscount'  => '10',
             'oxorder__oxpaid'      => date('Y-m-d H:i:s'),
             'oxorder__oxtrackcode' => 'tracking_code',
-            'oxorder__oxdelcost'   => '0'
-        );
+            'oxorder__oxdelcost'   => '0',
+        ];
 
         $data['do_recalculate'][0] = $editValues;
         $data['do_recalculate'][1] = $editValues['oxorder__oxdiscount'];
@@ -157,7 +158,7 @@ class OrderRecalculationTest extends \OxidTestCase
 
         //order is finished, now see what happens in admin when clicking on tab main
         oxRegistry::getSession()->deleteVariable('sess_challenge');
-        $orderMain = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class, array('getEditObjectId'));
+        $orderMain = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class, ['getEditObjectId']);
         $orderMain->expects($this->any())->method('getEditObjectId')->will($this->returnValue($this->testOrderId));
         $orderMain->setAdminMode(true);
         $orderMain->render();
@@ -173,7 +174,7 @@ class OrderRecalculationTest extends \OxidTestCase
 
         //simulate changes in admin order_main
         $editValues['oxorder__oxid'] = $this->testOrderId;
-        $_POST = array('editval' => $editValues, 'setDelSet' => 'oxidstandard');
+        $_POST = ['editval' => $editValues, 'setDelSet' => 'oxidstandard'];
         $orderMain->save();
 
         //NOTE: we do not see that the order was recalculated here and no way to mock oxorder without more changes in oder_main.php
@@ -205,13 +206,13 @@ class OrderRecalculationTest extends \OxidTestCase
         $payDate = date('Y-m-d H:i:s');
 
         $expectedOrderTotalBruttoSum = $buyAmount * self::TEST_ARTICLE_PRICE; //119.0
-        $expectedOrderTotalSum       = $buyAmount * self::TEST_ARTICLE_PRICE * 0.8 * 0.8; //two 20% vouchers applied 76.16
-        $expectedVoucherDiscount     = $buyAmount * self::TEST_ARTICLE_PRICE * (1.0 -0.8*0.8); //42.84
-        $expectedOrderTotalNettoSum  = $expectedOrderTotalSum * 100.0 / (100.0 + $defaultVat); //64.0
+        $expectedOrderTotalSum = $buyAmount * self::TEST_ARTICLE_PRICE * 0.8 * 0.8; //two 20% vouchers applied 76.16
+        $expectedVoucherDiscount = $buyAmount * self::TEST_ARTICLE_PRICE * (1.0 - 0.8 * 0.8); //42.84
+        $expectedOrderTotalNettoSum = $expectedOrderTotalSum * 100.0 / (100.0 + $defaultVat); //64.0
         $expectedDiscount = 0.0;
 
-        $vouchers = array(self::TESTVOUCHER_ID_PREFIX . '1',
-                          self::TESTVOUCHER_ID_PREFIX . '2');
+        $vouchers = [self::TESTVOUCHER_ID_PREFIX . '1',
+                          self::TESTVOUCHER_ID_PREFIX . '2'];
         $order = $this->placeOrder($buyAmount, $vouchers);
 
         $this->assertEquals($expectedOrderTotalBruttoSum, $order->oxorder__oxtotalbrutsum->value);
@@ -222,7 +223,7 @@ class OrderRecalculationTest extends \OxidTestCase
 
         //order is finished, now see what happens in admin when clicking on tab main
         oxRegistry::getSession()->deleteVariable('sess_challenge');
-        $orderMain = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class, array('getEditObjectId'));
+        $orderMain = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class, ['getEditObjectId']);
         $orderMain->expects($this->any())->method('getEditObjectId')->will($this->returnValue($this->testOrderId));
         $orderMain->setAdminMode(true);
         $orderMain->render();
@@ -237,16 +238,16 @@ class OrderRecalculationTest extends \OxidTestCase
         $this->assertEquals('0000-00-00 00:00:00', $order->oxorder__oxpaid->value);
 
         //simulate oxpaid date change in admin
-        $editValues = array(
+        $editValues = [
             'oxorder__oxid'        => $this->testOrderId,
             'oxorder__oxordernr'   => $order->oxorder__oxordernr->value,
             'oxorder__oxbillnr'    => $order->oxorder__oxbillnr->value,
             'oxorder__oxdiscount'  => '0',
             'oxorder__oxpaid'      => $payDate,
             'oxorder__oxtrackcode' => '',
-            'oxorder__oxdelcost'   => '0'
-        );
-        $_POST = array('editval' => $editValues);
+            'oxorder__oxdelcost'   => '0',
+        ];
+        $_POST = ['editval' => $editValues];
         $orderMain->save();
 
         //NOTE: we do not see that the order was recalculated here so this is only implicitly tested.
@@ -279,15 +280,15 @@ class OrderRecalculationTest extends \OxidTestCase
         //119.0 and 20% off -> 95.20
         $expectedOrderTotalBruttoSum = round($buyAmount * self::TEST_ARTICLE_PRICE * 0.8, 2);
         //two 20% vouchers applied on 95.20 -> 60.928
-        $expectedOrderTotalSum       = round($buyAmount * self::TEST_ARTICLE_PRICE * 0.8 * 0.8 * 0.8, 2);
+        $expectedOrderTotalSum = round($buyAmount * self::TEST_ARTICLE_PRICE * 0.8 * 0.8 * 0.8, 2);
         //total discount -> 95.20 - 60.928 = 34.272
-        $expectedVoucherDiscount     = round($buyAmount * self::TEST_ARTICLE_PRICE * 0.8 * (1.0 - 0.8*0.8), 2);
+        $expectedVoucherDiscount = round($buyAmount * self::TEST_ARTICLE_PRICE * 0.8 * (1.0 - 0.8 * 0.8), 2);
         //netto sum 100 * 0.8 * 0.8 * 0.8 = 51.20
-        $expectedOrderTotalNettoSum  = round($expectedOrderTotalSum * 100.0 / (100.0 + $defaultVat), 2);
+        $expectedOrderTotalNettoSum = round($expectedOrderTotalSum * 100.0 / (100.0 + $defaultVat), 2);
         $expectedDiscount = 0.0;
 
-        $vouchers = array(self::TESTVOUCHER_ID_PREFIX . '1',
-                          self::TESTVOUCHER_ID_PREFIX . '2');
+        $vouchers = [self::TESTVOUCHER_ID_PREFIX . '1',
+                          self::TESTVOUCHER_ID_PREFIX . '2'];
         $order = $this->placeOrder($buyAmount, $vouchers);
 
         $this->assertEquals($expectedOrderTotalBruttoSum, $order->oxorder__oxtotalbrutsum->value);
@@ -303,7 +304,7 @@ class OrderRecalculationTest extends \OxidTestCase
 
         //order is finished, now see what happens in admin when clicking on tab main
         oxRegistry::getSession()->deleteVariable('sess_challenge');
-        $orderMain = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class, array('getEditObjectId'));
+        $orderMain = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class, ['getEditObjectId']);
         $orderMain->expects($this->any())->method('getEditObjectId')->will($this->returnValue($this->testOrderId));
         $orderMain->setAdminMode(true);
         $orderMain->render();
@@ -318,16 +319,16 @@ class OrderRecalculationTest extends \OxidTestCase
         $this->assertEquals('0000-00-00 00:00:00', $order->oxorder__oxpaid->value);
 
         //simulate oxpaid date change in admin
-        $editValues = array(
+        $editValues = [
             'oxorder__oxid'        => $this->testOrderId,
             'oxorder__oxordernr'   => $order->oxorder__oxordernr->value,
             'oxorder__oxbillnr'    => $order->oxorder__oxbillnr->value,
             'oxorder__oxdiscount'  => '0',
             'oxorder__oxpaid'      => $payDate,
             'oxorder__oxtrackcode' => '',
-            'oxorder__oxdelcost'   => '0'
-        );
-        $_POST = array('editval' => $editValues);
+            'oxorder__oxdelcost'   => '0',
+        ];
+        $_POST = ['editval' => $editValues];
         $orderMain->save();
 
         $order = oxNew('oxOrder');
@@ -362,15 +363,15 @@ class OrderRecalculationTest extends \OxidTestCase
         //119.0 and 20% off -> 95.20
         $expectedOrderTotalBruttoSum = round($buyAmount * self::TEST_ARTICLE_PRICE * 0.8, 2);
         //two 20% vouchers applied on 95.20 -> 60.928
-        $expectedOrderTotalSum       = round($buyAmount * self::TEST_ARTICLE_PRICE * 0.8 * 0.8 * 0.8, 2);
+        $expectedOrderTotalSum = round($buyAmount * self::TEST_ARTICLE_PRICE * 0.8 * 0.8 * 0.8, 2);
         //total discount -> 95.20 - 60.928 = 34.272
-        $expectedVoucherDiscount     = round($buyAmount * self::TEST_ARTICLE_PRICE * 0.8 * (1.0 - 0.8*0.8), 2);
+        $expectedVoucherDiscount = round($buyAmount * self::TEST_ARTICLE_PRICE * 0.8 * (1.0 - 0.8 * 0.8), 2);
         //netto sum 100 * 0.8 * 0.8 * 0.8 = 51.20
-        $expectedOrderTotalNettoSum  = round($expectedOrderTotalSum * 100.0 / (100.0 + $defaultVat), 2);
+        $expectedOrderTotalNettoSum = round($expectedOrderTotalSum * 100.0 / (100.0 + $defaultVat), 2);
         $expectedDiscount = 0.0;
 
-        $vouchers = array(self::TESTVOUCHER_ID_PREFIX . '1',
-                          self::TESTVOUCHER_ID_PREFIX . '2');
+        $vouchers = [self::TESTVOUCHER_ID_PREFIX . '1',
+                          self::TESTVOUCHER_ID_PREFIX . '2'];
         $order = $this->placeOrder($buyAmount, $vouchers);
 
         $this->assertEquals($expectedOrderTotalBruttoSum, $order->oxorder__oxtotalbrutsum->value);
@@ -386,7 +387,7 @@ class OrderRecalculationTest extends \OxidTestCase
 
         //order is finished, now see what happens in admin when clicking on tab main
         oxRegistry::getSession()->deleteVariable('sess_challenge');
-        $orderMain = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class, array('getEditObjectId'));
+        $orderMain = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class, ['getEditObjectId']);
         $orderMain->expects($this->any())->method('getEditObjectId')->will($this->returnValue($this->testOrderId));
         $orderMain->setAdminMode(true);
         $orderMain->render();
@@ -401,16 +402,16 @@ class OrderRecalculationTest extends \OxidTestCase
         $this->assertEquals('0000-00-00 00:00:00', $order->oxorder__oxpaid->value);
 
         //simulate oxpaid date change in admin
-        $editValues = array(
+        $editValues = [
             'oxorder__oxid'        => $this->testOrderId,
             'oxorder__oxordernr'   => $order->oxorder__oxordernr->value,
             'oxorder__oxbillnr'    => $order->oxorder__oxbillnr->value,
             'oxorder__oxdiscount'  => '0',
             'oxorder__oxpaid'      => $payDate,
             'oxorder__oxtrackcode' => '',
-            'oxorder__oxdelcost'   => '0'
-        );
-        $_POST = array('editval' => $editValues, 'setDelSet' => 'oxidnew');
+            'oxorder__oxdelcost'   => '0',
+        ];
+        $_POST = ['editval' => $editValues, 'setDelSet' => 'oxidnew'];
         $orderMain->save();
 
         $order = oxNew('oxOrder');
@@ -457,11 +458,11 @@ class OrderRecalculationTest extends \OxidTestCase
      */
     private function createOrder()
     {
-        $order = $this->getMock(Order::class, array(
+        $order = $this->getMock(Order::class, [
             'validateDeliveryAddress',
             '_sendOrderByEmail',
             'validatePayment',
-        ));
+        ]);
         // sending order by email is always successful for tests
         $order->expects($this->any())->method('_sendOrderByEmail')->will($this->returnValue(1));
         //mocked to circumvent delivery address change md5 check from requestParameter
@@ -472,7 +473,6 @@ class OrderRecalculationTest extends \OxidTestCase
 
         return $order;
     }
-
 
     /**
      * @param oxBasket $basket
@@ -566,7 +566,7 @@ class OrderRecalculationTest extends \OxidTestCase
         $voucherSeries->oxvoucherseries__oxcalculateonce = new oxField('1', oxField::T_RAW);
         $voucherSeries->save();
 
-        for ($i=1; $i<=4; $i++) {
+        for ($i = 1; $i <= 4; $i++) {
             $voucherId = substr_replace(oxRegistry::getUtilsObject()->generateUId(), '_', 0, 1);
             $voucher = oxNew('oxVoucher');
             $voucher->setId($voucherId);
@@ -614,7 +614,7 @@ class OrderRecalculationTest extends \OxidTestCase
     private function endVouchers()
     {
         $startDate = date('Y-m-d 00:00:00', time() - 3 * 86400);
-        $endDate   = date('Y-m-d 00:00:00', time() - 86400);
+        $endDate = date('Y-m-d 00:00:00', time() - 86400);
 
         $voucherSeries = oxNew('oxVoucherSerie');
         $voucherSeries->load($this->voucherSeriesId);
@@ -629,7 +629,7 @@ class OrderRecalculationTest extends \OxidTestCase
     private function endDiscount()
     {
         $startDate = date('Y-m-d 00:00:00', time() - 3 * 86400);
-        $endDate   = date('Y-m-d 00:00:00', time() - 86400);
+        $endDate = date('Y-m-d 00:00:00', time() - 86400);
 
         $discount = oxNew('oxDiscount');
         $discount->load($this->discountId);
@@ -647,7 +647,7 @@ class OrderRecalculationTest extends \OxidTestCase
      *
      * @return object
      */
-    private function placeOrder($buyAmount, $vouchers = array())
+    private function placeOrder($buyAmount, $vouchers = [])
     {
         $basket = oxRegistry::getSession()->getBasket();
         $this->assertEquals(0, $basket->getBasketSummary()->iArticleCount);
@@ -659,7 +659,7 @@ class OrderRecalculationTest extends \OxidTestCase
 
         //try to be as close to usual checkout as possible
         $basketComponent = oxNew('oxcmp_basket');
-        $redirectUrl     = $basketComponent->tobasket($this->testArticleId, $buyAmount);
+        $redirectUrl = $basketComponent->tobasket($this->testArticleId, $buyAmount);
         $this->assertEquals('start?', $redirectUrl);
 
         $basket = $this->getSession()->getBasket();

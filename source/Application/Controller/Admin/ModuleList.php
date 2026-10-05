@@ -21,17 +21,19 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Module\Module;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ShopConfigurationDaoBridgeInterface;
 
 /**
- * Admin actionss manager.
+ * Admin actions' manager.
  * Sets list template, list object class ('oxactions') and default sorting
  * field ('oxactions.oxtitle').
  * Admin Menu: Manage Products -> Actions.
  */
-class ModuleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class ModuleList extends AdminListController
 {
     /**
      * @var array Loaded modules array
@@ -39,11 +41,11 @@ class ModuleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLis
      */
     protected $_aModules = [];
 
-
     /**
      * Calls parent::render() and returns name of template to render
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {

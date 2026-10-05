@@ -31,7 +31,7 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
      *
      * @var string
      */
-    const PROMO_PICTURE_DIR = 'promo';
+    public const PROMO_PICTURE_DIR = 'promo';
 
     /**
      * Max pictures count
@@ -169,8 +169,8 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
      */
     public function normalizeDir($sDir)
     {
-        if (isset($sDir) && $sDir != "" && substr($sDir, -1) !== '/') {
-            $sDir .= "/";
+        if (isset($sDir) && $sDir != '' && substr($sDir, -1) !== '/') {
+            $sDir .= '/';
         }
 
         return $sDir;
@@ -281,7 +281,7 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
     {
         if ($sValue) {
             // add type to name
-            $aFilename = explode(".", $sValue);
+            $aFilename = explode('.', $sValue);
 
             $sFileType = trim($aFilename[count($aFilename) - 1]);
 
@@ -303,7 +303,7 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
                     $sFName = $oStr->preg_replace('/[^a-zA-Z0-9()_\.-]/', '', implode('.', $aFilename));
                 }
 
-                $sValue = $this->_getUniqueFileName($sImagePath, "{$sFName}", $sFileType, "", $blUnique);
+                $sValue = $this->_getUniqueFileName($sImagePath, "{$sFName}", $sFileType, '', $blUnique);
             }
         }
 
@@ -432,7 +432,7 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
             $blDemo = (bool) $oConfig->isDemoShop();
 
             // folder where images will be processed
-            $sTmpFolder = $oConfig->getConfigParam("sCompileDir");
+            $sTmpFolder = $oConfig->getConfigParam('sCompileDir');
 
             $iNewFilesCounter = 0;
             $aSource = $aFiles['myfile']['tmp_name'];
@@ -443,7 +443,7 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
             foreach ($aFiles['myfile']['name'] as $sKey => $sValue) {
                 $sSource = $aSource[$sKey];
                 $iError = $aError[$sKey];
-                $aFiletype = explode("@", $sKey);
+                $aFiletype = explode('@', $sKey);
                 $sKey = $aFiletype[1];
                 $sType = $aFiletype[0];
 
@@ -499,7 +499,7 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
      */
     public function checkFile($sFile)
     {
-        $aCheckCache = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable("checkcache");
+        $aCheckCache = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('checkcache');
 
         if (isset($aCheckCache[$sFile])) {
             return $aCheckCache[$sFile];
@@ -511,7 +511,7 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
         }
 
         $aCheckCache[$sFile] = $blRet;
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("checkcache", $aCheckCache);
+        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('checkcache', $aCheckCache);
 
         return $blRet;
     }
@@ -526,13 +526,13 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
     public function urlValidate($sLink)
     {
         $aUrlParts = @parse_url($sLink);
-        $sHost = (isset($aUrlParts["host"]) && $aUrlParts["host"]) ? $aUrlParts["host"] : null;
+        $sHost = (isset($aUrlParts['host']) && $aUrlParts['host']) ? $aUrlParts['host'] : null;
 
         if ($sHost) {
-            $sDocumentPath = (isset($aUrlParts["path"]) && $aUrlParts["path"]) ? $aUrlParts["path"] : '/';
-            $sDocumentPath .= (isset($aUrlParts["query"]) && $aUrlParts["query"]) ? '?' . $aUrlParts["query"] : '';
+            $sDocumentPath = (isset($aUrlParts['path']) && $aUrlParts['path']) ? $aUrlParts['path'] : '/';
+            $sDocumentPath .= (isset($aUrlParts['query']) && $aUrlParts['query']) ? '?' . $aUrlParts['query'] : '';
 
-            $sPort = (isset($aUrlParts["port"]) && $aUrlParts["port"]) ? $aUrlParts["port"] : '80';
+            $sPort = (isset($aUrlParts['port']) && $aUrlParts['port']) ? $aUrlParts['port'] : '80';
 
             // Now (HTTP-)GET $documentpath at $sHost";
             if (($oConn = @fsockopen($sHost, $sPort, $iErrNo, $sErrStr, 30))) {
@@ -540,7 +540,7 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
                 $sResponse = fgets($oConn, 22);
                 fclose($oConn);
 
-                if (preg_match("/200 OK/", $sResponse)) {
+                if (preg_match('/200 OK/', $sResponse)) {
                     return true;
                 }
             }
@@ -586,7 +586,7 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
         $sFileName = $aPathInfo['filename'];
 
         $aAllowedUploadTypes = (array) $this->getConfig()->getConfigParam('aAllowedUploadTypes');
-        $aAllowedUploadTypes = array_map("strtolower", $aAllowedUploadTypes);
+        $aAllowedUploadTypes = array_map('strtolower', $aAllowedUploadTypes);
 
         if (!in_array(strtolower($sExt), $aAllowedUploadTypes)) {
             throw oxNew(\OxidEsales\Eshop\Core\Exception\StandardException::class, 'EXCEPTION_NOTALLOWEDTYPE');
@@ -594,7 +594,7 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
 
         $sFileName = $this->_getUniqueFileName($sBasePath . $sUploadPath, $sFileName, $sExt);
 
-        if ($this->_moveImage($aFileInfo['tmp_name'], $sBasePath . $sUploadPath . "/" . $sFileName)) {
+        if ($this->_moveImage($aFileInfo['tmp_name'], $sBasePath . $sUploadPath . '/' . $sFileName)) {
             return $sFileName;
         }
 
@@ -614,7 +614,7 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "getUniqueFileName" in next major
      */
-    protected function _getUniqueFileName($sFilePath, $sFileName, $sFileExt, $sSufix = "", $blUnique = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _getUniqueFileName($sFilePath, $sFileName, $sFileExt, $sSufix = '', $blUnique = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sFilePath = $this->normalizeDir($sFilePath);
         $iFileCounter = 0;
@@ -622,16 +622,16 @@ class UtilsFile extends \OxidEsales\Eshop\Core\Base
         $oStr = getStr();
 
         //file exists ?
-        while ($blUnique && file_exists($sFilePath . "/" . $sFileName . $sSufix . "." . $sFileExt)) {
+        while ($blUnique && file_exists($sFilePath . '/' . $sFileName . $sSufix . '.' . $sFileExt)) {
             $iFileCounter++;
 
             //removing "(any digit)" from file name end
-            $sTempFileName = $oStr->preg_replace("/\(" . $iFileCounter . "\)/", "", $sTempFileName);
+            $sTempFileName = $oStr->preg_replace("/\(" . $iFileCounter . "\)/", '', $sTempFileName);
 
             $sFileName = $sTempFileName . "($iFileCounter)";
         }
 
-        return $sFileName . $sSufix . "." . $sFileExt;
+        return $sFileName . $sSufix . '.' . $sFileExt;
     }
 
     /**

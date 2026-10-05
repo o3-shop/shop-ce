@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,16 +18,16 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for Tools class
  */
 class ToolsTest extends \OxidTestCase
 {
-
     /**
      * Tools::Render() test case
      *
@@ -47,14 +48,10 @@ class ToolsTest extends \OxidTestCase
     public function testRenderDemoshop()
     {
         oxTestModules::addFunction('oxUtils', 'showMessageAndExit', '{ return "Access denied !"; }');
-
-
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array("isDemoShop"));
-        $oConfig->expects($this->once())->method('isDemoShop')->will($this->returnValue(true));
+        $this->getConfig()->setConfigParam('blDemoShop', true);
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ToolsController::class, array("getConfig"), array(), '', false);
-        $oView->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
-        $this->assertEquals("Access denied !", $oView->render());
+        $oView = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ToolsController::class);
+        $this->assertEquals('Access denied !', $oView->render());
     }
 }

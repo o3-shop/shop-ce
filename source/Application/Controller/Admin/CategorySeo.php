@@ -21,30 +21,36 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxField;
+use Exception;
+use OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo;
+use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Application\Model\SeoEncoderCategory;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Category seo config class
  */
-class CategorySeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo
+class CategorySeo extends ObjectSeo
 {
     /**
-     * Updating showsuffix field
+     * Updating oxshowsuffix field
      *
      * @return null
+     * @throws Exception
      */
     public function save()
     {
         $sOxid = $this->getEditObjectId();
-        $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+        $oCategory = oxNew(Category::class);
         if ($oCategory->load($sOxid)) {
-            $blShowSuffixParameter = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('blShowSuffix');
+            $blShowSuffixParameter = Registry::getRequest()->getRequestEscapedParameter('blShowSuffix');
             $sShowSuffixField = 'oxcategories__oxshowsuffix';
-            $oCategory->$sShowSuffixField = new \OxidEsales\Eshop\Core\Field((int) $blShowSuffixParameter);
+            $oCategory->$sShowSuffixField = new Field((int) $blShowSuffixParameter);
             $oCategory->save();
 
-            $this->_getEncoder()->markRelatedAsExpired($oCategory);
+            $this->getEncoder()->markRelatedAsExpired($oCategory);
         }
 
         return parent::save();
@@ -53,12 +59,33 @@ class CategorySeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectS
     /**
      * Returns current object type seo encoder object
      *
-     * @return oxSeoEncoderCategory
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getEncoder" in next major
+     * @return SeoEncoderCategory
+     * @deprecated Transitional during #107. Modules SHOULD override _getEncoder()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getEncoder() to the canonical override
+      *             target and retires _getEncoder(); until then, _getEncoder() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class);
+        return Registry::get(SeoEncoderCategory::class);
+    }
+
+    /**
+     * Returns current object type seo encoder object
+     *
+     * @return SeoEncoderCategory
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getEncoder(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getEncoder() the canonical override target.
+     */
+    protected function getEncoder()
+    {
+        return $this->_getEncoder();
     }
 
     /**
@@ -75,7 +102,13 @@ class CategorySeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectS
      * Returns url type
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getType" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getType()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getType() to the canonical override
+      *             target and retires _getType(); until then, _getType() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -83,13 +116,29 @@ class CategorySeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectS
     }
 
     /**
+     * Returns url type
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getType(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getType() the canonical override target.
+     */
+    protected function getType()
+    {
+        return $this->_getType();
+    }
+
+    /**
      * Returns true if SEO object id has suffix enabled
      *
-     * @return bool
+     * @return bool|void
+     * @throws DatabaseConnectionException
      */
     public function isEntrySuffixed()
     {
-        $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+        $oCategory = oxNew(Category::class);
         if ($oCategory->load($this->getEditObjectId())) {
             return (bool) $oCategory->oxcategories__oxshowsuffix->value;
         }
@@ -98,13 +147,14 @@ class CategorySeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectS
     /**
      * Returns seo uri
      *
-     * @return string
+     * @return string|void
+     * @throws DatabaseConnectionException
      */
     public function getEntryUri()
     {
-        $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+        $oCategory = oxNew(Category::class);
         if ($oCategory->load($this->getEditObjectId())) {
-            return $this->_getEncoder()->getCategoryUri($oCategory, $this->getEditLang());
+            return $this->getEncoder()->getCategoryUri($oCategory, $this->getEditLang());
         }
     }
 }

@@ -62,12 +62,11 @@ register_shutdown_function(
 
             /** write to log */
             $time = microtime(true);
-            $micro = sprintf("%06d", ($time - floor($time)) * 1000000);
+            $micro = sprintf('%06d', ($time - floor($time)) * 1000000);
             $date = new \DateTime(date('Y-m-d H:i:s.' . $micro, $time));
             $timestamp = $date->format('d M H:i:s.u Y');
             $message = "[$timestamp] " . $logMessage . PHP_EOL;
             file_put_contents(OX_LOG_FILE, $message, FILE_APPEND);
-
 
             $bootstrapConfigFileReader = new \BootstrapConfigFileReader();
             if (!$bootstrapConfigFileReader->isDebugMode()) {
@@ -123,7 +122,8 @@ class BootstrapConfigFileReader
         trigger_error(
             'Undefined property via __get(): ' . $name .
             ' in ' . $trace[0]['file'] .
-            ' on line ' . $trace[0]['line']);
+            ' on line ' . $trace[0]['line']
+        );
 
         return null;
     }
@@ -142,7 +142,7 @@ class BootstrapConfigFileReader
      */
     public function __construct()
     {
-        include OX_BASE_PATH . "config.inc.php";
+        include OX_BASE_PATH . 'config.inc.php';
     }
 
     /**
@@ -160,13 +160,13 @@ class BootstrapConfigFileReader
 /**
  * Ensure shop config and autoload files are available.
  */
-$configMissing = !is_readable(OX_BASE_PATH . "config.inc.php");
+$configMissing = !is_readable(OX_BASE_PATH . 'config.inc.php');
 if ($configMissing || !is_readable(VENDOR_PATH . 'autoload.php')) {
     if ($configMissing) {
         $message = sprintf(
             "Error: Config file '%s' could not be found! Please use '%s.dist' to make a copy.",
-            OX_BASE_PATH . "config.inc.php",
-            OX_BASE_PATH . "config.inc.php"
+            OX_BASE_PATH . 'config.inc.php',
+            OX_BASE_PATH . 'config.inc.php'
         );
     } else {
         $message = "Error: Autoload file missing. Make sure you have ran the 'composer install' command.";
@@ -227,13 +227,56 @@ spl_autoload_register([OxidEsales\EshopCommunity\Core\Autoload\BackwardsCompatib
 require_once CORE_AUTOLOADER_PATH . 'ModuleAutoload.php';
 spl_autoload_register([\OxidEsales\EshopCommunity\Core\Autoload\ModuleAutoload::class, 'autoload']);
 
-
 /**
  * Store the shop configuration in the Registry prior including the custom bootstrap functionality.
  * Like this the shop configuration is available there.
  */
-$configFile = new \OxidEsales\Eshop\Core\ConfigFile(OX_BASE_PATH . "config.inc.php");
+$configFile = new \OxidEsales\Eshop\Core\ConfigFile(OX_BASE_PATH . 'config.inc.php');
 \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\ConfigFile::class, $configFile);
+
+/**
+ * Register the default exit handler. Tests swap this for a throwing fake via
+ * Registry::set() (see tests/Unit/ExitHandlerTestTrait.php) so exit() calls
+ * in the code under test do not tear down the PHPUnit process.
+ *
+ * The guard skips registration when the unified namespace has not been
+ * generated yet (e.g. mid composer install). ExitHandlerInterface is an
+ * INTERFACE, so it MUST be probed with interface_exists(): class_exists()
+ * returns false for interfaces, which would leave the handler unregistered
+ * and break the fresh-install Setup redirect (see o3-shop/o3-shop#166).
+ */
+if (interface_exists(\OxidEsales\Eshop\Core\ExitHandlerInterface::class)) {
+    \OxidEsales\Eshop\Core\Registry::set(
+        \OxidEsales\Eshop\Core\ExitHandlerInterface::class,
+        new \OxidEsales\Eshop\Core\ExitHandler()
+    );
+}
+/**
+ * Ensure tmp directory exists for shop functionality.
+ * This directory is required for caching, Smarty compilation, and other temporary files.
+ */
+$tmpDir = $configFile->getVar('sCompileDir');
+if ($tmpDir && strpos($tmpDir, '<') === false && !is_dir($tmpDir)) {
+    try {
+        // oxNew is not yet available here; instantiate directly via the composer autoloader.
+        // Use INSTALLATION_ROOT_PATH as the security boundary. If sCompileDir is configured
+        // outside the project root, fall back to the parent of the compile dir.
+        (new \OxidEsales\EshopCommunity\Core\FileSystem\FileSystem())
+            ->createDirIfNotExists($tmpDir, INSTALLATION_ROOT_PATH);
+    } catch (\InvalidArgumentException $e) {
+        // sCompileDir is outside the project root; try with its parent directory as boundary
+        $tmpDirParent = dirname(rtrim($tmpDir, DIRECTORY_SEPARATOR));
+        try {
+            (new \OxidEsales\EshopCommunity\Core\FileSystem\FileSystem())
+                ->createDirIfNotExists($tmpDir, $tmpDirParent);
+        } catch (\InvalidArgumentException | \RuntimeException $e) {
+            trigger_error("Error: Could not create tmp directory '$tmpDir'. Please check permissions.", E_USER_WARNING);
+        }
+    } catch (\RuntimeException $e) {
+        trigger_error("Error: Could not create tmp directory '$tmpDir'. " . $e->getMessage(), E_USER_WARNING);
+    }
+}
+
 unset($configFile);
 
 /**
@@ -243,7 +286,7 @@ $debugMode = (bool) \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\
 set_exception_handler(
     [
         new \OxidEsales\Eshop\Core\Exception\ExceptionHandler($debugMode),
-        'handleUncaughtException'
+        'handleUncaughtException',
     ]
 );
 unset($debugMode);
@@ -281,8 +324,8 @@ if (!function_exists('oxTriggerOfflinePageDisplay')) {
     {
         // Do not display the offline page, if this running in CLI mode
         if ('cli' !== strtolower(php_sapi_name())) {
-            header("HTTP/1.1 500 Internal Server Error");
-            header("Connection: close");
+            header('HTTP/1.1 500 Internal Server Error');
+            header('Connection: close');
 
             /**
              * Render an error message.
@@ -305,11 +348,27 @@ if (!function_exists('oxTriggerOfflinePageDisplay')) {
 function writeToLog($message)
 {
     $time = microtime(true);
-    $micro = sprintf("%06d", ($time - floor($time)) * 1000000);
+    $micro = sprintf('%06d', ($time - floor($time)) * 1000000);
     $date = new \DateTime(date('Y-m-d H:i:s.' . $micro, $time));
     $timestamp = $date->format('d M H:i:s.u Y');
 
     $message = "[$timestamp] " . $message . PHP_EOL;
 
     file_put_contents(OX_LOG_FILE, $message, FILE_APPEND);
+}
+
+/**
+ * Optional local / environment-specific bootstrap overrides.
+ *
+ * This file is intentionally NOT committed (see .gitignore). Copy
+ * bootstrap.custom.php.dist to bootstrap.custom.php to add local overrides
+ * such as custom DI bindings, Whoops/Debugbar, or ini_set() tweaks.
+ *
+ * Loaded last, so the composer autoloader, the shop ConfigFile, the
+ * ExitHandler, oxNew() and all overridable functions are already available.
+ * The is_readable() guard means no error or warning is raised when the file
+ * is absent (the default state of the repository).
+ */
+if (is_readable(OX_BASE_PATH . 'bootstrap.custom.php')) {
+    require OX_BASE_PATH . 'bootstrap.custom.php';
 }

@@ -21,15 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component;
 
-use oxRegistry;
+use OxidEsales\Eshop\Core\Controller\BaseController;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Shop language manager.
- * Performs language manager function: changes template settings, modifies URL's.
+ * Performs language manager function: changes template settings, modifies URLs.
  *
  * @subpackage oxcmp
  */
-class LanguageComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
+class LanguageComponent extends BaseController
 {
     /**
      * Marking object as component
@@ -41,18 +42,18 @@ class LanguageComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     /**
      * Executes parent::render() and returns array with languages.
      *
-     * @return array $this->aLanguages languages
+     * @return array|void $this->aLanguages languages
      */
     public function render()
     {
         parent::render();
 
         // Performance
-        if ($this->getConfig()->getConfigParam('bl_perfLoadLanguages')) {
-            $aLanguages = \OxidEsales\Eshop\Core\Registry::getLang()->getLanguageArray(null, true, true);
+        if (Registry::getConfig()->getConfigParam('bl_perfLoadLanguages')) {
+            $aLanguages = Registry::getLang()->getLanguageArray(null, true, true);
             reset($aLanguages);
             foreach ($aLanguages as $oVal) {
-                $oVal->link = $this->getConfig()->getTopActiveView()->getLink($oVal->id);
+                $oVal->link = Registry::getConfig()->getTopActiveView()->getLink($oVal->id);
             }
 
             return $aLanguages;

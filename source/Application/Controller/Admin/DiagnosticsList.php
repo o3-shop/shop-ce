@@ -21,11 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+
 /**
  * Checks Version of System files.
  * Admin Menu: Service -> Version Checker.
  */
-class DiagnosticsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class DiagnosticsList extends AdminListController
 {
     /**
      * Current class template name.

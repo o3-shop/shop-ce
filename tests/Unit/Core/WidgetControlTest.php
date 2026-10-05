@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,12 +18,12 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 use modDB;
 use OxidEsales\EshopCommunity\Core\Controller\BaseController;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInterface;
-use \oxRegistry;
 
 class WidgetControlTest extends \OxidTestCase
 {
@@ -40,11 +41,11 @@ class WidgetControlTest extends \OxidTestCase
      */
     public function testStart()
     {
-        $oControl = $this->getMock(\OxidEsales\Eshop\Core\WidgetControl::class, array("_runOnce", "_runLast", "_process"), array(), '', false);
+        $oControl = $this->getMock(\OxidEsales\Eshop\Core\WidgetControl::class, ['_runOnce', '_runLast', '_process'], [], '', false);
         $oControl->expects($this->once())->method('_runOnce');
         $oControl->expects($this->once())->method('_runLast');
-        $oControl->expects($this->once())->method('_process')->with($this->equalTo(\OxidEsales\Eshop\Application\Controller\StartController::class), $this->equalTo("testFnc"), $this->equalTo("testParams"), $this->equalTo("testViewsChain"));
-        $oControl->start("start", "testFnc", "testParams", "testViewsChain");
+        $oControl->expects($this->once())->method('_process')->with($this->equalTo(\OxidEsales\Eshop\Application\Controller\StartController::class), $this->equalTo('testFnc'), $this->equalTo('testParams'), $this->equalTo('testViewsChain'));
+        $oControl->start('start', 'testFnc', 'testParams', 'testViewsChain');
     }
 
     /**
@@ -54,25 +55,25 @@ class WidgetControlTest extends \OxidTestCase
      */
     public function testRunLast()
     {
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array("hasActiveViewsChain"));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['hasActiveViewsChain']);
         $oConfig->expects($this->any())->method('hasActiveViewsChain')->will($this->returnValue(true));
 
-        $oConfig->setActiveView("testView1");
-        $oConfig->setActiveView("testView2");
+        $oConfig->setActiveView('testView1');
+        $oConfig->setActiveView('testView2');
 
-        $this->assertEquals(array("testView1", "testView2"), $oConfig->getActiveViewsList());
+        $this->assertEquals(['testView1', 'testView2'], $oConfig->getActiveViewsList());
 
-
-        $oControl = $this->getMock(\OxidEsales\Eshop\Core\WidgetControl::class, array("getConfig"));
+        $oControl = $this->getMock(\OxidEsales\Eshop\Core\WidgetControl::class, ['getConfig']);
         $oControl->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
 
         $oControl->UNITrunLast();
 
         $template = $this->getContainer()->get(TemplateRendererInterface::class);
 
-        $this->assertEquals(array("testView1"), $oConfig->getActiveViewsList());
+        $this->assertEquals(['testView1'], $oConfig->getActiveViewsList());
         $globals = $template->getTemplateEngine()->getGlobals();
-        $this->assertEquals("testView1", $globals["oView"]);}
+        $this->assertEquals('testView1', $globals['oView']);
+    }
 
     /**
      * Testing oxShopControl::_initializeViewObject()
@@ -81,17 +82,17 @@ class WidgetControlTest extends \OxidTestCase
      */
     public function testInitializeViewObject()
     {
-        $oControl = oxNew("oxWidgetControl");
-        $oView = $oControl->UNITinitializeViewObject("oxwCookieNote", "testFunction", array("testParam" => "testValue"));
+        $oControl = oxNew('oxWidgetControl');
+        $oView = $oControl->UNITinitializeViewObject('oxwCookieNote', 'testFunction', ['testParam' => 'testValue']);
 
         //checking widget object
-        $this->assertEquals("oxwCookieNote", $oView->getClassName());
-        $this->assertEquals("testFunction", $oView->getFncName());
-        $this->assertEquals("testValue", $oView->getViewParameter("testParam"));
+        $this->assertEquals('oxwCookieNote', $oView->getClassName());
+        $this->assertEquals('testFunction', $oView->getFncName());
+        $this->assertEquals('testValue', $oView->getViewParameter('testParam'));
 
         // checking active view object
         $this->assertEquals(1, count($oControl->getConfig()->getActiveViewsList()));
-        $this->assertEquals("oxwCookieNote", $oControl->getConfig()->getActiveView()->getClassName());
+        $this->assertEquals('oxwCookieNote', $oControl->getConfig()->getActiveView()->getClassName());
     }
 
     /**
@@ -101,23 +102,23 @@ class WidgetControlTest extends \OxidTestCase
      */
     public function testInitializeViewObject_hasViewChain()
     {
-        $oControl = oxNew("oxWidgetControl");
-        $oView = $oControl->UNITinitializeViewObject("oxwCookieNote", "testFunction", array("testParam" => "testValue"), array("account", "oxubase"));
+        $oControl = oxNew('oxWidgetControl');
+        $oView = $oControl->UNITinitializeViewObject('oxwCookieNote', 'testFunction', ['testParam' => 'testValue'], ['account', 'oxubase']);
 
         //checking widget object
-        $this->assertEquals("oxwCookieNote", $oView->getClassName());
-        $this->assertEquals("testFunction", $oView->getFncName());
-        $this->assertEquals("testValue", $oView->getViewParameter("testParam"));
+        $this->assertEquals('oxwCookieNote', $oView->getClassName());
+        $this->assertEquals('testFunction', $oView->getFncName());
+        $this->assertEquals('testValue', $oView->getViewParameter('testParam'));
 
         // checking active view objects
         $aActiveViews = $oControl->getConfig()->getActiveViewsList();
 
         $this->assertEquals(3, count($aActiveViews));
-        $this->assertEquals("account", $aActiveViews[0]->getClassName());
+        $this->assertEquals('account', $aActiveViews[0]->getClassName());
         $this->assertInstanceOf(BaseController::class, $aActiveViews[1]);
-        $this->assertEquals("oxwCookieNote", $aActiveViews[2]->getClassName());
+        $this->assertEquals('oxwCookieNote', $aActiveViews[2]->getClassName());
 
-        $this->assertEquals("oxwCookieNote", $oControl->getConfig()->getActiveView()->getClassName());
+        $this->assertEquals('oxwCookieNote', $oControl->getConfig()->getActiveView()->getClassName());
     }
 
     /**

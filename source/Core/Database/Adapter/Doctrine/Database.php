@@ -34,8 +34,8 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\Logger\DatabaseLoggerFactoryInterface;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\Logger\DatabaseLoggerFactoryInterface;
 use PDO;
 
 /**
@@ -49,7 +49,7 @@ use PDO;
 class Database implements DatabaseInterface
 {
     /** @var int code of Mysql duplicated key error. */
-    const MYSQL_DUPLICATE_KEY_ERROR_CODE = 1062;
+    public const MYSQL_DUPLICATE_KEY_ERROR_CODE = 1062;
 
     /**
      * Holds the necessary parameters to connect to the database
@@ -73,7 +73,7 @@ class Database implements DatabaseInterface
         'READ UNCOMMITTED' => Connection::TRANSACTION_READ_UNCOMMITTED,
         'READ COMMITTED'   => Connection::TRANSACTION_READ_COMMITTED,
         'REPEATABLE READ'  => Connection::TRANSACTION_REPEATABLE_READ,
-        'SERIALIZABLE'     => Connection::TRANSACTION_SERIALIZABLE
+        'SERIALIZABLE'     => Connection::TRANSACTION_SERIALIZABLE,
     ];
 
     /**
@@ -83,7 +83,7 @@ class Database implements DatabaseInterface
         DatabaseInterface::FETCH_MODE_DEFAULT => PDO::FETCH_BOTH,
         DatabaseInterface::FETCH_MODE_NUM     => PDO::FETCH_NUM,
         DatabaseInterface::FETCH_MODE_ASSOC   => PDO::FETCH_ASSOC,
-        DatabaseInterface::FETCH_MODE_BOTH    => PDO::FETCH_BOTH
+        DatabaseInterface::FETCH_MODE_BOTH    => PDO::FETCH_BOTH,
     ];
 
     /**
@@ -223,10 +223,10 @@ class Database implements DatabaseInterface
      */
     protected function addDriverOptions(array &$existingParameters)
     {
-        $default = array(
+        $default = [
             PDO::MYSQL_ATTR_INIT_COMMAND => $this->getMySqlInitCommand(),
             PDO::ATTR_STRINGIFY_FETCHES => true,
-        );
+        ];
 
         // options defined in config override the default
         $existingParameters['driverOptions'] += $default;
@@ -643,7 +643,7 @@ class Database implements DatabaseInterface
     {
         $check = ltrim($query, " \t\n\r\0\x0B(");
         if (!(stripos($check, 'select') === 0 || stripos($check, 'show') === 0)) {
-            throw new \InvalidArgumentException("Function is only for read operations select or show");
+            throw new \InvalidArgumentException('Function is only for read operations select or show');
         }
     }
 
@@ -1279,7 +1279,6 @@ class Database implements DatabaseInterface
         return $result;
     }
 
-
     /**
      * Get the maximal length of a given column of a given type.
      *
@@ -1319,9 +1318,9 @@ class Database implements DatabaseInterface
              */
         } elseif (preg_match("/^(enum|set)\((.*)\)$/i", strtolower($mySqlType), $matches)) {
             if ($matches[2]) {
-                $pieces = explode(",", $matches[2]);
+                $pieces = explode(',', $matches[2]);
                 /** The array values contain 2 quotes, so we have to subtract 2 from the strlen */
-                $maxLength = max(array_map("strlen", $pieces)) - 2;
+                $maxLength = max(array_map('strlen', $pieces)) - 2;
                 if ($maxLength <= 0) {
                     $maxLength = 1;
                 }

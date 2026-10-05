@@ -27,7 +27,6 @@ namespace OxidEsales\EshopCommunity\Core\Contract;
  */
 interface IUrl
 {
-
     /**
      * Returns object URL. If SEO if ON returned link will be in SEO form,
      * else URL will have dynamic form

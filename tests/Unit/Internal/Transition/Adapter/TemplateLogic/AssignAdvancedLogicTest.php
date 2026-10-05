@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -21,11 +22,10 @@
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Transition\Adapter\TemplateLogic;
 
 use OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\AssignAdvancedLogic;
-use \PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class AssignAdvancedLogicTest extends TestCase
 {
-
     /**
      * @var AssignAdvancedLogic
      */

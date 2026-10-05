@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 /**
@@ -26,16 +28,16 @@ class EncryptorTest extends \OxidTestCase
 {
     public function providerEncodingAndDecoding()
     {
-        return array(
+        return [
             // string encrypted with empty key
-            array('testString', '', 'ox_MCcrOiwrDCstNjE4Njs!'),
+            ['testString', '', 'ox_MCcrOiwrDCstNjE4Njs!'],
             // string encrypted with numeric key
-            array('testString', 1, 'ox_MEkrVCxFDEUtWDFWNlU!'),
+            ['testString', 1, 'ox_MEkrVCxFDEUtWDFWNlU!'],
             // string encrypted with not empty key
-            array('testString', 'testKey', 'ox_MAwRFgc/Ng0tHQsUHS8!'),
+            ['testString', 'testKey', 'ox_MAwRFgc/Ng0tHQsUHS8!'],
             // empty string encrypted with not empty key
-            array('', 'testKey', 'ox_MAwMFw!!'),
-        );
+            ['', 'testKey', 'ox_MAwMFw!!'],
+        ];
     }
 
     /**

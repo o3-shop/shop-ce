@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component\Widget;
 
+use OxidEsales\Eshop\Application\Model\ContentList;
+
 /**
  * List of additional shop information links widget.
  * Forms info link list.
@@ -35,7 +37,7 @@ class Information extends \OxidEsales\Eshop\Application\Component\Widget\WidgetC
     protected $_sThisTemplate = 'widget/footer/info.tpl';
 
     /**
-     * @var oxContentList
+     * @var ContentList
      */
     protected $_oContentList;
 
@@ -54,7 +56,7 @@ class Information extends \OxidEsales\Eshop\Application\Component\Widget\WidgetC
     /**
      * Get services content list
      *
-     * @return array
+     * @return object
      */
     public function getServicesList()
     {
@@ -67,15 +69,33 @@ class Information extends \OxidEsales\Eshop\Application\Component\Widget\WidgetC
     /**
      * Returns content list object.
      *
-     * @return object|oxContentList
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getContentList" in next major
+     * @return object|ContentList
+     * @deprecated Use getContentList() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getContentList().
      */
     protected function _getContentList() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (!$this->_oContentList) {
-            $this->_oContentList = oxNew(\OxidEsales\Eshop\Application\Model\ContentList::class);
+            $this->_oContentList = oxNew(ContentList::class);
         }
 
         return $this->_oContentList;
+    }
+
+    /**
+     * Returns content list object.
+     *
+     * @return object|ContentList
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getContentList() (not the deprecated _getContentList()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getContentList()
+    {
+        return $this->_getContentList();
     }
 }

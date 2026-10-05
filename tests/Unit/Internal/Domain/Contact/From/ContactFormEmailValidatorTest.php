@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -18,11 +20,11 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Domain\Contact\Form;
+namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Domain\Contact\From;
 
+use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormEmailValidator;
 use OxidEsales\EshopCommunity\Internal\Framework\Form\Form;
 use OxidEsales\EshopCommunity\Internal\Framework\Form\FormField;
-use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormEmailValidator;
 use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapter;
 
 class ContactFormEmailValidatorTest extends \PHPUnit\Framework\TestCase

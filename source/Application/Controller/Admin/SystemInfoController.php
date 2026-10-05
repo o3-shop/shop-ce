@@ -21,6 +21,11 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
+use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInterface;
 
@@ -28,30 +33,32 @@ use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInte
  * Admin systeminfo manager.
  * Returns template "systeminfo.tpl" and phphinfo() result to frame.
  */
-class SystemInfoController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class SystemInfoController extends AdminController
 {
     /**
      * Executes parent method parent::render(), prints shop and
      * PHP configuration information.
      *
-     * @return null
+     * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         parent::render();
 
-        $oAuthUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+        $oAuthUser = oxNew(User::class);
         $oAuthUser->loadAdminUser();
-        $blisMallAdmin = $oAuthUser->oxuser__oxrights->value == "malladmin";
+        $blisMallAdmin = $oAuthUser->oxuser__oxrights->value == 'malladmin';
 
         if ($blisMallAdmin && !$myConfig->isDemoShop()) {
             $aClassVars = get_object_vars($myConfig);
             $aSystemInfo = [];
             $aSystemInfo['pkg.info'] = $myConfig->getPackageInfo();
             foreach ($aClassVars as $name => $value) {
-                if (gettype($value) == "object") {
+                if (gettype($value) == 'object') {
                     continue;
                 }
 
@@ -60,28 +67,28 @@ class SystemInfoController extends \OxidEsales\Eshop\Application\Controller\Admi
                 }
 
                 $value = var_export($value, true);
-                $value = str_replace("\n", "<br>", $value);
+                $value = str_replace("\n", '<br>', $value);
                 $aSystemInfo[$name] = $value;
                 //echo( "$name = $value <br>");
             }
             $context = [
-                "oViewConf" => $this->_aViewData["oViewConf"],
-                "oView" => $this->_aViewData["oView"],
-                "shop" => $this->_aViewData["shop"],
-                "isdemo" => $myConfig->isDemoShop(),
-                "aSystemInfo" => $aSystemInfo
+                'oViewConf' => $this->_aViewData['oViewConf'],
+                'oView' => $this->_aViewData['oView'],
+                'shop' => $this->_aViewData['shop'],
+                'isdemo' => $myConfig->isDemoShop(),
+                'aSystemInfo' => $aSystemInfo,
             ];
 
             ob_start();
-            echo $this->getRenderer()->renderTemplate("systeminfo.tpl", $context);
-            echo("<br><br>");
+            echo $this->getRenderer()->renderTemplate('systeminfo.tpl', $context);
+            echo('<br><br>');
 
             phpinfo();
             $sMessage = ob_get_clean();
 
-            \OxidEsales\Eshop\Core\Registry::getUtils()->showMessageAndExit($sMessage);
+            Registry::getUtils()->showMessageAndExit($sMessage);
         } else {
-            return \OxidEsales\Eshop\Core\Registry::getUtils()->showMessageAndExit("Access denied !");
+            return Registry::getUtils()->showMessageAndExit('Access denied !');
         }
     }
 
@@ -110,7 +117,7 @@ class SystemInfoController extends \OxidEsales\Eshop\Application\Controller\Admi
             'dbUser',
             'dbPwd',
             'aSerials',
-            'sSerialNr'
+            'sSerialNr',
         ]);
     }
 }

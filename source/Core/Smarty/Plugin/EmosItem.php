@@ -68,21 +68,21 @@ class EmosItem
      *
      * @var string
      */
-    public $productId = "NULL";
+    public $productId = 'NULL';
 
     /**
      * the name of a product
      *
      * @var string
      */
-    public $productName = "NULL";
+    public $productName = 'NULL';
 
     /**
      * the price of the product, it is your choice wether its gross or net
      *
      * @var string
      */
-    public $price = "NULL";
+    public $price = 'NULL';
 
     /**
      * the product group for this product, this is a drill down dimension
@@ -92,14 +92,14 @@ class EmosItem
      *
      * @var string
      */
-    public $productGroup = "NULL";
+    public $productGroup = 'NULL';
 
     /**
      * the quantity / number of products viewed/bought etc..
      *
      * @var string
      */
-    public $quantity = "NULL";
+    public $quantity = 'NULL';
 
     /**
      * variant of the product e.g. size, color, brand ....
@@ -108,7 +108,7 @@ class EmosItem
      *
      * @var string
      */
-    public $variant1 = "NULL";
-    public $variant2 = "NULL";
-    public $variant3 = "NULL";
+    public $variant1 = 'NULL';
+    public $variant2 = 'NULL';
+    public $variant3 = 'NULL';
 }

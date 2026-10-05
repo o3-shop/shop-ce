@@ -21,8 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Core;
 
-use OxidEsales\Eshop\Core\Exception\SystemComponentException;
 use OxidEsales\Eshop\Core\Database\Adapter\ResultSetInterface;
+use OxidEsales\Eshop\Core\Exception\SystemComponentException;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\CompatibilityChecker\DatabaseCheckerBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\Loader\TemplateLoaderInterface;
@@ -32,14 +32,14 @@ use OxidEsales\EshopCommunity\Internal\Framework\Templating\Loader\TemplateLoade
  */
 class SystemRequirements
 {
-    const MODULE_STATUS_UNABLE_TO_DETECT = -1;
-    const MODULE_STATUS_BLOCKS_SETUP = 0;
-    const MODULE_STATUS_FITS_MINIMUM_REQUIREMENTS = 1;
-    const MODULE_STATUS_OK = 2;
+    public const MODULE_STATUS_UNABLE_TO_DETECT = -1;
+    public const MODULE_STATUS_BLOCKS_SETUP = 0;
+    public const MODULE_STATUS_FITS_MINIMUM_REQUIREMENTS = 1;
+    public const MODULE_STATUS_OK = 2;
 
-    const MODULE_GROUP_ID_SERVER_CONFIG = 'server_config';
-    const MODULE_ID_MOD_REWRITE = 'mod_rewrite';
-    const MODULE_ID_MYSQL_VERSION = 'mysql_version';
+    public const MODULE_GROUP_ID_SERVER_CONFIG = 'server_config';
+    public const MODULE_ID_MOD_REWRITE = 'mod_rewrite';
+    public const MODULE_ID_MYSQL_VERSION = 'mysql_version';
 
     /**
      * System required modules
@@ -136,28 +136,29 @@ class SystemRequirements
      * @var array
      */
     protected $_aInfoMap = [
-        "php_version"        => "php",
-        "mod_rewrite"        => "webserver",
-        "mysql_version"      => "database",
+        'php_version'        => 'php',
+        'mod_rewrite'        => 'webserver',
+        'mysql_version'      => 'database',
 
-        "allow_url_fopen"    => "php",
-        "request_uri"        => "php",
-        "ini_set"            => "php",
-        "memory_limit"       => "php",
-        "file_uploads"       => "php",
-        "session_autostart"  => "php",
+        'allow_url_fopen'    => 'php',
+        'request_uri'        => 'php',
+        'ini_set'            => 'php',
+        'memory_limit'       => 'php',
+        'file_uploads'       => 'php',
+        'session_autostart'  => 'php',
 
-        "php_xml"            => "php",
-        "j_son"              => "php",
-        "i_conv"             => "php",
-        "tokenizer"          => "php",
-        "mysql_connect"      => "php",
-        "gd_info"            => "php",
-        "mb_string"          => "php",
-        "curl"               => "php",
-        "bc_math"            => "php",
-        "open_ssl"           => "openssl",
-        "soap"               => "php",
+        'php_xml'            => 'php',
+        'j_son'              => 'php',
+        'i_conv'             => 'php',
+        'tokenizer'          => 'php',
+        'mysql_connect'      => 'php',
+        'gd_info'            => 'php',
+        'gd_freetype'        => 'php',
+        'mb_string'          => 'php',
+        'curl'               => 'php',
+        'bc_math'            => 'php',
+        'open_ssl'           => 'openssl',
+        'soap'               => 'php',
     ];
 
     /**
@@ -166,7 +167,7 @@ class SystemRequirements
      * @var array
      */
     protected $_aPreparationInfoMap = [
-        "server_permissions" => "adjusting-file-and-directory-permissions",
+        'server_permissions' => 'adjusting-file-and-directory-permissions',
     ];
 
     /**
@@ -193,8 +194,8 @@ class SystemRequirements
     public function __call($sMethod, $aArgs)
     {
         if (defined('OXID_PHP_UNIT')) {
-            if (substr($sMethod, 0, 4) == "UNIT") {
-                $sMethod = str_replace("UNIT", "_", $sMethod);
+            if (substr($sMethod, 0, 4) == 'UNIT') {
+                $sMethod = str_replace('UNIT', '_', $sMethod);
             }
             if (method_exists($this, $sMethod)) {
                 return call_user_func_array([& $this, $sMethod], $aArgs);
@@ -202,7 +203,7 @@ class SystemRequirements
         }
 
         throw new \OxidEsales\Eshop\Core\Exception\SystemComponentException(
-            "Function '$sMethod' does not exist or is not accessible! (" . get_class($this) . ")" . PHP_EOL
+            "Function '$sMethod' does not exist or is not accessible! (" . get_class($this) . ')' . PHP_EOL
         );
     }
 
@@ -241,6 +242,7 @@ class SystemRequirements
                 'tokenizer',
                 'mysql_connect',
                 'gd_info',
+                'gd_freetype',
                 'mb_string',
                 'curl',
                 'bc_math',
@@ -262,7 +264,7 @@ class SystemRequirements
                 'php_version',
                 'mod_rewrite',
                 'server_permissions',
-                'mysql_version'
+                'mysql_version',
             ];
 
             if ($this->isAdmin()) {
@@ -271,7 +273,7 @@ class SystemRequirements
             $this->_aRequiredModules = array_fill_keys($aRequiredServerConfigs, 'server_config') +
                                        array_fill_keys($aRequiredPHPConfigs, 'php_config') +
                                        array_fill_keys($aRequiredPHPExtensions, 'php_extennsions')
-                                       ;
+            ;
         }
 
         return $this->_aRequiredModules;
@@ -311,7 +313,7 @@ class SystemRequirements
         $sPath = $sPath ? $sPath : getShopBasePath();
 
         // special config file check
-        $sFullPath = $sPath . "config.inc.php";
+        $sFullPath = $sPath . 'config.inc.php';
         if (
             !is_readable($sFullPath) ||
             ($this->isAdmin() && is_writable($sFullPath)) ||
@@ -321,7 +323,7 @@ class SystemRequirements
         }
 
         $sTmp = "$sPath/tmp/";
-        $config = new \OxidEsales\Eshop\Core\ConfigFile(getShopBasePath() . "/config.inc.php");
+        $config = new \OxidEsales\Eshop\Core\ConfigFile(getShopBasePath() . '/config.inc.php');
         $sCfgTmp = $config->getVar('sCompileDir');
         if ($sCfgTmp && strpos($sCfgTmp, '<sCompileDir') === false) {
             $sTmp = $sCfgTmp;
@@ -335,8 +337,35 @@ class SystemRequirements
             $sPath . 'out/media/',
             $sPath . 'log/',
             $sPath . '../var/',
-            $sTmp
+            $sTmp,
         ];
+
+        // Try to create the folders, in case they do not yet exist. In case it fails, the error handling later will handle it
+        // Direct instantiation (not oxNew) is intentional: this method runs during setup where the Registry/UtilsObject
+        // chain is not yet fully initialised, mirroring the same pattern used in bootstrap.php.
+        $fileSystem = new \OxidEsales\EshopCommunity\Core\FileSystem\FileSystem();
+        $shopParentPath = dirname(rtrim(realpath($sPath) ?: $sPath, DIRECTORY_SEPARATOR));
+        foreach ($aPathsToCheck as $sPathToCheck) {
+            try {
+                $fileSystem->createDirIfNotExists($sPathToCheck, $sPath, 0700);
+            } catch (\InvalidArgumentException $e) {
+                // Path may be outside $sPath (e.g. ../var/ or a configured compile dir outside source/)
+                try {
+                    $fileSystem->createDirIfNotExists($sPathToCheck, $shopParentPath, 0700);
+                } catch (\InvalidArgumentException | \RuntimeException $e) {
+                    trigger_error(
+                        sprintf('Could not create required directory "%s": %s', $sPathToCheck, $e->getMessage()),
+                        E_USER_WARNING
+                    );
+                }
+            } catch (\RuntimeException $e) {
+                trigger_error(
+                    sprintf('Could not create required directory "%s": %s', $sPathToCheck, $e->getMessage()),
+                    E_USER_WARNING
+                );
+            }
+        }
+
         $iModStat = 2;
         $sPathToCheck = reset($aPathsToCheck);
         while ($sPathToCheck) {
@@ -348,10 +377,10 @@ class SystemRequirements
 
             if (is_dir($sPathToCheck)) {
                 // adding subfolders
-                $aSubF = glob($sPathToCheck . "*", GLOB_ONLYDIR);
+                $aSubF = glob($sPathToCheck . '*', GLOB_ONLYDIR);
                 if (is_array($aSubF)) {
                     foreach ($aSubF as $sNewFolder) {
-                        $aPathsToCheck[] = $sNewFolder . "/";
+                        $aPathsToCheck[] = $sNewFolder . '/';
                     }
                 }
             }
@@ -367,7 +396,6 @@ class SystemRequirements
 
         return $iModStat;
     }
-
 
     /**
      * returns host, port, base dir, ssl information as assotiative array, false on error
@@ -440,8 +468,28 @@ class SystemRequirements
     {
         // got here from setup dir
         $sScript = $_SERVER['SCRIPT_NAME'];
-        $iPort = (int) $_SERVER['SERVER_PORT'];
-        $blSsl = (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on'));
+
+        // Behind a reverse proxy / TLS terminator (DDEV, Traefik, nginx ingress, load balancer) the
+        // PHP process sees the *internal* scheme/port (typically plain HTTP on 80) while the client
+        // reached the proxy over HTTPS. Honor the forwarded headers so the mod_rewrite self-probe
+        // dials the public scheme/port the proxy serves and loops back cleanly, instead of hitting an
+        // HTTP->HTTPS redirect that would make the probe undeterminable. These headers are only used
+        // for the local loopback probe (never for auth or URL generation), so trusting them here is
+        // harmless: a spoofed value at worst makes the probe fail and degrade to a warning.
+        $blForwardedHttps = (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])
+                && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+            || (isset($_SERVER['HTTP_X_FORWARDED_SSL'])
+                && strtolower($_SERVER['HTTP_X_FORWARDED_SSL']) === 'on');
+        $blSsl = $blForwardedHttps || (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on'));
+
+        if (!empty($_SERVER['HTTP_X_FORWARDED_PORT'])) {
+            $iPort = (int) $_SERVER['HTTP_X_FORWARDED_PORT'];
+        } elseif (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) || isset($_SERVER['HTTP_X_FORWARDED_SSL'])) {
+            // a proxy terminated the connection: SERVER_PORT is the internal port, not the public one
+            $iPort = $blSsl ? 443 : 80;
+        } else {
+            $iPort = (int) $_SERVER['SERVER_PORT'];
+        }
         if (!$iPort) {
             $iPort = $blSsl ? 443 : 80;
         }
@@ -527,33 +575,105 @@ class SystemRequirements
      */
     protected function _checkModRewrite($aHostInfo) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sHostname = ($aHostInfo['ssl'] ? 'ssl://' : '') . $aHostInfo['host'];
-        if ($rFp = @fsockopen($sHostname, $aHostInfo['port'], $iErrNo, $sErrStr, 10)) {
-            $sReq = "POST {$aHostInfo['dir']}oxseo.php?mod_rewrite_module_is=off HTTP/1.1\r\n";
-            $sReq .= "Host: {$aHostInfo['host']}\r\n";
-            $sReq .= "User-Agent: O3-Shop setup\r\n";
-            $sReq .= "Content-Type: application/x-www-form-urlencoded\r\n";
-            $sReq .= "Content-Length: 0\r\n"; // empty post
-            $sReq .= "Connection: close\r\n\r\n";
+        $sOut = $this->_getModRewriteResponse($aHostInfo);
 
-            $sOut = '';
-            fwrite($rFp, $sReq);
-            while (!feof($rFp)) {
-                $sOut .= fgets($rFp, 100);
+        if ($sOut !== false) {
+            // The probe (POST oxseo.php?mod_rewrite_module_is=off) reached a server that answered.
+            // Classify three ways instead of two, so an undeterminable answer does not block setup:
+            //   - 'mod_rewrite_on'  -> the RewriteRule rewrote off->on, mod_rewrite is confirmed working
+            //   - 'mod_rewrite_off' -> the request reached oxseo.php unrewritten, mod_rewrite is genuinely off
+            //   - neither marker    -> a redirect / reverse proxy / TLS terminator (e.g. DDEV) answered;
+            //                          we cannot tell, so warn instead of blocking the install
+            if (strpos($sOut, 'mod_rewrite_on') !== false) {
+                $iModStat = static::MODULE_STATUS_OK;
+            } elseif (strpos($sOut, 'mod_rewrite_off') !== false) {
+                $iModStat = static::MODULE_STATUS_BLOCKS_SETUP;
+            } else {
+                $iModStat = static::MODULE_STATUS_UNABLE_TO_DETECT;
             }
-            fclose($rFp);
-
-            $iModStat = (strpos($sOut, 'mod_rewrite_on') !== false) ? 2 : 0;
         } else {
             if (function_exists('apache_get_modules')) {
-                // it does not assure that mod_rewrite is enabled on current host, so setting 1
-                $iModStat = in_array('mod_rewrite', apache_get_modules()) ? 1 : 0;
+                // mod_rewrite missing from the loaded modules is positive proof it is absent;
+                // its presence does not assure it is enabled for this host, so only flag the minimum.
+                $iModStat = in_array('mod_rewrite', apache_get_modules())
+                    ? static::MODULE_STATUS_FITS_MINIMUM_REQUIREMENTS
+                    : static::MODULE_STATUS_BLOCKS_SETUP;
             } else {
-                $iModStat = -1;
+                $iModStat = static::MODULE_STATUS_UNABLE_TO_DETECT;
             }
         }
 
         return $iModStat;
+    }
+
+    /**
+     * Builds the stream context for the mod_rewrite self-probe.
+     *
+     * When the shop is reached over TLS and the operator has explicitly opted in via the
+     * blAllowSelfSignedCertificates config flag (development only, default off), peer
+     * verification is relaxed so the loopback probe can complete against a self-signed
+     * certificate. In every other case certificate verification stays on.
+     *
+     * The flag is read from the DB-less ConfigFile (config.inc.php), never the DB-backed
+     * Config: this probe runs during the Setup System Requirements step, before a database
+     * is configured, so touching Config::getConfigParam() there would trigger a DB load and
+     * break the requirements page on a fresh install. Same DB-less rationale as
+     * checkServerPermissions() (which reads config.inc.php via ConfigFile too); here we use
+     * the ConfigFile instance bootstrap.php already registered in the Registry.
+     *
+     * @param array $aHostInfo host info (host, port, dir, ssl)
+     *
+     * @return resource stream context
+     * @deprecated underscore prefix violates PSR12, will be renamed to "buildModRewriteStreamContext" in next major
+     */
+    protected function _buildModRewriteStreamContext($aHostInfo) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $aOptions = [];
+        $blAllowSelfSigned = (bool) \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)
+            ->getVar('blAllowSelfSignedCertificates');
+        if (!empty($aHostInfo['ssl']) && $blAllowSelfSigned) {
+            $aOptions['ssl'] = [
+                'verify_peer'       => false,
+                'verify_peer_name'  => false,
+                'allow_self_signed' => true,
+            ];
+        }
+
+        return stream_context_create($aOptions);
+    }
+
+    /**
+     * Performs the mod_rewrite self-probe: opens a socket back to the shop and POSTs to
+     * oxseo.php?mod_rewrite_module_is=off, returning the raw HTTP response.
+     *
+     * @param array $aHostInfo host info (host, port, dir, ssl)
+     *
+     * @return string|false the raw response, or false if the socket could not be opened
+     */
+    protected function _getModRewriteResponse($aHostInfo) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $sScheme = $aHostInfo['ssl'] ? 'ssl' : 'tcp';
+        $sRemote = $sScheme . '://' . $aHostInfo['host'] . ':' . $aHostInfo['port'];
+        $rContext = $this->_buildModRewriteStreamContext($aHostInfo);
+        if (!($rFp = @stream_socket_client($sRemote, $iErrNo, $sErrStr, 10, STREAM_CLIENT_CONNECT, $rContext))) {
+            return false;
+        }
+
+        $sReq = "POST {$aHostInfo['dir']}oxseo.php?mod_rewrite_module_is=off HTTP/1.1\r\n";
+        $sReq .= "Host: {$aHostInfo['host']}\r\n";
+        $sReq .= "User-Agent: O3-Shop setup\r\n";
+        $sReq .= "Content-Type: application/x-www-form-urlencoded\r\n";
+        $sReq .= "Content-Length: 0\r\n"; // empty post
+        $sReq .= "Connection: close\r\n\r\n";
+
+        $sOut = '';
+        fwrite($rFp, $sReq);
+        while (!feof($rFp)) {
+            $sOut .= fgets($rFp, 100);
+        }
+        fclose($rFp);
+
+        return $sOut;
     }
 
     /**
@@ -773,6 +893,19 @@ class SystemRequirements
     }
 
     /**
+     * Checks if GD is built with FreeType support (imagettftext), required to
+     * render text into images, e.g. the EU guarantee label.
+     *
+     * @return integer
+     */
+    public function checkGdFreetype()
+    {
+        return function_exists('imagettftext')
+            ? static::MODULE_STATUS_OK
+            : static::MODULE_STATUS_BLOCKS_SETUP;
+    }
+
+    /**
      * Checks if ini set is allowed
      *
      * @return integer
@@ -986,7 +1119,7 @@ class SystemRequirements
     {
         if ($sModule) {
             $iModStat = null;
-            $sCheckFunction = "check" . str_replace(" ", "", ucwords(str_replace("_", " ", $sModule)));
+            $sCheckFunction = 'check' . str_replace(' ', '', ucwords(str_replace('_', ' ', $sModule)));
             $iModStat = $this->$sCheckFunction();
 
             return $iModStat;
@@ -1046,9 +1179,9 @@ class SystemRequirements
 
         // only known will be anchored
         if (isset($aInfoMap[$sIdent])) {
-            $sUrl .= "#" . $aInfoMap[$sIdent];
+            $sUrl .= '#' . $aInfoMap[$sIdent];
         } elseif (isset($aPreparationInfoMap[$sIdent])) {
-            $sUrl = $this->_sPreparationInfoUrl . "#" . $aPreparationInfoMap[$sIdent];
+            $sUrl = $this->_sPreparationInfoUrl . '#' . $aPreparationInfoMap[$sIdent];
         }
 
         return $sUrl;
@@ -1071,12 +1204,12 @@ class SystemRequirements
             // gigabytes
             case 'g':
                 $sBytes *= 1024;
-            // megabytes
-            // no break
+                // megabytes
+                // no break
             case 'm':
                 $sBytes *= 1024;
-            // kilobytes
-            // no break
+                // kilobytes
+                // no break
             case 'k':
                 $sBytes *= 1024;
                 break;
@@ -1173,7 +1306,7 @@ class SystemRequirements
 
         return $database->select($query, [
             ':oxshopid' => $config->getShopId(),
-            ':oxtheme' => $activeThemeId
+            ':oxtheme' => $activeThemeId,
         ]);
     }
 

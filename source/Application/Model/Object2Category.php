@@ -21,12 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxField;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 
 /**
  * Manages product assignment to category.
  */
-class Object2Category extends \OxidEsales\Eshop\Core\Model\BaseModel
+class Object2Category extends BaseModel
 {
     /**
      * Current class name
@@ -61,7 +62,7 @@ class Object2Category extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function setProductId($sId)
     {
-        $this->oxobject2category__oxobjectid = new \OxidEsales\Eshop\Core\Field($sId);
+        $this->oxobject2category__oxobjectid = new Field($sId);
     }
 
     /**
@@ -81,6 +82,6 @@ class Object2Category extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function setCategoryId($sId)
     {
-        $this->oxobject2category__oxcatnid = new \OxidEsales\Eshop\Core\Field($sId);
+        $this->oxobject2category__oxcatnid = new Field($sId);
     }
 }

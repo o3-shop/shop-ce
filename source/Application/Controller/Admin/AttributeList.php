@@ -21,13 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+
 /**
  * Admin attributes manager.
  * Collects attributes base information (Description), there is ability to filter
  * them by Description or delete them.
  * Admin Menu: Manage Products -> Attributes.
  */
-class AttributeList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class AttributeList extends AdminListController
 {
     /**
      * Current class template name.

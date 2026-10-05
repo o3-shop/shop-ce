@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -26,14 +27,14 @@ $sMetadataVersion = '1.1';
 /**
  * Module information
  */
-$aModule = array(
+$aModule = [
     'id'           => 'bc_module_inheritance_4_3', // maybe find a better name for that
     'title'        => 'Test backwards compatible PHP class inheritance 4.3',
     'description'  => 'Both module class and shop class use the old notation without namespaces',
     'thumbnail'    => 'picture.png',
     'version'      => '1.0',
     'author'       => 'OXID eSales AG',
-    'files'       => array(
+    'files'       => [
         'vendor_1_module_4_3_myclass' => 'oeTest/bc_module_inheritance_4_3/vendor_1_module_4_3_myclass.php',
-    )
-);
+    ],
+];

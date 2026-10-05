@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,11 +18,12 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Modules;
 
 use oxDb;
-use OxidEsales\TestingLibrary\UnitTestCase;
 use OxidEsales\EshopCommunity\Core\Module\ModuleTemplateBlockRepository;
+use OxidEsales\TestingLibrary\UnitTestCase;
 
 /**
  * @group module
@@ -40,34 +42,34 @@ class ModuleTemplateBlockRepositoryTest extends UnitTestCase
     {
         parent::setUp();
 
-        $oxid = "__test_1";
-        $themeId = "";
-        $blockName = "blockname1";
-        $moduleBlockFileName = "contentfile1";
+        $oxid = '__test_1';
+        $themeId = '';
+        $blockName = 'blockname1';
+        $moduleBlockFileName = 'contentfile1';
         $this->insertBlock($oxid, $themeId, $blockName, $moduleBlockFileName);
 
-        $oxid = "__test_2";
-        $themeId = "";
-        $blockName = "blockname2";
-        $moduleBlockFileName = "contentfile_2";
+        $oxid = '__test_2';
+        $themeId = '';
+        $blockName = 'blockname2';
+        $moduleBlockFileName = 'contentfile_2';
         $this->insertBlock($oxid, $themeId, $blockName, $moduleBlockFileName);
 
-        $oxid = "__test_1_theme_1";
-        $themeId = "theme_1";
-        $blockName = "blockname1";
-        $moduleBlockFileName = "contentfile_1_theme_1";
+        $oxid = '__test_1_theme_1';
+        $themeId = 'theme_1';
+        $blockName = 'blockname1';
+        $moduleBlockFileName = 'contentfile_1_theme_1';
         $this->insertBlock($oxid, $themeId, $blockName, $moduleBlockFileName);
 
-        $oxid = "__test_2_theme_1";
-        $themeId = "theme_1";
-        $blockName = "blockname2";
-        $moduleBlockFileName = "contentfile_2_theme_1";
+        $oxid = '__test_2_theme_1';
+        $themeId = 'theme_1';
+        $blockName = 'blockname2';
+        $moduleBlockFileName = 'contentfile_2_theme_1';
         $this->insertBlock($oxid, $themeId, $blockName, $moduleBlockFileName);
 
-        $oxid = "__test_1_theme_2";
-        $themeId = "theme_2";
-        $blockName = "blockname1";
-        $moduleBlockFileName = "contentfile_1_theme_2";
+        $oxid = '__test_1_theme_2';
+        $themeId = 'theme_2';
+        $blockName = 'blockname1';
+        $moduleBlockFileName = 'contentfile_1_theme_2';
         $this->insertBlock($oxid, $themeId, $blockName, $moduleBlockFileName);
     }
 
@@ -264,7 +266,7 @@ class ModuleTemplateBlockRepositoryTest extends UnitTestCase
             'OXPOS' => '1',
             'OXFILE' => $moduleBlockFileName,
             'OXMODULE' => $this->activeModuleId,
-            'OXTIMESTAMP' => '2016-04-14 08:09:00'
+            'OXTIMESTAMP' => '2016-04-14 08:09:00',
         ];
     }
 }

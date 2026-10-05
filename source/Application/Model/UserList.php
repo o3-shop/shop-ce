@@ -21,13 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
+use OxidEsales\Eshop\Core\Model\ListModel;
 
 /**
  * User list manager.
  *
  */
-class UserList extends \OxidEsales\Eshop\Core\Model\ListModel
+class UserList extends ListModel
 {
     /**
      * Class constructor
@@ -37,13 +37,12 @@ class UserList extends \OxidEsales\Eshop\Core\Model\ListModel
         parent::__construct('oxuser');
     }
 
-
     /**
      * Load searched user list with wishlist
      *
      * @param string $sSearchStr Search string
      *
-     * @return null;
+     * @return void
      */
     public function loadWishlistUsers($sSearchStr)
     {
@@ -53,15 +52,15 @@ class UserList extends \OxidEsales\Eshop\Core\Model\ListModel
             return;
         }
 
-        $sSelect = "select oxuser.oxid, oxuser.oxfname, oxuser.oxlname from oxuser ";
-        $sSelect .= "left join oxuserbaskets on oxuserbaskets.oxuserid = oxuser.oxid ";
+        $sSelect = 'select oxuser.oxid, oxuser.oxfname, oxuser.oxlname from oxuser ';
+        $sSelect .= 'left join oxuserbaskets on oxuserbaskets.oxuserid = oxuser.oxid ';
         $sSelect .= "where oxuserbaskets.oxid is not null and oxuserbaskets.oxtitle = 'wishlist' ";
-        $sSelect .= "and oxuserbaskets.oxpublic = 1 ";
-        $sSelect .= "and ( oxuser.oxusername = :search or oxuser.oxlname = :search)";
-        $sSelect .= "and ( select 1 from oxuserbasketitems where oxuserbasketitems.oxbasketid = oxuserbaskets.oxid limit 1)";
+        $sSelect .= 'and oxuserbaskets.oxpublic = 1 ';
+        $sSelect .= 'and ( oxuser.oxusername = :search or oxuser.oxlname = :search)';
+        $sSelect .= 'and ( select 1 from oxuserbasketitems where oxuserbasketitems.oxbasketid = oxuserbaskets.oxid limit 1)';
 
         $this->selectString($sSelect, [
-            ':search' => "$sSearchStr"
+            ':search' => "$sSearchStr",
         ]);
     }
 }

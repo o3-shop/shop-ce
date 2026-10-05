@@ -21,6 +21,11 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\ProductRatingBridgeInterface;
 
 /**
@@ -28,7 +33,7 @@ use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\ProductRatingBridgeI
  * Performs loading, updating, inserting of article rates.
  *
  */
-class Rating extends \OxidEsales\Eshop\Core\Model\BaseModel
+class Rating extends BaseModel
 {
     /**
      * Shop control variable
@@ -56,31 +61,33 @@ class Rating extends \OxidEsales\Eshop\Core\Model\BaseModel
     /**
      * Checks if user can rate product.
      *
-     * @param string $sUserId   user id
-     * @param string $sType     object type
+     * @param string $sUserId user id
+     * @param string $sType object type
      * @param string $sObjectId object id
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function allowRating($sUserId, $sType, $sObjectId)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $myConfig = $this->getConfig();
+        $oDb = DatabaseProvider::getDb();
+        $myConfig = Registry::getConfig();
 
         if ($iRatingLogsTimeout = $myConfig->getConfigParam('iRatingLogsTimeout')) {
-            $sExpDate = date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime() - $iRatingLogsTimeout * 24 * 60 * 60);
-            $oDb->execute("delete from oxratings where oxtimestamp < :expDate", [
-                ':expDate' => $sExpDate
+            $sExpDate = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime() - $iRatingLogsTimeout * 24 * 60 * 60);
+            $oDb->execute('delete from oxratings where oxtimestamp < :expDate', [
+                ':expDate' => $sExpDate,
             ]);
         }
-        $sSelect = "select oxid from oxratings 
+        $sSelect = 'select oxid from oxratings 
             where oxuserid = :oxuserid 
                 and oxtype = :oxtype 
-                and oxobjectid = :oxobjectid";
+                and oxobjectid = :oxobjectid';
         $params = [
             ':oxuserid' => $sUserId,
             ':oxtype' => $sType,
-            ':oxobjectid' => $sObjectId
+            ':oxobjectid' => $sObjectId,
         ];
 
         if ($oDb->getOne($sSelect, $params)) {
@@ -90,38 +97,38 @@ class Rating extends \OxidEsales\Eshop\Core\Model\BaseModel
         return true;
     }
 
-
     /**
      * calculates and return objects rating
      *
-     * @param string $sObjectId           object id
-     * @param string $sType               object type
-     * @param array  $aIncludedObjectsIds array of ids
+     * @param string $sObjectId object id
+     * @param string $sType object type
+     * @param null $aIncludedObjectsIds array of ids
      *
      * @return float
+     * @throws DatabaseConnectionException
      */
     public function getRatingAverage($sObjectId, $sType, $aIncludedObjectsIds = null)
     {
-        $sQuerySnipet = " AND `oxobjectid` = :oxobjectid";
+        $sQuerySnippet = ' AND `oxobjectid` = :oxobjectid';
         if (is_array($aIncludedObjectsIds) && count($aIncludedObjectsIds) > 0) {
-            $sQuerySnipet = " AND ( `oxobjectid` = :oxobjectid OR `oxobjectid` in ('" . implode("', '", $aIncludedObjectsIds) . "') )";
+            $sQuerySnippet = " AND ( `oxobjectid` = :oxobjectid OR `oxobjectid` in ('" . implode("', '", $aIncludedObjectsIds) . "') )";
         }
 
-        $sSelect = "
+        $sSelect = '
             SELECT
                 AVG(`oxrating`)
             FROM `oxreviews`
             WHERE `oxrating` > 0
-                 AND `oxtype` = :oxtype"
-                   . $sQuerySnipet . "
-            LIMIT 1";
+                 AND `oxtype` = :oxtype'
+                   . $sQuerySnippet . '
+            LIMIT 1';
 
         $params = [
             ':oxobjectid' => $sObjectId,
-            ':oxtype' => $sType
+            ':oxtype' => $sType,
         ];
 
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
+        $database = DatabaseProvider::getMaster();
         if ($fRating = $database->getOne($sSelect, $params)) {
             $fRating = round($fRating, 1);
         }
@@ -132,40 +139,41 @@ class Rating extends \OxidEsales\Eshop\Core\Model\BaseModel
     /**
      * calculates and return objects rating count
      *
-     * @param string $sObjectId           object id
-     * @param string $sType               object type
-     * @param array  $aIncludedObjectsIds array of ids
+     * @param string $sObjectId object id
+     * @param string $sType object type
+     * @param null $aIncludedObjectsIds array of ids
      *
-     * @return integer
+     * @return false|string
+     * @throws DatabaseConnectionException
      */
     public function getRatingCount($sObjectId, $sType, $aIncludedObjectsIds = null)
     {
-        $sQuerySnipet = " AND `oxobjectid` = :oxobjectid";
+        $sQuerySnippet = ' AND `oxobjectid` = :oxobjectid';
         if (is_array($aIncludedObjectsIds) && count($aIncludedObjectsIds) > 0) {
-            $sQuerySnipet = " AND ( `oxobjectid` = :oxobjectid OR `oxobjectid` in ('" . implode("', '", $aIncludedObjectsIds) . "') )";
+            $sQuerySnippet = " AND ( `oxobjectid` = :oxobjectid OR `oxobjectid` in ('" . implode("', '", $aIncludedObjectsIds) . "') )";
         }
 
-        $sSelect = "
+        $sSelect = '
             SELECT
                 COUNT(*)
             FROM `oxreviews`
             WHERE `oxrating` > 0
-                AND `oxtype` = :oxtype"
-                   . $sQuerySnipet . "
-            LIMIT 1";
+                AND `oxtype` = :oxtype'
+                   . $sQuerySnippet . '
+            LIMIT 1';
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-        $masterDb = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
+        $masterDb = DatabaseProvider::getMaster();
         $iCount = $masterDb->getOne($sSelect, [
             ':oxobjectid' => $sObjectId,
-            ':oxtype' => $sType
+            ':oxtype' => $sType,
         ]);
 
         return $iCount;
     }
 
     /**
-     * Retuns review object type
+     * Returns review object type
      *
      * @return string
      */
@@ -175,7 +183,7 @@ class Rating extends \OxidEsales\Eshop\Core\Model\BaseModel
     }
 
     /**
-     * Retuns review object id
+     * Returns review object id
      *
      * @return string
      */
@@ -203,7 +211,6 @@ class Rating extends \OxidEsales\Eshop\Core\Model\BaseModel
 
         return $isDeleted;
     }
-
 
     /**
      * Returns true if Rating belongs to Product.

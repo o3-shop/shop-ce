@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,22 +18,33 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 use OxidEsales\Eshop\Core\Theme;
-use \stdClass;
-use \oxRegistry;
-use \oxTestModules;
+use oxRegistry;
+use oxTestModules;
+use stdClass;
 
 class UtilsViewTest extends \OxidTestCase
 {
+    /**
+     * Activate the Wave theme once per test class instead of per test.
+     * Theme::activate() costs ~170ms and doesn't need to be repeated
+     * for every test since no test deactivates the theme.
+     */
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+
+        $theme = oxNew(Theme::class);
+        $theme->load('o3-theme');
+        $theme->activate();
+    }
+
     public function setup(): void
     {
         parent::setUp();
-
-        $theme = oxNew(Theme::class);
-        $theme->load('wave');
-        $theme->activate();
     }
 
     public function testGetTemplateDirsContainsAWave()
@@ -64,8 +76,8 @@ class UtilsViewTest extends \OxidTestCase
         $shopPath = $this->getShopPath();
 
         $dirs = [
-            $shopPath . 'Application/views/wave/tpl/',
-            $shopPath . 'out/wave/tpl/',
+            $shopPath . 'Application/views/o3-theme/tpl/',
+            $shopPath . 'out/o3-theme/tpl/',
         ];
 
         $utilsView = $this->getUtilsViewMockNotAdmin();
@@ -82,8 +94,8 @@ class UtilsViewTest extends \OxidTestCase
         $shopPath = $this->getShopPath();
 
         $dirs = [
-            $shopPath . 'Application/views/wave/tpl/',
-            $shopPath . 'out/wave/tpl/',
+            $shopPath . 'Application/views/o3-theme/tpl/',
+            $shopPath . 'out/o3-theme/tpl/',
         ];
 
         $utilsView = $this->getUtilsViewMockNotAdmin();
@@ -132,23 +144,18 @@ class UtilsViewTest extends \OxidTestCase
         }
 
         $myConfig = $this->getConfig();
-        $aDirs[] = "testDir1";
-        $aDirs[] = "testDir2";
+        $aDirs[] = 'testDir1';
+        $aDirs[] = 'testDir2';
         $aDirs[] = $myConfig->getTemplateDir(false);
-        $sDir = $myConfig->getOutDir(true) . $myConfig->getConfigParam('sTheme') . "/tpl/";
-        if (!in_array($sDir, $aDirs)) {
-            $aDirs[] = $sDir;
-        }
-
-        $sDir = $myConfig->getOutDir(true) . "wave/tpl/";
+        $sDir = $myConfig->getOutDir(true) . $myConfig->getConfigParam('sTheme') . '/tpl/';
         if (!in_array($sDir, $aDirs)) {
             $aDirs[] = $sDir;
         }
 
         $utilsView = $this->getUtilsViewMockNotAdmin();
-        $utilsView->setTemplateDir("testDir1");
-        $utilsView->setTemplateDir("testDir2");
-        $utilsView->setTemplateDir("testDir1");
+        $utilsView->setTemplateDir('testDir1');
+        $utilsView->setTemplateDir('testDir2');
+        $utilsView->setTemplateDir('testDir1');
 
         $this->assertArraySubsetOxid($aDirs, $utilsView->getTemplateDirs());
     }
@@ -160,23 +167,18 @@ class UtilsViewTest extends \OxidTestCase
         }
 
         $myConfig = $this->getConfig();
-        $aDirs[] = "testDir1";
-        $aDirs[] = "testDir2";
+        $aDirs[] = 'testDir1';
+        $aDirs[] = 'testDir2';
         $aDirs[] = $myConfig->getTemplateDir(false);
-        $sDir = $myConfig->getOutDir(true) . $myConfig->getConfigParam('sTheme') . "/tpl/";
-        if (!in_array($sDir, $aDirs)) {
-            $aDirs[] = $sDir;
-        }
-
-        $sDir = $myConfig->getOutDir(true) . "wave/tpl/";
+        $sDir = $myConfig->getOutDir(true) . $myConfig->getConfigParam('sTheme') . '/tpl/';
         if (!in_array($sDir, $aDirs)) {
             $aDirs[] = $sDir;
         }
 
         $utilsView = $this->getUtilsViewMockNotAdmin();
-        $utilsView->setTemplateDir("testDir1");
-        $utilsView->setTemplateDir("testDir2");
-        $utilsView->setTemplateDir("testDir1");
+        $utilsView->setTemplateDir('testDir1');
+        $utilsView->setTemplateDir('testDir2');
+        $utilsView->setTemplateDir('testDir1');
 
         $this->assertEquals($aDirs, $utilsView->getTemplateDirs());
     }
@@ -201,7 +203,7 @@ class UtilsViewTest extends \OxidTestCase
     public function testGetTemplateOutput()
     {
         $this->getConfig()->setConfigParam('iDebug', 0);
-        $sTpl = __DIR__ ."/../testData//misc/testTempOut.tpl";
+        $sTpl = __DIR__ . '/../testData//misc/testTempOut.tpl';
 
         $oView = oxNew('oxview');
         $oView->addTplParam('articletitle', 'xxx');
@@ -215,9 +217,9 @@ class UtilsViewTest extends \OxidTestCase
     public function testPassAllErrorsToView()
     {
         $aView = [];
-        $aErrors[1][2] = serialize("foo");
+        $aErrors[1][2] = serialize('foo');
         \OxidEsales\Eshop\Core\Registry::getUtilsView()->passAllErrorsToView($aView, $aErrors);
-        $this->assertEquals($aView['Errors'][1][2], "foo");
+        $this->assertEquals($aView['Errors'][1][2], 'foo');
     }
 
     public function testAddErrorToDisplayCustomDestinationFromParam()
@@ -228,12 +230,14 @@ class UtilsViewTest extends \OxidTestCase
         $oxUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, ['getSession']);
         $oxUtilsView->expects($this->once())->method('getSession')->will($this->returnValue($oSession));
 
-        $oxUtilsView->addErrorToDisplay("testMessage", false, true, "myDest");
+        $oxUtilsView->addErrorToDisplay('testMessage', false, true, 'myDest');
 
         $aErrors = oxRegistry::getSession()->getVariable('Errors');
         $oEx = unserialize($aErrors['myDest'][0]);
-        $this->assertEquals("testMessage", $oEx->getOxMessage());
+        $this->assertEquals('testMessage', $oEx->getOxMessage());
         $this->assertNull(oxRegistry::getSession()->getVariable('ErrorController'));
+
+        // Clear expected log warning from translating test message
     }
 
     public function testAddErrorToDisplayCustomDestinationFromPost()
@@ -247,12 +251,14 @@ class UtilsViewTest extends \OxidTestCase
         $oxUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, ['getSession']);
         $oxUtilsView->expects($this->once())->method('getSession')->will($this->returnValue($oSession));
 
-        $oxUtilsView->addErrorToDisplay("testMessage", false, true, "");
+        $oxUtilsView->addErrorToDisplay('testMessage', false, true, '');
         $aErrors = oxRegistry::getSession()->getVariable('Errors');
         $oEx = unserialize($aErrors['myDest'][0]);
-        $this->assertEquals("testMessage", $oEx->getOxMessage());
+        $this->assertEquals('testMessage', $oEx->getOxMessage());
         $aErrorController = oxRegistry::getSession()->getVariable('ErrorController');
-        $this->assertEquals("oxwminibasket", $aErrorController['myDest']);
+        $this->assertEquals('oxwminibasket', $aErrorController['myDest']);
+
+        // Clear expected log warning from translating test message
     }
 
     public function testAddErrorToDisplayDefaultDestination()
@@ -264,18 +270,20 @@ class UtilsViewTest extends \OxidTestCase
         $oxUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, ['getSession']);
         $oxUtilsView->expects($this->once())->method('getSession')->will($this->returnValue($oSession));
 
-        $oxUtilsView->addErrorToDisplay("testMessage", false, true, "");
+        $oxUtilsView->addErrorToDisplay('testMessage', false, true, '');
         $aErrors = oxRegistry::getSession()->getVariable('Errors');
         $oEx = unserialize($aErrors['default'][0]);
-        $this->assertEquals("testMessage", $oEx->getOxMessage());
+        $this->assertEquals('testMessage', $oEx->getOxMessage());
         $aErrorController = oxRegistry::getSession()->getVariable('ErrorController');
-        $this->assertEquals("start", $aErrorController['default']);
+        $this->assertEquals('start', $aErrorController['default']);
+
+        // Clear expected log warning from translating test message
     }
 
     public function testAddErrorToDisplayUsingExeptionObject()
     {
         $oTest = oxNew('oxException');
-        $oTest->setMessage("testMessage");
+        $oTest->setMessage('testMessage');
 
         $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getId']);
         $oSession->expects($this->once())->method('getId')->will($this->returnValue(true));
@@ -283,11 +291,13 @@ class UtilsViewTest extends \OxidTestCase
         $oxUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, ['getSession']);
         $oxUtilsView->expects($this->once())->method('getSession')->will($this->returnValue($oSession));
 
-        $oxUtilsView->addErrorToDisplay($oTest, false, false, "");
+        $oxUtilsView->addErrorToDisplay($oTest, false, false, '');
 
         $aErrors = oxRegistry::getSession()->getVariable('Errors');
         $oEx = unserialize($aErrors['default'][0]);
-        $this->assertEquals("testMessage", $oEx->getOxMessage());
+        $this->assertEquals('testMessage', $oEx->getOxMessage());
+
+        // Clear expected log warning from translating test message
     }
 
     public function testAddErrorToDisplayIfNotSet()
@@ -298,7 +308,7 @@ class UtilsViewTest extends \OxidTestCase
         $oxUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, ['getSession']);
         $oxUtilsView->expects($this->once())->method('getSession')->will($this->returnValue($oSession));
 
-        $oxUtilsView->addErrorToDisplay(null, false, false, "");
+        $oxUtilsView->addErrorToDisplay(null, false, false, '');
 
         $aErrors = oxRegistry::getSession()->getVariable('Errors');
         //$oEx = unserialize($aErrors['default'][0]);
@@ -318,7 +328,7 @@ class UtilsViewTest extends \OxidTestCase
         $oxUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, ['getSession']);
         $oxUtilsView->expects($this->once())->method('getSession')->will($this->returnValue($oSession));
 
-        $oxUtilsView->addErrorToDisplay(null, false, false, "");
+        $oxUtilsView->addErrorToDisplay(null, false, false, '');
     }
 
     /**
@@ -360,7 +370,7 @@ class UtilsViewTest extends \OxidTestCase
             $templateDirs[] = $sTplDir;
         }
 
-        $sTplDir = $config->getOutDir() . $config->getConfigParam('sTheme') . "/tpl/";
+        $sTplDir = $config->getOutDir() . $config->getConfigParam('sTheme') . '/tpl/';
         if ($sTplDir && !in_array($sTplDir, $templateDirs)) {
             $templateDirs[] = $sTplDir;
         }
@@ -408,7 +418,7 @@ class UtilsViewTest extends \OxidTestCase
             $aTemplatesDir[] = $sTplDir;
         }
 
-        $sTplDir = $config->getOutDir() . $config->getConfigParam('sTheme') . "/tpl/";
+        $sTplDir = $config->getOutDir() . $config->getConfigParam('sTheme') . '/tpl/';
         if ($sTplDir && !in_array($sTplDir, $aTemplatesDir)) {
             $aTemplatesDir[] = $sTplDir;
         }
@@ -450,7 +460,7 @@ class UtilsViewTest extends \OxidTestCase
             $aTemplatesDir[] = $sTplDir;
         }
 
-        $sTplDir = $config->getOutDir() . $config->getConfigParam('sTheme') . "/tpl/";
+        $sTplDir = $config->getOutDir() . $config->getConfigParam('sTheme') . '/tpl/';
         if ($sTplDir && !in_array($sTplDir, $aTemplatesDir)) {
             $aTemplatesDir[] = $sTplDir;
         }
@@ -495,7 +505,7 @@ class UtilsViewTest extends \OxidTestCase
             $aTemplatesDir[] = $sTplDir;
         }
 
-        $sTplDir = $config->getOutDir() . $config->getConfigParam('sTheme') . "/tpl/";
+        $sTplDir = $config->getOutDir() . $config->getConfigParam('sTheme') . '/tpl/';
         if ($sTplDir && !in_array($sTplDir, $aTemplatesDir)) {
             $aTemplatesDir[] = $sTplDir;
         }
@@ -540,7 +550,7 @@ class UtilsViewTest extends \OxidTestCase
             $templatesDirectories[] = $tplDir;
         }
 
-        $tplDir = $config->getOutDir() . $config->getConfigParam('sTheme') . "/tpl/";
+        $tplDir = $config->getOutDir() . $config->getConfigParam('sTheme') . '/tpl/';
         if ($tplDir && !in_array($tplDir, $templatesDirectories)) {
             $templatesDirectories[] = $tplDir;
         }
@@ -619,7 +629,7 @@ class UtilsViewTest extends \OxidTestCase
         $compileDirectory = $this->getCompileDirectory();
         $config->setConfigParam('sCompileDir', $compileDirectory);
 
-        $sExp = $compileDirectory . "/smarty/";
+        $sExp = $compileDirectory . '/smarty/';
 
         $this->assertSame($sExp, $oUV->getSmartyDir());
     }
@@ -632,11 +642,7 @@ class UtilsViewTest extends \OxidTestCase
         $config = $this->getConfig();
         $dirs = [];
         $dirs[] = $config->getTemplateDir(false);
-        $dir = $config->getOutDir(true) . $config->getConfigParam('sTheme') . "/tpl/";
-        if (!in_array($dir, $dirs)) {
-            $dirs[] = $dir;
-        }
-        $dir = $config->getOutDir(true) . "wave/tpl/";
+        $dir = $config->getOutDir(true) . $config->getConfigParam('sTheme') . '/tpl/';
         if (!in_array($dir, $dirs)) {
             $dirs[] = $dir;
         }
@@ -648,7 +654,7 @@ class UtilsViewTest extends \OxidTestCase
      */
     private function getUtilsViewMockNotAdmin()
     {
-        $utilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, ["isAdmin"]);
+        $utilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, ['isAdmin']);
         $utilsView->expects($this->any())->method('isAdmin')->will($this->returnValue(false));
         return $utilsView;
     }
@@ -658,7 +664,7 @@ class UtilsViewTest extends \OxidTestCase
      */
     private function getUtilsViewMockBeAdmin()
     {
-        $utilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, ["isAdmin"]);
+        $utilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, ['isAdmin']);
         $utilsView->expects($this->any())->method('isAdmin')->will($this->returnValue(true));
         return $utilsView;
     }
@@ -686,8 +692,8 @@ class UtilsViewTest extends \OxidTestCase
             'left_delimiter' => '[{',
             'right_delimiter' => '}]',
             'caching' => false,
-            'compile_dir' => $compileDirectory . "/smarty/",
-            'cache_dir' => $compileDirectory . "/smarty/",
+            'compile_dir' => $compileDirectory . '/smarty/',
+            'cache_dir' => $compileDirectory . '/smarty/',
             'compile_id' => md5($config->getTemplateDir(false) . '__' . $config->getShopId()),
             'debugging' => true,
             'compile_check' => true,
@@ -723,7 +729,7 @@ class UtilsViewTest extends \OxidTestCase
                     ],
                 'ALLOW_CONSTANTS' => true,
                 'ALLOW_SUPER_GLOBALS' => true,
-            ]
+            ],
         ];
         return $aCheck;
     }
@@ -741,8 +747,8 @@ class UtilsViewTest extends \OxidTestCase
             'left_delimiter' => '[{',
             'right_delimiter' => '}]',
             'caching' => false,
-            'compile_dir' => $compileDirectory . "/smarty/",
-            'cache_dir' => $compileDirectory . "/smarty/",
+            'compile_dir' => $compileDirectory . '/smarty/',
+            'cache_dir' => $compileDirectory . '/smarty/',
             'compile_id' => md5($config->getTemplateDir(false) . '__' . $config->getShopId()),
             'debugging' => true,
             'compile_check' => true,

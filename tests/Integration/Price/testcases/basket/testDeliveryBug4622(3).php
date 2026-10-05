@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: Brutto;
  * Price view mode: Brutto;
@@ -10,22 +11,20 @@
  * 0003101: delivery cost is not recalculated after discount in basket
  * 6 with discount total price less than 150, but more without discount
  */
-$aData = array(
-
-    'articles' => array(
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
             'oxid'                     => 'coupon',
             'oxprice'                  => 50,
             'oxvat'                    => 19,
             'amount'                   => 2,
-            'oxnonmaterial'            => true
-        ),
-    ),
+            'oxnonmaterial'            => true,
+        ],
+    ],
 
-
-    'costs' => array(
-        'delivery' => array(
-            0 => array(
+    'costs' => [
+        'delivery' => [
+            0 => [
                 'oxtitle' => '10% from total ',
                 'oxactive' => 1,
                 'oxaddsum' => 10,
@@ -35,35 +34,34 @@ $aData = array(
                 'oxparam' => 0, //from
                 'oxparamend' => 1000, //to
                 'oxsort' => 1,
-            ),
-
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-            'coupon' => array( '50,00', '100,00' ),
-        ),
-        'totals' => array(
+            ],
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+            'coupon' => [ '50,00', '100,00' ],
+        ],
+        'totals' => [
             'totalBrutto' => '100,00',
             'totalNetto'  => '84,03',
-            'vats' => array(
+            'vats' => [
                 19 => '15,97',
-            ),
-            'delivery' => array(
+            ],
+            'delivery' => [
                 'brutto' => '10,00',
-            ),
-            'grandTotal'  => '110,00'
-        ),
-    ),
-    'options' => array(
+            ],
+            'grandTotal'  => '110,00',
+        ],
+    ],
+    'options' => [
         'activeCurrencyRate' => 1,
-        'config' => array(
+        'config' => [
             'blEnterNetPrice' => false,
             'blShowNetPrice' => false,
             'blShowVATForWrapping' => false,
             'blShowVATForDelivery' => false,
             'sAdditionalServVATCalcMethod' => 'biggest_net',
             'blExclNonMaterialFromDelivery' => false,
-        ),
-    ),
-);
+        ],
+    ],
+];

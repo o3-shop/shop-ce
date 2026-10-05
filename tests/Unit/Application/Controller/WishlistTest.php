@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,15 +18,15 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller;
 
-use \oxField;
-use \oxDb;
-use \oxRegistry;
+use oxDb;
+use oxField;
+use oxRegistry;
 
 class WishlistTest extends \OxidTestCase
 {
-
     /**
      * Initialize the fixture.
      *
@@ -63,7 +64,7 @@ class WishlistTest extends \OxidTestCase
     public function testGetWishUser()
     {
         $this->setRequestParameter('wishid', '_testId');
-        $oWishList = oxNew("Wishlist");
+        $oWishList = oxNew('Wishlist');
 
         $oWishUser = $oWishList->getWishUser();
 
@@ -77,7 +78,7 @@ class WishlistTest extends \OxidTestCase
     public function testGetWishList()
     {
         $this->setRequestParameter('wishid', '_testId');
-        $oWishList = oxNew("Wishlist");
+        $oWishList = oxNew('Wishlist');
         $myDB = oxDb::getDB();
 
         // adding article to basket
@@ -93,14 +94,13 @@ class WishlistTest extends \OxidTestCase
         $this->assertEquals('1126', $oArticle->getId());
     }
 
-
     /*
      * Checking getting wishlist
      */
     public function testGetWishListIactive()
     {
         $this->setRequestParameter('wishid', '_testId');
-        $oWishList = oxNew("Wishlist");
+        $oWishList = oxNew('Wishlist');
         $myDB = oxDb::getDB();
 
         // adding article to basket
@@ -121,7 +121,7 @@ class WishlistTest extends \OxidTestCase
     {
         $this->setRequestParameter('search', 'testUserName');
 
-        $oWishList = $this->getProxyClass("Wishlist");
+        $oWishList = $this->getProxyClass('Wishlist');
         $myDB = oxDb::getDB(oxDB::FETCH_MODE_ASSOC);
 
         // adding article to basket
@@ -143,7 +143,7 @@ class WishlistTest extends \OxidTestCase
      */
     public function testGetWishListUsers()
     {
-        $oWishList = $this->getProxyClass("Wishlist");
+        $oWishList = $this->getProxyClass('Wishlist');
 
         $oWishList->setNonPublicVar('_oWishListUsers', 'testValue');
         $this->assertEquals('testValue', $oWishList->getWishListUsers());
@@ -154,7 +154,7 @@ class WishlistTest extends \OxidTestCase
      */
     public function testGetWishListSearchParam()
     {
-        $oWishList = $this->getProxyClass("Wishlist");
+        $oWishList = $this->getProxyClass('Wishlist');
 
         $oWishList->setNonPublicVar('_sSearchParam', 'testValue');
         $this->assertEquals('testValue', $oWishList->getWishListSearchParam());
@@ -165,7 +165,7 @@ class WishlistTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $oWishList = $this->getProxyClass("Wishlist");
+        $oWishList = $this->getProxyClass('Wishlist');
 
         $this->assertEquals('page/wishlist/wishlist.tpl', $oWishList->render());
     }
@@ -178,11 +178,11 @@ class WishlistTest extends \OxidTestCase
     public function testGetBreadCrumb()
     {
         $oWishList = oxNew('Wishlist');
-        $aResults = array();
-        $aResult = array();
+        $aResults = [];
+        $aResult = [];
 
-        $aResult["title"] = oxRegistry::getLang()->translateString('PUBLIC_GIFT_REGISTRIES', oxRegistry::getLang()->getBaseLanguage(), false);
-        $aResult["link"] = $oWishList->getLink();
+        $aResult['title'] = oxRegistry::getLang()->translateString('PUBLIC_GIFT_REGISTRIES', oxRegistry::getLang()->getBaseLanguage(), false);
+        $aResult['link'] = $oWishList->getLink();
 
         $aResults[] = $aResult;
 
@@ -198,7 +198,7 @@ class WishlistTest extends \OxidTestCase
         $oUser->oxuser__oxfname = new oxField('fName');
         $oUser->oxuser__oxlname = new oxField('lName');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\WishListController::class, array('getWishUser'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\WishListController::class, ['getWishUser']);
         $oView->expects($this->any())->method('getWishUser')->will($this->returnValue($oUser));
 
         $this->assertEquals(oxRegistry::getLang()->translateString('GIFT_REGISTRY_OF_3', oxRegistry::getLang()->getBaseLanguage(), false) . ' fName lName', $oView->getTitle());
@@ -209,7 +209,7 @@ class WishlistTest extends \OxidTestCase
      */
     public function testGetTitleWithoutUser()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\WishListController::class, array('getWishUser'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\WishListController::class, ['getWishUser']);
         $oView->expects($this->any())->method('getWishUser')->will($this->returnValue(null));
 
         $this->assertEquals(oxRegistry::getLang()->translateString('PUBLIC_GIFT_REGISTRIES', oxRegistry::getLang()->getBaseLanguage(), false), $oView->getTitle());

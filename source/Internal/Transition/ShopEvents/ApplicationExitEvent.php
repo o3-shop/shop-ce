@@ -27,5 +27,5 @@ use Symfony\Component\EventDispatcher\Event;
 
 class ApplicationExitEvent extends Event
 {
-    const NAME = self::class;
+    public const NAME = self::class;
 }

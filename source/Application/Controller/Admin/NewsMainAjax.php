@@ -21,14 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxDb;
-use oxField;
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Application\Model\Object2Group;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class manages news user groups rights
  * @deprecated 6.5.6 "News" feature will be removed completely
  */
-class NewsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class NewsMainAjax extends ListComponentAjax
 {
     /**
      * Columns array
@@ -46,37 +50,60 @@ class NewsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListCo
             ['oxtitle', 'oxgroups', 1, 0, 0],
             ['oxid', 'oxgroups', 0, 0, 0],
             ['oxid', 'oxobject2group', 0, 0, 1],
-        ]
+        ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
+     * @throws DatabaseConnectionException
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // active AJAX component
-        $sGroupTable = $this->_getViewName('oxgroups');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sDiscountId = $this->getConfig()->getRequestParameter('oxid');
-        $sSynchDiscountId = $this->getConfig()->getRequestParameter('synchoxid');
+        $sGroupTable = $this->getViewName('oxgroups');
+        $oDb = DatabaseProvider::getDb();
+        $sDiscountId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchDiscountId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sDiscountId) {
             $sQAdd = " from $sGroupTable where 1 ";
         } else {
             $sQAdd = " from oxobject2group left join $sGroupTable on oxobject2group.oxgroupsid=$sGroupTable.oxid ";
-            $sQAdd .= " where oxobject2group.oxobjectid = " . $oDb->quote($sDiscountId);
+            $sQAdd .= ' where oxobject2group.oxobjectid = ' . $oDb->quote($sDiscountId);
         }
 
         if ($sSynchDiscountId && $sSynchDiscountId != $sDiscountId) {
             $sQAdd .= ' and ' . $sGroupTable . '.oxid not in ( select ' . $sGroupTable . '.oxid from oxobject2group left join ' . $sGroupTable . ' on oxobject2group.oxgroupsid=' . $sGroupTable . '.oxid ';
-            $sQAdd .= " where oxobject2group.oxobjectid = " . $oDb->quote($sSynchDiscountId) . " ) ";
+            $sQAdd .= ' where oxobject2group.oxobjectid = ' . $oDb->quote($sSynchDiscountId) . ' ) ';
         }
 
         return $sQAdd;
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
+     */
+    protected function getQuery()
+    {
+        return $this->_getQuery();
     }
 
     /**
@@ -85,12 +112,12 @@ class NewsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListCo
     public function removeGroupFromNews()
     {
         $aRemoveGroups = $this->_getActionIds('oxobject2group.oxid');
-        if ($this->getConfig()->getRequestParameter('all')) {
-            $sQ = $this->_addFilter("delete oxobject2group.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
+            $sQ = $this->_addFilter('delete oxobject2group.* ' . $this->getQuery());
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sQ = "delete from oxobject2group where oxobject2group.oxid in (" . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            $sQ = 'delete from oxobject2group where oxobject2group.oxid in (' . implode(', ', DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ') ';
+            DatabaseProvider::getDb()->Execute($sQ);
         }
     }
 
@@ -100,18 +127,18 @@ class NewsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListCo
     public function addGroupToNews()
     {
         $aAddGroups = $this->_getActionIds('oxgroups.oxid');
-        $soxId = $this->getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
-        if ($this->getConfig()->getRequestParameter('all')) {
-            $sGroupTable = $this->_getViewName('oxgroups');
-            $aAddGroups = $this->_getAll($this->_addFilter("select $sGroupTable.oxid " . $this->_getQuery()));
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
+            $sGroupTable = $this->getViewName('oxgroups');
+            $aAddGroups = $this->_getAll($this->_addFilter("select $sGroupTable.oxid " . $this->getQuery()));
         }
 
-        if ($soxId && $soxId != "-1" && is_array($aAddGroups)) {
+        if ($soxId && $soxId != '-1' && is_array($aAddGroups)) {
             foreach ($aAddGroups as $sAddgroup) {
-                $oNewGroup = oxNew(\OxidEsales\Eshop\Application\Model\Object2Group::class);
-                $oNewGroup->oxobject2group__oxobjectid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oNewGroup->oxobject2group__oxgroupsid = new \OxidEsales\Eshop\Core\Field($sAddgroup);
+                $oNewGroup = oxNew(Object2Group::class);
+                $oNewGroup->oxobject2group__oxobjectid = new Field($soxId);
+                $oNewGroup->oxobject2group__oxgroupsid = new Field($sAddgroup);
                 $oNewGroup->save();
             }
         }

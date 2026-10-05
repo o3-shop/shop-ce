@@ -26,8 +26,8 @@ namespace OxidEsales\EshopCommunity\Core\ViewHelper;
  */
 class JavaScriptRegistrator
 {
-    const SNIPPETS_PARAMETER_NAME = 'scripts';
-    const FILES_PARAMETER_NAME = 'includes';
+    public const SNIPPETS_PARAMETER_NAME = 'scripts';
+    public const FILES_PARAMETER_NAME = 'includes';
 
     /**
      * Register JavaScript code snippet for rendering.
@@ -93,7 +93,7 @@ class JavaScriptRegistrator
         }
 
         if (empty($url) && $config->getConfigParam('iDebug') != 0) {
-            $error = "{oxscript} resource not found: " . getStr()->htmlspecialchars($file);
+            $error = '{oxscript} resource not found: ' . getStr()->htmlspecialchars($file);
             trigger_error($error, E_USER_WARNING);
         }
 

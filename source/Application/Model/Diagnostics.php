@@ -21,6 +21,11 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Diagnostic tool model
  * Stores configuration and public diagnostic methods for shop diagnostics
@@ -33,14 +38,14 @@ class Diagnostics
      *
      * @var string
      */
-    protected $_sEdition = "";
+    protected $_sEdition = '';
 
     /**
      * Version of THIS O3-Shop
      *
      * @var string
      */
-    protected $_sVersion = "";
+    protected $_sVersion = '';
 
     /**
      * Revision of THIS O3-Shop
@@ -49,14 +54,14 @@ class Diagnostics
      *
      * @var string
      */
-    protected $_sRevision = "";
+    protected $_sRevision = '';
 
     /**
      * Revision of THIS O3-Shop
      *
      * @var string
      */
-    protected $_sShopLink = "";
+    protected $_sShopLink = '';
 
     /**
      * Array of all files and folders in shop root folder which are to be checked
@@ -137,7 +142,6 @@ class Diagnostics
         return $this->_aFileCheckerExtensionList;
     }
 
-
     /**
      * Version setter
      *
@@ -201,13 +205,12 @@ class Diagnostics
      *
      * @deprecated since v6.0.0 (2017-12-04); This functionality will be removed completely
      *
-     * @return bool|string
+     * @return string
      */
     public function getRevision()
     {
         return $this->_sRevision;
     }
-
 
     /**
      * ShopLink setter
@@ -235,11 +238,13 @@ class Diagnostics
      * Collects information on the shop, like amount of categories, articles, users
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getShopDetails()
     {
         $aShopDetails = [
-            'Date'                => date(\OxidEsales\Eshop\Core\Registry::getLang()->translateString('fullDateFormat'), time()),
+            'Date'                => date(Registry::getLang()->translateString('fullDateFormat'), time()),
             'URL'                 => $this->getShopLink(),
             'Edition'             => $this->getEdition(),
             'Version'             => $this->getVersion(),
@@ -259,15 +264,17 @@ class Diagnostics
     /**
      * counts result Rows
      *
-     * @param string  $sTable table
+     * @param string $sTable table
      * @param boolean $blMode mode
      *
      * @return integer
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "countRows" in next major
      */
     protected function _countRows($sTable, $blMode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $sRequest = 'SELECT COUNT(*) FROM ' . $sTable;
 
         if ($blMode == false) {
@@ -278,7 +285,6 @@ class Diagnostics
 
         return $aRes;
     }
-
 
     /**
      * Picks some pre-selected PHP configuration settings and returns them.
@@ -308,9 +314,8 @@ class Diagnostics
         return $aPhpIniConf;
     }
 
-
     /**
-     * Returns the installed PHP devoder (like Zend Optimizer, Guard Loader)
+     * Returns the installed PHP decoder (like Zend Optimizer, Guard Loader)
      *
      * @return string
      */
@@ -329,12 +334,12 @@ class Diagnostics
         return $sReturn;
     }
 
-
     /**
      * General server information
      * We will use the exec command here several times. In order tro prevent stop on failure, use $this->isExecAllowed().
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getServerInfo()
     {
@@ -549,11 +554,12 @@ class Diagnostics
      * Returns MySQL server Information
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getMySqlServerInfo" in next major
      */
     protected function _getMySqlServerInfo() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $aResult = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC)->getRow("SHOW VARIABLES LIKE 'version'");
+        $aResult = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getRow("SHOW VARIABLES LIKE 'version'");
 
         return $aResult['Value'];
     }

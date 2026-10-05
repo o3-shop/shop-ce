@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -29,7 +30,6 @@ use PHPUnit\Framework\TestCase;
  */
 class FormatDateLogicTest extends TestCase
 {
-
     /** @var FormatDateLogic */
     private $formDateLogic;
 
@@ -42,7 +42,7 @@ class FormatDateLogicTest extends TestCase
     public function testFormdateWithDatetime(): void
     {
         $input = '01.08.2007 11.56.25';
-        $expected = "2007-08-01 11:56:25";
+        $expected = '2007-08-01 11:56:25';
 
         $this->assertEquals($expected, $this->formDateLogic->formdate($input, 'datetime', true));
     }
@@ -50,7 +50,7 @@ class FormatDateLogicTest extends TestCase
     public function testFormdateWithTimestamp(): void
     {
         $input = '20070801115625';
-        $expected = "2007-08-01 11:56:25";
+        $expected = '2007-08-01 11:56:25';
 
         $this->assertEquals($expected, $this->formDateLogic->formdate($input, 'timestamp', true));
     }
@@ -58,17 +58,17 @@ class FormatDateLogicTest extends TestCase
     public function testFormdateWithDate(): void
     {
         $input = '2007-08-01 11:56:25';
-        $expected = "2007-08-01";
+        $expected = '2007-08-01';
 
         $this->assertEquals($expected, $this->formDateLogic->formdate($input, 'date', true));
     }
 
     public function testFormdateUsingObject(): void
     {
-        $expected = "2007-08-01 11:56:25";
+        $expected = '2007-08-01 11:56:25';
 
         $field = new Field();
-        $field->fldmax_length = "0";
+        $field->fldmax_length = '0';
         $field->fldtype = 'datetime';
         $field->setValue('01.08.2007 11.56.25');
 

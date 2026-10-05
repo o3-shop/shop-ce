@@ -21,28 +21,31 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxStr;
-use oxRegistry;
-use oxAdminDetails;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Core\DisplayError;
+use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
+use OxidEsales\Eshop\Core\NoJsValidator;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
 
 /**
  * Admin general export manager.
  */
-class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class GenericImportMain extends AdminDetailsController
 {
     /**
      * Export class name
      *
      * @var string
      */
-    public $sClassDo = "genImport_do";
+    public $sClassDo = 'genImport_do';
 
     /**
      * Export ui class name
      *
      * @var string
      */
-    public $sClassMain = "genImport_main";
+    public $sClassMain = 'genImport_main';
 
     /**
      * Csv file path
@@ -70,7 +73,7 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
      *
      * @var string
      */
-    protected $_sDefaultStringTerminator = ";";
+    protected $_sDefaultStringTerminator = ';';
 
     /**
      * Default Csv file field encloser
@@ -84,7 +87,7 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
      *
      * @var string
      */
-    protected $_sThisTemplate = "genimport_main.tpl";
+    protected $_sThisTemplate = 'genimport_main.tpl';
 
     /**
      * Creates shop object, passes shop data to Smarty engine and returns name of
@@ -94,12 +97,13 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
      */
     public function render()
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
+        $oRequest = Registry::getRequest();
 
         $genericImport = oxNew(\OxidEsales\Eshop\Core\GenericImport\GenericImport::class);
         $this->_sCsvFilePath = null;
 
-        $navigationStep = $config->getRequestParameter('sNavStep');
+        $navigationStep = $oRequest->getRequestEscapedParameter('sNavStep');
 
         if (!$navigationStep) {
             $navigationStep = 1;
@@ -110,14 +114,14 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
         $navigationStep = $this->_checkErrors($navigationStep);
 
         if ($navigationStep == 1) {
-            $this->_aViewData['sGiCsvFieldTerminator'] = \OxidEsales\Eshop\Core\Str::getStr()->htmlentities($this->_getCsvFieldsTerminator());
-            $this->_aViewData['sGiCsvFieldEncloser'] = \OxidEsales\Eshop\Core\Str::getStr()->htmlentities($this->_getCsvFieldsEncolser());
+            $this->_aViewData['sGiCsvFieldTerminator'] = Str::getStr()->htmlentities($this->_getCsvFieldsTerminator());
+            $this->_aViewData['sGiCsvFieldEncloser'] = Str::getStr()->htmlentities($this->getCsvFieldsEncloser());
         }
 
         if ($navigationStep == 2) {
-            $noJsValidator = oxNew(\OxidEsales\Eshop\Core\NoJsValidator::class);
+            $noJsValidator = oxNew(NoJsValidator::class);
             //saving csv field terminator and encloser to config
-            $terminator = $config->getRequestParameter('sGiCsvFieldTerminator');
+            $terminator = $oRequest->getRequestEscapedParameter('sGiCsvFieldTerminator');
             if ($terminator && !$noJsValidator->isValid($terminator)) {
                 $this->setErrorToView($terminator);
             } else {
@@ -125,7 +129,7 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
                 $config->saveShopConfVar('str', 'sGiCsvFieldTerminator', $terminator);
             }
 
-            $encloser = $config->getRequestParameter('sGiCsvFieldEncloser');
+            $encloser = $oRequest->getRequestEscapedParameter('sGiCsvFieldEncloser');
             if ($encloser && !$noJsValidator->isValid($encloser)) {
                 $this->setErrorToView($encloser);
             } else {
@@ -133,7 +137,7 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
                 $config->saveShopConfVar('str', 'sGiCsvFieldEncloser', $encloser);
             }
 
-            $type = $config->getRequestParameter('sType');
+            $type = $oRequest->getRequestEscapedParameter('sType');
             $importObject = $genericImport->getImportObject($type);
             $this->_aViewData['sType'] = $type;
             $this->_aViewData['sImportTable'] = $importObject->getBaseTableName();
@@ -142,25 +146,25 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
         }
 
         if ($navigationStep == 3) {
-            $csvFields = $config->getRequestParameter('aCsvFields');
-            $type = $config->getRequestParameter('sType');
+            $csvFields = $oRequest->getRequestEscapedParameter('aCsvFields');
+            $type = $oRequest->getRequestEscapedParameter('sType');
 
             $genericImport = oxNew(\OxidEsales\Eshop\Core\GenericImport\GenericImport::class);
             $genericImport->setImportType($type);
             $genericImport->setCsvFileFieldsOrder($csvFields);
-            $genericImport->setCsvContainsHeader(\OxidEsales\Eshop\Core\Registry::getSession()->getVariable('blCsvContainsHeader'));
+            $genericImport->setCsvContainsHeader(Registry::getSession()->getVariable('blCsvContainsHeader'));
 
             $genericImport->importFile($this->_getUploadedCsvFilePath());
             $this->_aViewData['iTotalRows'] = $genericImport->getImportedRowCount();
 
-            //checking if errors occured during import
+            //checking if errors occurred during import
             $this->_checkImportErrors($genericImport);
 
             //deleting uploaded csv file from temp dir
             $this->_deleteCsvFile();
 
-            //check if repeating import - then forsing first step
-            if ($config->getRequestParameter('iRepeatImport')) {
+            //check if repeating import - then forcing first step
+            if ($oRequest->getRequestEscapedParameter('iRepeatImport')) {
                 $this->_aViewData['iRepeatImport'] = 1;
                 $navigationStep = 1;
             }
@@ -179,7 +183,13 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
 
     /**
      * Deletes uploaded csv file from temp directory
-     * @deprecated underscore prefix violates PSR12, will be renamed to "deleteCsvFile" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _deleteCsvFile()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes deleteCsvFile() to the canonical override
+      *             target and retires _deleteCsvFile(); until then, _deleteCsvFile() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _deleteCsvFile() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -190,19 +200,39 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
     }
 
     /**
+     * Deletes uploaded csv file from temp directory
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _deleteCsvFile(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make deleteCsvFile() the canonical override target.
+     */
+    protected function deleteCsvFile()
+    {
+        $this->_deleteCsvFile();
+    }
+
+    /**
      * Get columns names from CSV file header. If file has no header
-     * returns default columns names Column 1, Column 2..
+     * returns default columns names Column 1, Column 2 ...
      *
      * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getCsvFieldsNames" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getCsvFieldsNames()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getCsvFieldsNames() to the canonical override
+      *             target and retires _getCsvFieldsNames(); until then, _getCsvFieldsNames() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getCsvFieldsNames() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $blCsvContainsHeader = $this->getConfig()->getRequestParameter('blContainsHeader');
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('blCsvContainsHeader', $blCsvContainsHeader);
+        $blCsvContainsHeader = Registry::getRequest()->getRequestEscapedParameter('blContainsHeader');
+        Registry::getSession()->setVariable('blCsvContainsHeader', $blCsvContainsHeader);
         $this->_getUploadedCsvFilePath();
 
         $aFirstRow = $this->_getCsvFirstRow();
+        $aCsvFields = [];
 
         if (!$blCsvContainsHeader) {
             $iIndex = 1;
@@ -211,7 +241,7 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
             }
         } else {
             foreach ($aFirstRow as $sKey => $sValue) {
-                $aFirstRow[$sKey] = \OxidEsales\Eshop\Core\Str::getStr()->htmlentities($sValue);
+                $aFirstRow[$sKey] = Str::getStr()->htmlentities($sValue);
             }
 
             $aCsvFields = $aFirstRow;
@@ -221,19 +251,42 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
     }
 
     /**
+     * Get columns names from CSV file header. If file has no header
+     * returns default columns names Column 1, Column 2 ...
+     *
+     * @return array
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getCsvFieldsNames(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getCsvFieldsNames() the canonical override target.
+     */
+    protected function getCsvFieldsNames()
+    {
+        return $this->_getCsvFieldsNames();
+    }
+
+    /**
      * Get first row from uploaded CSV file
      *
      * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getCsvFirstRow" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getCsvFirstRow()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getCsvFirstRow() to the canonical override
+      *             target and retires _getCsvFirstRow(); until then, _getCsvFirstRow() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getCsvFirstRow() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sPath = $this->_getUploadedCsvFilePath();
         $iMaxLineLength = 8192;
+        $aRow = [];
 
         //getting first row
-        if (($rFile = @fopen($sPath, "r")) !== false) {
-            $aRow = fgetcsv($rFile, $iMaxLineLength, $this->_getCsvFieldsTerminator(), $this->_getCsvFieldsEncolser());
+        if (($rFile = @fopen($sPath, 'r')) !== false) {
+            $aRow = fgetcsv($rFile, $iMaxLineLength, $this->_getCsvFieldsTerminator(), $this->getCsvFieldsEncloser());
             fclose($rFile);
         }
 
@@ -241,32 +294,72 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
     }
 
     /**
+     * Get first row from uploaded CSV file
+     *
+     * @return array
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getCsvFirstRow(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getCsvFirstRow() the canonical override target.
+     */
+    protected function getCsvFirstRow()
+    {
+        return $this->_getCsvFirstRow();
+    }
+
+    /**
      * Resets CSV parameters stored in session
-     * @deprecated underscore prefix violates PSR12, will be renamed to "resetUploadedCsvData" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _resetUploadedCsvData()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes resetUploadedCsvData() to the canonical override
+      *             target and retires _resetUploadedCsvData(); until then, _resetUploadedCsvData() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _resetUploadedCsvData() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $this->_sCsvFilePath = null;
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('sCsvFilePath', null);
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('blCsvContainsHeader', null);
+        Registry::getSession()->setVariable('sCsvFilePath', null);
+        Registry::getSession()->setVariable('blCsvContainsHeader', null);
+    }
+
+    /**
+     * Resets CSV parameters stored in session
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _resetUploadedCsvData(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make resetUploadedCsvData() the canonical override target.
+     */
+    protected function resetUploadedCsvData()
+    {
+        $this->_resetUploadedCsvData();
     }
 
     /**
      * Checks current import navigation step errors.
-     * Returns step id in which error occured.
+     * Returns step id in which error occurred.
      *
      * @param int $iNavStep Navigation step id
      *
      * @return int
-     * @deprecated underscore prefix violates PSR12, will be renamed to "checkErrors" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _checkErrors()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes checkErrors() to the canonical override
+      *             target and retires _checkErrors(); until then, _checkErrors() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _checkErrors($iNavStep) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($iNavStep == 2) {
             if (!$this->_getUploadedCsvFilePath()) {
-                $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ExceptionToDisplay::class);
+                $oEx = oxNew(ExceptionToDisplay::class);
                 $oEx->setMessage('GENIMPORT_ERRORUPLOADINGFILE');
-                \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'genimport');
+                Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'genimport');
 
                 return 1;
             }
@@ -274,7 +367,7 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
 
         if ($iNavStep == 3) {
             $blIsEmpty = true;
-            $aCsvFields = $this->getConfig()->getRequestParameter('aCsvFields');
+            $aCsvFields = Registry::getRequest()->getRequestEscapedParameter('aCsvFields');
             foreach ($aCsvFields as $sValue) {
                 if ($sValue) {
                     $blIsEmpty = false;
@@ -283,9 +376,9 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
             }
 
             if ($blIsEmpty) {
-                $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ExceptionToDisplay::class);
+                $oEx = oxNew(ExceptionToDisplay::class);
                 $oEx->setMessage('GENIMPORT_ERRORASSIGNINGFIELDS');
-                \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'genimport');
+                Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'genimport');
 
                 return 2;
             }
@@ -295,60 +388,127 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
     }
 
     /**
+     * Checks current import navigation step errors.
+     * Returns step id in which error occurred.
+     *
+     * @param int $iNavStep Navigation step id
+     *
+     * @return int
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _checkErrors(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make checkErrors() the canonical override target.
+     */
+    protected function checkErrors($iNavStep)
+    {
+        return $this->_checkErrors($iNavStep);
+    }
+
+    /**
      * Checks if CSV file was uploaded. If uploaded - moves it to temp dir
      * and stores path to file in session. Return path to uploaded file.
      *
-     * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getUploadedCsvFilePath" in next major
+     * @return string|null
+     * @deprecated Transitional during #107. Modules SHOULD override _getUploadedCsvFilePath()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getUploadedCsvFilePath() to the canonical override
+      *             target and retires _getUploadedCsvFilePath(); until then, _getUploadedCsvFilePath() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getUploadedCsvFilePath() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         //try to get uploaded csv file path
         if ($this->_sCsvFilePath !== null) {
             return $this->_sCsvFilePath;
-        } elseif ($this->_sCsvFilePath = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('sCsvFilePath')) {
+        } elseif ($this->_sCsvFilePath = Registry::getSession()->getVariable('sCsvFilePath')) {
             return $this->_sCsvFilePath;
         }
 
-        $oConfig = $this->getConfig();
+        $oConfig = Registry::getConfig();
         $aFile = $oConfig->getUploadedFile('csvfile');
         if (isset($aFile['name']) && $aFile['name']) {
             $this->_sCsvFilePath = $oConfig->getConfigParam('sCompileDir') . basename($aFile['tmp_name']);
             move_uploaded_file($aFile['tmp_name'], $this->_sCsvFilePath);
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('sCsvFilePath', $this->_sCsvFilePath);
+            Registry::getSession()->setVariable('sCsvFilePath', $this->_sCsvFilePath);
 
             return $this->_sCsvFilePath;
         }
     }
 
     /**
-     * Checks if any error occured during import and displays them
+     * Checks if CSV file was uploaded. If uploaded - moves it to temp dir
+     * and stores path to file in session. Return path to uploaded file.
+     *
+     * @return string|null|void
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getUploadedCsvFilePath(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getUploadedCsvFilePath() the canonical override target.
+     */
+    protected function getUploadedCsvFilePath()
+    {
+        return $this->_getUploadedCsvFilePath();
+    }
+
+    /**
+     * Checks if any error occurred during import and displays them
      *
      * @param object $oErpImport Import object
-     * @deprecated underscore prefix violates PSR12, will be renamed to "checkImportErrors" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _checkImportErrors()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes checkImportErrors() to the canonical override
+      *             target and retires _checkImportErrors(); until then, _checkImportErrors() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _checkImportErrors($oErpImport) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         foreach ($oErpImport->getStatistics() as $aValue) {
             if (!$aValue ['r']) {
-                $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ExceptionToDisplay::class);
+                $oEx = oxNew(ExceptionToDisplay::class);
                 $oEx->setMessage($aValue ['m']);
-                \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'genimport');
+                Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'genimport');
             }
         }
+    }
+
+    /**
+     * Checks if any error occurred during import and displays them
+     *
+     * @param object $oErpImport Import object
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _checkImportErrors(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make checkImportErrors() the canonical override target.
+     */
+    protected function checkImportErrors($oErpImport)
+    {
+        $this->_checkImportErrors($oErpImport);
     }
 
     /**
      * Get csv field terminator symbol
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getCsvFieldsTerminator" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getCsvFieldsTerminator()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getCsvFieldsTerminator() to the canonical override
+      *             target and retires _getCsvFieldsTerminator(); until then, _getCsvFieldsTerminator() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getCsvFieldsTerminator() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($this->_sStringTerminator === null) {
             $this->_sStringTerminator = $this->_sDefaultStringTerminator;
-            if ($char = $this->getConfig()->getConfigParam('sGiCsvFieldTerminator')) {
+            if ($char = Registry::getConfig()->getConfigParam('sGiCsvFieldTerminator')) {
                 $this->_sStringTerminator = $char;
             }
         }
@@ -357,16 +517,41 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
     }
 
     /**
+     * Get csv field terminator symbol
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getCsvFieldsTerminator(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getCsvFieldsTerminator() the canonical override target.
+     */
+    protected function getCsvFieldsTerminator()
+    {
+        return $this->_getCsvFieldsTerminator();
+    }
+
+    /**
      * Get csv field encloser symbol
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getCsvFieldsEncolser" in next major
+     * @deprecated underscore prefix violates PSR12, will be renamed to "getCsvFieldsEncloser" in next major
      */
     protected function _getCsvFieldsEncolser() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getCsvFieldsEncloser();
+    }
+
+    /**
+     * Get csv field encloser symbol
+     *
+     * @return string
+     */
+    protected function getCsvFieldsEncloser()
+    {
         if ($this->_sStringEncloser === null) {
             $this->_sStringEncloser = $this->_sDefaultStringEncloser;
-            if ($char = $this->getConfig()->getConfigParam('sGiCsvFieldEncloser')) {
+            if ($char = Registry::getConfig()->getConfigParam('sGiCsvFieldEncloser')) {
                 $this->_sStringEncloser = $char;
             }
         }
@@ -379,9 +564,9 @@ class GenericImportMain extends \OxidEsales\Eshop\Application\Controller\Admin\A
      */
     private function setErrorToView($invalidData)
     {
-        $error = oxNew(\OxidEsales\Eshop\Core\DisplayError::class);
-        $error->setFormatParameters(htmlspecialchars($invalidData));
-        $error->setMessage("SHOP_CONFIG_ERROR_INVALID_VALUE");
-        \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($error);
+        $error = oxNew(DisplayError::class);
+        $error->setFormatParameters([htmlspecialchars($invalidData)]);
+        $error->setMessage('SHOP_CONFIG_ERROR_INVALID_VALUE');
+        Registry::getUtilsView()->addErrorToDisplay($error);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -21,9 +22,9 @@
 namespace OxidEsales\EshopCommunity\Tests\Acceptance\Admin;
 
 use OxidEsales\EshopCommunity\Tests\Acceptance\AdminTestCase;
+use OxidEsales\Facts\Config\ConfigFile as FactsConfigFile;
 use OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper;
 use Webmozart\PathUtil\Path;
-use OxidEsales\Facts\Config\ConfigFile as FactsConfigFile;
 
 /**
  * Class QueryLoggerTest
@@ -32,7 +33,6 @@ use OxidEsales\Facts\Config\ConfigFile as FactsConfigFile;
  */
 class QueryLoggerTest extends AdminTestCase
 {
-
     /**
      * @var ExceptionLogFileHelper
      */
@@ -71,8 +71,8 @@ class QueryLoggerTest extends AdminTestCase
         $this->loginAdmin('Master Settings', 'Core Settings');
         $this->adminLogHelper->clearExceptionLogFile();
 
-        $this->openTab("Settings");
-        $this->click("link=Other settings");
+        $this->openTab('Settings');
+        $this->click('link=Other settings');
         $this->assertTextPresent('Mandatory fields in User Registration Form');
         $this->clickAndWait("//form[@id='myedit']/input[@name='save']");
 

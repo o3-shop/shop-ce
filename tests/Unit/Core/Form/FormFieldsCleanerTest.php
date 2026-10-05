@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -20,9 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Form;
 
-use OxidEsales\TestingLibrary\UnitTestCase;
 use OxidEsales\Eshop\Core\Form\FormFields;
 use OxidEsales\Eshop\Core\Form\FormFieldsCleaner;
+use OxidEsales\TestingLibrary\UnitTestCase;
 
 class FormFieldsCleanerTest extends UnitTestCase
 {

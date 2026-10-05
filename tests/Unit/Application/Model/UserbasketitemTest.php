@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,13 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
+use oxArticle;
+use oxField;
 use OxidEsales\EshopCommunity\Application\Model\Article;
-use \oxArticle;
-use oxArticleException;
-use \oxField;
-use \stdclass;
+use stdclass;
 
 class modOxArticle_oxUserBasketItem extends oxArticle
 {
@@ -40,7 +41,6 @@ class modOxArticle_oxUserBasketItem extends oxArticle
 
 class UserbasketitemTest extends \OxidTestCase
 {
-
     /**
      * Initialize the fixture.
      *
@@ -122,7 +122,7 @@ class UserbasketitemTest extends \OxidTestCase
 
     public function testSelectionListSetterGetter()
     {
-        $aData = array("t");
+        $aData = ['t'];
 
         $oUserBasketItem = oxNew('oxuserbasketitem');
 
@@ -139,7 +139,7 @@ class UserbasketitemTest extends \OxidTestCase
 
     public function testPersParamSetterGetter()
     {
-        $aData = array("p");
+        $aData = ['p'];
 
         $oUserBasketItem = oxNew('oxuserbasketitem');
 
@@ -187,7 +187,7 @@ class UserbasketitemTest extends \OxidTestCase
     {
         $oBasketItem = oxNew('oxuserbasketitem');
         try {
-            $oBasketItem->getArticle("");
+            $oBasketItem->getArticle('');
         } catch (\OxidEsales\EshopCommunity\Core\Exception\ArticleException $oEx) {
             $this->assertEquals('EXCEPTION_ARTICLE_NOPRODUCTID', $oEx->getMessage());
 
@@ -201,21 +201,21 @@ class UserbasketitemTest extends \OxidTestCase
     {
         $oBasketItem = oxNew('oxuserbasketitem');
         $oBasketItem->oxuserbasketitems__oxartid = new oxField('nothing', oxField::T_RAW);
-        $this->assertFalse($oBasketItem->getArticle("xxx"));
+        $this->assertFalse($oBasketItem->getArticle('xxx'));
     }
 
     // testing if getter returns article we expect
     public function testGetArticleTestingIfGetterWorksFine()
     {
-        $sProductId = "2000";
+        $sProductId = '2000';
 
         $oBasketItem = oxNew('oxuserbasketitem');
         $oBasketItem->setVariantParentBuyable(true);
         $oBasketItem->oxuserbasketitems__oxartid = new oxField($sProductId, oxField::T_RAW);
 
-        $oArticle = $oBasketItem->getArticle("123");
+        $oArticle = $oBasketItem->getArticle('123');
         $this->assertTrue($oArticle instanceof article);
-        $this->assertEquals($oArticle->getItemKey(), "123");
+        $this->assertEquals($oArticle->getItemKey(), '123');
 
         // if thi line one day will faile, probebly becaus these parameters are not public any more :)
         // removed due to #4178
@@ -248,10 +248,10 @@ class UserbasketitemTest extends \OxidTestCase
         $this->getConfig()->setConfigParam('bl_perfLoadSelectLists', true);
 
         $oBasketItem = oxNew('oxuserbasketitem');
-        $oBasketItem->oxuserbasketitems__oxartid = new oxField("xxx", oxField::T_RAW);
-        $oBasketItem->oxuserbasketitems__oxsellist = new oxField(serialize(array(0, 1)), oxField::T_RAW);
+        $oBasketItem->oxuserbasketitems__oxartid = new oxField('xxx', oxField::T_RAW);
+        $oBasketItem->oxuserbasketitems__oxsellist = new oxField(serialize([0, 1]), oxField::T_RAW);
 
-        $oArticle = $oBasketItem->getArticle("123");
+        $oArticle = $oBasketItem->getArticle('123');
 
         $oR = new stdclass();
         $oR->name = 'R, 10';
@@ -279,8 +279,8 @@ class UserbasketitemTest extends \OxidTestCase
         $oL->name = 'L, 30';
         $oL->value = '';
 
-        $aSel[] = array($oR, $oG, $oB, 'name' => '');
-        $aSel[] = array($oS, $oM, $oL, 'name' => '');
+        $aSel[] = [$oR, $oG, $oB, 'name' => ''];
+        $aSel[] = [$oS, $oM, $oL, 'name' => ''];
 
         // if this assertion will fail, probably due to protected variable
         $this->assertEquals($aSel, $oArticle->getDispSelList());

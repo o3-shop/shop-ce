@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -20,7 +21,6 @@
 
 class TestModuleTwoPrice extends testmoduletwoprice_parent
 {
-
     /**
      * Double the original price
      *
@@ -29,6 +29,6 @@ class TestModuleTwoPrice extends testmoduletwoprice_parent
     public function getPrice()
     {
         $return = parent::getPrice();
-        return 3*$return;
+        return 3 * $return;
     }
 }

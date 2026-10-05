@@ -37,12 +37,12 @@ class DatabaseProvider
     /**
      * @var int Fetch mode - numeric
      */
-    const FETCH_MODE_NUM = DatabaseInterface::FETCH_MODE_NUM;
+    public const FETCH_MODE_NUM = DatabaseInterface::FETCH_MODE_NUM;
 
     /**
      * @var int Fetch mode - associative
      */
-    const FETCH_MODE_ASSOC = DatabaseInterface::FETCH_MODE_ASSOC;
+    public const FETCH_MODE_ASSOC = DatabaseInterface::FETCH_MODE_ASSOC;
 
     /**
      * @var null|DatabaseProvider A singleton instance of this class or a sub class of this class
@@ -82,7 +82,7 @@ class DatabaseProvider
      */
     public function __clone()
     {
-        throw new \Exception("This object is a singleton, thou shalt not clone.");
+        throw new \Exception('This object is a singleton, thou shalt not clone.');
     }
 
     /**
@@ -309,7 +309,7 @@ class DatabaseProvider
          */
         $databaseDriverOptions = $this->getConfigParam('dbDriverOptions');
         if (!is_array($databaseDriverOptions)) {
-            $databaseDriverOptions = array();
+            $databaseDriverOptions = [];
         }
         /**
          * @var string $databaseUnixSocket The unix_socket path.
@@ -367,7 +367,7 @@ class DatabaseProvider
         $isValid = true;
 
         // If the shop has not been configured yet the hostname has the format '<dbHost>'
-        if (false  !== strpos($config->getVar('dbHost'), '<')) {
+        if (false !== strpos($config->getVar('dbHost'), '<')) {
             $isValid = false;
         }
 

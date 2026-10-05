@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -25,7 +27,6 @@ use OxidEsales\EshopCommunity\Internal\Framework\Logger\Factory\MonologLoggerFac
 use OxidEsales\EshopCommunity\Internal\Framework\Logger\Validator\PsrLoggerConfigurationValidator;
 use OxidEsales\EshopCommunity\Tests\Unit\Internal\ContextStub;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 
 class MonologFactoryTest extends \PHPUnit\Framework\TestCase
 {

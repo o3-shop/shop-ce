@@ -28,7 +28,7 @@ use Symfony\Component\EventDispatcher\Event;
 
 class ViewRenderedEvent extends Event
 {
-    const NAME = self::class;
+    public const NAME = self::class;
 
     /**
      * @var ShopControl

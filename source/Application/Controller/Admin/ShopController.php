@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
 use OxidEsales\Eshop\Core\ShopIdCalculator;
 
 /**
@@ -29,12 +30,12 @@ use OxidEsales\Eshop\Core\ShopIdCalculator;
  * and "shop_main.tpl") to frame.
  * Admin Menu: Main Menu -> Core Settings.
  */
-class ShopController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class ShopController extends AdminController
 {
-    const CURRENT_TEMPLATE = 'shop.tpl';
+    public const CURRENT_TEMPLATE = 'shop.tpl';
 
     /** @deprecated since 6.0 (2016-07-25); Instead use ShopIdCalculator::BASE_SHOP_ID */
-    const SHOP_ID = ShopIdCalculator::BASE_SHOP_ID;
+    public const SHOP_ID = ShopIdCalculator::BASE_SHOP_ID;
 
     /**
      * Executes parent method parent::render() and returns name of template

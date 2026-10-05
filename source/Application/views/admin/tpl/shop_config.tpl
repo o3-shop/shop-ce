@@ -124,6 +124,29 @@ function editThis(sID)
                 <div class="spacer"></div>
             </dl>
 
+            <dl>
+                <dt>
+                    <input type=hidden name=confbools[blSearchSuggest] value=false>
+                    <input type=checkbox name=confbools[blSearchSuggest] value=true  [{if ($confbools.blSearchSuggest)}]checked[{/if}] [{$readonly}]>
+                    [{oxinputhelp ident="HELP_SHOP_CONFIG_SEARCHSUGGEST"}]
+                </dt>
+                <dd>
+                    [{oxmultilang ident="SHOP_CONFIG_SEARCHSUGGEST"}]
+                </dd>
+                <div class="spacer"></div>
+            </dl>
+
+            <dl>
+                <dt>
+                    <input type=text class="txt" name=confnum[iSearchSuggestCount] value="[{$confnum.iSearchSuggestCount}]" [{$readonly}]>
+                    [{oxinputhelp ident="HELP_SHOP_CONFIG_SEARCHSUGGESTCOUNT"}]
+                </dt>
+                <dd>
+                    [{oxmultilang ident="SHOP_CONFIG_SEARCHSUGGESTCOUNT"}]
+                </dd>
+                <div class="spacer"></div>
+            </dl>
+
          </div>
     </div>
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,16 +18,16 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxDb;
+use oxDb;
 
 /**
  * Tests for Payment_Country_Ajax class
  */
 class PaymentCountryAjaxTest extends \OxidTestCase
 {
-
     /**
      * Initialize the fixture.
      *
@@ -86,7 +87,7 @@ class PaymentCountryAjaxTest extends \OxidTestCase
     public function testGetQuerySynchoxid()
     {
         $sSynchoxid = '_testAction';
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
 
         $oView = oxNew('payment_country_ajax');
         $this->assertEquals("from oxv_oxcountry_de where oxv_oxcountry_de.oxactive = '1' and oxv_oxcountry_de.oxid not in ( select oxv_oxcountry_de.oxid from oxobject2payment left join oxv_oxcountry_de on oxv_oxcountry_de.oxid=oxobject2payment.oxobjectid where oxobject2payment.oxpaymentid = '" . $sSynchoxid . "' and oxobject2payment.oxtype = 'oxcountry' )", trim($oView->UNITgetQuery()));
@@ -100,7 +101,7 @@ class PaymentCountryAjaxTest extends \OxidTestCase
     public function testGetQueryOxid()
     {
         $sOxid = '_testAction';
-        $this->setRequestParameter("oxid", $sOxid);
+        $this->setRequestParameter('oxid', $sOxid);
 
         $oView = oxNew('payment_country_ajax');
         $this->assertEquals("from oxobject2payment left join oxv_oxcountry_de on oxv_oxcountry_de.oxid=oxobject2payment.oxobjectid where oxv_oxcountry_de.oxactive = '1' and oxobject2payment.oxpaymentid = '" . $sOxid . "' and oxobject2payment.oxtype = 'oxcountry'", trim($oView->UNITgetQuery()));
@@ -115,8 +116,8 @@ class PaymentCountryAjaxTest extends \OxidTestCase
     {
         $sOxid = '_testAction';
         $sSynchoxid = '_testActionSynch';
-        $this->setRequestParameter("oxid", $sOxid);
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
+        $this->setRequestParameter('oxid', $sOxid);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
 
         $oView = oxNew('payment_country_ajax');
         $this->assertEquals("from oxobject2payment left join oxv_oxcountry_de on oxv_oxcountry_de.oxid=oxobject2payment.oxobjectid where oxv_oxcountry_de.oxactive = '1' and oxobject2payment.oxpaymentid = '" . $sOxid . "' and oxobject2payment.oxtype = 'oxcountry' and oxv_oxcountry_de.oxid not in ( select oxv_oxcountry_de.oxid from oxobject2payment left join oxv_oxcountry_de on oxv_oxcountry_de.oxid=oxobject2payment.oxobjectid where oxobject2payment.oxpaymentid = '" . $sSynchoxid . "' and oxobject2payment.oxtype = 'oxcountry' )", trim($oView->UNITgetQuery()));
@@ -129,8 +130,8 @@ class PaymentCountryAjaxTest extends \OxidTestCase
      */
     public function testRemovePayFromCountry()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\PaymentCountryAjax::class, array("_getActionIds"));
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(array('_testPayRemove1', '_testPayRemove2')));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\PaymentCountryAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testPayRemove1', '_testPayRemove2']));
 
         $sSql = "select count(oxid) from oxobject2payment where oxid in ('_testPayRemove1', '_testPayRemove2')";
         $this->assertEquals(2, oxDb::getDb()->getOne($sSql));
@@ -146,8 +147,8 @@ class PaymentCountryAjaxTest extends \OxidTestCase
     public function testRemovePayFromCountryAll()
     {
         $sOxid = '_testPayRemoveAll';
-        $this->setRequestParameter("oxid", $sOxid);
-        $this->setRequestParameter("all", true);
+        $this->setRequestParameter('oxid', $sOxid);
+        $this->setRequestParameter('all', true);
 
         $sSql = "select count(oxid) from oxobject2payment where oxpaymentid = '" . $sOxid . "'";
         $oView = oxNew('payment_country_ajax');
@@ -164,13 +165,13 @@ class PaymentCountryAjaxTest extends \OxidTestCase
     public function testAddPayToCountry()
     {
         $sSynchoxid = '_testPayAdd';
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
 
         $sSql = "select count(oxid) from oxobject2payment where oxpaymentid='$sSynchoxid'";
         $this->assertEquals(0, oxDb::getDb()->getOne($sSql));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\PaymentCountryAjax::class, array("_getActionIds"));
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(array('_testPayAdd1', '_testPayAdd2')));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\PaymentCountryAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testPayAdd1', '_testPayAdd2']));
 
         $oView->addPayCountry();
         $this->assertEquals(2, oxDb::getDb()->getOne($sSql));
@@ -184,8 +185,8 @@ class PaymentCountryAjaxTest extends \OxidTestCase
     public function testAddPayToCountryAll()
     {
         $sSynchoxid = '_testPayAddAll';
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
-        $this->setRequestParameter("all", true);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
+        $this->setRequestParameter('all', true);
 
         //count how much articles gets filtered
         $iCount = oxDb::getDb()->getOne("select count(oxv_oxcountry_de.oxid) from oxv_oxcountry_de where oxv_oxcountry_de.oxactive = '1' and oxv_oxcountry_de.oxid not in ( select oxv_oxcountry_de.oxid from oxobject2payment left join oxv_oxcountry_de on oxv_oxcountry_de.oxid=oxobject2payment.oxobjectid where oxobject2payment.oxpaymentid = '" . $sSynchoxid . "' and oxobject2payment.oxtype = 'oxcountry')");
@@ -193,8 +194,8 @@ class PaymentCountryAjaxTest extends \OxidTestCase
         $sSql = "select count(oxid) from oxobject2payment where oxpaymentid='$sSynchoxid'";
         $this->assertEquals(0, oxDb::getDb()->getOne($sSql));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\PaymentCountryAjax::class, array("_getActionIds"));
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(array('_testPayAdd1', '_testPayAdd2')));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\PaymentCountryAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testPayAdd1', '_testPayAdd2']));
 
         $oView->addPayCountry();
         $this->assertEquals($iCount, oxDb::getDb()->getOne($sSql));

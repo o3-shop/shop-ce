@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,24 +18,24 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
 class ShopViewValidatorTest extends \OxidTestCase
 {
-
     /**
      * Testing MultiLangTables getter and setter
      */
     public function testSetGetMultiLangTables()
     {
-        $oValidator = oxNew("oxShopViewValidator");
-        $oValidator->setMultiLangTables(array("table1", "table2"));
+        $oValidator = oxNew('oxShopViewValidator');
+        $oValidator->setMultiLangTables(['table1', 'table2']);
 
         $aList = $oValidator->getMultiLangTables();
 
         $this->assertEquals(2, count($aList));
-        $this->assertEquals("table1", $aList[0]);
-        $this->assertEquals("table2", $aList[1]);
+        $this->assertEquals('table1', $aList[0]);
+        $this->assertEquals('table2', $aList[1]);
     }
 
     /**
@@ -42,14 +43,14 @@ class ShopViewValidatorTest extends \OxidTestCase
      */
     public function testSetGetMultiShopTables()
     {
-        $oValidator = oxNew("oxShopViewValidator");
-        $oValidator->setMultiShopTables(array("table3", "table4"));
+        $oValidator = oxNew('oxShopViewValidator');
+        $oValidator->setMultiShopTables(['table3', 'table4']);
 
         $aList = $oValidator->getMultiShopTables();
 
         $this->assertEquals(2, count($aList));
-        $this->assertEquals("table3", $aList[0]);
-        $this->assertEquals("table4", $aList[1]);
+        $this->assertEquals('table3', $aList[0]);
+        $this->assertEquals('table4', $aList[1]);
     }
 
     /**
@@ -57,14 +58,14 @@ class ShopViewValidatorTest extends \OxidTestCase
      */
     public function testSetGetLanguages()
     {
-        $oValidator = oxNew("oxShopViewValidator");
-        $oValidator->setLanguages(array("de", "xx"));
+        $oValidator = oxNew('oxShopViewValidator');
+        $oValidator->setLanguages(['de', 'xx']);
 
         $aList = $oValidator->getLanguages();
 
         $this->assertEquals(2, count($aList));
-        $this->assertEquals("de", $aList[0]);
-        $this->assertEquals("xx", $aList[1]);
+        $this->assertEquals('de', $aList[0]);
+        $this->assertEquals('xx', $aList[1]);
     }
 
     /**
@@ -72,14 +73,14 @@ class ShopViewValidatorTest extends \OxidTestCase
      */
     public function testSetGetAllShopLanguages()
     {
-        $oValidator = oxNew("oxShopViewValidator");
-        $oValidator->setAllShopLanguages(array("de", "xx"));
+        $oValidator = oxNew('oxShopViewValidator');
+        $oValidator->setAllShopLanguages(['de', 'xx']);
 
         $aList = $oValidator->getAllShopLanguages();
 
         $this->assertEquals(2, count($aList));
-        $this->assertEquals("de", $aList[0]);
-        $this->assertEquals("xx", $aList[1]);
+        $this->assertEquals('de', $aList[0]);
+        $this->assertEquals('xx', $aList[1]);
     }
 
     /**
@@ -87,7 +88,7 @@ class ShopViewValidatorTest extends \OxidTestCase
      */
     public function testSetGetShopId()
     {
-        $oValidator = oxNew("oxShopViewValidator");
+        $oValidator = oxNew('oxShopViewValidator');
         $oValidator->setShopId(100);
 
         $this->assertEquals(100, $oValidator->getShopId());
@@ -101,16 +102,16 @@ class ShopViewValidatorTest extends \OxidTestCase
         $aAllShopViews = $this->_getShopViews();
 
         $aAllViews = $aAllShopViews['baseshop'];
-        $aAllShopLanguageIds = $aLanguageIds = array(0 => 'de', 1 => 'en');
+        $aAllShopLanguageIds = $aLanguageIds = [0 => 'de', 1 => 'en'];
 
-        $oValidator = $this->getMock(\OxidEsales\Eshop\Application\Model\ShopViewValidator::class, array('_getAllViews',));
+        $oValidator = $this->getMock(\OxidEsales\Eshop\Application\Model\ShopViewValidator::class, ['_getAllViews',]);
         $oValidator->expects($this->once())->method('_getAllViews')->will($this->returnValue($aAllViews));
 
         $oValidator->setShopId(1);
         $oValidator->setLanguages($aLanguageIds);
         $oValidator->setAllShopLanguages($aAllShopLanguageIds);
-        $oValidator->setMultiLangTables(array('oxartextends', 'oxarticles'));
-        $oValidator->setMultiShopTables(array('oxarticles'));
+        $oValidator->setMultiLangTables(['oxartextends', 'oxarticles']);
+        $oValidator->setMultiShopTables(['oxarticles']);
 
         $aResult = $oValidator->getInvalidViews();
 
@@ -126,8 +127,8 @@ class ShopViewValidatorTest extends \OxidTestCase
      */
     private function _getShopViews()
     {
-        return array(
-            'baseshop'  => array(
+        return [
+            'baseshop'  => [
                 'oxv_oxartextends',
                 'oxv_oxartextends_en',
                 'oxv_oxartextends_de',
@@ -136,9 +137,9 @@ class ShopViewValidatorTest extends \OxidTestCase
                 'oxv_oxarticles_en',
                 'oxv_oxarticles_de',
                 'oxv_oxarticles_lt',
-                'oxv_oxarticles_ru'
-            ),
-            'multishop' => array(
+                'oxv_oxarticles_ru',
+            ],
+            'multishop' => [
                 'oxv_oxarticles_1',
                 'oxv_oxarticles_1_en',
                 'oxv_oxarticles_1_de',
@@ -154,7 +155,7 @@ class ShopViewValidatorTest extends \OxidTestCase
                 'oxv_oxarticles_19_de',
                 'oxv_oxarticles_19_lt',
                 'oxv_oxarticles_19_ru',
-            ),
-        );
+            ],
+        ];
     }
 }

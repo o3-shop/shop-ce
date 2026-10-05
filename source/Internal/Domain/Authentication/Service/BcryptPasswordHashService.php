@@ -106,7 +106,6 @@ class BcryptPasswordHashService implements PasswordHashServiceInterface
         return ['cost' => $this->cost];
     }
 
-
     /**
      * @param int $cost
      *

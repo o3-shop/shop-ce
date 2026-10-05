@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Price enter mode: Brutto;
  * Price view mode: Brutto;
@@ -21,9 +22,9 @@
  * Brutto-Brutto mode.
  * Short description: test added from selenium test (testFrontendOrderStep1Calculation2) ;Is testing basked Step1 Calculation
  */
-$aData = array(
-    'articles' => array(
-            0 => array(
+$aData = [
+    'articles' => [
+            0 => [
                     'oxid'                     => 10012,
                     'oxprice'                  => 98,
                     'oxvat'                    => 10,
@@ -31,14 +32,14 @@ $aData = array(
                     'oxpricea'       		   => 0,
                     'oxpriceb' 			       => 0,
                     'oxpricec' 			       => 0,
-            ),
-            1 => array(
+            ],
+            1 => [
                     'oxid'                     => 1002,
                     'oxprice'                  => 67.00,
                     'oxvat'                    => 19,
                     'amount'                   => 1,
-            ),
-            2 => array(
+            ],
+            2 => [
                     'oxid'                     => 1003,
                     'oxprice'                  => 75.00,
                     'oxvat'                    => 19,
@@ -46,14 +47,14 @@ $aData = array(
                     'oxpricea'       		   => 70,
                     'oxpriceb' 			       => 85,
                     'oxpricec' 			       => 0,
-                    'scaleprices' => array(
+                    'scaleprices' => [
                         'oxamount'     => 6,
                         'oxamountto'   => 999999,
                         'oxartid'      => 1003,
                         'oxaddperc'    => 20,
-                    ),
-            ),
-            3 => array(
+                    ],
+            ],
+            3 => [
                     'oxid'                     => 1000,
                     'oxprice'                  => 50.00,
                     'oxvat'                    => 5,
@@ -63,12 +64,11 @@ $aData = array(
                     'oxpricec' 			       => 55,
                     'oxunitname'               => 'kg',
                     'oxunitquantity'           => 2,
-                    'oxweight'                 => 2
-            ),
-
-    ),
-    'discounts' => array(
-            0 => array(
+                    'oxweight'                 => 2,
+            ],
+    ],
+    'discounts' => [
+            0 => [
                     'oxid'         => 'discount1',
                     'oxaddsum'     => 10,
                     'oxaddsumtype' => '%',
@@ -77,35 +77,35 @@ $aData = array(
                     'oxprice'      => 100,
                     'oxpriceto'    => 99999,
                     'oxactive'     => 1,
-                    'oxarticles'   => array( 1002, 1003 ),
+                    'oxarticles'   => [ 1002, 1003 ],
                     'oxsort'       => 10,
-            ),
-            1 => array(
+            ],
+            1 => [
                     'oxid'         => 'discount2',
                     'oxaddsum'     => 5,
                     'oxaddsumtype' => 'abs',
                     'oxamount'     => 1,
                     'oxamountto'   => 99999,
                     'oxactive'     => 1,
-                    'oxarticles'   => array( 10012, 1000 ),
+                    'oxarticles'   => [ 10012, 1000 ],
                     'oxsort'       => 20,
-            ),
-    ),
+            ],
+    ],
 
-    'costs' => array(
-        'delivery' => array(
-            0 => array(
+    'costs' => [
+        'delivery' => [
+            0 => [
                 'oxactive' => 1,
                 'oxaddsum' => 1.50,
                 'oxaddsumtype' => 'abs',
                 'oxdeltype' => 'p',
                 'oxfinalize' => 1,
                 'oxparamend' => 99999,
-            ),
-        ),
+            ],
+        ],
                    // VOUCHERS
-        'voucherserie' => array(
-            0 => array(
+        'voucherserie' => [
+            0 => [
                 // oxvoucherseries DB fields
                 'oxdiscount' => 10.00,
                 'oxdiscounttype' => 'absolute',
@@ -114,44 +114,43 @@ $aData = array(
                 'oxallowuseanother' => 1,
                 'oxminimumvalue' =>75,
                 // voucher of this voucherserie count
-                'voucher_count' => 1
-            ),
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-                10012 => array( '93,00', '93,00' ),
-                1002 => array( '60,30', '60,30' ),
-                1003 => array( '54,00', '324,00' ),
-                1000 => array( '45,00', '45,00' ),
-
-        ),
-        'totals' => array(
+                'voucher_count' => 1,
+            ],
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+                10012 => [ '93,00', '93,00' ],
+                1002 => [ '60,30', '60,30' ],
+                1003 => [ '54,00', '324,00' ],
+                1000 => [ '45,00', '45,00' ],
+        ],
+        'totals' => [
                 'totalBrutto' => '522,30',
                 'totalNetto'  => '441,73',
-                'vats' => array(
+                'vats' => [
                         10 => '8,29',
                         19 => '60,18',
-                        5 => '2,10'
-                ),
-                'delivery' => array(
+                        5 => '2,10',
+                ],
+                'delivery' => [
                         'brutto' => '1,50',
-                ),
+                ],
                 // Total voucher amounts
-                'voucher' => array(
+                'voucher' => [
                 'brutto' => '10,00',
-                ),
-                'grandTotal'  => '513,80'
-        ),
-    ),
-    'options' => array(
+                ],
+                'grandTotal'  => '513,80',
+        ],
+    ],
+    'options' => [
         'activeCurrencyRate' => 1,
-        'config' => array(
+        'config' => [
                 'blEnterNetPrice' => false,
                 'blShowNetPrice' => false,
                 'blShowVATForWrapping' => false,
                 'blShowVATForDelivery' => false,
                 'sAdditionalServVATCalcMethod' => 'biggest_net',
-        ),
-    ),
-);
+        ],
+    ],
+];

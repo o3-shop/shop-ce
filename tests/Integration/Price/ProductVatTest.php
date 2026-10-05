@@ -3,13 +3,13 @@
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -140,7 +140,7 @@ class ProductVatTest extends UnitTestCase
                 'oxuser__oxstreet'    => 'Landstrasse',
                 'oxuser__oxzip'       => '22769',
                 'oxuser__oxcity'      => 'Hamburg',
-                'oxuser__oxcountryid' => $this->countriesId['germany']
+                'oxuser__oxcountryid' => $this->countriesId['germany'],
             ],
             'switzerland' => [
                 'oxuser__oxfname'     => 'Erna',
@@ -149,8 +149,8 @@ class ProductVatTest extends UnitTestCase
                 'oxuser__oxstreet'    => 'Landstrasse',
                 'oxuser__oxzip'       => '3741',
                 'oxuser__oxcity'      => 'PULKAU',
-                'oxuser__oxcountryid' => $this->countriesId['switzerland']
-            ]
+                'oxuser__oxcountryid' => $this->countriesId['switzerland'],
+            ],
         ];
 
         $_POST['invadr'] = $countryInfo[strtolower($country)];
@@ -187,7 +187,7 @@ class ProductVatTest extends UnitTestCase
         $oArticle->setId($articleId);
         $oArticle->oxarticles__oxprice = new Field($price);
         $oArticle->oxarticles__oxshopid = new Field(1);
-        $oArticle->oxarticles__oxtitle = new Field("test");
+        $oArticle->oxarticles__oxtitle = new Field('test');
         $oArticle->save();
     }
 }

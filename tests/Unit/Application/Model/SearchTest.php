@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,20 +18,20 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
 use oxDb;
+use OxidEsales\Eshop\Core\Price;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Application\Model\Article;
 use OxidEsales\EshopCommunity\Application\Model\Search;
-use OxidEsales\EshopCommunity\Core\DatabaseProvider;
 use OxidEsales\EshopCommunity\Core\TableViewNameGenerator;
 use OxidEsales\TestingLibrary\UnitTestCase;
-use oxRegistry;
 use oxTestModules;
 
 class SearchTest extends UnitTestCase
 {
-
     /** @var  Search */
     private $_oSearchHandler;
 
@@ -49,6 +50,7 @@ class SearchTest extends UnitTestCase
         $this->tableViewNameGenerator = oxNew('oxTableViewNameGenerator');
         $this->getConfig()->setConfigParam('blUseTimeCheck', true);
         $this->cleanUpTable('oxarticles');
+        $this->cleanUpTable('oxartextends');
         $this->cleanUpTable('oxobject2category');
         $this->cleanUpTable('oxcategories');
     }
@@ -65,6 +67,7 @@ class SearchTest extends UnitTestCase
         $myDB->execute('delete from oxobject2selectlist where oxselnid = "oxsellisttest" ');
         $this->cleanUpTable('oxcategories');
         $this->cleanUpTable('oxarticles');
+        $this->cleanUpTable('oxartextends');
         $this->cleanUpTable('oxobject2category');
         parent::tearDown();
     }
@@ -118,8 +121,8 @@ class SearchTest extends UnitTestCase
         /** @var Search $oSearch */
         $oSearch = oxNew('oxSearch');
 
-        $oSearchList = $oSearch->getSearchArticles('', "xxx");
-        $iAllArtCnt = $oSearch->getSearchArticleCount('', "xxx");
+        $oSearchList = $oSearch->getSearchArticles('', 'xxx');
+        $iAllArtCnt = $oSearch->getSearchArticleCount('', 'xxx');
 
         $this->assertEquals(0, $oSearchList->count());
         $this->assertEquals(0, $iAllArtCnt);
@@ -127,9 +130,9 @@ class SearchTest extends UnitTestCase
 
     public function testEmptySearchWithCorrectVendor()
     {
-        $sID = "68342e2955d7401e6.18967838";
+        $sID = '68342e2955d7401e6.18967838';
         if ($this->getConfig()->getEdition() === 'EE') {
-            $sID = "d2e44d9b31fcce448.08890330";
+            $sID = 'd2e44d9b31fcce448.08890330';
         }
 
         $oSearchList = $this->_oSearchHandler->getSearchArticles('', false, $sID);
@@ -160,9 +163,9 @@ class SearchTest extends UnitTestCase
 
     public function testEmptySearchWithCorrectManufacturer()
     {
-        $sID = "fe07958b49de225bd1dbc7594fb9a6b0";
+        $sID = 'fe07958b49de225bd1dbc7594fb9a6b0';
         if ($this->getConfig()->getEdition() === 'EE') {
-            $sID = "88a996f859f94176da943f38ee067984";
+            $sID = '88a996f859f94176da943f38ee067984';
         }
 
         $oSearchList = $this->_oSearchHandler->getSearchArticles('', false, false, $sID);
@@ -193,8 +196,8 @@ class SearchTest extends UnitTestCase
 
     public function testEmptySearchWithIncorrectVendor()
     {
-        $oSearchList = $this->_oSearchHandler->getSearchArticles("", false, "xxx");
-        $iAllArtCnt = $this->_oSearchHandler->getSearchArticleCount("", false, "xxx");
+        $oSearchList = $this->_oSearchHandler->getSearchArticles('', false, 'xxx');
+        $iAllArtCnt = $this->_oSearchHandler->getSearchArticleCount('', false, 'xxx');
 
         $this->assertEquals(0, $oSearchList->count());
         $this->assertEquals(0, $iAllArtCnt);
@@ -202,8 +205,8 @@ class SearchTest extends UnitTestCase
 
     public function testEmptySearchWithIncorrectManufacturer()
     {
-        $oSearchList = $this->_oSearchHandler->getSearchArticles("", false, false, "xxx");
-        $iAllArtCnt = $this->_oSearchHandler->getSearchArticleCount("", false, false, "xxx");
+        $oSearchList = $this->_oSearchHandler->getSearchArticles('', false, false, 'xxx');
+        $iAllArtCnt = $this->_oSearchHandler->getSearchArticleCount('', false, false, 'xxx');
 
         $this->assertEquals(0, $oSearchList->count());
         $this->assertEquals(0, $iAllArtCnt);
@@ -214,16 +217,16 @@ class SearchTest extends UnitTestCase
         // disabling oxactive check
         oxTestModules::addFunction('oxvendor', 'getSqlActiveSnippet', '{ return "1"; }');
 
-        $sID = "68342e2955d7401e6.18967838";
+        $sID = '68342e2955d7401e6.18967838';
         if ($this->getConfig()->getEdition() === 'EE') {
-            $sID = "d2e44d9b31fcce448.08890330";
+            $sID = 'd2e44d9b31fcce448.08890330';
         }
-        $sSortBy = "oxprice asc";
+        $sSortBy = 'oxprice asc';
 
         /** @var Search $oSearch */
         $oSearch = oxNew('oxSearch');
-        $oSearchList = $oSearch->getSearchArticles("", false, $sID, false, $sSortBy);
-        $iAllArtCnt = $oSearch->getSearchArticleCount("", false, $sID, false);
+        $oSearchList = $oSearch->getSearchArticles('', false, $sID, false, $sSortBy);
+        $iAllArtCnt = $oSearch->getSearchArticleCount('', false, $sID, false);
 
         $aAll = oxDb::getDb()->getAll("select oxid from oxarticles where oxvendorid='$sID' order by $sSortBy ");
 
@@ -250,16 +253,16 @@ class SearchTest extends UnitTestCase
 
     public function testEmptySearchWithCorrectManufacturerAndWithSort()
     {
-        $sID = "fe07958b49de225bd1dbc7594fb9a6b0";
+        $sID = 'fe07958b49de225bd1dbc7594fb9a6b0';
         if ($this->getConfig()->getEdition() === 'EE') {
-            $sID = "88a996f859f94176da943f38ee067984";
+            $sID = '88a996f859f94176da943f38ee067984';
         }
-        $sSortBy = "oxprice asc";
+        $sSortBy = 'oxprice asc';
 
         /** @var Search $oSearch */
         $oSearch = oxNew('oxSearch');
-        $oSearchList = $oSearch->getSearchArticles("", false, false, $sID, $sSortBy);
-        $iAllArtCnt = $oSearch->getSearchArticleCount("", false, false, $sID);
+        $oSearchList = $oSearch->getSearchArticles('', false, false, $sID, $sSortBy);
+        $iAllArtCnt = $oSearch->getSearchArticleCount('', false, false, $sID);
 
         $aAll = oxDb::getDb()->getAll("select oxid from oxarticles where oxmanufacturerid='$sID' order by $sSortBy ");
 
@@ -288,8 +291,8 @@ class SearchTest extends UnitTestCase
     {
         /** @var Search $oSearch */
         $oSearch = oxNew('oxSearch');
-        $searchList = $oSearch->getSearchArticles("bar");
-        $allArticlesCount = $oSearch->getSearchArticleCount("bar");
+        $searchList = $oSearch->getSearchArticles('bar');
+        $allArticlesCount = $oSearch->getSearchArticleCount('bar');
 
         $articleTable = $this->tableViewNameGenerator->getViewName('oxarticles');
         $datetime = date('Y-m-d H:i:s');
@@ -329,26 +332,26 @@ class SearchTest extends UnitTestCase
     {
         /** @var Search $oSearch */
         $oSearch = oxNew('oxSearch');
-        $oSearchList = $oSearch->getSearchArticles("1142");
-        $iAllArtCnt = $oSearch->getSearchArticleCount("1142");
+        $oSearchList = $oSearch->getSearchArticles('1142');
+        $iAllArtCnt = $oSearch->getSearchArticleCount('1142');
 
         $this->assertEquals(1, $oSearchList->count());
         $this->assertEquals(1, $iAllArtCnt);
 
         /** @var \OxidEsales\Eshop\Application\Controller\Admin\ArticleController $oArticle */
         $oArticle = $oSearchList->current();
-        $this->assertEquals("1142", $oArticle->getId());
+        $this->assertEquals('1142', $oArticle->getId());
     }
 
     public function testSearchWithParamInSecondPage()
     {
-        $this->setRequestParameter("pgNr", 1);
+        $this->setRequestParameter('pgNr', 1);
 
         /** @var Search $oSearch */
         $oSearch = oxNew('oxSearch');
-        $this->getConfig()->setConfigParam('aSearchCols', array('oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum'));
-        $oSearchList = $oSearch->getSearchArticles("a");
-        $iAllArtCnt = $oSearch->getSearchArticleCount("a");
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+        $oSearchList = $oSearch->getSearchArticles('a');
+        $iAllArtCnt = $oSearch->getSearchArticleCount('a');
 
         $sArticleTable = $this->tableViewNameGenerator->getViewName('oxarticles');
         $sQ = "select oxid from $sArticleTable where ( ( $sArticleTable.oxactive = 1  or ( $sArticleTable.oxactivefrom < '" . date('Y-m-d H:i:s') . "' and
@@ -357,7 +360,13 @@ class SearchTest extends UnitTestCase
         and ( ( $sArticleTable.oxtitle like '%a%' or  $sArticleTable.oxshortdesc like '%a%' or $sArticleTable.oxsearchkeys like '%a%' or
         $sArticleTable.oxartnum like '%a%' ) )";
 
-        $aAll = oxDb::getDb()->getAll($sQ . " limit 10, 10 ");
+        $sRelevanceOrder = ' ORDER BY CASE' .
+            " WHEN ($sArticleTable.oxtitle LIKE '%a%') THEN 1" .
+            " WHEN ($sArticleTable.oxshortdesc LIKE '%a%') THEN 2" .
+            " WHEN ($sArticleTable.oxsearchkeys LIKE '%a%') THEN 3" .
+            " WHEN ($sArticleTable.oxartnum LIKE '%a%') THEN 4" .
+            " ELSE 5 END ASC, $sArticleTable.oxtitle ASC";
+        $aAll = oxDb::getDb()->getAll($sQ . $sRelevanceOrder . ' limit 10, 10 ');
 
         // testing if article count in list is <= 'iNrOfCatArticles' = 10;
         $this->assertEquals(10, $oSearchList->count());
@@ -379,17 +388,17 @@ class SearchTest extends UnitTestCase
 
     public function testSearchWithParamCorrectVendor()
     {
-        $sID = "68342e2955d7401e6.18967838";
+        $sID = '68342e2955d7401e6.18967838';
         if ($this->getConfig()->getEdition() === 'EE') {
-            $sID = "d2e44d9b31fcce448.08890330";
+            $sID = 'd2e44d9b31fcce448.08890330';
         }
 
         /** @var Search $oSearch */
         $oSearch = oxNew('oxSearch');
 
-        $this->getConfig()->setConfigParam('aSearchCols', array('oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum'));
-        $oSearchList = $oSearch->getSearchArticles("a", false, $sID);
-        $iAllArtCnt = $oSearch->getSearchArticleCount("a", false, $sID);
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+        $oSearchList = $oSearch->getSearchArticles('a', false, $sID);
+        $iAllArtCnt = $oSearch->getSearchArticleCount('a', false, $sID);
 
         $sArticleTable = $this->tableViewNameGenerator->getViewName('oxarticles');
         $sQ = "select oxid from $sArticleTable where ( ( $sArticleTable.oxactive = 1  or ( $sArticleTable.oxactivefrom < '" . date('Y-m-d H:i:s') . "' and
@@ -424,17 +433,17 @@ class SearchTest extends UnitTestCase
 
     public function testSearchWithParamCorrectManufacturer()
     {
-        $sID = "fe07958b49de225bd1dbc7594fb9a6b0";
+        $sID = 'fe07958b49de225bd1dbc7594fb9a6b0';
         if ($this->getConfig()->getEdition() === 'EE') {
-            $sID = "88a996f859f94176da943f38ee067984";
+            $sID = '88a996f859f94176da943f38ee067984';
         }
 
         /** @var Search $oSearch */
         $oSearch = oxNew('oxSearch');
 
-        $this->getConfig()->setConfigParam('aSearchCols', array('oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum'));
-        $oSearchList = $oSearch->getSearchArticles("a", false, false, $sID);
-        $iAllArtCnt = $oSearch->getSearchArticleCount("a", false, false, $sID);
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+        $oSearchList = $oSearch->getSearchArticles('a', false, false, $sID);
+        $iAllArtCnt = $oSearch->getSearchArticleCount('a', false, false, $sID);
 
         $sArticleTable = $this->tableViewNameGenerator->getViewName('oxarticles');
         $sQ = "select oxid from $sArticleTable where ( ( $sArticleTable.oxactive = 1  or ( $sArticleTable.oxactivefrom < '" . date('Y-m-d H:i:s') . "' and
@@ -468,19 +477,19 @@ class SearchTest extends UnitTestCase
 
     public function testSearchWithParamCorrectVendorCorrectCatCorrectManufacturer()
     {
-        $sIDVend = "68342e2955d7401e6.18967838";
-        $sIDMan = "fe07958b49de225bd1dbc7594fb9a6b0";
-        $sIDCat = "8a142c3e4d3253c95.46563530";
+        $sIDVend = '68342e2955d7401e6.18967838';
+        $sIDMan = 'fe07958b49de225bd1dbc7594fb9a6b0';
+        $sIDCat = '8a142c3e4d3253c95.46563530';
         if ($this->getConfig()->getEdition() === 'EE') {
-            $sIDVend = "d2e44d9b31fcce448.08890330";
-            $sIDMan = "88a996f859f94176da943f38ee067984";
-            $sIDCat = "30e44ab8593023055.23928895";
+            $sIDVend = 'd2e44d9b31fcce448.08890330';
+            $sIDMan = '88a996f859f94176da943f38ee067984';
+            $sIDCat = '30e44ab8593023055.23928895';
         }
         /** @var Search $oSearch */
         $oSearch = oxNew('oxSearch');
 
-        $oSearchList = $oSearch->getSearchArticles("a", $sIDCat, $sIDVend, $sIDMan);
-        $iAllArtCnt = $oSearch->getSearchArticleCount("a", $sIDCat, $sIDVend, $sIDMan);
+        $oSearchList = $oSearch->getSearchArticles('a', $sIDCat, $sIDVend, $sIDMan);
+        $iAllArtCnt = $oSearch->getSearchArticleCount('a', $sIDCat, $sIDVend, $sIDMan);
 
         $sArticleTable = $this->tableViewNameGenerator->getViewName('oxarticles');
         $sQ = "select $sArticleTable.* from $sArticleTable, oxobject2category as
@@ -517,15 +526,15 @@ class SearchTest extends UnitTestCase
 
     public function testSearchWithParamWrongVendorCorrectCat()
     {
-        $sIDCat = "8a142c3e4d3253c95.46563530";
+        $sIDCat = '8a142c3e4d3253c95.46563530';
         if ($this->getConfig()->getEdition() === 'EE') {
-            $sIDCat = "30e44ab8593023055.23928895";
+            $sIDCat = '30e44ab8593023055.23928895';
         }
 
         /** @var Search $oSearch */
         $oSearch = oxNew('oxSearch');
-        $oSearchList = $oSearch->getSearchArticles("bar", $sIDCat, "sdfsdf");
-        $iAllArtCnt = $oSearch->getSearchArticleCount("bar", $sIDCat, "sdfsdf");
+        $oSearchList = $oSearch->getSearchArticles('bar', $sIDCat, 'sdfsdf');
+        $iAllArtCnt = $oSearch->getSearchArticleCount('bar', $sIDCat, 'sdfsdf');
 
         $this->assertEquals(0, $oSearchList->count());
         $this->assertEquals(0, $iAllArtCnt);
@@ -533,15 +542,15 @@ class SearchTest extends UnitTestCase
 
     public function testSearchWithParamWrongManufacturerCorrectCat()
     {
-        $sIDCat = "8a142c3e4d3253c95.46563530";
+        $sIDCat = '8a142c3e4d3253c95.46563530';
         if ($this->getConfig()->getEdition() === 'EE') {
-            $sIDCat = "30e44ab8593023055.23928895";
+            $sIDCat = '30e44ab8593023055.23928895';
         }
 
         /** @var Search $oSearch */
         $oSearch = oxNew('oxSearch');
-        $oSearchList = $oSearch->getSearchArticles("bar", $sIDCat, false, "sdfsdf");
-        $iAllArtCnt = $oSearch->getSearchArticleCount("bar", $sIDCat, false, "sdfsdf");
+        $oSearchList = $oSearch->getSearchArticles('bar', $sIDCat, false, 'sdfsdf');
+        $iAllArtCnt = $oSearch->getSearchArticleCount('bar', $sIDCat, false, 'sdfsdf');
 
         $this->assertEquals(0, $oSearchList->count());
         $this->assertEquals(0, $iAllArtCnt);
@@ -549,15 +558,15 @@ class SearchTest extends UnitTestCase
 
     public function testSearchWithParamCorrectVendorWrongCat()
     {
-        $sIDVend = "68342e2955d7401e6.18967838";
+        $sIDVend = '68342e2955d7401e6.18967838';
         if ($this->getConfig()->getEdition() === 'EE') {
-            $sIDVend = "d2e44d9b31fcce448.08890330";
+            $sIDVend = 'd2e44d9b31fcce448.08890330';
         }
 
         /** @var Search $oSearch */
         $oSearch = oxNew('oxSearch');
-        $oSearchList = $oSearch->getSearchArticles("bar", "xxx", $sIDVend);
-        $iAllArtCnt = $oSearch->getSearchArticleCount("bar", "xxx", $sIDVend);
+        $oSearchList = $oSearch->getSearchArticles('bar', 'xxx', $sIDVend);
+        $iAllArtCnt = $oSearch->getSearchArticleCount('bar', 'xxx', $sIDVend);
 
         $this->assertEquals(0, $oSearchList->count());
         $this->assertEquals(0, $iAllArtCnt);
@@ -565,15 +574,15 @@ class SearchTest extends UnitTestCase
 
     public function testSearchWithParamCorrectManufacturerWrongCat()
     {
-        $sIDMan = "fe07958b49de225bd1dbc7594fb9a6b0";
+        $sIDMan = 'fe07958b49de225bd1dbc7594fb9a6b0';
         if ($this->getConfig()->getEdition() === 'EE') {
-            $sIDMan = "88a996f859f94176da943f38ee067984";
+            $sIDMan = '88a996f859f94176da943f38ee067984';
         }
 
         /** @var Search $oSearch */
         $oSearch = oxNew('oxSearch');
-        $oSearchList = $oSearch->getSearchArticles("bar", "xxx", false, $sIDMan);
-        $iAllArtCnt = $oSearch->getSearchArticleCount("bar", "xxx", false, $sIDMan);
+        $oSearchList = $oSearch->getSearchArticles('bar', 'xxx', false, $sIDMan);
+        $iAllArtCnt = $oSearch->getSearchArticleCount('bar', 'xxx', false, $sIDMan);
 
         $this->assertEquals(0, $oSearchList->count());
         $this->assertEquals(0, $iAllArtCnt);
@@ -581,18 +590,18 @@ class SearchTest extends UnitTestCase
 
     public function testSearchWithCorrectVendorAndCat()
     {
-        $sIDVend = "68342e2955d7401e6.18967838";
-        $sIDCat = "8a142c3e4d3253c95.46563530";
+        $sIDVend = '68342e2955d7401e6.18967838';
+        $sIDCat = '8a142c3e4d3253c95.46563530';
         if ($this->getConfig()->getEdition() === 'EE') {
-            $sIDVend = "d2e44d9b31fcce448.08890330";
-            $sIDCat = "30e44ab8593023055.23928895";
+            $sIDVend = 'd2e44d9b31fcce448.08890330';
+            $sIDCat = '30e44ab8593023055.23928895';
         }
 
         /** @var Search $oSearch */
         $oSearch = oxNew('oxSearch');
 
-        $oSearchList = $oSearch->getSearchArticles("", $sIDCat, $sIDVend);
-        $iAllArtCnt = $oSearch->getSearchArticleCount("", $sIDCat, $sIDVend);
+        $oSearchList = $oSearch->getSearchArticles('', $sIDCat, $sIDVend);
+        $iAllArtCnt = $oSearch->getSearchArticleCount('', $sIDCat, $sIDVend);
 
         $sArticleTable = $this->tableViewNameGenerator->getViewName('oxarticles');
         $sQ = "select $sArticleTable.* from $sArticleTable, oxobject2category as
@@ -633,7 +642,7 @@ class SearchTest extends UnitTestCase
     // testing SQL "where" getter
     public function testGetWhereSearchColsAreNotDefinedInConfig()
     {
-        $sFix = "";
+        $sFix = '';
 
         $oConfig = $this->getConfig();
         $oConfig->setConfigParam('aSearchCols', 'xxx');
@@ -673,9 +682,9 @@ class SearchTest extends UnitTestCase
 
     public function testGetSearchSelectIllegalVendor()
     {
-        $sIDCat = "8a142c3e4d3253c95.46563530";
+        $sIDCat = '8a142c3e4d3253c95.46563530';
         if ($this->getConfig()->getEdition() === 'EE') {
-            $sIDCat = "30e44ab8593023055.23928895";
+            $sIDCat = '30e44ab8593023055.23928895';
         }
 
         /** @var Search $oSearch */
@@ -685,9 +694,9 @@ class SearchTest extends UnitTestCase
 
     public function testGetSearchSelectIllegalManufacturer()
     {
-        $sIDCat = "8a142c3e4d3253c95.46563530";
+        $sIDCat = '8a142c3e4d3253c95.46563530';
         if ($this->getConfig()->getEdition() === 'EE') {
-            $sIDCat = "30e44ab8593023055.23928895";
+            $sIDCat = '30e44ab8593023055.23928895';
         }
 
         /** @var Search $oSearch */
@@ -707,15 +716,15 @@ class SearchTest extends UnitTestCase
         $iCurrTime = time();
         $this->setTime($iCurrTime);
 
-        $this->getConfig()->setConfigParam('aSearchCols', array('oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum'));
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
 
-        $sIDVend = "68342e2955d7401e6.18967838";
-        $sIDMan = "fe07958b49de225bd1dbc7594fb9a6b0";
-        $sIDCat = "8a142c3e4d3253c95.46563530";
+        $sIDVend = '68342e2955d7401e6.18967838';
+        $sIDMan = 'fe07958b49de225bd1dbc7594fb9a6b0';
+        $sIDCat = '8a142c3e4d3253c95.46563530';
         if ($this->getConfig()->getEdition() === 'EE') {
-            $sIDVend = "d2e44d9b31fcce448.08890330";
-            $sIDMan = "88a996f859f94176da943f38ee067984";
-            $sIDCat = "30e44ab8593023055.23928895";
+            $sIDVend = 'd2e44d9b31fcce448.08890330';
+            $sIDMan = '88a996f859f94176da943f38ee067984';
+            $sIDCat = '30e44ab8593023055.23928895';
         }
 
         /** @var \OxidEsales\Eshop\Application\Controller\Admin\ArticleController $oArticle */
@@ -741,19 +750,19 @@ class SearchTest extends UnitTestCase
         $sQ = $oSearch->UNITgetSearchSelect('ü a', $sIDCat, $sIDVend, $sIDMan, "$sArticleTable.oxtitle");
 
         //cleaning spaces, tabs and so on...
-        $aSearch = array("/\s+/", "/\t+/", "/\r+/", "/\n+/");
-        $sQ = trim(strtolower(preg_replace($aSearch, " ", $sQ)));
-        $sFix = trim(strtolower(preg_replace($aSearch, " ", $sFix)));
+        $aSearch = ["/\s+/", "/\t+/", "/\r+/", "/\n+/"];
+        $sQ = trim(strtolower(preg_replace($aSearch, ' ', $sQ)));
+        $sFix = trim(strtolower(preg_replace($aSearch, ' ', $sFix)));
 
         $this->assertEquals($sFix, $sQ);
     }
 
     public function testGetSearchSelectPassingPriceCat()
     {
-        $sInsert = "Insert into oxcategories (`OXID`,`OXROOTID`,`OXTITLE`, `OXACTIVE`, `OXPRICEFROM`, `OXPRICETO`) " .
+        $sInsert = 'Insert into oxcategories (`OXID`,`OXROOTID`,`OXTITLE`, `OXACTIVE`, `OXPRICEFROM`, `OXPRICETO`) ' .
                    "values ('_testCat','test','test','1','10','50')";
         if ($this->getConfig()->getEdition() === 'EE') {
-            $sInsert = "Insert into oxcategories (`OXID`,`OXROOTID`,`OXTITLE`,`OXACTIVE`,`OXPRICEFROM`," .
+            $sInsert = 'Insert into oxcategories (`OXID`,`OXROOTID`,`OXTITLE`,`OXACTIVE`,`OXPRICEFROM`,' .
                        "`OXPRICETO`,`OXLONGDESC`,`OXLONGDESC_1`,`OXLONGDESC_2`,`OXLONGDESC_3`)
                        values ('_testCat','test','test','1','10','50','','','','')";
         }
@@ -763,7 +772,7 @@ class SearchTest extends UnitTestCase
         $iCurrTime = time();
         $this->setTime($iCurrTime);
 
-        $this->getConfig()->setConfigParam('aSearchCols', array('oxtitle'));
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle']);
 
         /** @var \OxidEsales\Eshop\Application\Controller\Admin\ArticleController $oArticle */
         $oArticle = oxNew('oxArticle');
@@ -788,9 +797,9 @@ class SearchTest extends UnitTestCase
         $sQ = $oSearch->UNITgetSearchSelect('a', '_testCat', null, null, "$sArticleTable.oxtitle");
 
         //cleaning spaces, tabs and so on...
-        $aSearch = array("/\s+/", "/\t+/", "/\r+/", "/\n+/");
-        $sQ = trim(strtolower(preg_replace($aSearch, " ", $sQ)));
-        $sFix = trim(strtolower(preg_replace($aSearch, " ", $sFix)));
+        $aSearch = ["/\s+/", "/\t+/", "/\r+/", "/\n+/"];
+        $sQ = trim(strtolower(preg_replace($aSearch, ' ', $sQ)));
+        $sFix = trim(strtolower(preg_replace($aSearch, ' ', $sFix)));
 
         $this->assertEquals($sFix, $sQ);
     }
@@ -798,12 +807,12 @@ class SearchTest extends UnitTestCase
     public function testGetSearchSelectWithSearchInLongDesc()
     {
         // forcing config
-        $this->getConfig()->setConfigParam('aSearchCols', array('oxlongdesc'));
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxlongdesc']);
         $this->getConfig()->setConfigParam('blUseRightsRoles', 0);
 
         $iCurrTime = 0;
 
-        $oUtilsDate = $this->getMock(\OxidEsales\Eshop\Core\UtilsDate::class, array('getRequestTime'));
+        $oUtilsDate = $this->getMock(\OxidEsales\Eshop\Core\UtilsDate::class, ['getRequestTime']);
         $oUtilsDate->expects($this->any())->method('getRequestTime')->will($this->returnValue($iCurrTime));
         /** @var oxUtilsDate $oUtils */
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\UtilsDate::class, $oUtilsDate);
@@ -821,23 +830,40 @@ class SearchTest extends UnitTestCase
         }
         $sQ .= ")  and $sArticleTable.oxparentid = '' and $sArticleTable.oxissearch = 1  and
                 ( (  $sAETable.oxlongdesc like '%xxx%' )  ) ";
+        $sQ .= " ORDER BY CASE WHEN ($sAETable.oxlongdesc LIKE '%xxx%') THEN 1 ELSE 2 END ASC, $sArticleTable.oxtitle ASC";
 
         /** @var Search $oSearch */
         $oSearch = oxNew('oxSearch');
         $sFix = $oSearch->UNITgetSearchSelect('xxx');
 
-        $aSearch = array("/\s+/", "/\t+/", "/\r+/", "/\n+/");
-        $sQ = trim(strtolower(preg_replace($aSearch, " ", $sQ)));
-        $sFix = trim(strtolower(preg_replace($aSearch, " ", $sFix)));
-
+        $aSearch = ["/\s+/", "/\t+/", "/\r+/", "/\n+/"];
+        $sQ = trim(strtolower(preg_replace($aSearch, ' ', $sQ)));
+        $sFix = trim(strtolower(preg_replace($aSearch, ' ', $sFix)));
 
         $this->assertEquals($sQ, $sFix);
+    }
+
+    public function testSearchRanksMultiWordMatchesByNumberOfMatchedWords()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle']);
+        $this->getConfig()->setConfigParam('blSearchUseAND', false);
+
+        // the adjacent phrase scores highest, then both words scattered, then a single word
+        $this->_insertSearchableArticle('_testMwPhrase', 'zzzalpha zzzbeta');
+        $this->_insertSearchableArticle('_testMwBoth', 'zzzbeta with zzzalpha');
+        $this->_insertSearchableArticle('_testMwOne', 'aaa zzzalpha only');
+
+        /** @var Search $oSearch */
+        $oSearch = oxNew('oxSearch');
+        $oSearchList = $oSearch->getSearchArticles('zzzalpha zzzbeta');
+
+        $this->assertSame(['_testMwPhrase', '_testMwBoth', '_testMwOne'], $oSearchList->arrayKeys());
     }
 
     public function testGetWhereWithSearchIngLongDescSecondLanguage()
     {
         // forcing config
-        $this->getConfig()->setConfigParam('aSearchCols', array('oxlongdesc'));
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxlongdesc']);
         $sAETable = $sTable = $this->tableViewNameGenerator->getViewName('oxartextends', 1);
 
         $sQ = " and ( (  $sAETable.oxlongdesc like '%xxx%' )  ) ";
@@ -850,9 +876,9 @@ class SearchTest extends UnitTestCase
 
         $sFix = $oSearch->UNITgetWhere('xxx');
 
-        $aSearch = array("/\s+/", "/\t+/", "/\r+/", "/\n+/");
-        $sQ = trim(strtolower(preg_replace($aSearch, " ", $sQ)));
-        $sFix = trim(strtolower(preg_replace($aSearch, " ", $sFix)));
+        $aSearch = ["/\s+/", "/\t+/", "/\r+/", "/\n+/"];
+        $sQ = trim(strtolower(preg_replace($aSearch, ' ', $sQ)));
+        $sFix = trim(strtolower(preg_replace($aSearch, ' ', $sFix)));
 
         $this->assertEquals($sQ, $sFix);
     }
@@ -890,5 +916,169 @@ class SearchTest extends UnitTestCase
         $this->addToDatabase($sQ3, 'oxobject2category');
         $aResults = $this->_oSearchHandler->getSearchArticles('searchTestVal', '_testCatSearch');
         $this->assertEquals(1, count($aResults));
+    }
+
+    public function testGetSearchSuggestionsReturnsEmptyWhenNoSearchColsConfigured()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', 'xxx');
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('bar');
+
+        $this->assertSame([], $aSuggestions);
+    }
+
+    /**
+     * Inserts a searchable article fixture.
+     *
+     * @param string $sOxid  article id
+     * @param string $sTitle article title
+     * @param float  $dPrice optional price
+     */
+    private function _insertSearchableArticle($sOxid, $sTitle, $dPrice = null)
+    {
+        $oDb = $this->getDb();
+        $sOxidQuoted = $oDb->quote($sOxid);
+        $sTitleQuoted = $oDb->quote($sTitle);
+        $sPriceCol = $dPrice === null ? '' : ', oxprice';
+        $sPriceVal = $dPrice === null ? '' : ', ' . (float) $dPrice;
+
+        $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxparentid, oxtitle{$sPriceCol}) VALUES ({$sOxidQuoted}, 1, 1, '', {$sTitleQuoted}{$sPriceVal})";
+        if ($this->getConfig()->getEdition() === 'EE') {
+            $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxshopid, oxparentid, oxtitle{$sPriceCol}) VALUES ({$sOxidQuoted}, 1, 1, 1, '', {$sTitleQuoted}{$sPriceVal})";
+        }
+        $this->addToDatabase($sInsert, 'oxarticles');
+    }
+
+    public function testGetSearchSuggestionsReturnsEmptyWhenSearchColsIsEmptyArray()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', []);
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('bar');
+
+        $this->assertSame([], $aSuggestions);
+    }
+
+    public function testGetSearchSuggestionsReturnsEmptyForWhitespace()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('   ');
+
+        $this->assertSame([], $aSuggestions);
+    }
+
+    public function testGetSearchSuggestionsReturnsMatchingArticles()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+        $this->_insertSearchableArticle('_testSuggResult', 'SuggFixtureResult');
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('SuggFixtureResult', 10);
+
+        $this->assertCount(1, $aSuggestions);
+        $this->assertSame('_testSuggResult', $aSuggestions[0]['id']);
+        $this->assertSame('SuggFixtureResult', $aSuggestions[0]['title']);
+
+        $expectedKeys = ['id', 'title', 'price', 'icon', 'link'];
+        foreach ($expectedKeys as $sKey) {
+            $this->assertArrayHasKey($sKey, $aSuggestions[0]);
+        }
+    }
+
+    public function testGetSearchSuggestionsReturnsPlaintextQuotesFromRawStorage()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+        $this->_insertSearchableArticle('_testSuggRawQuote', 'SuggRaw "Bar" & Co');
+        $this->addToDatabase(
+            "UPDATE oxarticles SET oxvarselect = 'Size \"L\"' WHERE oxid = '_testSuggRawQuote'",
+            'oxarticles'
+        );
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('SuggRaw');
+
+        $this->assertCount(1, $aSuggestions);
+        $this->assertSame('SuggRaw "Bar" & Co Size "L"', $aSuggestions[0]['title']);
+    }
+
+    public function testGetSearchSuggestionsDecodesHtmlEntitiesFromStoredData()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+        $this->_insertSearchableArticle(
+            '_testSuggEntities',
+            'SuggEnt &quot;Bar&quot; &amp; Co &#039;x&#039; <b>bold</b>'
+        );
+        $this->addToDatabase(
+            "UPDATE oxarticles SET oxvarselect = 'Var &quot;L&quot; &amp; Co' WHERE oxid = '_testSuggEntities'",
+            'oxarticles'
+        );
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('SuggEnt');
+
+        $this->assertCount(1, $aSuggestions);
+        $this->assertSame(
+            'SuggEnt "Bar" & Co \'x\' <b>bold</b> Var "L" & Co',
+            $aSuggestions[0]['title']
+        );
+    }
+
+    public function testGetSearchSuggestionsRespectsLimit()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+        for ($i = 1; $i <= 4; $i++) {
+            $this->_insertSearchableArticle('_testSuggLimit' . $i, 'SuggFixtureLimit' . $i);
+        }
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('SuggFixtureLimit', 3);
+
+        $this->assertCount(3, $aSuggestions);
+    }
+
+    public function testGetSearchSuggestionsMatchesLongDescription()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxlongdesc']);
+
+        $this->_insertSearchableArticle('_testSuggDesc', 'NoMatchingTitle');
+        $this->addToDatabase("REPLACE INTO oxartextends (oxid, oxlongdesc) VALUES ('_testSuggDesc', 'uniqueNeedleInLongDesc')", 'oxartextends');
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('uniqueNeedleInLongDesc');
+
+        $this->assertCount(1, $aSuggestions);
+        $this->assertSame('_testSuggDesc', $aSuggestions[0]['id']);
+    }
+
+    public function testGetSearchSuggestionsFormatsNetPriceWhenShowNetPriceIsEnabled()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle']);
+        $this->getConfig()->setConfigParam('blShowNetPrice', true);
+        $this->getConfig()->setConfigParam('blEnterNetPrice', false);
+
+        $this->_insertSearchableArticle('_testSuggNet', 'NetPriceTest', 100);
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('NetPriceTest');
+
+        $this->assertCount(1, $aSuggestions);
+
+        $oConfig = Registry::getConfig();
+        $oCurrency = $oConfig->getActShopCurrencyObject();
+        $dVat = (float) $oConfig->getConfigParam('dDefaultVAT');
+        $dNetto = round(Price::brutto2Netto(100, $dVat), $oCurrency->decimal);
+        $sFormattedPrice = Registry::getLang()->formatCurrency($dNetto * (float) $oCurrency->rate);
+        $sSign = $oCurrency->sign ?? '';
+        $sSide = $oCurrency->side ?? '';
+        $sExpectedPrice = trim(($sSide === 'Front') ? $sSign . $sFormattedPrice : $sFormattedPrice . ' ' . $sSign);
+
+        $this->assertSame($sExpectedPrice, $aSuggestions[0]['price']);
+    }
+
+    public function testGetSearchSuggestionsOmitsPriceWhenPriceLoadingIsDisabled()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle']);
+        $this->getConfig()->setConfigParam('bl_perfLoadPrice', false);
+
+        $this->_insertSearchableArticle('_testSuggNoPrice', 'NoPriceTest');
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('NoPriceTest');
+
+        $this->assertCount(1, $aSuggestions);
+        $this->assertArrayNotHasKey('price', $aSuggestions[0]);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 use OxidEsales\EshopCommunity\Core\BackwardsCompatibleClassNameProvider;
@@ -26,8 +28,10 @@ class ClassNameProviderTest extends UnitTestCase
 {
     public function providerReturnsClassNameFromClassAlias()
     {
-        return array(
-        );
+        return [
+            'known alias resolves to class' => ['oxarticle', 'OxidEsales\\Eshop\\Application\\Model\\Article'],
+            'unknown alias returns itself'  => ['nonExistentAlias', 'nonExistentAlias'],
+        ];
     }
 
     /**
@@ -39,6 +43,8 @@ class ClassNameProviderTest extends UnitTestCase
     public function testReturnsClassNameFromClassAlias($classAlias, $className)
     {
         $map = [
+            'oxarticle' => 'OxidEsales\\Eshop\\Application\\Model\\Article',
+            'oxorder'   => 'OxidEsales\\Eshop\\Application\\Model\\Order',
         ];
 
         $utilsObject = new BackwardsCompatibleClassNameProvider($map);
@@ -48,20 +54,25 @@ class ClassNameProviderTest extends UnitTestCase
 
     public function providerReturnsClassNameAliasFromClassName()
     {
-        return array(
-        );
+        return [
+            'known class resolves to alias'          => ['OxidEsales\\Eshop\\Application\\Model\\Article', 'oxarticle'],
+            'leading backslash is stripped'           => ['\\OxidEsales\\Eshop\\Application\\Model\\Article', 'oxarticle'],
+            'unknown class returns null'              => ['NonExistent\\Class\\Name', null],
+        ];
     }
 
     /**
      * @param string $className
-     * @param string $classAliasName
+     * @param string|null $classAliasName
      *
      * @dataProvider providerReturnsClassNameAliasFromClassName
      */
     public function testReturnsClassNameAliasFromClassName($className, $classAliasName)
     {
-        $map = array(
-        );
+        $map = [
+            'oxarticle' => 'OxidEsales\\Eshop\\Application\\Model\\Article',
+            'oxorder'   => 'OxidEsales\\Eshop\\Application\\Model\\Order',
+        ];
 
         $utilsObject = new BackwardsCompatibleClassNameProvider($map);
 

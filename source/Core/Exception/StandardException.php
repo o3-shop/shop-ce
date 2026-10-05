@@ -64,7 +64,7 @@ class StandardException extends \Exception
      * @param integer         $iCode    exception code
      * @param \Exception|null $previous previous exception
      */
-    public function __construct($sMessage = "not set", $iCode = 0, \Exception $previous = null)
+    public function __construct($sMessage = 'not set', $iCode = 0, \Exception $previous = null)
     {
         parent::__construct($sMessage, $iCode, $previous);
     }
@@ -169,18 +169,18 @@ class StandardException extends \Exception
      */
     public function getString()
     {
-        $sWarning = "";
+        $sWarning = '';
         if ($this->_blNotCaught) {
-            $sWarning .= "--!--NOT CAUGHT--!--";
+            $sWarning .= '--!--NOT CAUGHT--!--';
         }
 
         if ($this->_blRenderer) {
-            $sWarning .= "--!--RENDERER--!--";
+            $sWarning .= '--!--RENDERER--!--';
         }
 
         $currentTime = date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime());
 
-        return $sWarning . __CLASS__ . " (time: " . $currentTime . "): [{$this->code}]: {$this->message} \n Stack Trace: {$this->getTraceAsString()}\n\n";
+        return $sWarning . __CLASS__ . ' (time: ' . $currentTime . "): [{$this->code}]: {$this->message} \n Stack Trace: {$this->getTraceAsString()}\n\n";
     }
 
     /**

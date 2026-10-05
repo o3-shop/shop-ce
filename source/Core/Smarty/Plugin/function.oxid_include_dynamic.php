@@ -41,17 +41,17 @@ function smarty_function_oxid_include_dynamic($params, &$smarty)
         return;
     }
 
-    if (!empty($smarty->_tpl_vars["_render4cache"])) {
-        $sContent = "<oxid_dynamic>";
+    if (!empty($smarty->_tpl_vars['_render4cache'])) {
+        $sContent = '<oxid_dynamic>';
         foreach ($params as $key => $val) {
             $sContent .= " $key='" . base64_encode($val) . "'";
         }
-        $sContent .= "</oxid_dynamic>";
+        $sContent .= '</oxid_dynamic>';
         return $sContent;
     } else {
-        $sPrefix = "_";
+        $sPrefix = '_';
         if (array_key_exists('type', $params)) {
-            $sPrefix .= $params['type'] . "_";
+            $sPrefix .= $params['type'] . '_';
         }
 
         foreach ($params as $key => $val) {
@@ -62,9 +62,9 @@ function smarty_function_oxid_include_dynamic($params, &$smarty)
             }
         }
 
-        $smarty->assign("__oxid_include_dynamic", true);
+        $smarty->assign('__oxid_include_dynamic', true);
         $sRes = $smarty->fetch($params['file']);
-        $smarty->clear_assign("__oxid_include_dynamic");
+        $smarty->clear_assign('__oxid_include_dynamic');
         return $sRes;
     }
 }

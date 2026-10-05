@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Seo;
 
 use oxBase;
@@ -55,10 +57,10 @@ class SeoTest extends \OxidTestCase
     public function testArticleSeoAfterCategoryNameChange()
     {
         oxRegistry::getConfig()->setConfigParam('blEnableSeoCache', false);
-        $aCategories = array('_test1' => 0, '_test2' => time());
+        $aCategories = ['_test1' => 0, '_test2' => time()];
         $this->_addCategories($aCategories);
         $this->_addArticle();
-        $this->_addArticlesToCategories(array('_testid'), $aCategories);
+        $this->_addArticlesToCategories(['_testid'], $aCategories);
         $this->_addSeoEntries($aCategories);
         $this->getConfig()->setAdminMode(true);
 
@@ -74,12 +76,12 @@ class SeoTest extends \OxidTestCase
         $oCategory->oxcategories__oxtitle = new oxField($oCategory->oxcategories__oxtitle . 'test');
         $oCategory->save();
 
-        $sRegeneratedExpectedCategory = oxRegistry::getConfig()->getShopUrl() . "testCategory1test/";
+        $sRegeneratedExpectedCategory = oxRegistry::getConfig()->getShopUrl() . 'testCategory1test/';
         $oCategory = oxNew('oxCategory');
         $oCategory->load('_test1');
         $this->assertEquals($sRegeneratedExpectedCategory, $oCategory->getLink());
 
-        $sRegeneratedExpectedArticle = oxRegistry::getConfig()->getShopUrl() . "testCategory1test/testArticle.html";
+        $sRegeneratedExpectedArticle = oxRegistry::getConfig()->getShopUrl() . 'testCategory1test/testArticle.html';
         $oArticle = oxNew('oxArticle');
         $oArticle->load('_testid');
         $oArticle->getLink();
@@ -98,10 +100,10 @@ class SeoTest extends \OxidTestCase
      */
     public function testArticleSeoAfterArticleNameChange()
     {
-        $aCategories = array('_test3' => 0, '_test4' => time());
+        $aCategories = ['_test3' => 0, '_test4' => time()];
         $this->_addCategories($aCategories);
         $this->_addArticle();
-        $this->_addArticlesToCategories(array('_testid'), $aCategories);
+        $this->_addArticlesToCategories(['_testid'], $aCategories);
         $this->_addSeoEntries($aCategories);
         $this->getConfig()->setAdminMode(true);
 
@@ -114,7 +116,7 @@ class SeoTest extends \OxidTestCase
         $oArticle->oxarticles__oxtitle = new oxField($oArticle->oxarticles__oxtitle . 'test');
         $oArticle->save();
 
-        $sRegeneratedExpectedArticle = oxRegistry::getConfig()->getShopUrl() . "this/there/testArticletest.html";
+        $sRegeneratedExpectedArticle = oxRegistry::getConfig()->getShopUrl() . 'this/there/testArticletest.html';
         $oArticle = oxNew('oxArticle');
         $oArticle->load('_testid');
         $oArticle->getLink();
@@ -135,22 +137,22 @@ class SeoTest extends \OxidTestCase
      */
     public function testArticleSeoAfterCategoryNameChangeFixedArticleSeo()
     {
-        $aCategories = array('_test5' => 0, '_test6' => time());
+        $aCategories = ['_test5' => 0, '_test6' => time()];
         $this->_addCategories($aCategories);
         $this->_addArticle();
-        $this->_addArticlesToCategories(array('_testid'), $aCategories);
-        $aSeoData = array(
-            'oxseourl' => 'this/there/'
-        );
+        $this->_addArticlesToCategories(['_testid'], $aCategories);
+        $aSeoData = [
+            'oxseourl' => 'this/there/',
+        ];
 
         $this->setRequestParameter('aSeoData', $aSeoData);
         $oCategorySeo = oxNew('Category_Seo');
         $oCategorySeo->setEditObjectId('_test5');
         $oCategorySeo->save();
 
-        $aSeoData = array(
-            'oxseourl' => 'other/there/'
-        );
+        $aSeoData = [
+            'oxseourl' => 'other/there/',
+        ];
 
         $this->setRequestParameter('aSeoData', $aSeoData);
         $oCategorySeo = oxNew('Category_Seo');
@@ -159,11 +161,11 @@ class SeoTest extends \OxidTestCase
 
         $sArticleSeo = 'this/there/then.html';
         $sParams = 'oxcategory#_test5#' . oxRegistry::getLang()->getBaseLanguage();
-        $aSeoData = array(
+        $aSeoData = [
             'oxseourl' => $sArticleSeo,
             'oxparams' => $sParams,
-            'oxfixed' => 1
-        );
+            'oxfixed' => 1,
+        ];
 
         $this->setRequestParameter('aSeoData', $aSeoData);
         $oArticleSeo = oxNew('Article_Seo');
@@ -181,7 +183,7 @@ class SeoTest extends \OxidTestCase
         $oCategory->oxcategories__oxtitle = new oxField($oCategory->oxcategories__oxtitle . 'test');
         $oCategory->save();
 
-        $sRegeneratedExpectedCategory = oxRegistry::getConfig()->getShopUrl() . "testCategory1test/";
+        $sRegeneratedExpectedCategory = oxRegistry::getConfig()->getShopUrl() . 'testCategory1test/';
         $oCategory = oxNew('oxCategory');
         $oCategory->load('_test5');
         $this->assertEquals($sRegeneratedExpectedCategory, $oCategory->getLink());
@@ -204,23 +206,23 @@ class SeoTest extends \OxidTestCase
      */
     public function testArticleSeoAfterCategorySeoChange()
     {
-        $aCategories = array('_test7' => 0, '_test8' => time());
+        $aCategories = ['_test7' => 0, '_test8' => time()];
         $this->_addCategories($aCategories);
         $this->_addArticle();
-        $this->_addArticlesToCategories(array('_testid'), $aCategories);
+        $this->_addArticlesToCategories(['_testid'], $aCategories);
 
-        $aSeoData = array(
-            'oxseourl' => 'this/there/'
-        );
+        $aSeoData = [
+            'oxseourl' => 'this/there/',
+        ];
 
         $this->setRequestParameter('aSeoData', $aSeoData);
         $oCategorySeo = oxNew('Category_Seo');
         $oCategorySeo->setEditObjectId('_test7');
         $oCategorySeo->save();
 
-        $aSeoData = array(
-            'oxseourl' => 'other/there/'
-        );
+        $aSeoData = [
+            'oxseourl' => 'other/there/',
+        ];
 
         $this->setRequestParameter('aSeoData', $aSeoData);
         $oCategorySeo = oxNew('Category_Seo');
@@ -229,10 +231,10 @@ class SeoTest extends \OxidTestCase
 
         $sArticleSeo = 'this/there/then.html';
         $sParams = 'oxcategory#_test7#' . oxRegistry::getLang()->getBaseLanguage();
-        $aSeoData = array(
+        $aSeoData = [
             'oxseourl' => $sArticleSeo,
-            'oxparams' => $sParams
-        );
+            'oxparams' => $sParams,
+        ];
 
         $this->setRequestParameter('aSeoData', $aSeoData);
         $oArticleSeo = oxNew('Article_Seo');
@@ -245,21 +247,21 @@ class SeoTest extends \OxidTestCase
         $oArticle->load('_testid');
         $this->assertEquals($sCurrentSeo, $oArticle->getLink());
 
-        $aSeoData = array(
-            'oxseourl' => 'changed/here/'
-        );
+        $aSeoData = [
+            'oxseourl' => 'changed/here/',
+        ];
 
         $this->setRequestParameter('aSeoData', $aSeoData);
         $oCategorySeo = oxNew('Category_Seo');
         $oCategorySeo->setEditObjectId('_test7');
         $oCategorySeo->save();
 
-        $sRegeneratedExpectedCategory = oxRegistry::getConfig()->getShopUrl() . "changed/here/";
+        $sRegeneratedExpectedCategory = oxRegistry::getConfig()->getShopUrl() . 'changed/here/';
         $oCategory = oxNew('oxCategory');
         $oCategory->load('_test7');
         $this->assertEquals($sRegeneratedExpectedCategory, $oCategory->getLink());
 
-        $sRegeneratedExpectedArticle = oxRegistry::getConfig()->getShopUrl() . "changed/here/testArticle.html";
+        $sRegeneratedExpectedArticle = oxRegistry::getConfig()->getShopUrl() . 'changed/here/testArticle.html';
         $oArticle = oxNew('oxArticle');
         $oArticle->load('_testid');
         $this->assertEquals($sRegeneratedExpectedArticle, $oArticle->getLink());
@@ -278,23 +280,23 @@ class SeoTest extends \OxidTestCase
      */
     public function testArticleSeoAfterCategorySeoChangeOnFixedArticle()
     {
-        $aCategories = array('_test9' => 0, '_test10' => time());
+        $aCategories = ['_test9' => 0, '_test10' => time()];
         $this->_addCategories($aCategories);
         $this->_addArticle();
-        $this->_addArticlesToCategories(array('_testid'), $aCategories);
+        $this->_addArticlesToCategories(['_testid'], $aCategories);
 
-        $aSeoData = array(
-            'oxseourl' => 'this/there/'
-        );
+        $aSeoData = [
+            'oxseourl' => 'this/there/',
+        ];
 
         $this->setRequestParameter('aSeoData', $aSeoData);
         $oCategorySeo = oxNew('Category_Seo');
         $oCategorySeo->setEditObjectId('_test9');
         $oCategorySeo->save();
 
-        $aSeoData = array(
-            'oxseourl' => 'other/there/'
-        );
+        $aSeoData = [
+            'oxseourl' => 'other/there/',
+        ];
 
         $this->setRequestParameter('aSeoData', $aSeoData);
         $oCategorySeo = oxNew('Category_Seo');
@@ -303,11 +305,11 @@ class SeoTest extends \OxidTestCase
 
         $sArticleSeo = 'this/there/then.html';
         $sParams = 'oxcategory#_test9#' . oxRegistry::getLang()->getBaseLanguage();
-        $aSeoData = array(
+        $aSeoData = [
             'oxseourl' => $sArticleSeo,
             'oxparams' => $sParams,
-            'oxfixed' => 1
-        );
+            'oxfixed' => 1,
+        ];
 
         $this->setRequestParameter('aSeoData', $aSeoData);
         $oArticleSeo = oxNew('Article_Seo');
@@ -320,16 +322,16 @@ class SeoTest extends \OxidTestCase
         $oArticle->load('_testid');
         $this->assertEquals($sCurrentSeo, $oArticle->getLink());
 
-        $aSeoData = array(
-            'oxseourl' => 'changed/here/'
-        );
+        $aSeoData = [
+            'oxseourl' => 'changed/here/',
+        ];
 
         $this->setRequestParameter('aSeoData', $aSeoData);
         $oCategorySeo = oxNew('Category_Seo');
         $oCategorySeo->setEditObjectId('_test9');
         $oCategorySeo->save();
 
-        $sRegeneratedExpectedCategory = oxRegistry::getConfig()->getShopUrl() . "changed/here/";
+        $sRegeneratedExpectedCategory = oxRegistry::getConfig()->getShopUrl() . 'changed/here/';
         $oCategory = oxNew('oxCategory');
         $oCategory->load('_test9');
         $this->assertEquals($sRegeneratedExpectedCategory, $oCategory->getLink());
@@ -353,10 +355,10 @@ class SeoTest extends \OxidTestCase
      */
     public function testArticleSeoAfterCategoryIsRemoved()
     {
-        $aCategories = array('_test3' => 0);
+        $aCategories = ['_test3' => 0];
         $this->_addCategories($aCategories);
         $this->_addArticle();
-        $this->_addArticlesToCategories(array('_testid'), $aCategories);
+        $this->_addArticlesToCategories(['_testid'], $aCategories);
 
         $sArticleSeo = 'testCategory1/testArticle.html';
         $sCurrentSeo = oxRegistry::getConfig()->getShopUrl() . $sArticleSeo;
@@ -367,10 +369,10 @@ class SeoTest extends \OxidTestCase
 
         $oAlc = oxNew('ajaxListComponent');
         //reset article URL
-        $oAlc->resetArtSeoUrl(array('_testid'), array('_test3'));
+        $oAlc->resetArtSeoUrl(['_testid'], ['_test3']);
 
         //check if old URL still active
-        $aExp = array("cl" => "details", "anid" => "_testid", "cnid" => "_test3", "lang" => 0);
+        $aExp = ['cl' => 'details', 'anid' => '_testid', 'cnid' => '_test3', 'lang' => 0];
         /** @var oxSeoEncoder $oSeoDecoder */
         $oSeoDecoder = \OxidEsales\Eshop\Core\Registry::getSeoDecoder();
         $aDecoded = $oSeoDecoder->decodeUrl($sCurrentSeo);
@@ -385,13 +387,13 @@ class SeoTest extends \OxidTestCase
     protected function _addSeoEntries(array $aCategories)
     {
         foreach ($aCategories as $sCategoryId => $sTime) {
-            $sQ = "replace into oxseo (`OXOBJECTID`,`OXIDENT`,`OXSHOPID`,`OXLANG`,`OXSEOURL`,`OXTYPE`,`OXFIXED`,`OXPARAMS`) " .
+            $sQ = 'replace into oxseo (`OXOBJECTID`,`OXIDENT`,`OXSHOPID`,`OXLANG`,`OXSEOURL`,`OXTYPE`,`OXFIXED`,`OXPARAMS`) ' .
                    "values ('{$sCategoryId}','{$sCategoryId}','{$this->_getShopId()}','0','this/there/','oxcategory','0','')";
 
             $this->addToDatabase($sQ, 'oxseo');
         }
         $sParam = key($aCategories);
-        $sQ = "replace into oxseo (`OXOBJECTID`,`OXIDENT`,`OXSHOPID`,`OXLANG`,`OXSEOURL`,`OXTYPE`,`OXFIXED`,`OXPARAMS`) " .
+        $sQ = 'replace into oxseo (`OXOBJECTID`,`OXIDENT`,`OXSHOPID`,`OXLANG`,`OXSEOURL`,`OXTYPE`,`OXFIXED`,`OXPARAMS`) ' .
                "values ('_testid','_testIndent3','{$this->_getShopId()}','0','this/there/then.html','oxarticle','0','{$sParam}')";
 
         $this->addToDatabase($sQ, 'oxseo');
@@ -405,7 +407,7 @@ class SeoTest extends \OxidTestCase
     protected function _addCategories(array $aCategoryIds)
     {
         foreach ($aCategoryIds as $sId => $sTime) {
-            $sQ = "Insert into oxcategories (`OXID`,`OXROOTID`,`OXSHOPID`,`OXLEFT`,`OXRIGHT`,`OXTITLE`,`OXLONGDESC`,`OXLONGDESC_1`,`OXLONGDESC_2`,`OXLONGDESC_3`, `OXACTIVE`, `OXPRICEFROM`, `OXPRICETO`) " .
+            $sQ = 'Insert into oxcategories (`OXID`,`OXROOTID`,`OXSHOPID`,`OXLEFT`,`OXRIGHT`,`OXTITLE`,`OXLONGDESC`,`OXLONGDESC_1`,`OXLONGDESC_2`,`OXLONGDESC_3`, `OXACTIVE`, `OXPRICEFROM`, `OXPRICETO`) ' .
                    "values ('{$sId}',1,'{$sId}','1','4','testCategory1','','','','','1','10','50')";
 
             $this->addToDatabase($sQ, 'oxcategories');
@@ -436,10 +438,10 @@ class SeoTest extends \OxidTestCase
                 /** @var oxBase $oNew */
                 $oNew = oxNew('oxBase');
                 $oNew->init('oxobject2category');
-                $oNew->oxobject2category__oxid       = new oxField($oNew->setId($myUtilsObject->generateUID()));
+                $oNew->oxobject2category__oxid = new oxField($oNew->setId($myUtilsObject->generateUID()));
                 $oNew->oxobject2category__oxobjectid = new oxField($sArticle);
-                $oNew->oxobject2category__oxcatnid   = new oxField($sCategory);
-                $oNew->oxobject2category__oxtime     = new oxField($iTime);
+                $oNew->oxobject2category__oxcatnid = new oxField($sCategory);
+                $oNew->oxobject2category__oxtime = new oxField($iTime);
                 $oNew->save();
             }
         }

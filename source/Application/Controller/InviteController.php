@@ -21,15 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\AccountController;
+use OxidEsales\Eshop\Core\Email;
+use OxidEsales\Eshop\Core\MailValidator;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 
 /**
  * Article suggestion page.
  * Collects some article base information, sets default recommendation text,
  * sends suggestion mail to user.
  */
-class InviteController extends \OxidEsales\Eshop\Application\Controller\AccountController
+class InviteController extends AccountController
 {
     /**
      * Current class template name.
@@ -76,9 +78,9 @@ class InviteController extends \OxidEsales\Eshop\Application\Controller\AccountC
     protected $_oRecommList = null;
 
     /**
-     * Invition data
+     * Invitation data
      *
-     * @var object
+     * @var array
      */
     protected $_aInviteData = null;
 
@@ -92,13 +94,13 @@ class InviteController extends \OxidEsales\Eshop\Application\Controller\AccountC
     /**
      * Executes parent::render(), if invitation is disabled - redirects to main page
      *
-     * @return string
+     * @return string|void
      */
     public function render()
     {
-        $oConfig = $this->getConfig();
+        $oConfig = Registry::getConfig();
 
-        if (!$oConfig->getConfigParam("blInvitationsEnabled")) {
+        if (!$oConfig->getConfigParam('blInvitationsEnabled')) {
             Registry::getUtils()->redirect($oConfig->getShopHomeUrl());
 
             return;
@@ -111,17 +113,24 @@ class InviteController extends \OxidEsales\Eshop\Application\Controller\AccountC
      * Sends product suggestion mail and returns a URL according to
      * URL formatting rules.
      *
-     * @return  null
+     * @return void
      */
     public function send()
     {
-        $oConfig = $this->getConfig();
+        $captchaService = $this->getContainer()
+            ->get(\OxidEsales\EshopCommunity\Internal\Domain\Captcha\CaptchaServiceInterface::class);
+        if (!$captchaService->verifyForForm('invite', \OxidEsales\Eshop\Core\Registry::getRequest())) {
+            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay('O3_CAPTCHA_FAILED');
+            return false;
+        }
 
-        if (!$oConfig->getConfigParam("blInvitationsEnabled")) {
+        $oConfig = Registry::getConfig();
+
+        if (!$oConfig->getConfigParam('blInvitationsEnabled')) {
             Registry::getUtils()->redirect($oConfig->getShopHomeUrl());
         }
 
-        $aParams = Registry::getConfig()->getRequestParameter('editval', true);
+        $aParams = Registry::getRequest()->getRequestParameter('editval');
         $oUser = $this->getUser();
         if (!is_array($aParams) || !$oUser) {
             return;
@@ -129,14 +138,14 @@ class InviteController extends \OxidEsales\Eshop\Application\Controller\AccountC
 
         // storing used written values
         $oParams = (object) $aParams;
-        $this->setInviteData((object) Registry::getConfig()->getRequestParameter('editval'));
+        $this->setInviteData((object) Registry::getRequest()->getRequestEscapedParameter('editval'));
 
         $oUtilsView = Registry::getUtilsView();
 
         // filled not all fields ?
         foreach ($this->_aReqFields as $sFieldName) {
             //checking if any email was entered
-            if ($sFieldName == "rec_email") {
+            if ($sFieldName == 'rec_email') {
                 foreach ($aParams[$sFieldName] as $sKey => $sEmail) {
                     //removing empty emails fields from eMails array
                     if (empty($sEmail)) {
@@ -163,22 +172,22 @@ class InviteController extends \OxidEsales\Eshop\Application\Controller\AccountC
         }
 
         //validating entered emails
-        foreach ($aParams["rec_email"] as $sRecipientEmail) {
-            if (!oxNew(\OxidEsales\Eshop\Core\MailValidator::class)->isValidEmail($sRecipientEmail)) {
+        foreach ($aParams['rec_email'] as $sRecipientEmail) {
+            if (!oxNew(MailValidator::class)->isValidEmail($sRecipientEmail)) {
                 $oUtilsView->addErrorToDisplay('ERROR_MESSAGE_INVITE_INCORRECTEMAILADDRESS');
 
                 return;
             }
         }
 
-        if (!oxNew(\OxidEsales\Eshop\Core\MailValidator::class)->isValidEmail($aParams["send_email"])) {
+        if (!oxNew(MailValidator::class)->isValidEmail($aParams['send_email'])) {
             $oUtilsView->addErrorToDisplay('ERROR_MESSAGE_INVITE_INCORRECTEMAILADDRESS');
 
             return;
         }
 
         // sending invite email
-        $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
+        $oEmail = oxNew(Email::class);
 
         if ($oEmail->sendInviteMail($oParams)) {
             $this->_iMailStatus = 1;
@@ -187,7 +196,7 @@ class InviteController extends \OxidEsales\Eshop\Application\Controller\AccountC
             $oUser = $this->getUser();
 
             //saving statistics for sent emails
-            $oUser->updateInvitationStatistics($aParams["rec_email"]);
+            $oUser->updateInvitationStatistics($aParams['rec_email']);
         } else {
             Registry::getUtilsView()->addErrorToDisplay('ERROR_MESSAGE_CHECK_EMAIL');
         }
@@ -196,7 +205,7 @@ class InviteController extends \OxidEsales\Eshop\Application\Controller\AccountC
     /**
      * Template variable getter. Return if mail was send successfully
      *
-     * @return array
+     * @return bool
      */
     public function getInviteSendStatus()
     {
@@ -235,7 +244,7 @@ class InviteController extends \OxidEsales\Eshop\Application\Controller\AccountC
 
         $iLang = Registry::getLang()->getBaseLanguage();
         $aPath['title'] = Registry::getLang()->translateString('INVITE_YOUR_FRIENDS', $iLang, false);
-        $aPath['link']  = $this->getLink();
+        $aPath['link'] = $this->getLink();
         $aPaths[] = $aPath;
 
         return $aPaths;

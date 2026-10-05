@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component\Widget;
 
+use OxidEsales\Eshop\Application\Controller\CompareController;
+
 /**
  * Recomendation list.
  * Forms recomendation list.
@@ -64,7 +66,7 @@ class ServiceMenu extends \OxidEsales\Eshop\Application\Component\Widget\WidgetC
      */
     public function getCompareItems($blJson = false)
     {
-        $oCompare = oxNew(\OxidEsales\Eshop\Application\Controller\CompareController::class);
+        $oCompare = oxNew(CompareController::class);
         $aCompareItems = $oCompare->getCompareItems();
 
         if ($blJson) {

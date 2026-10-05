@@ -29,7 +29,7 @@ class CompanyVatInCountryChecker extends \OxidEsales\Eshop\Core\CompanyVatInChec
     /**
      * Error string if country mismatch
      */
-    const ERROR_ID_NOT_VALID = 'ID_NOT_VALID';
+    public const ERROR_ID_NOT_VALID = 'ID_NOT_VALID';
 
     /**
      * Country

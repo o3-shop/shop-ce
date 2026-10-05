@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Multilanguage;
 
 use oxField;
@@ -34,7 +36,7 @@ class ViewTest extends MultilanguageTestCase
     /**
      * Make a copy of Stewart+Brown Shirt Kisser Fish for testing
      */
-    const SOURCE_ARTICLE_ID = '6b6099c305f591cb39d4314e9a823fc1';
+    public const SOURCE_ARTICLE_ID = '6b6099c305f591cb39d4314e9a823fc1';
 
     /** @var string Generated test article id. */
     private $testArticleId = null;
@@ -111,7 +113,7 @@ class ViewTest extends MultilanguageTestCase
         $article->load(self::SOURCE_ARTICLE_ID);
         $article->setId($this->testArticleId);
         $article->oxarticles__oxartnum = new oxField('666-T', oxField::T_RAW);
-        $article->oxarticles__oxtitle  = new oxField('TEST_MULTI_LANGUAGE', oxField::T_RAW);
+        $article->oxarticles__oxtitle = new oxField('TEST_MULTI_LANGUAGE', oxField::T_RAW);
         $article->save();
     }
 }

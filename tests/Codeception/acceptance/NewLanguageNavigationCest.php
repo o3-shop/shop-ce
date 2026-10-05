@@ -40,7 +40,7 @@ final class NewLanguageNavigationCest
         'id'          => '3503',
         'title'       => 'Kuyichi leather belt JEVER',
         'description' => 'Leather belt, unisex',
-        'price'       => '29,90 €'
+        'price'       => '29,90 €',
     ];
 
     /** @param AcceptanceTester $I */
@@ -69,7 +69,7 @@ final class NewLanguageNavigationCest
         $I->clearShopCache();
         $shop = $I->openShop();
 
-        $I->assertEquals("Lietuviu", $I->grabAttributeFrom(".languages-menu ul li:nth-child(3) a", "title"));
+        $I->assertEquals('Lietuviu', $I->grabAttributeFrom('.languages-menu ul li:nth-child(3) a', 'title'));
 
         $productDetailsPage = $this->checkProductDetails($shop, $I);
 
@@ -96,7 +96,7 @@ final class NewLanguageNavigationCest
         $searchListPage = $shop->searchFor($this->productData['id']);
 
         $expectedHeader = '1 ' . Translator::translate('HITS_FOR') . ' ' . sprintf('"%s"', $this->productData['id']);
-        $I->assertEquals($expectedHeader, $I->grabTextFrom("//h1"));
+        $I->assertEquals($expectedHeader, $I->grabTextFrom('//h1'));
 
         $productDetailsPage = $searchListPage->openProductDetailsPage(1);
         $productDetailsPage->seeProductData($this->productData);
@@ -106,7 +106,7 @@ final class NewLanguageNavigationCest
 
     private function switchLanguageAndCheckProductDetails(ProductDetails $productDetailsPage, AcceptanceTester $I): void
     {
-        $productDetailsPage->switchLanguage("Lietuviu");
+        $productDetailsPage->switchLanguage('Lietuviu');
         $I->see($this->productData['price'], '#productPrice');
         $I->see($this->productData['id'], '.detailsInfo');
     }

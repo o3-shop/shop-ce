@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,10 +18,11 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
-use \oxField;
-use \oxRegistry;
+use oxField;
+use oxRegistry;
 
 class FieldTest extends \OxidTestCase
 {
@@ -88,8 +90,8 @@ class FieldTest extends \OxidTestCase
 
         $oField->setValue("ssss<\n>");
         $this->assertEquals("ssss&lt;\n&gt;", $oField->value);
-        $oField->setValue("ssss<");
-        $this->assertEquals("ssss&lt;", $oField->value);
+        $oField->setValue('ssss<');
+        $this->assertEquals('ssss&lt;', $oField->value);
     }
 
     public function testGetRawValue()
@@ -113,6 +115,6 @@ class FieldTest extends \OxidTestCase
     public function testToString()
     {
         $oField = new oxField(451);
-        $this->assertSame("451", (string) $oField);
+        $this->assertSame('451', (string) $oField);
     }
 }

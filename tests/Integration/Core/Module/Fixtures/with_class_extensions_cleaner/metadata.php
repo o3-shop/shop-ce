@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -26,7 +27,7 @@ $sMetadataVersion = '2.1';
 /**
  * Module information
  */
-$aModule = array(
+$aModule = [
     'id'           => 'with_class_extensions_cleaner',
     'title'        => 'Smarty plugin directoies',
     'description'  => 'Test defining smarty plugin directoies',
@@ -35,5 +36,5 @@ $aModule = array(
     'author'       => 'OXID eSales AG',
     'extend'       => [
         \OxidEsales\Eshop\Application\Model\Article::class => 'with_class_extensions_cleaner/ModuleArticle',
-    ]
-);
+    ],
+];

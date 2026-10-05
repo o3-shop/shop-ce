@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,11 +18,12 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxDb;
-use \oxRegistry;
-use \oxTestModules;
+use oxDb;
+use oxRegistry;
+use oxTestModules;
 use oxUtilsHelper;
 
 require_once TEST_LIBRARY_HELPERS_PATH . 'oxUtilsHelper.php';
@@ -30,7 +32,6 @@ require_once TEST_LIBRARY_HELPERS_PATH . 'oxUtilsHelper.php';
  */
 class VendorlistTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      *
@@ -60,7 +61,7 @@ class VendorlistTest extends \OxidTestCase
 
         $oVendorlist->loadVendorList();
 
-        $this->assertTrue((count($oVendorlist) > 0), "Vendors list not loaded");
+        $this->assertTrue((count($oVendorlist) > 0), 'Vendors list not loaded');
 
         // checking if vendros are the same
         $sQ = 'select oxid, oxtitle_1, oxshortdesc_1 from oxvendor where oxvendor.oxshopid = "' . $myConfig->getShopID() . '"';
@@ -92,7 +93,7 @@ class VendorlistTest extends \OxidTestCase
 
         foreach ($oVendorlist as $sVndId => $value) {
             $iArtCount = $oVendorlist[$sVndId]->oxvendor__oxnrofarticles->value;
-            $this->assertTrue(($iArtCount > 0), "Vendor articles were not counted");
+            $this->assertTrue(($iArtCount > 0), 'Vendor articles were not counted');
         }
     }
 
@@ -104,7 +105,7 @@ class VendorlistTest extends \OxidTestCase
         $myConfig = $this->getConfig();
         $myDB = oxDb::getDB();
 
-        $oVendorlist = $this->getProxyClass("oxvendorList"); //oxNew('oxvendorlist', 'core');
+        $oVendorlist = $this->getProxyClass('oxvendorList'); //oxNew('oxvendorlist', 'core');
 
         // get first vendor id
         $sQ = 'select oxid from oxvendor where oxvendor.oxshopid = "' . $myConfig->getShopID() . ' "';
@@ -115,7 +116,6 @@ class VendorlistTest extends \OxidTestCase
 
         //check if root for vendors tree was added
         $aPath = $oVendorlist->getPath();
-
 
         $this->assertNotNull($oVendorlist->getClickVendor());
         $this->assertEquals($sFirstVendorId, $oVendorlist->getClickVendor()->getId());
@@ -138,7 +138,7 @@ class VendorlistTest extends \OxidTestCase
      */
     public function test_addCategoryFields()
     {
-        oxTestModules::addFunction("oxutils", "seoIsActive", "{return false;}");
+        oxTestModules::addFunction('oxutils', 'seoIsActive', '{return false;}');
         $myConfig = $this->getConfig();
 
         $oVendorlist = oxNew('oxvendorlist');
@@ -148,7 +148,7 @@ class VendorlistTest extends \OxidTestCase
         $oVendorlist->UNITaddCategoryFields($oVendor);
 
         // check if category specific fields was added to vendor object
-        $this->assertEquals("v_" . $oVendor->getId(), $oVendor->oxcategories__oxid->value);
+        $this->assertEquals('v_' . $oVendor->getId(), $oVendor->oxcategories__oxid->value);
         $this->assertEquals($oVendor->oxvendor__oxicon, $oVendor->oxcategories__oxicon);
         $this->assertEquals($oVendor->oxvendor__oxtitle, $oVendor->oxcategories__oxtitle);
         $this->assertEquals($oVendor->oxvendor__oxshortdesc, $oVendor->oxcategories__oxdesc);
@@ -166,7 +166,7 @@ class VendorlistTest extends \OxidTestCase
         oxUtilsHelper::$sSeoIsActive = true;
         oxAddClassModule('oxUtilsHelper', 'oxutils');
 
-        $oVendorlist = $this->getProxyClass("oxvendorlist");
+        $oVendorlist = $this->getProxyClass('oxvendorlist');
         $oVendorlist->loadVendorList();
 
         $oVendorlist->UNITSeosetVendorData();

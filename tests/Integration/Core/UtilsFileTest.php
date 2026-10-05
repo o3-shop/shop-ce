@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -31,11 +33,11 @@ class UtilsFileTest extends UnitTestCase
     public function testUrlValidate(): void
     {
         $utilsFile = oxNew(UtilsFile::class);
-        $this->assertFalse($utilsFile->urlValidate("test/notvalid"));
-        $this->assertFalse($utilsFile->urlValidate("http://www.oxid_non_existing_page.com"));
+        $this->assertFalse($utilsFile->urlValidate('test/notvalid'));
+        $this->assertFalse($utilsFile->urlValidate('http://www.oxid_non_existing_page.com'));
 
         $this->activateTheme('azure');
         $shopUrl = $this->getTestConfig()->getShopUrl();
-        $this->assertTrue($utilsFile->urlValidate($shopUrl . "?param=value"));
+        $this->assertTrue($utilsFile->urlValidate($shopUrl . '?param=value'));
     }
 }

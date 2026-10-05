@@ -31,18 +31,18 @@ final class Version20230405094126 extends AbstractMigration
 {
     protected string $columnname = 'OXISPLAIN';
 
-    public function getDescription() : string
+    public function getDescription(): string
     {
         return 'add plain option to content elements';
     }
 
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
         $this->connection->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
 
         $table = $schema->getTable('oxcontents');
 
-        $this->skipIf( $table->hasColumn($this->columnname), 'column already exists');
+        $this->skipIf($table->hasColumn($this->columnname), 'column already exists');
 
         $table->addColumn($this->columnname, (new IntegerType())->getName())
             ->setLength(1)
@@ -50,13 +50,13 @@ final class Version20230405094126 extends AbstractMigration
             ->setDefault(0);
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
         $this->connection->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
 
         $table = $schema->getTable('oxcontents');
 
-        $this->skipIf( !$table->hasColumn($this->columnname), 'column doesn\'t exist');
+        $this->skipIf(!$table->hasColumn($this->columnname), 'column doesn\'t exist');
 
         $table->dropColumn($this->columnname);
     }

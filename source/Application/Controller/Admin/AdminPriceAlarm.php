@@ -21,13 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
+
 /**
  * Admin admin_pricealarm manager.
- * Returns template, that arranges two other templates ("apricealarm_list.tpl"
+ * Returns template, that arranges two other templates ("pricealarm_list.tpl"
  * and "pricealarm_main.tpl") to frame.
  * Admin Menu: Customer Info -> admin_pricealarm.
  */
-class AdminPriceAlarm extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class AdminPriceAlarm extends AdminController
 {
     /**
      * Default active tab number

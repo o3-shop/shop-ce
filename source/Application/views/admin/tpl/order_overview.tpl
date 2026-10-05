@@ -169,6 +169,11 @@
                     [{oxmultilang ident="ORDER_OVERVIEW_INTSTATUS"}]:&nbsp;<b>[{$edit->oxorder__oxtransstatus->value}]</b><br>
                 [{/block}]
             [{/if}]
+            [{* Per-shop order aggregates only matter on the overview view;
+                hide on single-order view both to declutter the panel and to
+                pair with the controller-side skip of the 4 aggregate queries
+                (see OrderOverview::render, o3-shop/o3-shop#112). *}]
+            [{if !$edit}]
             <br>
             <b>[{oxmultilang ident="GENERAL_REVIEW"}]: </b>
             <br>
@@ -208,6 +213,7 @@
                 </tr>
             [{/block}]
             </table>
+            [{/if}]
         <br>
         [{if $edit}]
         <table cellspacing="0" cellpadding="0" border="0">

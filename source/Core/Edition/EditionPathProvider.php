@@ -30,9 +30,9 @@ namespace OxidEsales\EshopCommunity\Core\Edition;
  */
 class EditionPathProvider
 {
-    const SETUP_DIRECTORY = 'Setup';
+    public const SETUP_DIRECTORY = 'Setup';
 
-    const DATABASE_SQL_DIRECTORY = 'Sql';
+    public const DATABASE_SQL_DIRECTORY = 'Sql';
 
     /** @var EditionRootPathProvider */
     private $editionRootPathProvider;

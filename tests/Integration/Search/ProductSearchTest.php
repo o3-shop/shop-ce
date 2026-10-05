@@ -21,7 +21,7 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\EshopCommunity\Tests\Integration\Checkout;
+namespace OxidEsales\EshopCommunity\Tests\Integration\Search;
 
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Core\Field;

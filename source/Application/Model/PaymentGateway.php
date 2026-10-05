@@ -21,12 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Base;
+
 /**
  * Payment gateway manager.
  * Checks and sets payment method data, executes payment.
  *
  */
-class PaymentGateway extends \OxidEsales\Eshop\Core\Base
+class PaymentGateway extends Base
 {
     /**
      * Payment status (active - true/not active - false) (default false).
@@ -36,7 +38,7 @@ class PaymentGateway extends \OxidEsales\Eshop\Core\Base
     protected $_blActive = false;
 
     /**
-     * oUserpayment object (default null).
+     * UserPayment object (default null).
      *
      * @var object
      */
@@ -61,12 +63,12 @@ class PaymentGateway extends \OxidEsales\Eshop\Core\Base
     /**
      * Sets payment parameters.
      *
-     * @param object $oUserpayment User payment object
+     * @param UserPayment $oUserPayment User payment object
      */
-    public function setPaymentParams($oUserpayment)
+    public function setPaymentParams($oUserPayment)
     {
         // store data
-        $this->_oPaymentInfo = & $oUserpayment;
+        $this->_oPaymentInfo = & $oUserPayment;
     }
 
     /**
@@ -108,7 +110,7 @@ class PaymentGateway extends \OxidEsales\Eshop\Core\Base
     /**
      * Returns last payment processing error.
      *
-     * @return int
+     * @return string|null
      */
     public function getLastError()
     {

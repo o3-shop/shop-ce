@@ -21,13 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
+
 /**
  * Admin starting page.
  * Returns template, that consists with title-admin-page.
  * Starting admin menu window.
  * Admin Menu.
  */
-class AdminStart extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class AdminStart extends AdminController
 {
     /**
      * Current class template name.

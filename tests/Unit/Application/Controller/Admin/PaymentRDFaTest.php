@@ -57,7 +57,7 @@ final class PaymentRDFaTest extends \OxidTestCase
 
         $iExists = $oDB->GetOne(
             'SELECT 1 FROM oxobject2payment WHERE oxpaymentid = ? AND oxtype = ?',
-            array($sTestID, 'rdfapayment')
+            [$sTestID, 'rdfapayment']
         );
         $this->assertFalse(empty($iExists));
 
@@ -66,7 +66,7 @@ final class PaymentRDFaTest extends \OxidTestCase
 
         $iExists = $oDB->GetOne(
             'SELECT 1 FROM oxobject2payment WHERE oxpaymentid = ? AND oxtype = ?',
-            array($sTestID, 'rdfapayment')
+            [$sTestID, 'rdfapayment']
         );
         $this->assertTrue(empty($iExists));
     }
@@ -79,15 +79,15 @@ final class PaymentRDFaTest extends \OxidTestCase
     public function testSave_createRecords()
     {
         $sTestID = '_test_recid';
-        $aObjIDs = array('_test_obj1', '_test_obj2');
+        $aObjIDs = ['_test_obj1', '_test_obj2'];
         $this->setRequestParameter('oxid', $sTestID);
         $this->setRequestParameter('ardfapayments', $aObjIDs);
         $this->setRequestParameter(
             'editval',
-            array(
+            [
                  'oxobject2payment__oxpaymentid' => $sTestID,
                  'oxobject2payment__oxtype'      => 'rdfapayment',
-            )
+            ]
         );
 
         $oDB = oxDb::getDb();
@@ -97,7 +97,7 @@ final class PaymentRDFaTest extends \OxidTestCase
 
         $aCurrObjIDs = $oDB->GetCol(
             'SELECT oxobjectid FROM oxobject2payment WHERE oxpaymentid = ? AND oxtype = ?',
-            array($sTestID, 'rdfapayment')
+            [$sTestID, 'rdfapayment']
         );
         sort($aObjIDs);
         sort($aCurrObjIDs);
@@ -111,10 +111,10 @@ final class PaymentRDFaTest extends \OxidTestCase
      */
     public function testGetAllRDFaPayments()
     {
-        $aAssignedRDFaPayments = array('GoogleCheckout');
-        $aExpResp = array();
+        $aAssignedRDFaPayments = ['GoogleCheckout'];
+        $aExpResp = [];
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\PaymentRdfa::class, array('getAssignedRDFaPayments'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\PaymentRdfa::class, ['getAssignedRDFaPayments']);
         $oView->expects($this->once())->method('getAssignedRDFaPayments')->will($this->returnValue($aAssignedRDFaPayments));
         $aCurrResp = $oView->getAllRDFaPayments();
 
@@ -146,13 +146,13 @@ final class PaymentRDFaTest extends \OxidTestCase
     public function testGetAssignedRDFaPayments()
     {
         $sTestID = '_test_recid';
-        $aObjIDs = array('_test_obj1', '_test_obj2');
+        $aObjIDs = ['_test_obj1', '_test_obj2'];
         $this->setRequestParameter('oxid', $sTestID);
         $oView = oxNew('Payment_RDFa');
 
         $oDB = oxDb::getDb();
-        $oDB->Execute('DELETE FROM oxobject2payment WHERE oxpaymentid = ? AND oxtype = ?', array($sTestID, 'rdfapayment'));
-        $this->assertSame(array(), $oView->getAssignedRDFaPayments(), 'Should be empty array');
+        $oDB->Execute('DELETE FROM oxobject2payment WHERE oxpaymentid = ? AND oxtype = ?', [$sTestID, 'rdfapayment']);
+        $this->assertSame([], $oView->getAssignedRDFaPayments(), 'Should be empty array');
 
         foreach ($aObjIDs as $sObjID) {
             $oMapping = oxNew('oxBase');

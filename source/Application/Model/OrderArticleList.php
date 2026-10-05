@@ -21,13 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
+use OxidEsales\Eshop\Core\Model\ListModel;
 
 /**
  * Order article list manager.
  *
  */
-class OrderArticleList extends \OxidEsales\Eshop\Core\Model\ListModel
+class OrderArticleList extends ListModel
 {
     /**
      * Class constructor, initiates class constructor (parent::oxbase()).
@@ -42,7 +42,7 @@ class OrderArticleList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param string $sOxId object id
      *
-     * @return null
+     * @return void
      */
     public function loadOrderArticlesForUser($sOxId)
     {
@@ -52,13 +52,13 @@ class OrderArticleList extends \OxidEsales\Eshop\Core\Model\ListModel
             return;
         }
 
-        $sSelect = "SELECT oxorderarticles.* FROM oxorder ";
-        $sSelect .= "left join oxorderarticles on oxorderarticles.oxorderid = oxorder.oxid ";
-        $sSelect .= "left join oxarticles on oxorderarticles.oxartid = oxarticles.oxid ";
-        $sSelect .= "WHERE oxorder.oxuserid = :oxuserid";
+        $sSelect = 'SELECT oxorderarticles.* FROM oxorder ';
+        $sSelect .= 'left join oxorderarticles on oxorderarticles.oxorderid = oxorder.oxid ';
+        $sSelect .= 'left join oxarticles on oxorderarticles.oxartid = oxarticles.oxid ';
+        $sSelect .= 'WHERE oxorder.oxuserid = :oxuserid';
 
         $this->selectString($sSelect, [
-            ':oxuserid' => $sOxId
+            ':oxuserid' => $sOxId,
         ]);
     }
 }

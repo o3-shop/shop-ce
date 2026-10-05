@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\RestrictedAddress;
 
 /**
@@ -33,22 +35,22 @@ class RestrictedAddressTest extends \OxidTestCase
     {
         $shopUrl = $this->getConfig()->getShopMainUrl();
 
-        return array(
-            array($shopUrl . '?fnc=getShopVersion'),
-            array($shopUrl . '?fnc=getShopEdition'),
-            array($shopUrl . '?fnc=getShopVersion&n2=v2'),
-            array($shopUrl . '?fnc=getShopEdition&n2=v2'),
-            array($shopUrl . '?name=value&fnc=getShopVersion'),
-            array($shopUrl . '?name=value&fnc=getShopEdition'),
-            array($shopUrl . '?name=value&fnc=getShopVersion&n2=v2'),
-            array($shopUrl . '?name=value&fnc=getShopEdition&n2=v2'),
-            array($shopUrl . '?fnc=%67etshopversion'),
-            array($shopUrl . '?fnc=getCharSet'),
-            array($shopUrl . '?fnc=getShopFullEdition'),
-            array($shopUrl . '?fnc=isMall'),
-            array($shopUrl . '?fnc=getCacheLifeTime'),
-            array($shopUrl . '?fnc=addGlobalParams')
-        );
+        return [
+            [$shopUrl . '?fnc=getShopVersion'],
+            [$shopUrl . '?fnc=getShopEdition'],
+            [$shopUrl . '?fnc=getShopVersion&n2=v2'],
+            [$shopUrl . '?fnc=getShopEdition&n2=v2'],
+            [$shopUrl . '?name=value&fnc=getShopVersion'],
+            [$shopUrl . '?name=value&fnc=getShopEdition'],
+            [$shopUrl . '?name=value&fnc=getShopVersion&n2=v2'],
+            [$shopUrl . '?name=value&fnc=getShopEdition&n2=v2'],
+            [$shopUrl . '?fnc=%67etshopversion'],
+            [$shopUrl . '?fnc=getCharSet'],
+            [$shopUrl . '?fnc=getShopFullEdition'],
+            [$shopUrl . '?fnc=isMall'],
+            [$shopUrl . '?fnc=getCacheLifeTime'],
+            [$shopUrl . '?fnc=addGlobalParams'],
+        ];
     }
 
     /**
@@ -63,7 +65,7 @@ class RestrictedAddressTest extends \OxidTestCase
 
         $result = $this->callPage($sForbiddenUrl);
 
-        $location = "Location: " .  $shopUrl . 'index.php?force_sid=' . $this->extractSessionId($result) .
+        $location = 'Location: ' . $shopUrl . 'index.php?force_sid=' . $this->extractSessionId($result) .
                      "&cl=start&redirected=1\r\n";
         $this->assertStringContainsString($location, $result, 'User should be redirected to shop front page.');
     }
@@ -75,21 +77,21 @@ class RestrictedAddressTest extends \OxidTestCase
     {
         $sShopUrl = $this->getConfig()->getShopMainUrl();
         $sResult = $this->_getPageResult('/config.inc.php');
-        $sLocation = "Location: " . $sShopUrl . "index.php\r\n";
+        $sLocation = 'Location: ' . $sShopUrl . "index.php\r\n";
         $this->assertStringContainsString($sLocation, $sResult, 'User should be redirected to same URL without forbidden parameter.');
     }
 
     public function providerForbiddenFilesAccessibility()
     {
-        return array(
-            array('/log/EXCEPTION_LOG.txt'),
-            array('/log/anything'),
-            array('/Application/views/azure/tpl/widget/rss.tpl'),
-            array('/pkg.info'),
-            array('/op.ini'),
-            array('/.htaccess'),
-            array('/.ht'),
-        );
+        return [
+            ['/log/EXCEPTION_LOG.txt'],
+            ['/log/anything'],
+            ['/Application/views/azure/tpl/widget/rss.tpl'],
+            ['/pkg.info'],
+            ['/op.ini'],
+            ['/.htaccess'],
+            ['/.ht'],
+        ];
     }
 
     /**
@@ -106,10 +108,10 @@ class RestrictedAddressTest extends \OxidTestCase
 
     public function providerCheckAllowedFilesAccessibility()
     {
-        return array(
-            array('/op.ini.php'),
-            array('/Application/views/azure/tpl/widget/rss.tpl.whatever'),
-        );
+        return [
+            ['/op.ini.php'],
+            ['/Application/views/azure/tpl/widget/rss.tpl.whatever'],
+        ];
     }
 
     /**

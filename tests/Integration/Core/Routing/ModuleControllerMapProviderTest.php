@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,12 +18,13 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Core\Routing;
 
-use OxidEsales\EshopCommunity\Core\Routing\Module\ClassProviderStorage;
-use OxidEsales\TestingLibrary\UnitTestCase;
-use OxidEsales\EshopCommunity\Core\Routing\ModuleControllerMapProvider;
 use OxidEsales\Eshop\Core\Module\ModuleVariablesLocator;
+use OxidEsales\EshopCommunity\Core\Routing\Module\ClassProviderStorage;
+use OxidEsales\EshopCommunity\Core\Routing\ModuleControllerMapProvider;
+use OxidEsales\TestingLibrary\UnitTestCase;
 
 /**
  * Test the module ControllerProvider.
@@ -31,7 +33,6 @@ use OxidEsales\Eshop\Core\Module\ModuleVariablesLocator;
  */
 class ModuleControllerMapProviderTest extends UnitTestCase
 {
-
     /**
      * Set up fixture
      */
@@ -53,7 +54,7 @@ class ModuleControllerMapProviderTest extends UnitTestCase
             // no module active
             [
                 [],
-                []
+                [],
             ],
 
             // 2 modules active
@@ -61,20 +62,20 @@ class ModuleControllerMapProviderTest extends UnitTestCase
                 [
                     'module1' => [
                         'module1controller1' => 'a',
-                        'module1controller2' => 'b'
+                        'module1controller2' => 'b',
                     ],
                     'module2' => [
                         'module2controller1' => 'c',
-                        'module2controller2' => 'd'
-                    ]
+                        'module2controller2' => 'd',
+                    ],
                 ],
                 [
                     'module1controller1' => 'a',
                     'module1controller2' => 'b',
                     'module2controller1' => 'c',
-                    'module2controller2' => 'd'
-                ]
-            ]
+                    'module2controller2' => 'd',
+                ],
+            ],
         ];
     }
 
@@ -124,7 +125,7 @@ class ModuleControllerMapProviderTest extends UnitTestCase
     {
         $shopId = $this->getTestConfig()->getShopId();
 
-        $shopIdCalculatorMock = $this->getMock('\OxidEsales\EshopCommunity\Core\ShopIdCalculator', array('getShopId'), array(), '', false);
+        $shopIdCalculatorMock = $this->getMock('\OxidEsales\EshopCommunity\Core\ShopIdCalculator', ['getShopId'], [], '', false);
         $shopIdCalculatorMock->expects($this->any())->method('getShopId')->will($this->returnValue($shopId));
 
         $subShopSpecificCache = oxNew('\OxidEsales\EshopCommunity\Core\SubShopSpecificFileCache', $shopIdCalculatorMock);

@@ -21,13 +21,26 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use OxidEsales\EshopCommunity\Application\Model\Contract\ArticleInterface;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\Contract\ArticleInterface;
+use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Application\Model\OrderFile;
+use OxidEsales\Eshop\Application\Model\Wrapping;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Price;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
 
 /**
  * Order article manager.
  * Performs copying of article.
  */
-class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements ArticleInterface
+class OrderArticle extends BaseModel implements ArticleInterface
 {
     /**
      * Order cache.
@@ -43,7 +56,7 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
     protected $_sClassName = 'oxorderarticle';
 
     /**
-     * Persisten info
+     * Persistent info
      *
      * @var array
      */
@@ -66,14 +79,14 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
     /**
      * Order article instance
      *
-     * @var \OxidEsales\Eshop\Application\Model\Article
+     * @var Article
      */
     protected $_oOrderArticle = null;
 
     /**
      * Article instance
      *
-     * @var \OxidEsales\Eshop\Application\Model\Article
+     * @var Article
      */
     protected $_oArticle = null;
 
@@ -86,7 +99,7 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
 
     /**
      * Array of fields to skip when saving
-     * Overrids oxBase variable
+     * Overrides oxBase variable
      *
      * @var array
      */
@@ -113,13 +126,13 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
         foreach ($aObjectVars as $sName => $sValue) {
             if (isset($oProduct->$sName->value)) {
                 $sFieldName = preg_replace('/oxarticles__/', 'oxorderarticles__', $sName);
-                if ($sFieldName != "oxorderarticles__oxtimestamp") {
+                if ($sFieldName != 'oxorderarticles__oxtimestamp') {
                     $this->$sFieldName = $oProduct->$sName;
                 }
                 // formatting view
-                if (!$this->getConfig()->getConfigParam('blSkipFormatConversion')) {
-                    if ($sFieldName == "oxorderarticles__oxinsert") {
-                        \OxidEsales\Eshop\Core\Registry::getUtilsDate()->convertDBDate($this->$sFieldName, true);
+                if (!Registry::getConfig()->getConfigParam('blSkipFormatConversion')) {
+                    if ($sFieldName == 'oxorderarticles__oxinsert') {
+                        Registry::getUtilsDate()->convertDBDate($this->$sFieldName, true);
                     }
                 }
             }
@@ -136,30 +149,32 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
     }
 
     /**
-     * Performs stock modification for current order article. Additionally
+     * Performs stock modification for current order article. Additionally,
      * executes changeable article onChange/updateSoldAmount methods to
      * update chained data
      *
-     * @param double $dAddAmount           amount which will be substracled from value in db
-     * @param bool   $blAllowNegativeStock amount allow or not negative stock value
+     * @param double $dAddAmount amount which will be subtracted from value in db
+     * @param bool $blAllowNegativeStock amount allow or not negative stock value
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function updateArticleStock($dAddAmount, $blAllowNegativeStock = false)
     {
         // TODO: use oxarticle reduceStock
         // decrement stock if there is any
-        $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+        $oArticle = oxNew(Article::class);
         $oArticle->load($this->oxorderarticles__oxartid->value);
         $oArticle->beforeUpdate();
 
-        if ($this->getConfig()->getConfigParam('blUseStock')) {
+        if (Registry::getConfig()->getConfigParam('blUseStock')) {
             // get real article stock count
             $iStockCount = $this->_getArtStock($dAddAmount, $blAllowNegativeStock);
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $oDb = DatabaseProvider::getDb();
 
-            $oArticle->oxarticles__oxstock = new \OxidEsales\Eshop\Core\Field($iStockCount);
+            $oArticle->oxarticles__oxstock = new Field($iStockCount);
             $oDb->execute('update oxarticles set oxarticles.oxstock = :oxstock where oxarticles.oxid = :oxid', [
                 ':oxstock' => $iStockCount,
-                ':oxid' => $this->oxorderarticles__oxartid->value
+                ':oxid' => $this->oxorderarticles__oxartid->value,
             ]);
             $oArticle->onChange(ACTION_UPDATE_STOCK);
         }
@@ -169,24 +184,25 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
     }
 
     /**
-     * Adds or substracts defined amount passed by param from arcticle stock
+     * Adds or subtracts defined amount passed by param from article stock
      *
-     * @param double $dAddAmount           amount which will be added/substracled from value in db
-     * @param bool   $blAllowNegativeStock allow/disallow negative stock value
+     * @param int $dAddAmount amount which will be added/subtracted from value in db
+     * @param bool $blAllowNegativeStock allow/disallow negative stock value
      *
      * @return double
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getArtStock" in next major
      */
     protected function _getArtStock($dAddAmount = 0, $blAllowNegativeStock = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-        $masterDb = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
+        $masterDb = DatabaseProvider::getMaster();
 
         // #1592A. must take real value
         $sQ = 'select oxstock from oxarticles 
             where oxid = :oxid';
         $iStockCount = (float) $masterDb->getOne($sQ, [
-            ':oxid' => $this->oxorderarticles__oxartid->value
+            ':oxid' => $this->oxorderarticles__oxartid->value,
         ]);
 
         $iStockCount += $dAddAmount;
@@ -226,21 +242,21 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
     {
         $this->_aPersParam = $aParams;
 
-        // serializing persisten info stored while ordering
-        $this->oxorderarticles__oxpersparam = new \OxidEsales\Eshop\Core\Field(serialize($aParams), \OxidEsales\Eshop\Core\Field::T_RAW);
+        // serializing persistent info stored while ordering
+        $this->oxorderarticles__oxpersparam = new Field(serialize($aParams), Field::T_RAW);
     }
 
     /**
      * Sets data field value
      *
-     * @param string $sFieldName index OR name (eg. 'oxarticles__oxtitle') of a data field to set
+     * @param string $sFieldName index OR name (e.g. 'oxarticles__oxtitle') of a data field to set
      * @param string $sValue     value of data field
      * @param int    $iDataType  field type
      *
      * @return null
      * @deprecated underscore prefix violates PSR12, will be renamed to "setFieldData" in next major
      */
-    protected function _setFieldData($sFieldName, $sValue, $iDataType = \OxidEsales\Eshop\Core\Field::T_TEXT) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _setFieldData($sFieldName, $sValue, $iDataType = Field::T_TEXT) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sFieldName = strtolower($sFieldName);
         switch ($sFieldName) {
@@ -250,7 +266,7 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
             case 'oxorderarticles__oxerpstatus':
             case 'oxtitle':
             case 'oxorderarticles__oxtitle':
-                $iDataType = \OxidEsales\Eshop\Core\Field::T_RAW;
+                $iDataType = Field::T_RAW;
                 break;
         }
 
@@ -258,7 +274,7 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
     }
 
     /**
-     * Executes \OxidEsales\Eshop\Application\Model\OrderArticle::load() and returns its result
+     * Executes OrderArticle::load() and returns its result
      *
      * @param int    $iLanguage language id
      * @param string $sOxid     order article id
@@ -284,6 +300,7 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
      * Returns product parent id
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getParentId()
     {
@@ -292,12 +309,12 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
             return $this->oxorderarticles__oxartparentid->value;
         }
 
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-        $sQ = "select oxparentid from " . $oArticle->getViewName() . " 
-            where oxid = :oxid";
-        $this->oxarticles__oxparentid = new \OxidEsales\Eshop\Core\Field($oDb->getOne($sQ, [
-            ':oxid' => $this->getProductId()
+        $oDb = DatabaseProvider::getDb();
+        $oArticle = oxNew(Article::class);
+        $sQ = 'select oxparentid from ' . $oArticle->getViewName() . ' 
+            where oxid = :oxid';
+        $this->oxarticles__oxparentid = new Field($oDb->getOne($sQ, [
+            ':oxid' => $this->getProductId(),
         ]));
 
         return $this->oxarticles__oxparentid->value;
@@ -361,9 +378,10 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
      * Loads, caches and returns real order article instance. If article is not
      * available (deleted from db or so) false is returned
      *
-     * @param string $sArticleId article id (optional, is not passed oxorderarticles__oxartid will be used)
+     * @param null $sArticleId article id (optional, is not passed oxorderarticles__oxartid will be used)
      *
-     * @return \OxidEsales\Eshop\Application\Model\Article|false
+     * @return Article|false
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getOrderArticle" in next major
      */
     protected function _getOrderArticle($sArticleId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -372,7 +390,7 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
             $this->_oOrderArticle = false;
 
             $sArticleId = $sArticleId ? $sArticleId : $this->getProductId();
-            $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+            $oArticle = oxNew(Article::class);
             $oArticle->setLoadParentData(true);
             if ($oArticle->load($sArticleId)) {
                 $this->_oOrderArticle = $oArticle;
@@ -385,9 +403,10 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
     /**
      * Returns article select lists, implements iBaseArticle interface method
      *
-     * @param string $sKeyPrefix prefix (not used)
+     * @param null $sKeyPrefix prefix (not used)
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getSelectLists($sKeyPrefix = null)
     {
@@ -402,10 +421,11 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
     /**
      * Returns order article selection list array
      *
-     * @param string $sArtId           ordered article id [optional]
-     * @param string $sOrderArtSelList order article selection list [optional]
+     * @param null $sArtId ordered article id [optional]
+     * @param null $sOrderArtSelList order article selection list [optional]
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getOrderArticleSelectList($sArtId = null, $sOrderArtSelList = null)
     {
@@ -417,8 +437,8 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
             $aRet = [];
 
             if ($oArticle = $this->_getOrderArticle($sArtId)) {
-                $aList = explode(", ", $sOrderArtSelList);
-                $oStr = getStr();
+                $aList = explode(', ', $sOrderArtSelList);
+                $oStr = Str::getStr();
 
                 $aArticleSelList = $oArticle->getSelectLists();
 
@@ -426,7 +446,7 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
                 if (count($aArticleSelList) > 0) {
                     foreach ($aList as $sList) {
                         if ($sList) {
-                            $aVal = explode(":", $sList);
+                            $aVal = explode(':', $sList);
                             if (isset($aVal[0]) && isset($aVal[1])) {
                                 $sOrderArtListTitle = $oStr->strtolower(trim($aVal[0]));
                                 $sOrderArtSelValue = $oStr->strtolower(trim($aVal[1]));
@@ -467,11 +487,14 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
     /**
      * Returns basket order article price
      *
-     * @param double                                     $dAmount  basket item amount
-     * @param array                                      $aSelList chosen selection list
-     * @param \OxidEsales\Eshop\Application\Model\Basket $oBasket  basket
+     * @param double $dAmount basket item amount
+     * @param array $aSelList chosen selection list
+     * @param Basket $oBasket basket
      *
-     * @return oxprice
+     * @return Price
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function getBasketPrice($dAmount, $aSelList, $oBasket)
     {
@@ -497,10 +520,12 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
     /**
      * Returns empty array, implements iBaseArticle interface getter method
      *
-     * @param bool $blActCats   select categories if all parents are active
+     * @param bool $blActCats select categories if all parents are active
      * @param bool $blSkipCache force reload or not (default false - no reload)
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getCategoryIds($blActCats = false, $blSkipCache = false)
     {
@@ -519,7 +544,7 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
      */
     public function getLanguage()
     {
-        return \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
+        return Registry::getLang()->getBaseLanguage();
     }
 
     /**
@@ -537,11 +562,11 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
     /**
      * Returns order article unit price
      *
-     * @return oxprice
+     * @return Price
      */
     public function getPrice()
     {
-        $oBasePrice = oxNew(\OxidEsales\Eshop\Core\Price::class);
+        $oBasePrice = oxNew(Price::class);
         // prices in db are ONLY brutto
         $oBasePrice->setBruttoPriceMode();
         $oBasePrice->setVat($this->oxorderarticles__oxvat->value);
@@ -553,7 +578,7 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
     /**
      * Marks object as new order item (this marker useful when recalculating stocks after order recalculation)
      *
-     * @param bool $blIsNew marker value - TRUE if this item is newy added to order
+     * @param bool $blIsNew marker value - TRUE if this item is newly added to order
      */
     public function setIsNewOrderItem($blIsNew)
     {
@@ -576,12 +601,14 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
      * to it
      *
      * @param int $iNewAmount new ordered items amount
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function setNewAmount($iNewAmount)
     {
         if ($iNewAmount >= 0) {
             // to update stock we must first check if it is possible - article exists?
-            $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+            $oArticle = oxNew(Article::class);
             if ($oArticle->load($this->oxorderarticles__oxartid->value)) {
                 // updating stock info
                 $iStockChange = $iNewAmount - $this->oxorderarticles__oxamount->value;
@@ -592,10 +619,10 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
                     }
                 }
 
-                $this->updateArticleStock($iStockChange * -1, $this->getConfig()->getConfigParam('blAllowNegativeStock'));
+                $this->updateArticleStock($iStockChange * -1, Registry::getConfig()->getConfigParam('blAllowNegativeStock'));
 
                 // updating self
-                $this->oxorderarticles__oxamount = new \OxidEsales\Eshop\Core\Field($iNewAmount, \OxidEsales\Eshop\Core\Field::T_RAW);
+                $this->oxorderarticles__oxamount = new Field($iNewAmount, Field::T_RAW);
                 $this->save();
             }
         }
@@ -618,8 +645,8 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
     public function cancelOrderArticle()
     {
         if ($this->oxorderarticles__oxstorno->value == 0) {
-            $myConfig = $this->getConfig();
-            $this->oxorderarticles__oxstorno = new \OxidEsales\Eshop\Core\Field(1);
+            $myConfig = Registry::getConfig();
+            $this->oxorderarticles__oxstorno = new Field(1);
             if ($this->save()) {
                 $this->updateArticleStock($this->oxorderarticles__oxamount->value, $myConfig->getConfigParam('blAllowNegativeStock'));
             }
@@ -627,17 +654,19 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
     }
 
     /**
-     * Deletes order article object. If deletion succeded - updates
+     * Deletes order article object. If deletion succeeded - updates
      * article stock information. Returns deletion status
      *
-     * @param string $sOXID Article id
+     * @param null $sOXID Article id
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($sOXID = null)
     {
         if ($blDelete = parent::delete($sOXID)) {
-            $myConfig = $this->getConfig();
+            $myConfig = Registry::getConfig();
             if ($this->oxorderarticles__oxstorno->value != 1) {
                 $this->updateArticleStock($this->oxorderarticles__oxamount->value, $myConfig->getConfigParam('blAllowNegativeStock'));
             }
@@ -647,22 +676,24 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
     }
 
     /**
-     * Saves order article object. If saving succeded - updates
-     * article stock information if \OxidEsales\Eshop\Application\Model\OrderArticle::isNewOrderItem()
+     * Saves order article object. If saving succeeded - updates
+     * article stock information if OrderArticle::isNewOrderItem()
      * returns TRUE. Returns saving status
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function save()
     {
         // ordered articles
         if (($blSave = parent::save()) && $this->isNewOrderItem()) {
-            $myConfig = $this->getConfig();
+            $myConfig = Registry::getConfig();
             if (
                 $myConfig->getConfigParam('blUseStock') &&
                 $myConfig->getConfigParam('blPsBasketReservationEnabled')
             ) {
-                $this->getSession()
+                Registry::getSession()
                     ->getBasketReservations()
                     ->commitArticleReservation(
                         $this->oxorderarticles__oxartid->value,
@@ -672,10 +703,10 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
                 $this->updateArticleStock($this->oxorderarticles__oxamount->value * (-1), $myConfig->getConfigParam('blAllowNegativeStock'));
             }
 
-            // seting downloadable products article files
+            // setting downloadable products article files
             $this->_setOrderFiles();
 
-            // marking object as "non new" disable further stock changes
+            // marking object as "non-new" disable further stock changes
             $this->setIsNewOrderItem(false);
         }
 
@@ -685,12 +716,12 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
     /**
      * get used wrapping
      *
-     * @return oxWrapping
+     * @return Wrapping
      */
     public function getWrapping()
     {
         if ($this->oxorderarticles__oxwrapid->value) {
-            $oWrapping = oxNew(\OxidEsales\Eshop\Application\Model\Wrapping::class);
+            $oWrapping = oxNew(Wrapping::class);
             if ($oWrapping->load($this->oxorderarticles__oxwrapid->value)) {
                 return $oWrapping;
             }
@@ -710,43 +741,43 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
     }
 
     /**
-     * Get Total brut price formated
+     * Get Total brut price formatted
      *
      * @return string
      */
     public function getTotalBrutPriceFormated()
     {
-        $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
+        $oLang = Registry::getLang();
         $oOrder = $this->getOrder();
-        $oCurrency = $this->getConfig()->getCurrencyObject($oOrder->oxorder__oxcurrency->value);
+        $oCurrency = Registry::getConfig()->getCurrencyObject($oOrder->oxorder__oxcurrency->value);
 
         return $oLang->formatCurrency($this->oxorderarticles__oxbrutprice->value, $oCurrency);
     }
 
     /**
-     * Get  brut price formated
+     * Get  brut price formatted
      *
      * @return string
      */
     public function getBrutPriceFormated()
     {
-        $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
+        $oLang = Registry::getLang();
         $oOrder = $this->getOrder();
-        $oCurrency = $this->getConfig()->getCurrencyObject($oOrder->oxorder__oxcurrency->value);
+        $oCurrency = Registry::getConfig()->getCurrencyObject($oOrder->oxorder__oxcurrency->value);
 
         return $oLang->formatCurrency($this->oxorderarticles__oxbprice->value, $oCurrency);
     }
 
     /**
-     * Get Net price formated
+     * Get Net price formatted
      *
      * @return string
      */
     public function getNetPriceFormated()
     {
-        $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
+        $oLang = Registry::getLang();
         $oOrder = $this->getOrder();
-        $oCurrency = $this->getConfig()->getCurrencyObject($oOrder->oxorder__oxcurrency->value);
+        $oCurrency = Registry::getConfig()->getCurrencyObject($oOrder->oxorder__oxcurrency->value);
 
         return $oLang->formatCurrency($this->oxorderarticles__oxnprice->value, $oCurrency);
     }
@@ -764,8 +795,8 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
                 // returning the cached object
                 return $this->_aOrderCache[$this->oxorderarticles__oxorderid->value];
             }
-            // creatina new order object and trying to load it
-            $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
+            // creating new order object and trying to load it
+            $oOrder = oxNew(Order::class);
             if ($oOrder->load($this->oxorderarticles__oxorderid->value)) {
                 return $this->_aOrderCache[$this->oxorderarticles__oxorderid->value] = $oOrder;
             }
@@ -776,7 +807,7 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
 
     /**
      * Sets article creation date
-     * (\OxidEsales\Eshop\Application\Model\OrderArticle::oxorderarticles__oxtimestamp). Then executes parent method
+     * (OrderArticle::oxorderarticles__oxtimestamp). Then executes parent method
      * parent::_insert() and returns insertion status.
      *
      * @return bool
@@ -786,11 +817,10 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
     {
         $iInsertTime = time();
         $now = date('Y-m-d H:i:s', $iInsertTime);
-        $this->oxorderarticles__oxtimestamp = new \OxidEsales\Eshop\Core\Field($now);
+        $this->oxorderarticles__oxtimestamp = new Field($now);
 
         return parent::_insert();
     }
-
 
     /**
      * Set article
@@ -805,19 +835,19 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
     /**
      * Get article
      *
-     * @return \OxidEsales\Eshop\Application\Model\Article
+     * @return Article
+     * @throws DatabaseConnectionException
      */
     public function getArticle()
     {
         if ($this->_oArticle === null) {
-            $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+            $oArticle = oxNew(Article::class);
             $oArticle->load($this->oxorderarticles__oxartid->value);
             $this->_oArticle = $oArticle;
         }
 
         return $this->_oArticle;
     }
-
 
     /**
      * Set order files
@@ -828,7 +858,7 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
         $oArticle = $this->getArticle();
 
         if ($oArticle->oxarticles__oxisdownloadable->value) {
-            $oConfig = $this->getConfig();
+            $oConfig = Registry::getConfig();
             $sOrderId = $this->oxorderarticles__oxorderid->value;
             $sOrderArticleId = $this->getId();
             $sShopId = $oConfig->getShopId();
@@ -839,7 +869,7 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
 
             if ($oFiles) {
                 foreach ($oFiles as $oFile) {
-                    $oOrderFile = oxNew(\OxidEsales\Eshop\Application\Model\OrderFile::class);
+                    $oOrderFile = oxNew(OrderFile::class);
                     $oOrderFile->setOrderId($sOrderId);
                     $oOrderFile->setOrderArticleId($sOrderArticleId);
                     $oOrderFile->setShopId($sShopId);
@@ -859,15 +889,15 @@ class OrderArticle extends \OxidEsales\Eshop\Core\Model\BaseModel implements Art
     }
 
     /**
-     * Get Total brut price formated
+     * Get Total brut price formatted
      *
      * @return string
      */
     public function getTotalNetPriceFormated()
     {
-        $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
+        $oLang = Registry::getLang();
         $oOrder = $this->getOrder();
-        $oCurrency = $this->getConfig()->getCurrencyObject($oOrder->oxorder__oxcurrency->value);
+        $oCurrency = Registry::getConfig()->getCurrencyObject($oOrder->oxorder__oxcurrency->value);
 
         return $oLang->formatCurrency($this->oxorderarticles__oxnetprice->value, $oCurrency);
     }

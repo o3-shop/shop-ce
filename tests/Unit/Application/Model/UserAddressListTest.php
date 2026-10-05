@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,18 +18,19 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
-use \oxRegistry;
+use oxField;
+use oxRegistry;
 
 class UserAddressListTest extends \OxidTestCase
 {
-    public $aList = array();
+    public $aList = [];
 
-    const AUSTRIA_ID = 'a7c40f6320aeb2ec2.72885259';
+    public const AUSTRIA_ID = 'a7c40f6320aeb2ec2.72885259';
 
-    const GERMANY_ID = 'a7c40f631fc920687.20179984';
+    public const GERMANY_ID = 'a7c40f631fc920687.20179984';
 
     private $_iAddressCounter = 0;
 
@@ -59,10 +61,10 @@ class UserAddressListTest extends \OxidTestCase
      */
     public function providerLoadActiveAddress()
     {
-        return array(
-            array(0, 'Österreich'),
-            array(1, 'Austria'),
-        );
+        return [
+            [0, 'Österreich'],
+            [1, 'Austria'],
+        ];
     }
 
     /**

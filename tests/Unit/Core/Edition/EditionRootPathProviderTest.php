@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,21 +18,21 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Edition;
 
 use OxidEsales\EshopCommunity\Core\Edition\EditionRootPathProvider;
 use OxidEsales\EshopCommunity\Core\Edition\EditionSelector;
 use OxidEsales\TestingLibrary\UnitTestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class EditionRootPathProviderTest extends UnitTestCase
 {
     public function providerReturnsEditionPath()
     {
         $vendorDirectory = VENDOR_PATH;
-        return array(
-            array(EditionSelector::COMMUNITY, realpath(getShopBasePath()) . '/'),
-        );
+        return [
+            [EditionSelector::COMMUNITY, realpath(getShopBasePath()) . '/'],
+        ];
     }
 
     /**

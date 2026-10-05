@@ -69,12 +69,12 @@ class UtilsString
         $oStr = getStr();
 
         //multiple whitespaces
-        $sString = $oStr->preg_replace("/[ \t\n\r]+/", " ", $sString);
+        $sString = $oStr->preg_replace("/[ \t\n\r]+/", ' ', $sString);
         if ($oStr->strlen($sString) > $iLength && $iLength != -1) {
             $sString = $oStr->substr($sString, 0, $iLength);
         }
 
-        return $oStr->preg_replace("/,+$/", "", $sString);
+        return $oStr->preg_replace('/,+$/', '', $sString);
     }
 
     /**

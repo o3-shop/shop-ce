@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: netto
  * Price view mode: netto
@@ -21,11 +22,11 @@
  * Add additional article(1003) updating,
 */
 #bug
-$aData = array(
+$aData = [
   'skipped' => 1,
     // Articles
-    'articles' => array(
-        0 => array(
+    'articles' => [
+        0 => [
                 // oxarticles db fields
                 'oxid'                     => 1001,
                 'oxprice'                  => 20.00,
@@ -33,9 +34,8 @@ $aData = array(
                 // Amount in basket
                 'amount'                   => 1,
                 'oxfreeshipping'        => 1,
-  
-        ),
-        1 => array(
+        ],
+        1 => [
          // oxarticles db fields
                 'oxid'                  => 1002,
                 'oxprice'               => 200.00,
@@ -43,17 +43,14 @@ $aData = array(
                 // Amount in basket
                 'amount'                => 1,
               //  'oxfreeshipping'        => 1,
-                
+        ],
+     ],
 
-        ),
-     ),
- 
     // Additional costs
-    'costs' => array(
-
+    'costs' => [
         // Delivery
-        'delivery' => array(
-              0 => array(
+        'delivery' => [
+              0 => [
                 // oxdelivery DB fields
                 'oxactive' => 1,
                 'oxaddsum' => 10.00,
@@ -61,11 +58,11 @@ $aData = array(
                 'oxdeltype' => 'p',
                 'oxfinalize' => 1,
                 'oxparamend' => 99999,
-            ),
-        ),
+            ],
+        ],
         // Payment
-        'payment' => array(
-             0 => array(
+        'payment' => [
+             0 => [
                 // oxpayments DB fields
                 'oxaddsum' => 10.00,
                 'oxaddsumtype' => '%',
@@ -73,84 +70,83 @@ $aData = array(
                 'oxtoamount' => 1000000,
                 'oxchecked' => 1,
                 'oxaddsumrules'=>1,
-            ),
-        ),
-    ),
+            ],
+        ],
+    ],
     // TEST EXPECTATIONS
-    'expected' => array(
-        1 => array(
+    'expected' => [
+        1 => [
         // Article expected prices: ARTICLE ID => ( Unit price, Total Price )
-        'articles' => array(
-             1001 => array( '20,00', '20,00' ),
-             1002 => array( '200,00', '200,00' ),
-        ),
+        'articles' => [
+             1001 => [ '20,00', '20,00' ],
+             1002 => [ '200,00', '200,00' ],
+        ],
         // Expectations of other totals
-        'totals' => array(
+        'totals' => [
             // Total BRUTTO
             'totalBrutto' => '261,80',
             // Total NETTO
             'totalNetto'  => '220,00',
             // Total VAT amount: vat% => total cost
-            'vats' => array(
+            'vats' => [
                 19 => '41,80',
-            ),
-            // Total discount amounts: discount id => total cost
-                // Expectation for special discount with specified ID
-                'discount'  => '0,00',
-           
-      
-            // Total delivery amounts
-            'delivery' => array(
-                'brutto' => '23,80',
-            ),
-            // Total payment amounts
-            'payment' => array(
-                'brutto' => '26,18',
-            ),
-  
-            // GRAND TOTAL
-            'grandTotal'  => '311,78'
-        ),
-        ),
-        2 => array(
-           // Article expected prices: ARTICLE ID => ( Unit price, Total Price )
-        'articles' => array(
-             1001 => array( '20,00', '20,00' ),
-             1002 => array( '200,00', '200,00' ),
-             1003 => array( '2,00', '2,00' ),
-        ),
-        // Expectations of other totals
-        'totals' => array(
-            // Total BRUTTO
-            'totalBrutto' => '264,18',
-            // Total NETTO
-            'totalNetto'  => '222,00',
-            // Total VAT amount: vat% => total cost
-            'vats' => array(
-                19 => '42,18',
-            ),
+            ],
             // Total discount amounts: discount id => total cost
                 // Expectation for special discount with specified ID
                 'discount'  => '0,00',
 
             // Total delivery amounts
-            'delivery' => array(
-                'brutto' => '24,04',
-            ),
+            'delivery' => [
+                'brutto' => '23,80',
+            ],
             // Total payment amounts
-            'payment' => array(
-                'brutto' => '26,42',
-            ),
-  
+            'payment' => [
+                'brutto' => '26,18',
+            ],
+
             // GRAND TOTAL
-            'grandTotal'  => '314,64'
-        ),
-        ),
-    ),
+            'grandTotal'  => '311,78',
+        ],
+        ],
+        2 => [
+           // Article expected prices: ARTICLE ID => ( Unit price, Total Price )
+        'articles' => [
+             1001 => [ '20,00', '20,00' ],
+             1002 => [ '200,00', '200,00' ],
+             1003 => [ '2,00', '2,00' ],
+        ],
+        // Expectations of other totals
+        'totals' => [
+            // Total BRUTTO
+            'totalBrutto' => '264,18',
+            // Total NETTO
+            'totalNetto'  => '222,00',
+            // Total VAT amount: vat% => total cost
+            'vats' => [
+                19 => '42,18',
+            ],
+            // Total discount amounts: discount id => total cost
+                // Expectation for special discount with specified ID
+                'discount'  => '0,00',
+
+            // Total delivery amounts
+            'delivery' => [
+                'brutto' => '24,04',
+            ],
+            // Total payment amounts
+            'payment' => [
+                'brutto' => '26,42',
+            ],
+
+            // GRAND TOTAL
+            'grandTotal'  => '314,64',
+        ],
+        ],
+    ],
     // Test case options
-    'options' => array(
+    'options' => [
         // Configs (real named)
-        'config' => array(
+        'config' => [
             'blEnterNetPrice' => true,
             'blShowNetPrice' => true,
             'blShowVATForDelivery'=> true,
@@ -160,24 +156,24 @@ $aData = array(
             'blDeliveryVatOnTop' => true,
             'blPaymentVatOnTop' => true,
             'blWrappingVatOnTop' => true,
-        ),
+        ],
         // Other options
         'activeCurrencyRate' => 1,
-    ),
-        'actions' => array(
+    ],
+        'actions' => [
       /*  '_changeConfigs' => array (
             'blShowNetPrice' => false,
             'blEnterNetPrice' => true,
         ),*/
-        '_addArticles' => array(
-                0 => array(
+        '_addArticles' => [
+                0 => [
                         'oxid'       => '1003',
                         'oxtitle'    => '1003',
                         'oxprice'    => 2.00,
                         'oxvat'      => 19,
                         'oxstock'    => 999,
                         'amount' => 1,
-                ),
-        ),
-        ),
-);
+                ],
+        ],
+        ],
+];

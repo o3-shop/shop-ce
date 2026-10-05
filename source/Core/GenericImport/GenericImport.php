@@ -29,8 +29,8 @@ use OxidEsales\Eshop\Core\GenericImport\ImportObject\ImportObject;
  */
 class GenericImport
 {
-    const ERROR_USER_NO_RIGHTS = 'Not sufficient rights to perform operation!';
-    const ERROR_NO_INIT = 'Init not executed, Access denied!';
+    public const ERROR_USER_NO_RIGHTS = 'Not sufficient rights to perform operation!';
+    public const ERROR_NO_INIT = 'Init not executed, Access denied!';
 
     /** @var array Import objects types. */
     protected $objects = [
@@ -309,7 +309,7 @@ class GenericImport
         $dataForRetry = [];
         foreach ($statistics as $key => $value) {
             if ($value['r'] == false) {
-                $this->returnMessage .= "File[" . $this->importFilePath . "] - dataset number: $key - Error: " . $value['m'] . " ---<br> " . PHP_EOL;
+                $this->returnMessage .= 'File[' . $this->importFilePath . "] - dataset number: $key - Error: " . $value['m'] . ' ---<br> ' . PHP_EOL;
                 $dataForRetry[$key] = $data[$key];
             }
         }
@@ -459,7 +459,7 @@ class GenericImport
      */
     protected function createImportObject($type)
     {
-        $className = __NAMESPACE__ . "\\ImportObject\\" . $type;
+        $className = __NAMESPACE__ . '\\ImportObject\\' . $type;
 
         return oxNew($className);
     }

@@ -21,32 +21,41 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FieldConfigurationInterface;
-use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface;
 use Exception;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleSettingNotFountException;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Application\Model\Shop;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\DisplayError;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\NoJsValidator;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FieldConfigurationInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleSettingNotFountException;
 
 /**
  * Admin shop config manager.
  * Collects shop config information, updates it on user submit, etc.
  * Admin Menu: Main Menu -> Core Settings -> General.
  */
-class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ShopConfiguration extends AdminDetailsController
 {
     protected $_sThisTemplate = 'shop_config.tpl';
     protected $_aSkipMultiline = ['aHomeCountry'];
     protected $_aParseFloat = ['iMinOrderPrice'];
 
     protected $_aConfParams = [
-        "bool"   => 'confbools',
-        "str"    => 'confstrs',
-        "arr"    => 'confarrs',
-        "aarr"   => 'confaarrs',
-        "select" => 'confselects',
-        "num"    => 'confnum',
+        'bool'   => 'confbools',
+        'str'    => 'confstrs',
+        'arr'    => 'confarrs',
+        'aarr'   => 'confaarrs',
+        'select' => 'confselects',
+        'num'    => 'confnum',
     ];
 
     /**
@@ -54,39 +63,41 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      * to Smarty and returns name of template file "shop_config.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
 
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
-            $this->_aViewData["edit"] = $shop = $this->_getEditShop($soxId);
+            $this->_aViewData['edit'] = $shop = $this->_getEditShop($soxId);
 
             try {
-                // category choosen as default
-                $this->_aViewData["defcat"] = null;
+                // category chosen as default
+                $this->_aViewData['defcat'] = null;
                 if ($shop->oxshops__oxdefcat->value) {
-                    $category = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+                    $category = oxNew(Category::class);
                     if ($category->load($shop->oxshops__oxdefcat->value)) {
-                        $this->_aViewData["defcat"] = $category;
+                        $this->_aViewData['defcat'] = $category;
                     }
                 }
             } catch (Exception $exception) {
                 // on most cases this means that views are broken, so just
-                // outputting notice and keeping functionality flow ..
-                $this->_aViewData["updateViews"] = 1;
+                // outputting notice and keeping functionality flow ...
+                $this->_aViewData['updateViews'] = 1;
             }
 
-            $aoc = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aoc");
+            $aoc = Registry::getRequest()->getRequestEscapedParameter('aoc');
             if ($aoc == 1) {
                 $shopDefaultCategoryAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ShopDefaultCategoryAjax::class);
                 $this->_aViewData['oxajax'] = $shopDefaultCategoryAjax->getColumns();
 
-                return "popups/shop_default_category.tpl";
+                return 'popups/shop_default_category.tpl';
             }
         }
 
@@ -94,27 +105,27 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
         $confVars = $dbVariables['vars'];
         $confVars['str']['sVersion'] = $config->getConfigParam('sVersion');
 
-        $this->_aViewData["var_constraints"] = $dbVariables['constraints'];
-        $this->_aViewData["var_grouping"] = $dbVariables['grouping'];
+        $this->_aViewData['var_constraints'] = $dbVariables['constraints'];
+        $this->_aViewData['var_grouping'] = $dbVariables['grouping'];
         foreach ($this->_aConfParams as $type => $param) {
             $this->_aViewData[$param] = $confVars[$type];
         }
 
         // #251A passing country list
         $countryList = oxNew(\OxidEsales\Eshop\Application\Model\CountryList::class);
-        $countryList->loadActiveCountries(\OxidEsales\Eshop\Core\Registry::getLang()->getObjectTplLanguage());
-        if (isset($confVars['arr']["aHomeCountry"]) && count($confVars['arr']["aHomeCountry"]) && count($countryList)) {
+        $countryList->loadActiveCountries(Registry::getLang()->getObjectTplLanguage());
+        if (isset($confVars['arr']['aHomeCountry']) && count($confVars['arr']['aHomeCountry']) && count($countryList)) {
             foreach ($countryList as $sCountryId => $oCountry) {
-                if (in_array($oCountry->oxcountry__oxid->value, $confVars['arr']["aHomeCountry"])) {
-                    $countryList[$sCountryId]->selected = "1";
+                if (in_array($oCountry->oxcountry__oxid->value, $confVars['arr']['aHomeCountry'])) {
+                    $countryList[$sCountryId]->selected = '1';
                 }
             }
         }
 
-        $this->_aViewData["countrylist"] = $countryList;
+        $this->_aViewData['countrylist'] = $countryList;
 
         // checking if cUrl is enabled
-        $this->_aViewData["blCurlIsActive"] = (!function_exists('curl_init')) ? false : true;
+        $this->_aViewData['blCurlIsActive'] = function_exists('curl_init');
 
         /** @var ContactFormBridgeInterface $contactFormBridge */
         $contactFormBridge = $this->getContainer()->get(ContactFormBridgeInterface::class);
@@ -136,7 +147,13 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      * return theme filter for config variables
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getModuleForConfigVars" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getModuleForConfigVars()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getModuleForConfigVars() to the canonical override
+      *             target and retires _getModuleForConfigVars(); until then, _getModuleForConfigVars() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getModuleForConfigVars() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -144,28 +161,42 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
     }
 
     /**
+     * return theme filter for config variables
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getModuleForConfigVars(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getModuleForConfigVars() the canonical override target.
+     */
+    protected function getModuleForConfigVars()
+    {
+        return $this->_getModuleForConfigVars();
+    }
+
+    /**
      * Saves shop configuration variables
      */
     public function saveConfVars()
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
 
         $this->resetContentCache();
 
-        $configValidator = oxNew(\OxidEsales\Eshop\Core\NoJsValidator::class);
+        $configValidator = oxNew(NoJsValidator::class);
         foreach ($this->_aConfParams as $existingConfigType => $existingConfigName) {
-            $requestValue = \OxidEsales\Eshop\Core\Registry::getConfig()
-                ->getRequestParameter($existingConfigName, true);
+            $requestValue = Registry::getRequest()->getRequestParameter($existingConfigName);
             if (is_array($requestValue)) {
                 foreach ($requestValue as $configName => $newConfigValue) {
                     $oldValue = $config->getConfigParam($configName);
                     if ($newConfigValue !== $oldValue) {
                         $sValueToValidate = is_array($newConfigValue) ? join(', ', $newConfigValue) : $newConfigValue;
                         if (!$configValidator->isValid($sValueToValidate)) {
-                            $error = oxNew(\OxidEsales\Eshop\Core\DisplayError::class);
+                            $error = oxNew(DisplayError::class);
                             $error->setFormatParameters(htmlspecialchars($sValueToValidate));
-                            $error->setMessage("SHOP_CONFIG_ERROR_INVALID_VALUE");
-                            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($error);
+                            $error->setMessage('SHOP_CONFIG_ERROR_INVALID_VALUE');
+                            Registry::getUtilsView()->addErrorToDisplay($error);
                             continue;
                         }
                         $this->saveSetting($configName, $existingConfigType, $newConfigValue);
@@ -184,10 +215,10 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
         $this->saveConfVars();
 
         //saving additional fields ("oxshops__oxdefcat"") that goes directly to shop (not config)
-        /** @var \OxidEsales\Eshop\Application\Model\Shop $shop */
-        $shop = oxNew(\OxidEsales\Eshop\Application\Model\Shop::class);
+        /** @var Shop $shop */
+        $shop = oxNew(Shop::class);
         if ($shop->load($this->getEditObjectId())) {
-            $shop->assign(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval"));
+            $shop->assign(Registry::getRequest()->getRequestEscapedParameter('editval'));
             $shop->save();
         }
     }
@@ -203,22 +234,23 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      * @param string $moduleId module to load (empty string is for base values)
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function loadConfVars($shopId, $moduleId)
     {
-        $config = $this->getConfig();
         $configurationVariables = [
-            "bool"   => [],
-            "str"    => [],
-            "arr"    => [],
-            "aarr"   => [],
-            "select" => [],
+            'bool'   => [],
+            'str'    => [],
+            'arr'    => [],
+            'aarr'   => [],
+            'select' => [],
         ];
         $constraints = [];
         $groupings = [];
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $database = DatabaseProvider::getDb();
         $rs = $database->select(
-            "select cfg.oxvarname,
+            'select cfg.oxvarname,
                     cfg.oxvartype,
                     cfg.oxvarvalue as oxvarvalue,
                         disp.oxvarconstraint,
@@ -228,14 +260,14 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
                         on cfg.oxmodule=disp.oxcfgmodule and cfg.oxvarname=disp.oxcfgvarname
                 where cfg.oxshopid = :oxshopid
                     and cfg.oxmodule = :oxmodule
-                order by disp.oxpos, cfg.oxvarname",
+                order by disp.oxpos, cfg.oxvarname',
             [
                 ':oxshopid' => $shopId,
-                ':oxmodule' => $moduleId
+                ':oxmodule' => $moduleId,
             ]
         );
 
-        if ($rs != false && $rs->count() > 0) {
+        if ($rs && $rs->count() > 0) {
             while (!$rs->EOF) {
                 list($name, $type, $value, $constraint, $grouping) = $rs->fields;
                 $configurationVariables[$type][$name] = $this->_unserializeConfVar($type, $name, $value);
@@ -264,17 +296,39 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      * @param string $type       variable type
      * @param string $constraint serialized constraint
      *
-     * @return mixed
-     * @deprecated underscore prefix violates PSR12, will be renamed to "parseConstraint" in next major
+     * @return array|null
+     * @deprecated Transitional during #107. Modules SHOULD override _parseConstraint()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes parseConstraint() to the canonical override
+      *             target and retires _parseConstraint(); until then, _parseConstraint() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _parseConstraint($type, $constraint) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        switch ($type) {
-            case "select":
-                return array_map('trim', explode('|', $constraint));
-                break;
+        if ($type == 'select') {
+            return array_map('trim', explode('|', $constraint));
         }
         return null;
+    }
+
+    /**
+     * parse constraint from type and serialized values
+     *
+     * @param string $type       variable type
+     * @param string $constraint serialized constraint
+     *
+     * @return array|null
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _parseConstraint(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make parseConstraint() the canonical override target.
+     */
+    protected function parseConstraint($type, $constraint)
+    {
+        return $this->_parseConstraint($type, $constraint);
     }
 
     /**
@@ -284,16 +338,38 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      * @param mixed  $constraint constraint value
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "serializeConstraint" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _serializeConstraint()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes serializeConstraint() to the canonical override
+      *             target and retires _serializeConstraint(); until then, _serializeConstraint() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _serializeConstraint($type, $constraint) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        switch ($type) {
-            case "select":
-                return implode('|', array_map('trim', $constraint));
-                break;
+        if ($type == 'select') {
+            return implode('|', array_map('trim', $constraint));
         }
         return '';
+    }
+
+    /**
+     * serialize constraint from type and value
+     *
+     * @param string $type       variable type
+     * @param mixed  $constraint constraint value
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _serializeConstraint(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make serializeConstraint() the canonical override target.
+     */
+    protected function serializeConstraint($type, $constraint)
+    {
+        return $this->_serializeConstraint($type, $constraint);
     }
 
     /**
@@ -308,25 +384,25 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      */
     public function _unserializeConfVar($type, $name, $value) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $str = getStr();
+        $str = Str::getStr();
         $data = null;
 
         switch ($type) {
-            case "bool":
-                $data = ($value == "true" || $value == "1");
+            case 'bool':
+                $data = ($value == 'true' || $value == '1');
                 break;
 
-            case "str":
-            case "select":
-            case "num":
-            case "int":
+            case 'str':
+            case 'select':
+            case 'num':
+            case 'int':
                 $data = $str->htmlentities($value);
                 if (in_array($name, $this->_aParseFloat)) {
                     $data = str_replace(',', '.', $data);
                 }
                 break;
 
-            case "arr":
+            case 'arr':
                 if (in_array($name, $this->_aSkipMultiline)) {
                     $data = unserialize($value);
                 } else {
@@ -334,7 +410,7 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
                 }
                 break;
 
-            case "aarr":
+            case 'aarr':
                 if (in_array($name, $this->_aSkipMultiline)) {
                     $data = unserialize($value);
                 } else {
@@ -348,7 +424,7 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
 
     /**
      * Prepares data for storing to database.
-     * Example: $sType='aarr', $sName='aModules', $mValue='key1=>val1\nkey2=>val2'
+     * Example: $sType='aarr', $sName='aModules', $mValue='key1=>val1\key2=>val2'
      *
      * @param string $type  var type
      * @param string $name  var name
@@ -362,24 +438,24 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
         $data = $value;
 
         switch ($type) {
-            case "bool":
+            case 'bool':
                 break;
 
-            case "str":
-            case "select":
-            case "int":
+            case 'str':
+            case 'select':
+            case 'int':
                 if (in_array($name, $this->_aParseFloat)) {
                     $data = str_replace(',', '.', $data);
                 }
                 break;
 
-            case "arr":
+            case 'arr':
                 if (!is_array($value)) {
                     $data = $this->_multilineToArray($value);
                 }
                 break;
 
-            case "aarr":
+            case 'aarr':
                 $data = $this->_multilineToAarray($value);
                 break;
         }
@@ -393,7 +469,13 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      * @param array $input Array with text
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "arrayToMultiline" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _arrayToMultiline()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes arrayToMultiline() to the canonical override
+      *             target and retires _arrayToMultiline(); until then, _arrayToMultiline() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _arrayToMultiline($input) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -401,12 +483,35 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
     }
 
     /**
+     * Converts simple array to multiline text. Returns this text.
+     *
+     * @param array $input Array with text
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _arrayToMultiline(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make arrayToMultiline() the canonical override target.
+     */
+    protected function arrayToMultiline($input)
+    {
+        return $this->_arrayToMultiline($input);
+    }
+
+    /**
      * Converts Multiline text to simple array. Returns this array.
      *
      * @param string $multiline Multiline text
      *
-     * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "multilineToArray" in next major
+     * @return array|void
+     * @deprecated Transitional during #107. Modules SHOULD override _multilineToArray()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes multilineToArray() to the canonical override
+      *             target and retires _multilineToArray(); until then, _multilineToArray() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _multilineToArray($multiline) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -414,7 +519,7 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
         if (is_array($array)) {
             foreach ($array as $key => $value) {
                 $array[$key] = trim($value);
-                if ($array[$key] == "") {
+                if ($array[$key] == '') {
                     unset($array[$key]);
                 }
             }
@@ -424,12 +529,35 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
     }
 
     /**
+     * Converts Multiline text to simple array. Returns this array.
+     *
+     * @param string $multiline Multiline text
+     *
+     * @return array|void
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _multilineToArray(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make multilineToArray() the canonical override target.
+     */
+    protected function multilineToArray($multiline)
+    {
+        return $this->_multilineToArray($multiline);
+    }
+
+    /**
      * Converts associative array to multiline text. Returns this text.
      *
      * @param array $input Array to convert
      *
-     * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "aarrayToMultiline" in next major
+     * @return string|void
+     * @deprecated Transitional during #107. Modules SHOULD override _aarrayToMultiline()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes aarrayToMultiline() to the canonical override
+      *             target and retires _aarrayToMultiline(); until then, _aarrayToMultiline() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _aarrayToMultiline($input) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -439,11 +567,28 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
                 if ($multiline) {
                     $multiline .= "\n";
                 }
-                $multiline .= $key . " => " . $value;
+                $multiline .= $key . ' => ' . $value;
             }
 
             return $multiline;
         }
+    }
+
+    /**
+     * Converts associative array to multiline text. Returns this text.
+     *
+     * @param array $input Array to convert
+     *
+     * @return string|void
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _aarrayToMultiline(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make aarrayToMultiline() the canonical override target.
+     */
+    protected function aarrayToMultiline($input)
+    {
+        return $this->_aarrayToMultiline($input);
     }
 
     /**
@@ -452,25 +597,48 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      * @param string $multiline Multiline text
      *
      * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "multilineToAarray" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _multilineToAarray()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes multilineToAarray() to the canonical override
+      *             target and retires _multilineToAarray(); until then, _multilineToAarray() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _multilineToAarray($multiline) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $string = getStr();
+        $string = Str::getStr();
         $array = [];
         $lines = explode("\n", $multiline);
         foreach ($lines as $line) {
             $line = trim($line);
-            if ($line != "" && $string->preg_match("/(.+)=>(.+)/", $line, $regs)) {
+            if ($line != '' && $string->preg_match('/(.+)=>(.+)/', $line, $regs)) {
                 $key = trim($regs[1]);
                 $value = trim($regs[2]);
-                if ($key != "" && $value != "") {
+                if ($key != '' && $value != '') {
                     $array[$key] = $value;
                 }
             }
         }
 
         return $array;
+    }
+
+    /**
+     * Converts Multiline text to associative array. Returns this array.
+     *
+     * @param string $multiline Multiline text
+     *
+     * @return array
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _multilineToAarray(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make multilineToAarray() the canonical override target.
+     */
+    protected function multilineToAarray($multiline)
+    {
+        return $this->_multilineToAarray($multiline);
     }
 
     /**
@@ -482,7 +650,7 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
     {
         $editId = parent::getEditObjectId();
         if (!$editId) {
-            return $this->getConfig()->getShopId();
+            return Registry::getConfig()->getShopId();
         }
 
         return $editId;
@@ -497,7 +665,7 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
     {
         $shopId = $this->getEditObjectId();
         $module = $this->_getModuleForConfigVars();
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
         $preparedConfigValue = $this->_serializeConfVar($existingConfigType, $configName, $configValue);
         if (strpos($module, 'module:') !== false) {
             $moduleId = explode(':', $module)[1];

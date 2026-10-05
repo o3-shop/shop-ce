@@ -29,7 +29,7 @@ if (!function_exists('getInstallPath')) {
      */
     function getInstallPath()
     {
-        return "../";
+        return '../';
     }
 }
 
@@ -61,6 +61,24 @@ if (!function_exists('getCountryList')) {
         $relativePath = 'Application/Controller/Admin/ShopCountries.php';
 
         include "$cePath/$relativePath";
+
+        $language = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 5);
+
+        [$language, $country] = explode('-', $language);
+
+        if (!empty($country)) {
+            $names = json_decode(file_get_contents('http://country.io/names.json'), true);
+            $bCountries = $aCountries;
+            $aCountries['en'] = [array_search($names[strtoupper($country)], $bCountries['en']) => $names[strtoupper($country)]];
+            $aCountries['de'] = [array_search($names[strtoupper($country)], $bCountries['de']) => $names[strtoupper($country)]];
+            foreach ($bCountries as $lang => $countries) {
+                foreach ($countries as $code => $name) {
+                    if ($code != array_search($names[strtoupper($country)], $bCountries['en'])) {
+                        $aCountries[$lang][$code] = $name;
+                    }
+                }
+            }
+        }
 
         return $aCountries;
     }
@@ -138,7 +156,7 @@ if (!function_exists('getVendorDirectory')) {
     }
 }
 
-if (!class_exists("Conf", false)) {
+if (!class_exists('Conf', false)) {
     /**
      * Config key loader class
      *
@@ -153,7 +171,7 @@ if (!class_exists("Conf", false)) {
          */
         public function __construct()
         {
-            $config = new \OxidEsales\EshopCommunity\Core\ConfigFile(getShopBasePath() . "/config.inc.php");
+            $config = new \OxidEsales\EshopCommunity\Core\ConfigFile(getShopBasePath() . '/config.inc.php');
             $this->sConfigKey = $config->getVar('sConfigKey') ?: \OxidEsales\EshopCommunity\Core\Config::DEFAULT_CONFIG_KEY;
         }
     }

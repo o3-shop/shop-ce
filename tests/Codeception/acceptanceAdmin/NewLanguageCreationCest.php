@@ -34,13 +34,13 @@ final class NewLanguageCreationCest
 
         $adminPanel = $I->loginAdmin();
         $languages = $adminPanel->openLanguages();
-        $languages->createNewLanguage("lt", "Lietuviu");
+        $languages->createNewLanguage('lt', 'Lietuviu');
 
         $tools = $adminPanel->openTools();
         $tools->updateDbViews();
 
         $I->wait(3);
 
-        $b = $I->grabFromDatabase('oxv_oxarticles_lt', 'oxid', ['oxartnum' => "3503"]);
+        $b = $I->grabFromDatabase('oxv_oxarticles_lt', 'oxid', ['oxartnum' => '3503']);
     }
 }

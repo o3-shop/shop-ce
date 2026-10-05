@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,20 +18,17 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 use OxidEsales\EshopCommunity\Application\Model\User;
-
-use \oxField;
-use \Exception;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for User_Main class
  */
 class UserMainTest extends \OxidTestCase
 {
-
     /**
      * User_Main::Render() test case
      *
@@ -39,7 +37,7 @@ class UserMainTest extends \OxidTestCase
     public function testRender()
     {
         oxTestModules::addFunction('oxuser', 'loadAdminUser', '{ $this->oxuser__oxrights = new oxField( "malladmin" ); return; }');
-        $this->setRequestParameter("oxid", "oxdefaultadmin");
+        $this->setRequestParameter('oxid', 'oxdefaultadmin');
 
         // testing..
         $oView = oxNew('User_Main');
@@ -60,7 +58,7 @@ class UserMainTest extends \OxidTestCase
     public function testRenderNoRealObjectId()
     {
         oxTestModules::addFunction('oxuser', 'loadAdminUser', '{ $this->oxuser__oxrights = new oxField( "malladmin" ); return; }');
-        $this->setRequestParameter("oxid", "-1");
+        $this->setRequestParameter('oxid', '-1');
 
         // testing..
         $oView = oxNew('User_Main');
@@ -68,7 +66,7 @@ class UserMainTest extends \OxidTestCase
 
         $aViewData = $oView->getViewData();
         $this->assertTrue(isset($aViewData['oxid']));
-        $this->assertEquals("-1", $aViewData['oxid']);
+        $this->assertEquals('-1', $aViewData['oxid']);
     }
 
     /**
@@ -78,7 +76,7 @@ class UserMainTest extends \OxidTestCase
      */
     public function testSave()
     {
-        $this->setRequestParameter("oxid", "-1");
+        $this->setRequestParameter('oxid', '-1');
 
         oxTestModules::addFunction('oxuser', 'load', '{ return true; }');
         oxTestModules::addFunction('oxuser', 'save', '{ return true; }');
@@ -87,14 +85,14 @@ class UserMainTest extends \OxidTestCase
         oxTestModules::addFunction('oxuser', 'assign', '{ return true; }');
         oxTestModules::addFunction('oxuser', 'getId', '{ return "testId"; }');
 
-        $aTasks = array("_allowAdminEdit", "resetContentCache");
+        $aTasks = ['_allowAdminEdit', 'resetContentCache'];
 
         $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserMain::class, $aTasks);
         $oView->expects($this->once())->method('_allowAdminEdit')->will($this->returnValue(true));
         $oView->expects($this->once())->method('resetContentCache');
         $oView->save();
 
-        $this->assertEquals("1", $oView->getViewDataElement("updatelist"));
+        $this->assertEquals('1', $oView->getViewDataElement('updatelist'));
     }
 
     /**
@@ -104,7 +102,7 @@ class UserMainTest extends \OxidTestCase
      */
     public function testSaveExceptionDuringSave()
     {
-        $this->setRequestParameter("oxid", "-1");
+        $this->setRequestParameter('oxid', '-1');
 
         oxTestModules::addFunction('oxuser', 'load', '{ return true; }');
         oxTestModules::addFunction('oxuser', 'save', '{ throw new Exception("save"); }');
@@ -113,7 +111,7 @@ class UserMainTest extends \OxidTestCase
         oxTestModules::addFunction('oxuser', 'assign', '{ return true; }');
         oxTestModules::addFunction('oxuser', 'getId', '{ return "testId"; }');
 
-        $aTasks = array("_allowAdminEdit", "resetContentCache");
+        $aTasks = ['_allowAdminEdit', 'resetContentCache'];
 
         $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserMain::class, $aTasks);
         $oView->expects($this->atLeastOnce())->method('_allowAdminEdit')->will($this->returnValue(true));
@@ -121,7 +119,7 @@ class UserMainTest extends \OxidTestCase
         $oView->save();
         $oView->render();
 
-        $this->assertEquals("save", $oView->getViewDataElement("sSaveError"));
+        $this->assertEquals('save', $oView->getViewDataElement('sSaveError'));
     }
 
     /**
@@ -136,18 +134,18 @@ class UserMainTest extends \OxidTestCase
         oxTestModules::addFunction('oxuser', 'setPassword', '{ return true; }');
         oxTestModules::addFunction('oxuser', 'checkIfEmailExists', '{ return true; }');
 
-        $aTasks = array("_allowAdminEdit", "resetContentCache");
+        $aTasks = ['_allowAdminEdit', 'resetContentCache'];
 
         $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserMain::class, $aTasks);
 
         $oView->expects($this->atLeastOnce())->method('_allowAdminEdit')->will($this->returnValue(true));
         $oView->expects($this->once())->method('resetContentCache');
 
-        $_POST["editval"]['oxuser__oxusername'] = 'some';
+        $_POST['editval']['oxuser__oxusername'] = 'some';
         $oView->save();
         $oView->render();
 
-        $this->assertEquals("EXCEPTION_USER_USEREXISTS", $oView->getViewDataElement("sSaveError"));
+        $this->assertEquals('EXCEPTION_USER_USEREXISTS', $oView->getViewDataElement('sSaveError'));
     }
 
     /**
@@ -163,12 +161,12 @@ class UserMainTest extends \OxidTestCase
         $sPass = '&quot;&#34;"o?p[]XfdKvA=#3K8tQ%';
         $this->setRequestParameter('newPassword', $sPass);
 
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array('setPassword', 'checkIfEmailExists', 'load'));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['setPassword', 'checkIfEmailExists', 'load']);
         $oUser->expects($this->once())->method('setPassword')->with($this->equalTo($sPass));
         oxTestModules::addModuleObject('oxuser', $oUser);
 
         /** @var User_Main|PHPUnit\Framework\MockObject\MockObject $oView */
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserMain::class, array('getEditObjectId', '_allowAdminEdit'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserMain::class, ['getEditObjectId', '_allowAdminEdit']);
         $oView->expects($this->once())->method('_allowAdminEdit')->will($this->returnValue(true));
 
         $oView->save();

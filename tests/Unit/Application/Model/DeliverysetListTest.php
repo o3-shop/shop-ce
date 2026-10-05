@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,16 +18,15 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
+use oxDb;
+use oxDeliverySetList;
+use oxField;
 use OxidEsales\EshopCommunity\Application\Model\DeliverySet;
-
-use \oxDeliverySetList;
-use \oxDb;
-use \oxPaymentList;
-use \oxField;
-use \oxRegistry;
-use \oxTestModules;
+use oxPaymentList;
+use oxRegistry;
 
 class modOxDeliverySetList extends oxDeliverySetList
 {
@@ -58,7 +58,6 @@ class modOxDeliverySetList_paymentList extends oxPaymentList
 
 class DeliverysetListTest extends \OxidTestCase
 {
-
     /**
      * Initialize the fixture.
      *
@@ -114,13 +113,17 @@ class DeliverysetListTest extends \OxidTestCase
         $this->getConfig()->setActShopCurrency(2);
         $this->cleanUpTable('oxaddress');
 
-        $sShipSet = "oxidstandard";
-        $sProductId = "1126";
-        $dAmount = 29410;
+        $sShipSet = 'oxidstandard';
+        $sProductId = '1126';
+        // CHF amount chosen so the EUR-equivalent (~20530 EUR after dividing by
+        // the current CHF rate) stays in the same delivery-threshold band the
+        // original bug regression targeted. Update both rate and amount when
+        // currency rates are refreshed.
+        $dAmount = 18867;
 
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array("getActiveCountry"));
-        $oUser->expects($this->any())->method('getActiveCountry')->will($this->returnValue("a7c40f631fc920687.20179984"));
-        $oUser->load("oxdefaultadmin");
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['getActiveCountry']);
+        $oUser->expects($this->any())->method('getActiveCountry')->will($this->returnValue('a7c40f631fc920687.20179984'));
+        $oUser->load('oxdefaultadmin');
 
         $oBasket = oxNew('oxbasket');
         $oBasket->addToBasket($sProductId, $dAmount);
@@ -137,7 +140,7 @@ class DeliverysetListTest extends \OxidTestCase
     public function testGetDeliverySetListWithSomeWrongData()
     {
         $oUser = oxNew('oxUser');
-        $oUser->load("oxdefaultadmin");
+        $oUser->load('oxdefaultadmin');
 
         $oDelSetList = oxNew('oxDeliverySetList');
         $oDelSetList = $oDelSetList->getDeliverySetList($oUser, $oUser->oxuser__oxcountryid->value);
@@ -150,27 +153,27 @@ class DeliverysetListTest extends \OxidTestCase
 
         // adding garbage
         $oGarbage = oxNew('oxbase');
-        $oGarbage->init("oxobject2delivery");
-        $oGarbage->setId("_testoxobject2delivery1");
+        $oGarbage->init('oxobject2delivery');
+        $oGarbage->setId('_testoxobject2delivery1');
         $oGarbage->oxobject2delivery__oxdeliveryid = new oxField($oDeliverySet->getId());
-        $oGarbage->oxobject2delivery__oxobjectid = new oxField("yyy");
-        $oGarbage->oxobject2delivery__oxtype = new oxField("oxdelset");
+        $oGarbage->oxobject2delivery__oxobjectid = new oxField('yyy');
+        $oGarbage->oxobject2delivery__oxtype = new oxField('oxdelset');
         $oGarbage->save();
 
         $oGarbage = oxNew('oxbase');
-        $oGarbage->init("oxobject2delivery");
-        $oGarbage->setId("_testoxobject2delivery2");
+        $oGarbage->init('oxobject2delivery');
+        $oGarbage->setId('_testoxobject2delivery2');
         $oGarbage->oxobject2delivery__oxdeliveryid = new oxField($oDeliverySet->getId());
-        $oGarbage->oxobject2delivery__oxobjectid = new oxField("yyy");
-        $oGarbage->oxobject2delivery__oxtype = new oxField("oxdelsetu");
+        $oGarbage->oxobject2delivery__oxobjectid = new oxField('yyy');
+        $oGarbage->oxobject2delivery__oxtype = new oxField('oxdelsetu');
         $oGarbage->save();
 
         $oGarbage = oxNew('oxbase');
-        $oGarbage->init("oxobject2delivery");
-        $oGarbage->setId("_testoxobject2delivery3");
+        $oGarbage->init('oxobject2delivery');
+        $oGarbage->setId('_testoxobject2delivery3');
         $oGarbage->oxobject2delivery__oxdeliveryid = new oxField($oDeliverySet->getId());
-        $oGarbage->oxobject2delivery__oxobjectid = new oxField("yyy");
-        $oGarbage->oxobject2delivery__oxtype = new oxField("oxdelsetg");
+        $oGarbage->oxobject2delivery__oxobjectid = new oxField('yyy');
+        $oGarbage->oxobject2delivery__oxtype = new oxField('oxdelsetg');
         $oGarbage->save();
 
         $oDelSetList = oxNew('oxDeliverySetList');
@@ -188,7 +191,7 @@ class DeliverysetListTest extends \OxidTestCase
                 break;
             }
         }
-        $this->assertTrue($blFound, "Error, delivery set not found");
+        $this->assertTrue($blFound, 'Error, delivery set not found');
     }
 
     /**
@@ -204,7 +207,7 @@ class DeliverysetListTest extends \OxidTestCase
     public function testGetDeliverySetListForTestCase()
     {
         $iActShop = $this->getConfig()->getBaseShopId();
-        $this->getConfig()->setConfigParam("blVariantParentBuyable", 1);
+        $this->getConfig()->setConfigParam('blVariantParentBuyable', 1);
 
         /**
          * Preparing data
@@ -303,7 +306,7 @@ class DeliverysetListTest extends \OxidTestCase
         $oP2DelSet1->init('oxobject2payment');
         $oP2DelSet1->oxobject2payment__oxpaymentid = new oxField('oxidcashondel', oxField::T_RAW);
         $oP2DelSet1->oxobject2payment__oxobjectid = new oxField($oDelSet1->getId(), oxField::T_RAW);
-        $oP2DelSet1->oxobject2payment__oxtype = new oxField("oxdelset", oxField::T_RAW);
+        $oP2DelSet1->oxobject2payment__oxtype = new oxField('oxdelset', oxField::T_RAW);
         $oP2DelSet1->save();
 
         // payment => Deliveryset 2
@@ -311,7 +314,7 @@ class DeliverysetListTest extends \OxidTestCase
         $oP2DelSet2->init('oxobject2payment');
         $oP2DelSet2->oxobject2payment__oxpaymentid = new oxField('oxidpayadvance', oxField::T_RAW);
         $oP2DelSet2->oxobject2payment__oxobjectid = new oxField($oDelSet2->getId(), oxField::T_RAW);
-        $oP2DelSet2->oxobject2payment__oxtype = new oxField("oxdelset", oxField::T_RAW);
+        $oP2DelSet2->oxobject2payment__oxtype = new oxField('oxdelset', oxField::T_RAW);
         $oP2DelSet2->save();
 
         /**
@@ -355,7 +358,7 @@ class DeliverysetListTest extends \OxidTestCase
          * act. delivery set mustl be "Test deliveryset1" ('_testdeliveryset1')
          */
         $oBasket->addToBasket('1126', 9);
-        $oBasket->addToBasket('1127', 0, array(), null, true);
+        $oBasket->addToBasket('1127', 0, [], null, true);
         $oBasket->calculateBasket();
 
         $oUser->oxuser__oxcountryid = new oxField('a7c40f631fc920687.20179984', oxField::T_RAW);
@@ -386,7 +389,7 @@ class DeliverysetListTest extends \OxidTestCase
         $oDel2->oxdelivery__oxsort = new oxField(2, oxField::T_RAW);
         $oDel2->save();
 
-        $oBasket->addToBasket('1126', 0, array(), null, true);
+        $oBasket->addToBasket('1126', 0, [], null, true);
         $oBasket->calculateBasket();
 
         $oDeliverySetList = oxNew('oxDeliverySetList');
@@ -414,7 +417,7 @@ class DeliverysetListTest extends \OxidTestCase
      */
     public function testOxDeliverySetList()
     {
-        $oList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliverySetList::class, array('setHomeCountry'));
+        $oList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliverySetList::class, ['setHomeCountry']);
         $oList->expects($this->once())->method('setHomeCountry');
         $oList->__construct();
 
@@ -428,8 +431,8 @@ class DeliverysetListTest extends \OxidTestCase
      */
     public function testGetListWithoutCountryId()
     {
-        $oDelSetList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliverySetList::class, array('_getFilterSelect'));
-        $oDelSetList->setHomeCountry(array('_testHomeCountryId'));
+        $oDelSetList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliverySetList::class, ['_getFilterSelect']);
+        $oDelSetList->setHomeCountry(['_testHomeCountryId']);
 
         $oDelSetList->expects($this->any())
             ->method('_getFilterSelect')
@@ -446,8 +449,8 @@ class DeliverysetListTest extends \OxidTestCase
      */
     public function testGetListWithoutUser()
     {
-        $oDelSetList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliverySetList::class, array('_getFilterSelect'));
-        $oDelSetList->setHomeCountry(array('_testHomeCountryId'));
+        $oDelSetList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliverySetList::class, ['_getFilterSelect']);
+        $oDelSetList->setHomeCountry(['_testHomeCountryId']);
 
         $oDelSetList->expects($this->any())
             ->method('_getFilterSelect')
@@ -464,8 +467,8 @@ class DeliverysetListTest extends \OxidTestCase
      */
     public function testGetListWithUserAndCountryId()
     {
-        $oDelSetList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliverySetList::class, array('_getFilterSelect'));
-        $oDelSetList->setHomeCountry(array('_testHomeCountryId'));
+        $oDelSetList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliverySetList::class, ['_getFilterSelect']);
+        $oDelSetList->setHomeCountry(['_testHomeCountryId']);
 
         $oDelSetList->expects($this->any())
             ->method('_getFilterSelect')
@@ -481,7 +484,7 @@ class DeliverysetListTest extends \OxidTestCase
     // when user is not passed and does not exist in session
     public function testgetListCodeExecNoUser()
     {
-        $oList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliverySetList::class, array('getUser', 'setUser', '_getFilterSelect', 'selectString', 'rewind'));
+        $oList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliverySetList::class, ['getUser', 'setUser', '_getFilterSelect', 'selectString', 'rewind']);
         $oList->expects($this->once())->method('getUser')->will($this->returnValue(null));
         $oList->expects($this->never())->method('setUser');
         $oList->expects($this->once())->method('_getFilterSelect');
@@ -495,12 +498,12 @@ class DeliverysetListTest extends \OxidTestCase
     // when user is passed by param
     public function testgetListCodeExecUserIsTakenFromSession()
     {
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array('getId', 'getActiveCountry'));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['getId', 'getActiveCountry']);
         $oUser->expects($this->once())->method('getId')->will($this->returnValue('xxx'));
         ;
         $oUser->expects($this->once())->method('getActiveCountry')->will($this->returnValue('yyy'));
 
-        $oList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliverySetList::class, array('getUser', 'setUser', '_getFilterSelect', 'selectString', 'rewind'));
+        $oList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliverySetList::class, ['getUser', 'setUser', '_getFilterSelect', 'selectString', 'rewind']);
         $oList->expects($this->once())->method('getUser')->will($this->returnValue($oUser));
         $oList->expects($this->never())->method('setUser');
         $oList->expects($this->once())->method('_getFilterSelect')->with($oUser, 'yyy');
@@ -514,7 +517,7 @@ class DeliverysetListTest extends \OxidTestCase
     // when user and country ar set
     public function testgetListCountryAndUserAreSet()
     {
-        $oList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliverySetList::class, array('getUser', 'setUser', '_getFilterSelect', 'selectString', 'rewind'));
+        $oList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliverySetList::class, ['getUser', 'setUser', '_getFilterSelect', 'selectString', 'rewind']);
         $oList->expects($this->never())->method('getUser');
         $oList->expects($this->exactly(2))->method('setUser');
         $oList->expects($this->once())->method('_getFilterSelect')->will($this->returnValue('SELECT 1'))->with($this->_oUser, '_testHomeCountryId');
@@ -522,7 +525,7 @@ class DeliverysetListTest extends \OxidTestCase
         $oList->expects($this->exactly(2))->method('rewind');
 
         // testing
-        $oList->setHomeCountry(array('_testHomeCountryId'));
+        $oList->setHomeCountry(['_testHomeCountryId']);
         $oList->UNITgetList($this->_oUser, '_testHomeCountryId');
         $oList->UNITgetList($this->_oUser, '_testHomeCountryId');
     }
@@ -530,7 +533,7 @@ class DeliverysetListTest extends \OxidTestCase
     // when user and country ar set
     public function testgetListCountryIsChanged()
     {
-        $oList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliverySetList::class, array('getUser', 'setUser', '_getFilterSelect', 'selectString', 'rewind'));
+        $oList = $this->getMock(\OxidEsales\Eshop\Application\Model\DeliverySetList::class, ['getUser', 'setUser', '_getFilterSelect', 'selectString', 'rewind']);
         $oList->expects($this->never())->method('getUser');
         $oList->expects($this->exactly(2))->method('setUser');
         $oList->expects($this->exactly(2))->method('_getFilterSelect')->will($this->returnValue('SELECT 1'));
@@ -596,8 +599,8 @@ class DeliverysetListTest extends \OxidTestCase
             ) order by $sTable.oxpos";
 
         //cleaning spaces, tabs and so on...
-        $aSearch = array("/\s+/", "/\t+/", "/\r+/", "/\n+/");
-        $aReplace = array(" ", " ", " ", " ");
+        $aSearch = ["/\s+/", "/\t+/", "/\r+/", "/\n+/"];
+        $aReplace = [' ', ' ', ' ', ' '];
         $sQ = strtolower(preg_replace($aSearch, $aReplace, $sQ));
         $sTestSQ = strtolower(preg_replace($aSearch, $aReplace, $sTestSQ));
 
@@ -631,8 +634,8 @@ class DeliverysetListTest extends \OxidTestCase
             ) order by $sTable.oxpos";
 
         //cleaning spaces, tabs and so on...
-        $aSearch = array("/\s+/", "/\t+/", "/\r+/", "/\n+/");
-        $aReplace = array(" ", " ", " ", " ");
+        $aSearch = ["/\s+/", "/\t+/", "/\r+/", "/\n+/"];
+        $aReplace = [' ', ' ', ' ', ' '];
         $sQ = strtolower(preg_replace($aSearch, $aReplace, $sQ));
         $sTestSQ = strtolower(preg_replace($aSearch, $aReplace, $sTestSQ));
 
@@ -658,7 +661,7 @@ class DeliverysetListTest extends \OxidTestCase
         $oGroup->setId('25');
         $aGroups[] = $oGroup;
 
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array('getUserGroups', 'getId'));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['getUserGroups', 'getId']);
 
         $oUser->expects($this->any())
             ->method('getUserGroups')
@@ -672,10 +675,10 @@ class DeliverysetListTest extends \OxidTestCase
                 $this->returnValue('_testUserId')
             );
 
-        $sQ = oxRegistry::get("oxDeliverySetList")->UNITgetFilterSelect($oUser, '_testCoutntryId');
+        $sQ = oxRegistry::get('oxDeliverySetList')->UNITgetFilterSelect($oUser, '_testCoutntryId');
 
         $sTable = getViewName('oxdeliveryset');
-        $sTestSQ = "select $sTable.* from $sTable where " . oxRegistry::get("oxDeliverySetList")->getBaseObject()->getSqlActiveSnippet() . " and (
+        $sTestSQ = "select $sTable.* from $sTable where " . oxRegistry::get('oxDeliverySetList')->getBaseObject()->getSqlActiveSnippet() . " and (
                 if(EXISTS(select 1 from oxobject2delivery, $sCountryTable where $sCountryTable.oxid=oxobject2delivery.oxobjectid and oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxdelset' LIMIT 1),
                     EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxdelset' and oxobject2delivery.OXOBJECTID='_testCoutntryId'),
                     1) &&
@@ -688,8 +691,8 @@ class DeliverysetListTest extends \OxidTestCase
             ) order by $sTable.oxpos";
 
         //cleaning spaces, tabs and so on...
-        $aSearch = array("/\s+/", "/\t+/", "/\r+/", "/\n+/");
-        $aReplace = array(" ", " ", " ", " ");
+        $aSearch = ["/\s+/", "/\t+/", "/\r+/", "/\n+/"];
+        $aReplace = [' ', ' ', ' ', ' '];
         $sQ = strtolower(preg_replace($aSearch, $aReplace, $sQ));
         $sTestSQ = strtolower(preg_replace($aSearch, $aReplace, $sTestSQ));
 
@@ -717,7 +720,6 @@ class DeliverysetListTest extends \OxidTestCase
         $oDelSet->oxdeliveryset__oxactive = new oxField(1, oxField::T_RAW);
         $oDelSet->save();
 
-
         $oDelSetList = oxNew('oxDeliverySetList');
         $aList = $oDelSetList->getDeliverySetList(null, null, '_testDeliverySetId2');
         reset($aList);
@@ -735,7 +737,7 @@ class DeliverysetListTest extends \OxidTestCase
         $oUser = oxNew('oxuser');
         $oUser->setId('oLiaLiaMergaite');
 
-        $oDelSetList = oxNew("oxDeliverySetList");
+        $oDelSetList = oxNew('oxDeliverySetList');
         $oDelSetList->setUser($oUser);
         $this->assertEquals('oLiaLiaMergaite', $oDelSetList->getUser()->getId());
     }
@@ -746,7 +748,7 @@ class DeliverysetListTest extends \OxidTestCase
     public function testSetHomeCountry()
     {
         $oList = $this->getProxyClass('oxDeliverySetList');
-        $oList->setHomeCountry(array('something'));
+        $oList->setHomeCountry(['something']);
         $this->assertEquals('something', $oList->getNonPublicVar('_sHomeCountry'));
     }
 
@@ -756,7 +758,6 @@ class DeliverysetListTest extends \OxidTestCase
         $oList->setHomeCountry('something');
         $this->assertEquals('something', $oList->getNonPublicVar('_sHomeCountry'));
     }
-
 
     /**
      * Test if method for getting payments list uses basket price without payment costs
@@ -801,17 +802,18 @@ class DeliverysetListTest extends \OxidTestCase
         $oP2DelSet1->init('oxobject2payment');
         $oP2DelSet1->oxobject2payment__oxpaymentid = new oxField('oxidcashondel', oxField::T_RAW);
         $oP2DelSet1->oxobject2payment__oxobjectid = new oxField($oDelSet1->getId(), oxField::T_RAW);
-        $oP2DelSet1->oxobject2payment__oxtype = new oxField("oxdelset", oxField::T_RAW);
+        $oP2DelSet1->oxobject2payment__oxtype = new oxField('oxdelset', oxField::T_RAW);
         $oP2DelSet1->save();
 
         $oUser = oxNew('oxuser');
         $oUser->load('oxdefaultadmin');
         $this->setRequestParameter('deladrid', null);
 
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, array('getPriceForPayment'));
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getPriceForPayment']);
         $oBasket->expects($this->once())->method('getPriceForPayment')->will($this->returnValue(100));
 
-        oxAddClassModule(\OxidEsales\EshopCommunity\Tests\Unit\Application\Model\modOxDeliverySetList_paymentList::class, 'oxPaymentList');
+        $oPayList = new modOxDeliverySetList_paymentList();
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\PaymentList::class, $oPayList);
 
         $oDeliverySetList = oxNew('oxDeliverySetList');
 
@@ -829,7 +831,7 @@ class DeliverysetListTest extends \OxidTestCase
         $oP2DelSet1->setId('_testoxobject2delivery1');
         $oP2DelSet1->oxobject2delivery__oxdeliveryid = new oxField('oxidstandard', oxField::T_RAW);
         $oP2DelSet1->oxobject2delivery__oxobjectid = new oxField('DHL', oxField::T_RAW);
-        $oP2DelSet1->oxobject2delivery__oxtype = new oxField("rdfadeliveryset", oxField::T_RAW);
+        $oP2DelSet1->oxobject2delivery__oxtype = new oxField('rdfadeliveryset', oxField::T_RAW);
         $oP2DelSet1->save();
 
         $oDeliverySetList = oxNew('oxDeliverySetList');
@@ -847,7 +849,7 @@ class DeliverysetListTest extends \OxidTestCase
         $oP2DelSet1->setId('_testoxobject2delivery1');
         $oP2DelSet1->oxobject2delivery__oxdeliveryid = new oxField('oxidstandard', oxField::T_RAW);
         $oP2DelSet1->oxobject2delivery__oxobjectid = new oxField('DHL', oxField::T_RAW);
-        $oP2DelSet1->oxobject2delivery__oxtype = new oxField("rdfadeliveryset", oxField::T_RAW);
+        $oP2DelSet1->oxobject2delivery__oxtype = new oxField('rdfadeliveryset', oxField::T_RAW);
         $oP2DelSet1->save();
 
         $oDeliverySet = oxNew('oxDeliverySet');
@@ -877,7 +879,7 @@ class DeliverysetListTest extends \OxidTestCase
         $oP2DelSet1->setId('_testoxobject2delivery1');
         $oP2DelSet1->oxobject2delivery__oxdeliveryid = new oxField('oxidstandard', oxField::T_RAW);
         $oP2DelSet1->oxobject2delivery__oxobjectid = new oxField('DHL', oxField::T_RAW);
-        $oP2DelSet1->oxobject2delivery__oxtype = new oxField("rdfadeliveryset", oxField::T_RAW);
+        $oP2DelSet1->oxobject2delivery__oxtype = new oxField('rdfadeliveryset', oxField::T_RAW);
         $oP2DelSet1->save();
 
         // Deliverycost 1 => Deliveryset 1

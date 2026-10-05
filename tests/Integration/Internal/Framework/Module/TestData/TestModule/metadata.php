@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -26,7 +27,7 @@ $sMetadataVersion = '2.1';
 /**
  * Module information
  */
-$aModule = array(
+$aModule = [
     'id'           => 'test-module',
     'thumbnail'    => 'picture.png',
     'version'      => '1.0',
@@ -49,6 +50,6 @@ $aModule = array(
             'name' => 'string-setting',
             'type' => 'str',
             'value' => 'default',
-        ]
+        ],
     ],
-);
+];

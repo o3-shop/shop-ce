@@ -45,7 +45,7 @@ class DatabaseCheckerFactory implements DatabaseCheckerFactoryInterface
     public function __construct(
         MysqlCheckerInterface $mysqlChecker,
         MariaDbCheckerInterface $mariaDbChecker
-    ){
+    ) {
         $this->mysqlChecker = $mysqlChecker;
         $this->mariaDbChecker = $mariaDbChecker;
     }

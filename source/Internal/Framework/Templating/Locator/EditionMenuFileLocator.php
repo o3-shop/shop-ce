@@ -24,7 +24,6 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\Framework\Templating\Locator;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Theme\Bridge\AdminThemeBridgeInterface;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContext;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use Symfony\Component\Filesystem\Filesystem;
 

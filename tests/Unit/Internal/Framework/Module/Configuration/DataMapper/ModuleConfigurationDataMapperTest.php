@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -58,10 +60,10 @@ class ModuleConfigurationDataMapperTest extends TestCase
             'url'         => 'http://example.com',
             'email'       => 'test@example.com',
             'keyWithoutDataMapperAssigned' => [
-                'subkey' => 'subvalue'
+                'subkey' => 'subvalue',
             ],
             ClassesWithoutNamespaceDataMapper::MAPPING_KEY => [
-                'myvendor_mymodule_file1' => 'path/to/file1.php'
+                'myvendor_mymodule_file1' => 'path/to/file1.php',
             ],
             ClassExtensionsDataMapper::MAPPING_KEY => [
                 'shopClass' => 'moduleClass',
@@ -70,7 +72,7 @@ class ModuleConfigurationDataMapperTest extends TestCase
                 'controller1' => \MyVendor\MyController\Controller1::class,
             ],
             EventsDataMapper::MAPPING_KEY => [
-                'onActivate'   => 'MyEvents::onActivate'
+                'onActivate'   => 'MyEvents::onActivate',
             ],
             ModuleSettingsDataMapper::MAPPING_KEY => [
                 'name' => [
@@ -79,7 +81,7 @@ class ModuleConfigurationDataMapperTest extends TestCase
                     'value'         => true,
                     'position'      => 4,
                     'constraints'   => [1, 2],
-                ]
+                ],
             ],
             SmartyPluginDirectoriesDataMapper::MAPPING_KEY => [
                 'Smarty/PluginDirectory1WithMetadataVersion21',
@@ -88,12 +90,12 @@ class ModuleConfigurationDataMapperTest extends TestCase
                 [
                     'template' => 'page/checkout/basket.tpl',
                     'block' => 'basket_btn_next_top',
-                    'file' => '/views/blocks/page/checkout/myexpresscheckout.tpl'
+                    'file' => '/views/blocks/page/checkout/myexpresscheckout.tpl',
                 ],
             ],
             TemplatesDataMapper::MAPPING_KEY => [
                 'order_special.tpl'    => 'with_2_templates/views/admin/tpl/order_special.tpl',
-            ]
+            ],
         ];
 
         $moduleConfigurationDataMapper = $this->get(ModuleConfigurationDataMapperInterface::class);
@@ -108,7 +110,7 @@ class ModuleConfigurationDataMapperTest extends TestCase
         );
     }
 
-    private function removeKeysWithoutAssignedDataMapper(array $configurationData) : array
+    private function removeKeysWithoutAssignedDataMapper(array $configurationData): array
     {
         unset($configurationData['keyWithoutDataMapperAssigned']);
         return $configurationData;
@@ -122,7 +124,6 @@ class ModuleConfigurationDataMapperTest extends TestCase
      */
     public function testToDataAndFromData(array $data, ModuleConfigurationDataMapperInterface $dataMapper)
     {
-
         $moduleConfiguration = new ModuleConfiguration();
         $moduleConfiguration = $dataMapper->fromData($moduleConfiguration, $data);
 
@@ -140,40 +141,36 @@ class ModuleConfigurationDataMapperTest extends TestCase
                     ClassesWithoutNamespaceDataMapper::MAPPING_KEY => [
                         'myvendor_mymodule_file1' => 'path/to/file1.php',
                         'myvendor_mymodule_file2' => 'path/to/file2.php',
-                    ]
+                    ],
                 ],
-                'dataMapper' => new ClassesWithoutNamespaceDataMapper()
-
+                'dataMapper' => new ClassesWithoutNamespaceDataMapper(),
             ],
             [
                 'data' => [
                     ClassExtensionsDataMapper::MAPPING_KEY => [
                         'shopClass1' => 'moduleClass1',
-                        'shopClass2' => 'moduleClass2'
-                    ]
+                        'shopClass2' => 'moduleClass2',
+                    ],
                 ],
-                'dataMapper' => new ClassExtensionsDataMapper()
-
+                'dataMapper' => new ClassExtensionsDataMapper(),
             ],
             [
                 'data' => [
                     ControllersDataMapper::MAPPING_KEY => [
                         'controller1' => \MyVendor\MyController\Controller1::class,
-                        'controller2' => \MyVendor\MyController\Controller2::class
-                    ]
+                        'controller2' => \MyVendor\MyController\Controller2::class,
+                    ],
                 ],
-                'dataMapper' => new ControllersDataMapper()
-
+                'dataMapper' => new ControllersDataMapper(),
             ],
             [
                 'data' => [
                     EventsDataMapper::MAPPING_KEY => [
                             'onActivate'   => 'MyEvents::onActivate',
-                            'onDeactivate' => 'MyEvents::onDeactivate'
-                    ]
+                            'onDeactivate' => 'MyEvents::onDeactivate',
+                    ],
                 ],
-                'dataMapper' => new EventsDataMapper()
-
+                'dataMapper' => new EventsDataMapper(),
             ],
             [
                 'data' => [
@@ -181,27 +178,25 @@ class ModuleConfigurationDataMapperTest extends TestCase
                         'testEmptyBoolConfig' => [
                             'group' => 'settingsEmpty',
                             'type' => 'bool',
-                            'value' => 'false'
+                            'value' => 'false',
                         ],
                         'testFilledAArrConfig' => [
                             'group' => 'settingsFilled',
                             'type' => 'aarr',
-                            'value' => ['key1' => 'option1', 'key2' => 'option2']
-                        ]
-                    ]
+                            'value' => ['key1' => 'option1', 'key2' => 'option2'],
+                        ],
+                    ],
                 ],
-                'dataMapper' => new ModuleSettingsDataMapper()
-
+                'dataMapper' => new ModuleSettingsDataMapper(),
             ],
             [
                 'data' => [
                     SmartyPluginDirectoriesDataMapper::MAPPING_KEY => [
                         'Smarty/PluginDirectory1WithMetadataVersion21',
-                        'Smarty/PluginDirectory2WithMetadataVersion21'
-                    ]
+                        'Smarty/PluginDirectory2WithMetadataVersion21',
+                    ],
                 ],
-                'dataMapper' => new SmartyPluginDirectoriesDataMapper()
-
+                'dataMapper' => new SmartyPluginDirectoriesDataMapper(),
             ],
             [
                 'data' => [
@@ -209,28 +204,26 @@ class ModuleConfigurationDataMapperTest extends TestCase
                         [
                             'template' => 'page/checkout/basket.tpl',
                             'block' => 'basket_btn_next_top',
-                            'file' => '/views/blocks/page/checkout/myexpresscheckout.tpl'
+                            'file' => '/views/blocks/page/checkout/myexpresscheckout.tpl',
                         ],
                         [
                             'template' => 'page/checkout/basket.tpl',
                             'block' => 'basket_btn_next_bottom',
-                            'file' => '/views/blocks/page/checkout/myexpresscheckout.tpl'
+                            'file' => '/views/blocks/page/checkout/myexpresscheckout.tpl',
                         ],
-                    ]
+                    ],
                 ],
-                'dataMapper' => new TemplateBlocksDataMapper()
-
+                'dataMapper' => new TemplateBlocksDataMapper(),
             ],
             [
                 'data' => [
                     TemplatesDataMapper::MAPPING_KEY => [
                             'order_special.tpl'    => 'with_2_templates/views/admin/tpl/order_special.tpl',
-                            'user_connections.tpl' => 'with_2_templates/views/tpl/user_connections.tpl'
-                    ]
+                            'user_connections.tpl' => 'with_2_templates/views/tpl/user_connections.tpl',
+                    ],
                 ],
-                'dataMapper' => new TemplatesDataMapper()
-
-            ]
+                'dataMapper' => new TemplatesDataMapper(),
+            ],
         ];
     }
 }

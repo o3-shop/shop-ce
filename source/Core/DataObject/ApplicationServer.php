@@ -33,17 +33,17 @@ class ApplicationServer
     /**
      * Time in seconds, active server information life time.
      */
-    const SERVER_INFORMATION_TIME_LIFE = 86400;
+    public const SERVER_INFORMATION_TIME_LIFE = 86400;
 
     /**
      * Time in seconds, how long inactive server information will be stored.
      */
-    const INACTIVE_SERVER_STORAGE_PERIOD = 259200;
+    public const INACTIVE_SERVER_STORAGE_PERIOD = 259200;
 
     /**
      * Time in seconds, how often server information must be updated.
      */
-    const SERVER_INFO_UPDATE_PERIOD = 86400;
+    public const SERVER_INFO_UPDATE_PERIOD = 86400;
 
     /**
      * @var string

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -19,5 +20,4 @@
  */
 class _NonExistentClass
 {
-
 }

@@ -21,14 +21,22 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
-use oxDb;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\ArticleList;
+use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Application\Model\Manufacturer;
+use OxidEsales\Eshop\Application\Model\Vendor;
+use OxidEsales\Eshop\Core\Base;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Implements search
  *
  */
-class Search extends \OxidEsales\Eshop\Core\Base
+class Search extends Base
 {
     /**
      * Active language id
@@ -38,7 +46,7 @@ class Search extends \OxidEsales\Eshop\Core\Base
     protected $_iLanguage = 0;
 
     /**
-     * Class constructor. Executes search lenguage setter
+     * Class constructor. Executes search language setter
      */
     public function __construct()
     {
@@ -53,7 +61,7 @@ class Search extends \OxidEsales\Eshop\Core\Base
     public function setLanguage($iLanguage = null)
     {
         if (!isset($iLanguage)) {
-            $this->_iLanguage = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
+            $this->_iLanguage = Registry::getLang()->getBaseLanguage();
         } else {
             $this->_iLanguage = $iLanguage;
         }
@@ -62,26 +70,27 @@ class Search extends \OxidEsales\Eshop\Core\Base
     /**
      * Returns a list of articles according to search parameters. Returns matched
      *
-     * @param string $sSearchParamForQuery       query parameter
-     * @param string $sInitialSearchCat          initial category to seearch in
-     * @param string $sInitialSearchVendor       initial vendor to seearch for
-     * @param string $sInitialSearchManufacturer initial Manufacturer to seearch for
-     * @param string $sSortBy                    sort by
+     * @param bool $sSearchParamForQuery query parameter
+     * @param bool $sInitialSearchCat initial category to search in
+     * @param bool $sInitialSearchVendor initial vendor to search for
+     * @param bool $sInitialSearchManufacturer initial Manufacturer to search for
+     * @param bool $sSortBy sort by
      *
      * @return ArticleList
+     * @throws DatabaseConnectionException
      */
     public function getSearchArticles($sSearchParamForQuery = false, $sInitialSearchCat = false, $sInitialSearchVendor = false, $sInitialSearchManufacturer = false, $sSortBy = false)
     {
         // sets active page
-        $this->iActPage = (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('pgNr');
+        $this->iActPage = (int) Registry::getRequest()->getRequestEscapedParameter('pgNr');
         $this->iActPage = ($this->iActPage < 0) ? 0 : $this->iActPage;
 
         // load only articles which we show on screen
         //setting default values to avoid possible errors showing article list
-        $iNrofCatArticles = $this->getConfig()->getConfigParam('iNrofCatArticles');
+        $iNrofCatArticles = Registry::getConfig()->getConfigParam('iNrofCatArticles');
         $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 10;
 
-        $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+        $oArtList = oxNew(ArticleList::class);
         $oArtList->setSqlLimit($iNrofCatArticles * $this->iActPage, $iNrofCatArticles);
 
         $sSelect = $this->_getSearchSelect($sSearchParamForQuery, $sInitialSearchCat, $sInitialSearchVendor, $sInitialSearchManufacturer, $sSortBy);
@@ -95,12 +104,13 @@ class Search extends \OxidEsales\Eshop\Core\Base
     /**
      * Returns the amount of articles according to search parameters.
      *
-     * @param string $sSearchParamForQuery       query parameter
-     * @param string $sInitialSearchCat          initial category to seearch in
-     * @param string $sInitialSearchVendor       initial vendor to seearch for
-     * @param string $sInitialSearchManufacturer initial Manufacturer to seearch for
+     * @param bool $sSearchParamForQuery query parameter
+     * @param bool $sInitialSearchCat initial category to search in
+     * @param bool $sInitialSearchVendor initial vendor to search for
+     * @param bool $sInitialSearchManufacturer initial Manufacturer to search for
      *
      * @return int
+     * @throws DatabaseConnectionException
      */
     public function getSearchArticleCount($sSearchParamForQuery = false, $sInitialSearchCat = false, $sInitialSearchVendor = false, $sInitialSearchManufacturer = false)
     {
@@ -108,9 +118,9 @@ class Search extends \OxidEsales\Eshop\Core\Base
         $sSelect = $this->_getSearchSelect($sSearchParamForQuery, $sInitialSearchCat, $sInitialSearchVendor, $sInitialSearchManufacturer, false);
         if ($sSelect) {
             $sPartial = substr($sSelect, strpos($sSelect, ' from '));
-            $sSelect = "select count( " . getViewName('oxarticles', $this->_iLanguage) . ".oxid ) $sPartial ";
+            $sSelect = 'select count( ' . Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $this->_iLanguage) . ".oxid ) $sPartial ";
 
-            $iCnt = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sSelect);
+            $iCnt = DatabaseProvider::getDb()->getOne($sSelect);
         }
 
         return $iCnt;
@@ -119,13 +129,14 @@ class Search extends \OxidEsales\Eshop\Core\Base
     /**
      * Returns the appropriate SQL select for a search according to search parameters
      *
-     * @param string $sSearchParamForQuery       query parameter
-     * @param string $sInitialSearchCat          initial category to search in
-     * @param string $sInitialSearchVendor       initial vendor to search for
-     * @param string $sInitialSearchManufacturer initial Manufacturer to search for
-     * @param string $sSortBy                    sort by
+     * @param bool $sSearchParamForQuery query parameter
+     * @param bool $sInitialSearchCat initial category to search in
+     * @param bool $sInitialSearchVendor initial vendor to search for
+     * @param bool $sInitialSearchManufacturer initial Manufacturer to search for
+     * @param bool $sSortBy sort by
      *
-     * @return string
+     * @return string|void
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSearchSelect" in next major
      */
     protected function _getSearchSelect($sSearchParamForQuery = false, $sInitialSearchCat = false, $sInitialSearchVendor = false, $sInitialSearchManufacturer = false, $sSortBy = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -135,20 +146,20 @@ class Search extends \OxidEsales\Eshop\Core\Base
             return null;
         }
 
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
         // performance
         if ($sInitialSearchCat) {
-            // lets search this category - is no such category - skip all other code
-            $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+            // let's search this category - is no such category - skip all other code
+            $oCategory = oxNew(Category::class);
             $sCatTable = $oCategory->getViewName();
 
             $sQ = "select 1 from $sCatTable 
                 where $sCatTable.oxid = :oxid ";
-            $sQ .= "and " . $oCategory->getSqlActiveSnippet();
+            $sQ .= 'and ' . $oCategory->getSqlActiveSnippet();
 
             $params = [
-                ':oxid' => $sInitialSearchCat
+                ':oxid' => $sInitialSearchCat,
             ];
 
             if (!$oDb->getOne($sQ, $params)) {
@@ -158,16 +169,16 @@ class Search extends \OxidEsales\Eshop\Core\Base
 
         // performance:
         if ($sInitialSearchVendor) {
-            // lets search this vendor - if no such vendor - skip all other code
-            $oVendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
+            // let's search this vendor - if no such vendor - skip all other code
+            $oVendor = oxNew(Vendor::class);
             $sVndTable = $oVendor->getViewName();
 
             $sQ = "select 1 from $sVndTable 
                 where $sVndTable.oxid = :oxid ";
-            $sQ .= "and " . $oVendor->getSqlActiveSnippet();
+            $sQ .= 'and ' . $oVendor->getSqlActiveSnippet();
 
             $params = [
-                ':oxid' => $sInitialSearchVendor
+                ':oxid' => $sInitialSearchVendor,
             ];
 
             if (!$oDb->getOne($sQ, $params)) {
@@ -177,16 +188,16 @@ class Search extends \OxidEsales\Eshop\Core\Base
 
         // performance:
         if ($sInitialSearchManufacturer) {
-            // lets search this Manufacturer - if no such Manufacturer - skip all other code
-            $oManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
+            // let's search this Manufacturer - if no such Manufacturer - skip all other code
+            $oManufacturer = oxNew(Manufacturer::class);
             $sManTable = $oManufacturer->getViewName();
 
             $sQ = "select 1 from $sManTable 
                 where $sManTable.oxid = :oxid ";
-            $sQ .= "and " . $oManufacturer->getSqlActiveSnippet();
+            $sQ .= 'and ' . $oManufacturer->getSqlActiveSnippet();
 
             $params = [
-                ':oxid' => $sInitialSearchManufacturer
+                ':oxid' => $sInitialSearchManufacturer,
             ];
 
             if (!$oDb->getOne($sQ, $params)) {
@@ -199,9 +210,9 @@ class Search extends \OxidEsales\Eshop\Core\Base
             $sWhere = $this->_getWhere($sSearchParamForQuery);
         }
 
-        $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+        $oArticle = oxNew(Article::class);
         $sArticleTable = $oArticle->getViewName();
-        $sO2CView = getViewName('oxobject2category');
+        $sO2CView = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category');
 
         $sSelectFields = $oArticle->getSelectFields();
 
@@ -213,7 +224,7 @@ class Search extends \OxidEsales\Eshop\Core\Base
 
         // must be additional conditions in select if searching in category
         if ($sInitialSearchCat) {
-            $sCatView = getViewName('oxcategories', $this->_iLanguage);
+            $sCatView = Registry::get(TableViewNameGenerator::class)->getViewName('oxcategories', $this->_iLanguage);
             $sInitialSearchCatQuoted = $oDb->quote($sInitialSearchCat);
             $sSelectCat = "select oxid from {$sCatView} where oxid = $sInitialSearchCatQuoted and (oxpricefrom != '0' or oxpriceto != 0)";
             if ($oDb->getOne($sSelectCat)) {
@@ -232,20 +243,108 @@ class Search extends \OxidEsales\Eshop\Core\Base
         $sSelect .= " and {$sArticleTable}.oxparentid = '' and {$sArticleTable}.oxissearch = 1 ";
 
         if ($sInitialSearchVendor) {
-            $sSelect .= " and {$sArticleTable}.oxvendorid = " . $oDb->quote($sInitialSearchVendor) . " ";
+            $sSelect .= " and {$sArticleTable}.oxvendorid = " . $oDb->quote($sInitialSearchVendor) . ' ';
         }
 
         if ($sInitialSearchManufacturer) {
-            $sSelect .= " and {$sArticleTable}.oxmanufacturerid = " . $oDb->quote($sInitialSearchManufacturer) . " ";
+            $sSelect .= " and {$sArticleTable}.oxmanufacturerid = " . $oDb->quote($sInitialSearchManufacturer) . ' ';
         }
 
         $sSelect .= $sWhere;
 
         if ($sSortBy) {
             $sSelect .= " order by {$sSortBy} ";
+        } elseif ($sSearchParamForQuery) {
+            $sSelect .= $this->_getRelevanceOrder($sSearchParamForQuery);
         }
 
         return $sSelect;
+    }
+
+    /**
+     * Builds a relevance ORDER BY clause for the search string.
+     *
+     * Multi-word queries are tokenized the same way as in _getWhere(), so rows are ranked by how many
+     * of the query words they match (the whole phrase counts as an extra word, lifting adjacent matches).
+     * Within the same score, the first matching field from the aSearchCols config wins - title match ranks
+     * highest, each subsequent configured field lower. Used as default sort when no explicit sort is requested.
+     *
+     * @param string $sSearchString
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function _getRelevanceOrder(string $sSearchString): string // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $aSearchCols = Registry::getConfig()->getConfigParam('aSearchCols');
+        if (!is_array($aSearchCols) || !$sSearchString) {
+            return '';
+        }
+
+        $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $this->_iLanguage);
+        $aWords = array_filter(explode(' ', $sSearchString), 'strlen');
+        // the whole phrase is ranked alongside the single words, so adjacent matches score one point higher
+        $aTerms = array_unique(array_merge([$sSearchString], $aWords));
+
+        $aFields = [];
+        foreach ($aSearchCols as $sField) {
+            $aFields[] = $this->getSearchField($sArticleTable, $sField);
+        }
+
+        $aCases = [];
+        $iRank = 1;
+        foreach ($aFields as $sSearchField) {
+            $aMatches = [];
+            foreach ($aTerms as $sTerm) {
+                $aMatches[] = $this->getRelevanceMatch($sSearchField, $sTerm);
+            }
+            $aCases[] = 'WHEN (' . implode(' OR ', $aMatches) . ") THEN {$iRank}";
+            $iRank++;
+        }
+
+        if (!$aCases) {
+            return '';
+        }
+
+        $sOrder = ' ORDER BY ';
+
+        // a single-word query matches every returned row exactly once, so the score is constant and pointless
+        if (count($aTerms) > 1) {
+            $aScores = [];
+            foreach ($aTerms as $sTerm) {
+                $aMatches = [];
+                foreach ($aFields as $sSearchField) {
+                    $aMatches[] = $this->getRelevanceMatch($sSearchField, $sTerm);
+                }
+                // IS TRUE turns the match into 1/0 - a NULL column (left joined long description) must not
+                // poison the whole sum
+                $aScores[] = '((' . implode(' OR ', $aMatches) . ') IS TRUE)';
+            }
+            $sOrder .= implode(' + ', $aScores) . ' DESC, ';
+        }
+
+        return $sOrder . 'CASE ' . implode(' ', $aCases) . " ELSE {$iRank} END ASC, {$sArticleTable}.oxtitle ASC";
+    }
+
+    /**
+     * Builds the LIKE condition matching a single search term against one field, special chars included.
+     *
+     * @param string $sSearchField
+     * @param string $sTerm
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getRelevanceMatch(string $sSearchField, string $sTerm): string
+    {
+        $oDb = DatabaseProvider::getDb();
+        $sCondition = "{$sSearchField} LIKE " . $oDb->quote("%{$sTerm}%");
+
+        if (($sUml = Registry::getUtilsString()->prepareStrForSearch($sTerm))) {
+            $sCondition .= " OR {$sSearchField} LIKE " . $oDb->quote("%{$sUml}%");
+        }
+
+        return $sCondition;
     }
 
     /**
@@ -254,14 +353,15 @@ class Search extends \OxidEsales\Eshop\Core\Base
      * @param string $sSearchString searching string
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getWhere" in next major
      */
     protected function _getWhere($sSearchString) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $myConfig = $this->getConfig();
+        $oDb = DatabaseProvider::getDb();
+        $myConfig = Registry::getConfig();
         $blSep = false;
-        $sArticleTable = getViewName('oxarticles', $this->_iLanguage);
+        $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $this->_iLanguage);
 
         $aSearchCols = $myConfig->getConfigParam('aSearchCols');
         if (!(is_array($aSearchCols) && count($aSearchCols))) {
@@ -271,7 +371,7 @@ class Search extends \OxidEsales\Eshop\Core\Base
         $sSearchSep = $myConfig->getConfigParam('blSearchUseAND') ? 'and ' : 'or ';
         $aSearch = explode(' ', $sSearchString);
         $sSearch = ' and ( ';
-        $myUtilsString = \OxidEsales\Eshop\Core\Registry::getUtilsString();
+        $myUtilsString = Registry::getUtilsString();
 
         foreach ($aSearch as $sSearchString) {
             if (!strlen($sSearchString)) {
@@ -290,7 +390,7 @@ class Search extends \OxidEsales\Eshop\Core\Base
                     $sSearch .= ' or ';
                 }
 
-                // as long description now is on different table table must differ
+                // as long description now is on different table, table must differ
                 $sSearchField = $this->getSearchField($sArticleTable, $sField);
 
                 $sSearch .= " {$sSearchField} like " . $oDb->quote("%$sSearchString%");
@@ -322,10 +422,10 @@ class Search extends \OxidEsales\Eshop\Core\Base
     protected function getDescriptionJoin($table)
     {
         $descriptionJoin = '';
-        $searchColumns = $this->getConfig()->getConfigParam('aSearchCols');
+        $searchColumns = Registry::getConfig()->getConfigParam('aSearchCols');
 
         if (is_array($searchColumns) && in_array('oxlongdesc', $searchColumns)) {
-            $viewName = getViewName('oxartextends', $this->_iLanguage);
+            $viewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxartextends', $this->_iLanguage);
             $descriptionJoin = " LEFT JOIN {$viewName } ON {$table}.oxid={$viewName }.oxid ";
         }
         return $descriptionJoin;
@@ -343,10 +443,89 @@ class Search extends \OxidEsales\Eshop\Core\Base
     protected function getSearchField($table, $field)
     {
         if ($field == 'oxlongdesc') {
-            $searchField = getViewName('oxartextends', $this->_iLanguage) . ".{$field}";
+            $searchField = Registry::get(TableViewNameGenerator::class)->getViewName('oxartextends', $this->_iLanguage) . ".{$field}";
         } else {
             $searchField = "{$table}.{$field}";
         }
         return $searchField;
+    }
+
+    /**
+     * Returns a list of article suggestions for the search dropdown.
+     * Returns lightweight data: id, title, price, icon url, link.
+     *
+     * @param string $sSearchParam search term
+     * @param int    $iLimit      max results
+     *
+     * @return array
+     */
+    public function getSearchSuggestions($sSearchParam, $iLimit = 10)
+    {
+        $sSearchParam = trim((string) $sSearchParam);
+        if ($sSearchParam === '') {
+            return [];
+        }
+
+        $myConfig = Registry::getConfig();
+        $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $this->_iLanguage);
+        $sDescView = Registry::get(TableViewNameGenerator::class)->getViewName('oxartextends', $this->_iLanguage);
+
+        $aSearchCols = $myConfig->getConfigParam('aSearchCols');
+        if (!(is_array($aSearchCols) && count($aSearchCols))) {
+            return [];
+        }
+
+        $oArticle = oxNew(Article::class);
+        $sActiveSnippet = $oArticle->getSqlActiveSnippet();
+
+        $sSearchClause = $this->_getWhere($sSearchParam);
+        if (!$sSearchClause) {
+            return [];
+        }
+
+        $sDescJoin = '';
+        if (in_array('oxlongdesc', $aSearchCols)) {
+            $sDescJoin = " LEFT JOIN {$sDescView} ON {$sArticleTable}.oxid={$sDescView}.oxid";
+        }
+
+        $sSelect = "SELECT {$sArticleTable}.oxid,
+                           {$sArticleTable}.oxtitle,
+                           {$sArticleTable}.oxvarselect,
+                           {$sArticleTable}.oxprice,
+                           {$sArticleTable}.oxthumb
+                    FROM {$sArticleTable} {$sDescJoin}
+                    WHERE {$sActiveSnippet}
+                      AND {$sArticleTable}.oxparentid = ''
+                      AND {$sArticleTable}.oxissearch = 1
+                      {$sSearchClause}
+                    {$this->_getRelevanceOrder($sSearchParam)}
+                    LIMIT " . (int) $iLimit;
+
+        $aResults = [];
+        $oCurrency = $myConfig->getActShopCurrencyObject();
+        $oArtList = oxNew(ArticleList::class);
+        $oArtList->selectString($sSelect);
+
+        foreach ($oArtList as $oSuggestion) {
+            $sTitle = html_entity_decode((string) $oSuggestion->getRawFieldData('oxtitle'), ENT_QUOTES);
+            $sVarSelect = html_entity_decode((string) $oSuggestion->getRawFieldData('oxvarselect'), ENT_QUOTES);
+            $aResult = [
+                'id'    => $oSuggestion->oxarticles__oxid->value,
+                'title' => $sTitle . ($sVarSelect ? ' ' . $sVarSelect : ''),
+                'icon'  => $oSuggestion->getThumbnailUrl(),
+                'link'  => htmlspecialchars_decode($oSuggestion->getLink(), ENT_QUOTES),
+            ];
+
+            $sFormattedPrice = $oSuggestion->getFPrice();
+            if ($sFormattedPrice !== null) {
+                $sSign = $oCurrency->sign ?? '';
+                $sSide = $oCurrency->side ?? '';
+                $aResult['price'] = trim(($sSide === 'Front') ? $sSign . $sFormattedPrice : $sFormattedPrice . ' ' . $sSign);
+            }
+
+            $aResults[] = $aResult;
+        }
+
+        return $aResults;
     }
 }

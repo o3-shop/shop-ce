@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\User;
 
 use oxcmp_user;
@@ -30,7 +32,6 @@ require_once 'UserTestCase.php';
 
 class RegistrationTest extends UserTestCase
 {
-
     /** @var bool */
     protected $_blSkipCustomTearDown = true;
 
@@ -70,7 +71,7 @@ class RegistrationTest extends UserTestCase
     public function testRegisterWithoutCsrf()
     {
         $session = $this->createPartialMock(Session::class, ['checkSessionChallenge']);
-        $session->method('checkSessionChallenge')->willReturn(False);
+        $session->method('checkSessionChallenge')->willReturn(false);
 
         $utilsView = $this->createPartialMock(UtilsView::class, ['addErrorToDisplay']);
         $utilsView->expects($this->once())->method('addErrorToDisplay')->with('ERROR_MESSAGE_NON_MATCHING_CSRF_TOKEN');
@@ -100,7 +101,7 @@ class RegistrationTest extends UserTestCase
 
         $this->setRequestParameter(
             'invadr',
-            array(
+            [
                  'oxuser__oxsal'       => 'Mr',
                  'oxuser__oxfname'     => 'SomeTestName',
                  'oxuser__oxlname'     => 'SomeTestSurname',
@@ -108,8 +109,8 @@ class RegistrationTest extends UserTestCase
                  'oxuser__oxstreetnr'  => '23',
                  'oxuser__oxzip'       => '44444',
                  'oxuser__oxcity'      => 'SomeTestCoty',
-                 'oxuser__oxcountryid' => $sGermanyId
-            )
+                 'oxuser__oxcountryid' => $sGermanyId,
+            ]
         );
     }
 

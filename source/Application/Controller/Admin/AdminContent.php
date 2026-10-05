@@ -21,12 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
+
 /**
  * Sets template, that arranges two other templates ("content_list.tpl"
  * and "content_main.tpl") to frame.
- * Admin Menu: Customerinformations -> Content.
+ * Admin Menu: Customer-Information -> Content.
  */
-class AdminContent extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class AdminContent extends AdminController
 {
     /**
      * Current class template name.

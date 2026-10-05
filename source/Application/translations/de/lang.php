@@ -19,7 +19,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-$sLangName  = "Deutsch";
+$sLangName = 'Deutsch';
 
 // -------------------------------
 // RESOURCE IDENTIFIER = STRING
@@ -78,6 +78,10 @@ $aLang = [
 /** @deprecated since v6.5.4 (2020-04-06); Suggest feature will be removed completely */
 'CARD_TO'                                                     => 'Karte an',
 /** end deprecated */
+'CARD_MASTERCARD'                                             => 'MasterCard',
+'CARD_VISA'                                                   => 'Visa',
+'CARD_SECURITY_CODE'                                          => 'Prüfnummer',
+'CARD_SECURITY_CODE_DESCRIPTION'                              => 'Die letzten 3 Ziffern auf der Rückseite Ihrer Kreditkarte.',
 'CART'                                                        => 'Warenkorb',
 'CATEGORIES'                                                  => 'Kategorien',
 'CATEGORY'                                                    => 'Kategorie',
@@ -110,6 +114,7 @@ $aLang = [
 'COUPON'                                                      => 'Gutschein',
 'COUPON_NOT_ACCEPTED'                                         => 'Der Gutschein "%s" kann nicht akzeptiert werden.',
 'CREATE_PASSWORD'                                             => 'Passwort erstellen',
+'CREDITCARD'                                                  => 'Kreditkarte',
 'CURRENT_PRODUCT'                                             => 'Aktueller Artikel',
 'CUSTOMERS_ALSO_BOUGHT'                                       => 'Kunden, die diesen Artikel gekauft haben, kauften auch',
 'DATE'                                                        => 'Datum',
@@ -137,6 +142,8 @@ $aLang = [
 'EDIT'                                                        => 'Ändern',
 'EMAIL'                                                       => 'E-Mail',
 'EMAIL_ADDRESS'                                               => 'E-Mail-Adresse',
+'EMAIL_INVITE_HTML_INVITETOSHOP2'                             => 'hat Sie eingeladen, den Shop',
+'EMAIL_INVITE_HTML_INVITETOSHOP3'                             => 'zu besuchen.',
 'ENABLE'                                                      => 'Anzeigen',
 'ENTER_COUPON_NUMBER'                                         => 'Gutscheincode eingeben',
 'ENTER_EMAIL_OR_NAME'                                         => 'E-Mail-Adresse oder Nachname eingeben',
@@ -452,6 +459,8 @@ $aLang = [
 'RECIPIENT_EMAIL'                                             => 'E-Mail des Empfängers',
 'RECIPIENT_NAME'                                              => 'Name des Empfängers',
 'RECOMMEND'                                                   => 'Empfehlen',
+'RECOMMLIST'                                                  => 'Empfehlungsliste',
+'RECOMMLIST_SEARCH'                                           => 'Suche',
 /** @deprecated since v6.5.4 (2020-04-06); Suggest feature will be removed completely */
 'RECOMMENDED_PRODUCTS'                                        => 'Meine Artikelempfehlung',
 /** end deprecated */
@@ -714,6 +723,8 @@ $aLang = [
 'BASKET_TOTAL_PLUS_PROPORTIONAL_VAT'                          => 'plus MwSt. (anteilig berechnet)',
 'PROPORTIONALLY_CALCULATED'                                   => 'Anteilig berechnet',
 'PRICE_FROM'                                                  => 'ab',
+'PAGE_CHECKOUT_ORDER_COUPONNOTACCEPTED1'                      => 'Der Gutschein',
+'PAGE_CHECKOUT_ORDER_COUPONNOTACCEPTED2'                      => 'konnte nicht akzeptiert werden.',
 'PAGE_DETAILS_THANKYOUMESSAGE1'                               => 'Vielen Dank für Ihre Nachricht an',
 'PAGE_DETAILS_THANKYOUMESSAGE2'                               => '.',
 'PAGE_DETAILS_THANKYOUMESSAGE3'                               => 'Sie bekommen eine Nachricht von uns sobald der Preis unter',
@@ -746,6 +757,7 @@ $aLang = [
 'PAGE_TITLE_SUGGEST'                                          => 'Artikel weiterempfehlen',
 'PAGE_TITLE_INVITE'                                           => 'Freunde einladen',
 'PAGE_TITLE_REVIEW'                                           => 'Bewerten',
+'PAGE_TITLE_REVOCATION'                                       => 'Vertrag widerrufen',
 
 'WISHLIST_PRODUCTS'                                           => 'Diese Artikel hat sich %s gewünscht. Wenn Sie ihr/ihm eine Freude machen wollen, dann kaufen Sie einen oder mehrere von diesen Artikeln.',
 
@@ -765,6 +777,10 @@ $aLang = [
 'SERVICES'                                                    => 'Service',
 'FORM_FIELDSET_USER_SHIPPING_ADDITIONALINFO2_TOOLTIP'         => '', // this is specifically for DHL
 'FORM_FIELDSET_USER_BILLING_ADDITIONALINFO_TOOLTIP'           => '', // this is specifically for DHL
+'FORM_REGISTER_IAGREETOTERMS1'                                => 'Ich stimme den',
+'FORM_REGISTER_IAGREETOTERMS3'                                => 'zu und akzeptiere',
+'FORM_REGISTER_IAGREETORIGHTOFWITHDRAWAL1'                    => 'und bin über mein',
+'FORM_REGISTER_IAGREETORIGHTOFWITHDRAWAL3'                    => 'informiert worden.',
 'FORM_SUGGEST_MESSAGE1'                                       => 'Hallo, Heute habe ich den interessanten Shop',
 'FORM_SUGGEST_MESSAGE2'                                       => 'für dich gefunden. Einfach auf den Link unten klicken, und du gelangst direkt zum Shop.',
 'SHOP_SUGGEST_MESSAGE'                                        => 'Hallo, heute habe ich den interessanten Shop %s für Dich gefunden. Einfach auf den Link unten klicken und Du gelangst direkt zum Shop.',
@@ -791,4 +807,55 @@ $aLang = [
 'PARTNERS'                                                    => 'Partner',
 
 'MY_REVIEWS'                                                  => 'Meine Bewertungen',
+
+// §356a BGB electronic revocation feature (issue #99) — admin and email
+// texts plus storefront defaults. Theme-specific storefront texts can be
+// overridden in wave / o3-theme. All keys share the `O3_REVOCATION_` prefix.
+
+// Storefront — defaults (overridable by wave / o3-theme)
+'O3_REVOCATION_FOOTER_LINK'                                   => 'Vertrag widerrufen',
+'O3_REVOCATION_FORM_HEADING'                                  => 'Vertrag widerrufen',
+'O3_REVOCATION_FIELD_NAME_LABEL'                              => 'Vor- und Nachname',
+'O3_REVOCATION_FIELD_ORDERNUMBER_LABEL'                       => 'Bestellnummer',
+'O3_REVOCATION_FIELD_EMAIL_LABEL'                             => 'E-Mail-Adresse',
+'O3_REVOCATION_FIELD_FREETEXT_LABEL'                          => 'Anmerkungen (optional)',
+'O3_REVOCATION_CONFIRM_BUTTON'                                => 'Widerruf bestätigen',
+'O3_REVOCATION_CONFIRMATION_PAGE_HEADING'                     => 'Widerruf eingegangen',
+'O3_REVOCATION_VALIDATION_REQUIRED'                           => 'Bitte ausfüllen.',
+'O3_REVOCATION_VALIDATION_EMAIL_FORMAT'                       => 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
+'O3_REVOCATION_VALIDATION_SESSION_EXPIRED'                    => 'Ihre Sitzung ist abgelaufen. Bitte senden Sie das Formular erneut.',
+'O3_REVOCATION_VALIDATION_SPAM'                               => 'Ihre Anfrage konnte derzeit nicht entgegengenommen werden. Bitte versuchen Sie es später erneut.',
+
+// Email field labels — duplicated from admin lang (where the same labels live
+// for the admin detail view) so storefront-context email rendering can
+// resolve them. OXID's Language::translateString does not fall back across
+// domains.
+'O3_REVOCATION_ADMIN_FIELD_OXID'                              => 'Vorgangs-ID',
+'O3_REVOCATION_ADMIN_FIELD_SUBMITTED'                         => 'Eingegangen am',
+
+// Customer email (receipt of declaration per § 356a Abs. 4 BGB)
+'O3_REVOCATION_CUSTOMER_EMAIL_SUBJECT'                        => 'Wir haben Ihre Widerrufserklärung erhalten',
+'O3_REVOCATION_CUSTOMER_EMAIL_BODY_INTRO'                     => 'hiermit bestätigen wir den Eingang Ihrer Widerrufserklärung.',
+'O3_REVOCATION_CUSTOMER_EMAIL_BODY_RECEIPT_NOTE'              => 'Bitte beachten Sie, dass es sich hierbei ausschließlich um die Bestätigung des Eingangs Ihrer Widerrufserklärung handelt. Eine Prüfung der Wirksamkeit und des Umfangs Ihrer Widerrufserklärung erfolgt gesondert. Wir werden uns hierzu zeitnah bei Ihnen melden.',
+'O3_REVOCATION_CUSTOMER_EMAIL_BODY_FOOTER'                    => 'Mit freundlichen Grüßen',
+
+// Operator email (notification — operational, not legally required)
+'O3_REVOCATION_OPERATOR_EMAIL_SUBJECT'                        => 'Neuer Widerruf eingegangen',
+'O3_REVOCATION_OPERATOR_EMAIL_BODY'                           => 'Im Shop ist ein neuer Widerruf gemäß § 356a BGB eingegangen. Den Datensatz finden Sie im Admin-Bereich unter „Kundeninformationen → Widerrufe“.',
+
+// Core CAPTCHA provider feature (issue #213) — storefront texts
+'O3_CAPTCHA_FAILED'                                           => 'Die Sicherheitsüberprüfung ist fehlgeschlagen. Bitte versuchen Sie es erneut.',
+'O3_CAPTCHA_CONSENT_NOTICE'                                   => 'Bitte akzeptieren Sie die erforderlichen Cookies. Andernfalls können wir nicht prüfen, ob Sie ein Mensch sind, und das Formular kann nicht abgesendet werden.',
+
+// EU-Garantie-Labels (Issue #219, Reg. (EU) 2025/1960) - Storefront-Texte.
+// Die Texte IN den Labels selbst sind festes EU-Artwork, keine Übersetzungen.
+'O3_GUARANTEE_NOTICE_IMG_ALT'                                 => 'EU-einheitlicher Hinweis auf die gesetzliche Gewährleistung von mindestens zwei Jahren',
+'O3_GUARANTEE_LABEL_IMG_ALT'                                  => 'EU-Garantie-Label: Haltbarkeitsgarantie des Herstellers für dieses Produkt',
+'O3_GUARANTEE_LABEL_FALLBACK_DURATION'                        => 'Haltbarkeitsgarantie des Herstellers: %s Jahre',
+'O3_GUARANTEE_LABEL_FALLBACK_GUARANTOR'                       => 'Garantiegeber: %s',
+'O3_GUARANTEE_LABEL_FALLBACK_NOTE'                            => 'Das offizielle EU-Garantie-Label kann derzeit leider nicht angezeigt werden.',
+'O3_GUARANTEE_LEGAL_REMINDER'                                => 'Unabhängig davon gilt die gesetzliche Gewährleistung von mindestens zwei Jahren.',
+'O3_GUARANTEE_CONDITIONS_HEADING'                            => 'Garantiebedingungen',
+'O3_GUARANTEE_RIGHTS_LINK'                                   => 'Ihre gesetzlichen Gewährleistungsrechte',
+'O3_GUARANTEE_CLOSE'                                         => 'Schließen',
 ];

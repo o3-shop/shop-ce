@@ -20,15 +20,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
 use OxidEsales\Eshop\Application\Model\RightsRoles;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 
 /**
  * Collects System information.
  * Admin Menu: Service -> System Requirements.
  */
-class AdminRightsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class AdminRightsList extends AdminListController
 {
     /**
      * Current class template name.
@@ -55,7 +56,8 @@ class AdminRightsList extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      * Collects articles base data and passes them according to filtering rules,
      * returns name of template file "article_list.tpl".
      *
-     * @return string
+     * @return string|null
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -70,8 +72,8 @@ class AdminRightsList extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
         $tpl = parent::render();
 
         // load fields
-        if (!$oArticle && $oList) {
-            $oArticle = $oList->getBaseObject();
+        if ($oList) {
+            $oList->getBaseObject();
         }
 
         return $tpl;

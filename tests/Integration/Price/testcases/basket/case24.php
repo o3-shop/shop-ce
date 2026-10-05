@@ -1,4 +1,5 @@
 <?php
+
 /*
 /**
  * Price enter mode: netto
@@ -20,46 +21,46 @@
  * Short description:
  * Resting Vat in Mode Neto-Neto
  */
-$aData = array(
+$aData = [
     // Articles
-    'articles' => array(
-        0 => array(
+    'articles' => [
+        0 => [
             // oxarticles db fields
             'oxid'                     => 111,
             'oxprice'                  => 5.02,
             'oxvat'                    => 7,
             // Amount in basket
             'amount'                   => 1,
-        ),
-        1 => array(
+        ],
+        1 => [
          // oxarticles db fields
             'oxid'                     => 1112,
             'oxprice'                  => 99,00,
             'oxvat'                    => 19,
             // Amount in basket
             'amount'                   => 1,
-        ),
-        2 => array(
+        ],
+        2 => [
          // oxarticles db fields
             'oxid'                     => 1113,
             'oxprice'                  => 1001,
             'oxvat'                    => 19,
             // Amount in basket
             'amount'                   => 1,
-        ),
-        3 => array(
+        ],
+        3 => [
          // oxarticles db fields
             'oxid'                     => 1114,
             'oxprice'                  => 5.02,
             'oxvat'                    => 8,
             // Amount in basket
             'amount'                   => 1,
-        ),
-    ),
+        ],
+    ],
     // Discounts
-    'discounts' => array(
+    'discounts' => [
         // oxdiscount DB fields
-        0 => array(
+        0 => [
             // 10% discount for basket
             'oxid'         => 'discount10%',
             'oxaddsum'     => -10,
@@ -67,10 +68,10 @@ $aData = array(
             'oxamount' => 0,
             'oxamountto' => 99999,
             'oxactive' => 1,
-            'oxarticles' => array( 111 ),
+            'oxarticles' => [ 111 ],
             'oxsort' => 10,
-        ),
-        1 => array(
+        ],
+        1 => [
             // 10% discount for basket
             'oxid'         => 'discount5.5',
             'oxaddsum'     => 5.5,
@@ -78,41 +79,40 @@ $aData = array(
             'oxamount' => 0,
             'oxamountto' => 99999,
             'oxactive' => 1,
-            'oxarticles' => array( 1112, 1113 ),
+            'oxarticles' => [ 1112, 1113 ],
             'oxsort' => 20,
-        ),
-    ),
+        ],
+    ],
     // TEST EXPECTATIONS
-    'expected' => array(
+    'expected' => [
         // Article expected prices: ARTICLE ID => ( Unit price, Total Price )
-        'articles' => array(
-             111 => array( '5,52', '5,52' ),
-             1112 => array( '93,56', '93,56' ),
-             1113 => array( '945,95', '945,95' ),
-             1114 => array( '5,02', '5,02' ),
-
-        ),
+        'articles' => [
+             111 => [ '5,52', '5,52' ],
+             1112 => [ '93,56', '93,56' ],
+             1113 => [ '945,95', '945,95' ],
+             1114 => [ '5,02', '5,02' ],
+        ],
         // Expectations of other totals
-        'totals' => array(
+        'totals' => [
             // Total BRUTTO
             'totalBrutto' => '1.248,35',
             // Total NETTO
             'totalNetto'  => '1.050,05',
             // Total VAT amount: vat% => total cost
-            'vats' => array(
+            'vats' => [
                 7 => '0,39',
                 8 => '0,40',
                 19 => '197,51',
-            ),
+            ],
 
             // GRAND TOTAL
-            'grandTotal'  => '1.248,35'
-        ),
-    ),
+            'grandTotal'  => '1.248,35',
+        ],
+    ],
     // Test case options
-    'options' => array(
+    'options' => [
         // Configs (real named)
-        'config' => array(
+        'config' => [
             'blEnterNetPrice' => true,
             'blShowNetPrice' => true,
             'blShowVATForPayCharge' => true,
@@ -120,9 +120,8 @@ $aData = array(
             'blPaymentVatOnTop'=>true,
             'blDeliveryVatOnTop'=>true,
             'blPaymentVatOnTop'=>true,
-
-        ),
+        ],
         // Other options
         'activeCurrencyRate' => 1,
-    ),
-);
+    ],
+];

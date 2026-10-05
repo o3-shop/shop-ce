@@ -21,16 +21,20 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxDb;
-use oxField;
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class manages discount groups
  */
-class DiscountGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class DiscountGroupsAjax extends ListComponentAjax
 {
     /** If this discount id comes from request, it means that new discount should be created. */
-    const NEW_DISCOUNT_ID = "-1";
+    public const NEW_DISCOUNT_ID = '-1';
 
     /**
      * Columns array
@@ -44,41 +48,48 @@ class DiscountGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
             ['oxid', 'oxgroups', 0, 0, 0],
             ['oxid', 'oxgroups', 0, 0, 1],
         ],
-         'container2' => [
-             ['oxtitle', 'oxgroups', 1, 0, 0],
-             ['oxid', 'oxgroups', 0, 0, 0],
-             ['oxid', 'oxobject2discount', 0, 0, 1],
-         ]
+        'container2' => [
+            ['oxtitle', 'oxgroups', 1, 0, 0],
+            ['oxid', 'oxgroups', 0, 0, 0],
+            ['oxid', 'oxobject2discount', 0, 0, 1],
+        ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
+     * @throws DatabaseConnectionException
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oConfig = $this->getConfig();
+        $oRequest = Registry::getRequest();
         // active AJAX component
-        $sGroupTable = $this->_getViewName('oxgroups');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sId = $oConfig->getRequestParameter('oxid');
-        $sSynchId = $oConfig->getRequestParameter('synchoxid');
+        $sGroupTable = $this->getViewName('oxgroups');
+        $oDb = DatabaseProvider::getDb();
+        $sId = $oRequest->getRequestEscapedParameter('oxid');
+        $sSynchId = $oRequest->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sId) {
             $sQAdd = " from {$sGroupTable} where 1 ";
         } else {
             $sQAdd = " from oxobject2discount, {$sGroupTable} where {$sGroupTable}.oxid=oxobject2discount.oxobjectid ";
-            $sQAdd .= " and oxobject2discount.oxdiscountid = " . $oDb->quote($sId) .
+            $sQAdd .= ' and oxobject2discount.oxdiscountid = ' . $oDb->quote($sId) .
                       " and oxobject2discount.oxtype = 'oxgroups' ";
         }
 
         if ($sSynchId && $sSynchId != $sId) {
             $sQAdd .= " and {$sGroupTable}.oxid not in ( select {$sGroupTable}.oxid " .
                       "from oxobject2discount, {$sGroupTable} where {$sGroupTable}.oxid=oxobject2discount.oxobjectid " .
-                      " and oxobject2discount.oxdiscountid = " . $oDb->quote($sSynchId) .
+                      ' and oxobject2discount.oxdiscountid = ' . $oDb->quote($sSynchId) .
                       " and oxobject2discount.oxtype = 'oxgroups' ) ";
         }
 
@@ -86,20 +97,34 @@ class DiscountGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
     }
 
     /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
+     */
+    protected function getQuery()
+    {
+        return $this->_getQuery();
+    }
+
+    /**
      * Removes user group from discount config
      */
     public function removeDiscGroup()
     {
-        $config = $this->getConfig();
-
         $groupIds = $this->_getActionIds('oxobject2discount.oxid');
-        if ($config->getRequestParameter('all')) {
-            $query = $this->_addFilter("delete oxobject2discount.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($query);
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
+            $query = $this->_addFilter('delete oxobject2discount.* ' . $this->getQuery());
+            DatabaseProvider::getDb()->Execute($query);
         } elseif ($groupIds && is_array($groupIds)) {
-            $groupIdsQuoted = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($groupIds));
-            $query = "delete from oxobject2discount where oxobject2discount.oxid in (" . $groupIdsQuoted . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($query);
+            $groupIdsQuoted = implode(', ', DatabaseProvider::getDb()->quoteArray($groupIds));
+            $query = 'delete from oxobject2discount where oxobject2discount.oxid in (' . $groupIdsQuoted . ') ';
+            DatabaseProvider::getDb()->Execute($query);
         }
     }
 
@@ -108,21 +133,21 @@ class DiscountGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
      */
     public function addDiscGroup()
     {
-        $config = $this->getConfig();
+        $oRequest = Registry::getRequest();
         $groupIds = $this->_getActionIds('oxgroups.oxid');
-        $discountId = $config->getRequestParameter('synchoxid');
+        $discountId = $oRequest->getRequestEscapedParameter('synchoxid');
 
-        if ($config->getRequestParameter('all')) {
-            $groupTable = $this->_getViewName('oxgroups');
-            $groupIds = $this->_getAll($this->_addFilter("select $groupTable.oxid " . $this->_getQuery()));
+        if ($oRequest->getRequestEscapedParameter('all')) {
+            $groupTable = $this->getViewName('oxgroups');
+            $groupIds = $this->_getAll($this->_addFilter("select $groupTable.oxid " . $this->getQuery()));
         }
         if ($discountId && $discountId != self::NEW_DISCOUNT_ID && is_array($groupIds)) {
             foreach ($groupIds as $groupId) {
-                $object2Discount = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+                $object2Discount = oxNew(BaseModel::class);
                 $object2Discount->init('oxobject2discount');
-                $object2Discount->oxobject2discount__oxdiscountid = new \OxidEsales\Eshop\Core\Field($discountId);
-                $object2Discount->oxobject2discount__oxobjectid = new \OxidEsales\Eshop\Core\Field($groupId);
-                $object2Discount->oxobject2discount__oxtype = new \OxidEsales\Eshop\Core\Field("oxgroups");
+                $object2Discount->oxobject2discount__oxdiscountid = new Field($discountId);
+                $object2Discount->oxobject2discount__oxobjectid = new Field($groupId);
+                $object2Discount->oxobject2discount__oxtype = new Field('oxgroups');
                 $object2Discount->save();
             }
         }

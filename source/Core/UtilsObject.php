@@ -233,7 +233,7 @@ class UtilsObject
             $realClassName = $this->getClassName($className);
             //expect __autoload() (oxfunctions.php) to do its job when class_exists() is called
             if (!class_exists($realClassName)) {
-                $exception =  new \OxidEsales\Eshop\Core\Exception\SystemComponentException();
+                $exception = new \OxidEsales\Eshop\Core\Exception\SystemComponentException();
                 /** Use setMessage here instead of passing it in constructor in order to test exception message */
                 $exception->setMessage('EXCEPTION_SYSTEMCOMPONENT_CLASSNOTFOUND' . ' ' . $realClassName);
                 throw $exception;

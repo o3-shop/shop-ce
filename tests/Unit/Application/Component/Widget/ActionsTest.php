@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Component\Widget;
 
 use OxidEsales\EshopCommunity\Application\Model\ArticleList;
@@ -26,7 +28,6 @@ use OxidEsales\EshopCommunity\Application\Model\ArticleList;
  */
 class ActionsTest extends \OxidTestCase
 {
-
     /**
      * Fixture tearDown
      */
@@ -61,7 +62,7 @@ class ActionsTest extends \OxidTestCase
         $this->getConfig()->setConfigParam('bl_perfLoadAktion', 1);
 
         $action = oxNew('oxwActions');
-        $action->setViewParameters(array('action' => 'oxtop5'));
+        $action->setViewParameters(['action' => 'oxtop5']);
         $aList = $action->getAction();
         $this->assertTrue($aList instanceof ArticleList);
         $this->assertSame($topProductCount, $aList->count());
@@ -74,7 +75,7 @@ class ActionsTest extends \OxidTestCase
     public function testGetActionName()
     {
         $action = oxNew('oxwActions');
-        $action->setViewParameters(array('action' => 'oxbargain'));
+        $action->setViewParameters(['action' => 'oxbargain']);
         $this->assertSame('Angebot der Woche', $action->getActionName());
     }
 
@@ -84,7 +85,7 @@ class ActionsTest extends \OxidTestCase
     public function testGetListType()
     {
         $action = oxNew('oxwActions');
-        $action->setViewParameters(array('listtype' => 'grid'));
+        $action->setViewParameters(['listtype' => 'grid']);
         $this->assertSame('grid', $action->getListType());
     }
 }

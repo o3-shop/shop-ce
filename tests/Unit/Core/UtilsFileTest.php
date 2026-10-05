@@ -31,8 +31,8 @@ class UtilsFileTest extends \OxidTestCase
     {
         parent::setUp();
         $this->aFiles = $_FILES;
-        $aTmpDirectories[] = $this->getDirectoryPathToCreateFiles() . DIRECTORY_SEPARATOR . "targetDir";
-        $aTmpDirectories[] = $this->getDirectoryPathToCreateFiles() . DIRECTORY_SEPARATOR . "sourceDir";
+        $aTmpDirectories[] = $this->getDirectoryPathToCreateFiles() . DIRECTORY_SEPARATOR . 'targetDir';
+        $aTmpDirectories[] = $this->getDirectoryPathToCreateFiles() . DIRECTORY_SEPARATOR . 'sourceDir';
 
         foreach ($aTmpDirectories as $sDirectory) {
             if (is_dir(realpath($sDirectory))) {
@@ -43,32 +43,32 @@ class UtilsFileTest extends \OxidTestCase
 
     public function testGetUniqueFileName()
     {
-        $sFilePath = $this->getConfig()->getPictureDir(false) . "/master/product/1/";
+        $sFilePath = $this->getConfig()->getPictureDir(false) . '/master/product/1/';
 
         $oUtilsFile = oxNew('oxUtilsFile');
-        $this->assertEquals("2010_speed3_120_1.jpg", $oUtilsFile->UNITgetUniqueFileName($sFilePath, "2010_speed3_120_1", "jpg"));
+        $this->assertEquals('2010_speed3_120_1.jpg', $oUtilsFile->UNITgetUniqueFileName($sFilePath, '2010_speed3_120_1', 'jpg'));
     }
 
     public function testGetImageSize()
     {
         $oUtilsFile = oxNew('oxUtilsFile');
 
-        $aDetailImageSizes = array("oxpic1" => "251*201", "oxpic2" => "252*202", "oxpic3" => "253*203");
-        $this->getConfig()->setConfigParam("aDetailImageSizes", $aDetailImageSizes);
-        $this->getConfig()->setConfigParam("sZoomImageSize", '450*450');
-        $this->getConfig()->setConfigParam("sThumbnailsize", '100*100');
+        $aDetailImageSizes = ['oxpic1' => '251*201', 'oxpic2' => '252*202', 'oxpic3' => '253*203'];
+        $this->getConfig()->setConfigParam('aDetailImageSizes', $aDetailImageSizes);
+        $this->getConfig()->setConfigParam('sZoomImageSize', '450*450');
+        $this->getConfig()->setConfigParam('sThumbnailsize', '100*100');
 
         // details img size
-        $this->assertEquals(array(251, 201), $oUtilsFile->UNITgetImageSize(null, 1, 'aDetailImageSizes'));
+        $this->assertEquals([251, 201], $oUtilsFile->UNITgetImageSize(null, 1, 'aDetailImageSizes'));
 
         // details img size
-        $this->assertEquals(array(253, 203), $oUtilsFile->UNITgetImageSize(null, 3, 'aDetailImageSizes'));
+        $this->assertEquals([253, 203], $oUtilsFile->UNITgetImageSize(null, 3, 'aDetailImageSizes'));
 
         // zoom img size
-        $this->assertEquals(array(450, 450), $oUtilsFile->UNITgetImageSize(null, 2, 'sZoomImageSize'));
+        $this->assertEquals([450, 450], $oUtilsFile->UNITgetImageSize(null, 2, 'sZoomImageSize'));
 
         // thumbnail img size
-        $this->assertEquals(array(100, 100), $oUtilsFile->UNITgetImageSize(null, null, 'sThumbnailsize'));
+        $this->assertEquals([100, 100], $oUtilsFile->UNITgetImageSize(null, null, 'sThumbnailsize'));
 
         // non existing img type size
         $this->assertNull($oUtilsFile->UNITgetImageSize('nonexisting', '666', 'nonexisting'));
@@ -79,13 +79,13 @@ class UtilsFileTest extends \OxidTestCase
         $sName1 = time();
         $sName2 = __FILE__;
 
-        $oUtilsFile = $this->getMock(\OxidEsales\Eshop\Core\UtilsFile::class, array('urlValidate'));
+        $oUtilsFile = $this->getMock(\OxidEsales\Eshop\Core\UtilsFile::class, ['urlValidate']);
         $oUtilsFile->expects($this->once())->method('urlValidate')->will($this->returnValue(true));
         $this->assertTrue($oUtilsFile->checkFile($sName1));
         $this->assertTrue($oUtilsFile->checkFile($sName1));
         $this->assertTrue($oUtilsFile->checkFile($sName2));
 
-        $aCache = oxRegistry::getSession()->getVariable("checkcache");
+        $aCache = oxRegistry::getSession()->getVariable('checkcache');
         $this->assertTrue($aCache[$sName1]);
         $this->assertTrue($aCache[$sName1]);
         $this->assertTrue($aCache[$sName2]);
@@ -94,16 +94,16 @@ class UtilsFileTest extends \OxidTestCase
     public function testProcessFilesCallState()
     {
         $oObject = oxNew('oxbase');
-        $oObject->testfield = $this->getMock(\OxidEsales\Eshop\Core\Field::class, array('setValue'));
+        $oObject->testfield = $this->getMock(\OxidEsales\Eshop\Core\Field::class, ['setValue']);
         $oObject->testfield->expects($this->once())->method('setValue')->with($this->equalTo('testfilename'));
 
-        $sProcessPath = $this->getConfig()->getConfigParam("sCompileDir");
+        $sProcessPath = $this->getConfig()->getConfigParam('sCompileDir');
 
-        $aFiles = array();
+        $aFiles = [];
         $aFiles['myfile']['name']['gif@testfield'] = 'testfilename.gif';
         $aFiles['myfile']['tmp_name']['gif@testfield'] = 'testimagesource/testfilename';
 
-        $oUtilsFile = $this->getMock(\OxidEsales\Eshop\Core\UtilsFile::class, array('_prepareImageName', '_getImagePath', '_moveImage'));
+        $oUtilsFile = $this->getMock(\OxidEsales\Eshop\Core\UtilsFile::class, ['_prepareImageName', '_getImagePath', '_moveImage']);
         $oUtilsFile->expects($this->once())->method('_prepareImageName')->with($this->equalTo('testfilename.gif'), $this->equalTo('gif'), $this->equalTo($this->getConfig()->isDemoShop()))->will($this->returnValue('testfilename'));
         $oUtilsFile->expects($this->once())->method('_getImagePath')->with($this->equalTo('gif'))->will($this->returnValue('testimagepath/'));
         $oUtilsFile->expects($this->once())->method('_moveImage')->with($this->equalTo('testimagesource/testfilename'), $this->equalTo('testimagepath/testfilename'))->will($this->returnValue(true));
@@ -115,16 +115,16 @@ class UtilsFileTest extends \OxidTestCase
     {
         oxTestModules::addFunction('oxUtilspic', 'resizeImage', '{return true;}');
 
-        $_FILES['myfile']['name'] = array('P1@oxarticles__oxpic1' => 'testname.gif');
-        $_FILES['myfile']['tmp_name'] = array('P1@oxarticles__oxpic1' => 'testimagesource');
-        $_FILES['myfile']['error'] = array('P1@oxarticles__oxpic1' => 0);
+        $_FILES['myfile']['name'] = ['P1@oxarticles__oxpic1' => 'testname.gif'];
+        $_FILES['myfile']['tmp_name'] = ['P1@oxarticles__oxpic1' => 'testimagesource'];
+        $_FILES['myfile']['error'] = ['P1@oxarticles__oxpic1' => 0];
 
         /** @var oxConfig|PHPUnit\Framework\MockObject\MockObject $oConfig */
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getPictureDir'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getPictureDir']);
         $oConfig->expects($this->once())->method('getPictureDir')->will($this->returnValue('pictures_dir'));
 
         /** @var oxUtilsFile|PHPUnit\Framework\MockObject\MockObject $oUtilsFile */
-        $oUtilsFile = $this->getMock(\OxidEsales\Eshop\Core\UtilsFile::class, array("_moveImage"));
+        $oUtilsFile = $this->getMock(\OxidEsales\Eshop\Core\UtilsFile::class, ['_moveImage']);
         $oUtilsFile->expects($this->once())->method('_moveImage')->will($this->returnValue(true));
 
         $oUtilsFile->setConfig($oConfig);
@@ -133,16 +133,16 @@ class UtilsFileTest extends \OxidTestCase
 
     public function testProcessNonImageFiles()
     {
-        $_FILES['myfile']['name'] = array('FL@oxarticles__oxfile' => 'testname.pdf');
-        $_FILES['myfile']['tmp_name'] = array('FL@oxarticles__oxfile' => 'testpdfsource');
-        $_FILES['myfile']['error'] = array('P1@oxarticles__oxpic1' => 0);
+        $_FILES['myfile']['name'] = ['FL@oxarticles__oxfile' => 'testname.pdf'];
+        $_FILES['myfile']['tmp_name'] = ['FL@oxarticles__oxfile' => 'testpdfsource'];
+        $_FILES['myfile']['error'] = ['P1@oxarticles__oxpic1' => 0];
 
         /** @var oxConfig|PHPUnit\Framework\MockObject\MockObject $oConfig */
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getPictureDir'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getPictureDir']);
         $oConfig->expects($this->once())->method('getPictureDir')->will($this->returnValue('pictures_dir'));
 
         /** @var oxUtilsFile|PHPUnit\Framework\MockObject\MockObject $oUtilsFile */
-        $oUtilsFile = $this->getMock(\OxidEsales\Eshop\Core\UtilsFile::class, array("_moveImage", "_copyFile"));
+        $oUtilsFile = $this->getMock(\OxidEsales\Eshop\Core\UtilsFile::class, ['_moveImage', '_copyFile']);
         $oUtilsFile->expects($this->once())->method('_moveImage')->will($this->returnValue(true));
         $oUtilsFile->expects($this->never())->method('_copyFile')->will($this->returnValue(false));
 
@@ -155,11 +155,11 @@ class UtilsFileTest extends \OxidTestCase
         $this->expectException('oxFileException');
         $this->expectExceptionMessage('this is ok');
 
-        $_FILES['myfile']['name'] = array('testname.php5');
+        $_FILES['myfile']['name'] = ['testname.php5'];
         $_FILES['myfile']['tmp_name'] = 'testname';
 
         /** @var oxConfig|PHPUnit\Framework\MockObject\MockObject $oConfig */
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('isDemoShop'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isDemoShop']);
         $oConfig->expects($this->once())->method('isDemoShop')->will($this->returnValue(false));
 
         /** @var oxUtilsFile|PHPUnit\Framework\MockObject\MockObject $oUtilsFile */
@@ -171,11 +171,11 @@ class UtilsFileTest extends \OxidTestCase
 
     public function testProcessFilesAllowsOnlySomeFilesOnDemo()
     {
-        $_FILES['myfile']['name'] = array('testname.unknown');
+        $_FILES['myfile']['name'] = ['testname.unknown'];
         $_FILES['myfile']['tmp_name'] = 'testname';
         //$oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('hasModule'));
         //$oConfig->expects( $this->once() )->method('hasModule')->with( $this->equalTo( 'demoshop' ) )->will( $this->returnValue( true ) );
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('isDemoShop'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isDemoShop']);
         $oConfig->expects($this->once())->method('isDemoShop')->will($this->returnValue(true));
         $oUF = \OxidEsales\Eshop\Core\Registry::getUtilsFile();
         $oUF->setConfig($oConfig);
@@ -191,19 +191,19 @@ class UtilsFileTest extends \OxidTestCase
     public function testCopyDir()
     {
         $sTempDir = $this->getDirectoryPathToCreateFiles();
-        $sTargetDir = $sTempDir . DIRECTORY_SEPARATOR . "targetDir";
-        $sSourceDir = $sTempDir . DIRECTORY_SEPARATOR . "sourceDir";
+        $sTargetDir = $sTempDir . DIRECTORY_SEPARATOR . 'targetDir';
+        $sSourceDir = $sTempDir . DIRECTORY_SEPARATOR . 'sourceDir';
 
-        $sSourceDeeperDir = $sSourceDir . DIRECTORY_SEPARATOR . "deeper";
-        $sTargetDeeperDir = $sTargetDir . DIRECTORY_SEPARATOR . "deeper";
-        $sSourceFilePathText = $sSourceDir . DIRECTORY_SEPARATOR . "test.txt";
-        $sTargetFilePathText = $sTargetDir . DIRECTORY_SEPARATOR . "test.txt";
-        $sSourceFilePathnopic = $sSourceDir . DIRECTORY_SEPARATOR . "nopic.jpg";
-        $sTargetFilePathnopic = $sTargetDir . DIRECTORY_SEPARATOR . "nopic.jpg";
-        $sSourceFilePathnopicIco = $sSourceDir . DIRECTORY_SEPARATOR . "nopic_ico.jpg";
-        $sTargetFilePathnopicIco = $sTargetDir . DIRECTORY_SEPARATOR . "nopic_ico.jpg";
-        $sSourceFilePathCVS = $sSourceDir . DIRECTORY_SEPARATOR . "deeper" . DIRECTORY_SEPARATOR . "CVS";
-        $sTargetFilePathCVS = $sTargetDir . DIRECTORY_SEPARATOR . "deeper" . DIRECTORY_SEPARATOR . "CVS";
+        $sSourceDeeperDir = $sSourceDir . DIRECTORY_SEPARATOR . 'deeper';
+        $sTargetDeeperDir = $sTargetDir . DIRECTORY_SEPARATOR . 'deeper';
+        $sSourceFilePathText = $sSourceDir . DIRECTORY_SEPARATOR . 'test.txt';
+        $sTargetFilePathText = $sTargetDir . DIRECTORY_SEPARATOR . 'test.txt';
+        $sSourceFilePathnopic = $sSourceDir . DIRECTORY_SEPARATOR . 'nopic.jpg';
+        $sTargetFilePathnopic = $sTargetDir . DIRECTORY_SEPARATOR . 'nopic.jpg';
+        $sSourceFilePathnopicIco = $sSourceDir . DIRECTORY_SEPARATOR . 'nopic_ico.jpg';
+        $sTargetFilePathnopicIco = $sTargetDir . DIRECTORY_SEPARATOR . 'nopic_ico.jpg';
+        $sSourceFilePathCVS = $sSourceDir . DIRECTORY_SEPARATOR . 'deeper' . DIRECTORY_SEPARATOR . 'CVS';
+        $sTargetFilePathCVS = $sTargetDir . DIRECTORY_SEPARATOR . 'deeper' . DIRECTORY_SEPARATOR . 'CVS';
 
         //test with textfile
         if ($this->_prepareCopyDir($sSourceDir, $sTargetDir, $sSourceFilePathText)) {
@@ -237,7 +237,6 @@ class UtilsFileTest extends \OxidTestCase
         }
     }
 
-
     public function testDeleteDir()
     {
         //set-up a directory and a subdirectory
@@ -258,12 +257,11 @@ class UtilsFileTest extends \OxidTestCase
         $this->_cleanupDeleteDir($hFileHandle, $sDir, $sFileName, $sSubDir);
     }
 
-
     public function testReadRemoteFileAsString()
     {
         $oUtilsFile = oxNew('oxUtilsFile');
-        $this->assertEquals("", $oUtilsFile->readRemoteFileAsString(getShopBasePath() . time()));
-        $this->assertEquals("<?php", substr($oUtilsFile->readRemoteFileAsString(getShopBasePath() . "index.php"), 0, 5));
+        $this->assertEquals('', $oUtilsFile->readRemoteFileAsString(getShopBasePath() . time()));
+        $this->assertEquals('<?php', substr($oUtilsFile->readRemoteFileAsString(getShopBasePath() . 'index.php'), 0, 5));
     }
 
     public function testProcessFileEmpty()
@@ -311,16 +309,15 @@ class UtilsFileTest extends \OxidTestCase
 
     public function testNormalizeDir()
     {
-        $sFullDir = "/test/good/dir/";
+        $sFullDir = '/test/good/dir/';
         $this->assertEquals($sFullDir, \OxidEsales\Eshop\Core\Registry::getUtilsFile()->normalizeDir($sFullDir));
 
-        $sHalfDir = "/test/good/dir";
+        $sHalfDir = '/test/good/dir';
         $this->assertEquals($sFullDir, \OxidEsales\Eshop\Core\Registry::getUtilsFile()->normalizeDir($sHalfDir));
 
         $this->assertEquals('', \OxidEsales\Eshop\Core\Registry::getUtilsFile()->normalizeDir(''));
         $this->assertEquals(null, \OxidEsales\Eshop\Core\Registry::getUtilsFile()->normalizeDir(null));
     }
-
 
     public function testTranslateError()
     {
@@ -375,21 +372,21 @@ class UtilsFileTest extends \OxidTestCase
     {
         oxTestModules::addFunction('oxUtilspic', 'resizeImage', '{return true;}');
 
-        $_FILES['myfile']['name'] = array('P1@oxarticles__oxpic1' => 'testname.gif', 'P1@oxarticles__oxpic2' => 'testname2.gif');
-        $_FILES['myfile']['tmp_name'] = array('P1@oxarticles__oxpic1' => 'testimagesource', 'P1@oxarticles__oxpic2' => 'testimagesource2');
+        $_FILES['myfile']['name'] = ['P1@oxarticles__oxpic1' => 'testname.gif', 'P1@oxarticles__oxpic2' => 'testname2.gif'];
+        $_FILES['myfile']['tmp_name'] = ['P1@oxarticles__oxpic1' => 'testimagesource', 'P1@oxarticles__oxpic2' => 'testimagesource2'];
 
         /** @var oxConfig|PHPUnit\Framework\MockObject\MockObject $oConfig */
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getPictureDir'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getPictureDir']);
         $oConfig->expects($this->any())->method('getPictureDir')->will($this->returnValue('pictures_dir'));
 
         /** @var oxUtilsFile|PHPUnit\Framework\MockObject\MockObject $oUtilsFile */
-        $oUtilsFile = $this->getMock(\OxidEsales\Eshop\Core\UtilsFile::class, array("_moveImage"));
+        $oUtilsFile = $this->getMock(\OxidEsales\Eshop\Core\UtilsFile::class, ['_moveImage']);
         $oUtilsFile->expects($this->any())->method('_moveImage')->will($this->returnValue(true));
 
         $oUtilsFile->setConfig($oConfig);
         $oUtilsFile->processFiles(oxNew('oxArticle'));
 
-        $this->assertEquals($oUtilsFile->getNewFilesCounter(), 2, "Check how much new files add.");
+        $this->assertEquals($oUtilsFile->getNewFilesCounter(), 2, 'Check how much new files add.');
     }
 
     // 20070720-AS - End setup
@@ -415,7 +412,6 @@ class UtilsFileTest extends \OxidTestCase
      */
     protected function _prepareCopyDir($sSourceDir, $sTargetDir, $sSourceFilePath)
     {
-
         // try to create source dir
         if (!is_dir($sSourceDir)) {
             if (mkdir($sSourceDir)) {

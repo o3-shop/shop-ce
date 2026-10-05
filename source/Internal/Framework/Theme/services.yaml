@@ -11,3 +11,21 @@ services:
     arguments:
       - '%oxid_esales.theme.admin.name%'
     public: true
+
+  OxidEsales\EshopCommunity\Internal\Framework\Theme\Bridge\ThemeBridgeInterface:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Theme\Bridge\ThemeBridge
+
+  oxid_esales.command.theme_activate_command:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Theme\Command\ThemeActivateCommand
+    tags:
+      - { name: 'console.command', command: 'oe:theme:activate' }
+
+  oxid_esales.command.theme_deactivate_command:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Theme\Command\ThemeDeactivateCommand
+    tags:
+      - { name: 'console.command', command: 'oe:theme:deactivate' }
+
+  oxid_esales.command.theme_list_command:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Theme\Command\ThemeListCommand
+    tags:
+      - { name: 'console.command', command: 'oe:theme:list' }

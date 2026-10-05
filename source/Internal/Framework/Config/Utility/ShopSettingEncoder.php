@@ -26,8 +26,8 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Config\Utility;
 use OxidEsales\EshopCommunity\Internal\Framework\Config\DataObject\ShopSettingType;
 use OxidEsales\EshopCommunity\Internal\Framework\Config\Exception\InvalidShopSettingValueException;
 
-use function unserialize;
 use function serialize;
+use function unserialize;
 
 class ShopSettingEncoder implements ShopSettingEncoderInterface
 {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,16 +18,16 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for DeliverySet_Users class
  */
 class DeliverySetUsersTest extends \OxidTestCase
 {
-
     /**
      * DeliverySet_Users::Render() test case
      *
@@ -34,8 +35,8 @@ class DeliverySetUsersTest extends \OxidTestCase
      */
     public function testRender()
     {
-        oxTestModules::addFunction("oxdeliveryset", "isDerived", "{return true;}");
-        $this->setRequestParameter("oxid", "testId");
+        oxTestModules::addFunction('oxdeliveryset', 'isDerived', '{return true;}');
+        $this->setRequestParameter('oxid', 'testId');
 
         // testing..
         $oView = oxNew('DeliverySet_Users');

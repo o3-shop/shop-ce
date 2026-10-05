@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -24,7 +26,7 @@ use Symfony\Component\EventDispatcher\Event;
 
 class TestEvent extends Event
 {
-    const NAME = 'TESTEVENT';
+    public const NAME = 'TESTEVENT';
 
     private $handled = false;
 

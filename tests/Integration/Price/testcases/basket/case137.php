@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: brutto;
  * Price view mode: brutto;
@@ -20,17 +21,17 @@
  * Short description:
  * Brutto-Brutto mode.
  @bug #3587: general discount for basket */
-$aData = array(
-     'articles' => array(
-         0 => array(
+$aData = [
+     'articles' => [
+         0 => [
              'oxid'                     => '3587',
              'oxtitle'                  => 'newspaper',
              'oxprice'                  => 2.98,
              'amount'                   => 200,
-         ),
-     ),
-    'discounts' => array(
-        0 => array(
+         ],
+     ],
+    'discounts' => [
+        0 => [
             'oxid'         => 'discount2forBasket',
             'oxaddsum'     => 2,
             'oxaddsumtype' => '%',
@@ -38,28 +39,28 @@ $aData = array(
             'oxamountto' => 99999,
             'oxactive' => 1,
             'oxsort' => 10,
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-                '3587' => array( '2,98', '596,00' ),
-        ),
-        'totals' => array(
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+                '3587' => [ '2,98', '596,00' ],
+        ],
+        'totals' => [
             'totalBrutto' => '596,00',
-            'discounts' => array(
-                    'discount2forBasket' => '11,92'
-            ),
+            'discounts' => [
+                    'discount2forBasket' => '11,92',
+            ],
             'totalNetto'  => '490,82',
-            'vats' => array(
-                    '19' => '93,26'
-            ),
-            'grandTotal'  => '584,08'
-        ),
-    ),
-    'options' => array(
-            'config' => array(
+            'vats' => [
+                    '19' => '93,26',
+            ],
+            'grandTotal'  => '584,08',
+        ],
+    ],
+    'options' => [
+            'config' => [
                 'blEnterNetPrice' => false,
                 'blShowNetPrice' => false,
-            ),
-    )
-);
+            ],
+    ],
+];

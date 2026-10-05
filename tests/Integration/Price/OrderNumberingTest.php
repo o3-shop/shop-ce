@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,14 +18,13 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Price;
 
 use oxDb;
 use OxidEsales\Eshop\Application\Model\Order;
-use oxOrder;
-use PHPUnit\Framework\MockObject\MockObject;
 
-require_once __DIR__. '/BasketConstruct.php';
+require_once __DIR__ . '/BasketConstruct.php';
 
 /**
  * Class Integration_Price_OrderNumberingTest
@@ -32,12 +32,12 @@ require_once __DIR__. '/BasketConstruct.php';
 class OrderNumberingTest extends BaseTestCase
 {
     /** @var string Test case directory */
-    private $testCasesDirectory = "testcases/numbering";
+    private $testCasesDirectory = 'testcases/numbering';
 
     /** @var array Specified test cases (optional) */
-    private $testCases = array(
+    private $testCases = [
         // "test_case.php",
-    );
+    ];
 
     /**
      * Remove admin user as test fail with sql error: duplicate users.
@@ -83,7 +83,7 @@ class OrderNumberingTest extends BaseTestCase
     public function testOrderNumberingForDifferentShops($testCase)
     {
         if ($testCase['skipped'] == 1) {
-            $this->markTestSkipped("testcase is skipped");
+            $this->markTestSkipped('testcase is skipped');
         }
 
         $options = $testCase['options'];
@@ -129,7 +129,7 @@ class OrderNumberingTest extends BaseTestCase
     public function testOrderNumberingForDifferentShops2($testCase)
     {
         if ($testCase['skipped'] == 1) {
-            $this->markTestSkipped("testcase is skipped");
+            $this->markTestSkipped('testcase is skipped');
         }
 
         $options = $testCase['options'];
@@ -184,7 +184,7 @@ class OrderNumberingTest extends BaseTestCase
     public function testOrderNumberingForDifferentShops3($testCase)
     {
         if ($testCase['skipped'] == 1) {
-            $this->markTestSkipped("testcase is skipped");
+            $this->markTestSkipped('testcase is skipped');
         }
 
         $options = $testCase['options'];
@@ -225,12 +225,12 @@ class OrderNumberingTest extends BaseTestCase
 
     private function getOrderMock()
     {
-        $order = $this->getMock(Order::class, array(
+        $order = $this->getMock(Order::class, [
             '_sendOrderByEmail',
             'validateDeliveryAddress',
             'validateDelivery',
-            'validatePayment'
-        ));
+            'validatePayment',
+        ]);
 
         $order
             ->expects($this->any())

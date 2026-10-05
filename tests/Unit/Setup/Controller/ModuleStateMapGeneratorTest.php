@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -21,7 +22,7 @@
 namespace OxidEsales\EshopCommunity\Tests\Unit\Setup\Controller;
 
 use OxidEsales\EshopCommunity\Setup\Controller\ModuleStateMapGenerator;
-use \PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class ModuleStateMapGeneratorTest extends TestCase
 {
@@ -78,24 +79,24 @@ class ModuleStateMapGeneratorTest extends TestCase
                 [
                     'module' => 'module_a',
                     'state' => 0,
-                    'class' => 'class_a'
+                    'class' => 'class_a',
                 ],
                 [
                     'module' => 'module_b',
                     'state' => 1,
-                    'class' => 'class_b'
+                    'class' => 'class_b',
                 ],
             ],
             'group_b' => [
                 [
                     'module' => 'module_c',
                     'state' => 1,
-                    'class' => 'class_b'
+                    'class' => 'class_b',
                 ],
                 [
                     'module' => 'module_d',
                     'state' => 2,
-                    'class' => 'class_c'
+                    'class' => 'class_c',
                 ],
             ],
         ];
@@ -114,24 +115,24 @@ class ModuleStateMapGeneratorTest extends TestCase
                 [
                     'module' => 'module_a',
                     'state' => 0,
-                    'modulename' => 'translated_a'
+                    'modulename' => 'translated_a',
                 ],
                 [
                     'module' => 'module_b',
                     'state' => 1,
-                    'modulename' => 'translated_b'
+                    'modulename' => 'translated_b',
                 ],
             ],
             'group_b' => [
                 [
                     'module' => 'module_c',
                     'state' => 1,
-                    'modulename' => 'translated_c'
+                    'modulename' => 'translated_c',
                 ],
                 [
                     'module' => 'module_d',
                     'state' => 2,
-                    'modulename' => 'translated_d'
+                    'modulename' => 'translated_d',
                 ],
             ],
         ];
@@ -190,7 +191,6 @@ class ModuleStateMapGeneratorTest extends TestCase
                     'state' => 1,
                     'class' => 'class_b',
                     'modulename' => 'translated_b',
-
                 ],
             ],
             'translated_b' => [
@@ -280,7 +280,7 @@ class ModuleStateMapGeneratorTest extends TestCase
             'group_b' => [
                 'module_c' => 1,
                 'module_d' => 2,
-            ]
+            ],
         ];
     }
 

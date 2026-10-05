@@ -21,13 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
+use OxidEsales\Eshop\Application\Model\Vendor;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\SeoEncoder;
 
 /**
  * Seo encoder base
  *
  */
-class SeoEncoderVendor extends \OxidEsales\Eshop\Core\SeoEncoder
+class SeoEncoderVendor extends SeoEncoder
 {
     /**
      * Root vendor uri cache
@@ -40,7 +44,13 @@ class SeoEncoderVendor extends \OxidEsales\Eshop\Core\SeoEncoder
      * Returns target "extension" (/)
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getUrlExtension" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getUrlExtension()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getUrlExtension() to the canonical override
+      *             target and retires _getUrlExtension(); until then, _getUrlExtension() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getUrlExtension() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -48,9 +58,24 @@ class SeoEncoderVendor extends \OxidEsales\Eshop\Core\SeoEncoder
     }
 
     /**
+     * Returns target "extension" (/)
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getUrlExtension(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getUrlExtension() the canonical override target.
+     */
+    protected function getUrlExtension()
+    {
+        return $this->_getUrlExtension();
+    }
+
+    /**
      * Returns part of SEO url excluding path
      *
-     * @param \OxidEsales\Eshop\Application\Model\Vendor $vendor           Vendor object
+     * @param Vendor $vendor           Vendor object
      * @param int                                        $languageId       Language id
      * @param bool                                       $shouldRegenerate If TRUE - forces seo url regeneration
      *
@@ -65,14 +90,14 @@ class SeoEncoderVendor extends \OxidEsales\Eshop\Core\SeoEncoder
         if ($shouldRegenerate || !($seoUrl = $this->_loadFromDb('oxvendor', $vendor->getId(), $languageId))) {
             if ($languageId != $vendor->getLanguage()) {
                 $vendorId = $vendor->getId();
-                $vendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
+                $vendor = oxNew(Vendor::class);
                 $vendor->loadInLang($languageId, $vendorId);
             }
 
             $seoUrl = '';
             if ($vendor->getId() != 'root') {
                 if (!isset($this->_aRootVendorUri[$languageId])) {
-                    $rootVendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
+                    $rootVendor = oxNew(Vendor::class);
                     $rootVendor->loadInLang($languageId, 'root');
                     $this->_aRootVendorUri[$languageId] = $this->getVendorUri($rootVendor, $languageId);
                 }
@@ -92,7 +117,7 @@ class SeoEncoderVendor extends \OxidEsales\Eshop\Core\SeoEncoder
     /**
      * Returns vendor SEO url for specified page
      *
-     * @param \OxidEsales\Eshop\Application\Model\Vendor $vendor     Vendor object.
+     * @param Vendor $vendor     Vendor object.
      * @param int                                        $pageNumber Number of the page which should be prepared.
      * @param int                                        $languageId Language id.
      * @param bool                                       $isFixed    Fixed url marker (default is null).
@@ -120,7 +145,7 @@ class SeoEncoderVendor extends \OxidEsales\Eshop\Core\SeoEncoder
     /**
      * Encodes vendor category URLs into SEO format.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Vendor $vendor     Vendor object
+     * @param Vendor $vendor     Vendor object
      * @param int                                        $languageId Language id
      *
      * @return null
@@ -137,20 +162,22 @@ class SeoEncoderVendor extends \OxidEsales\Eshop\Core\SeoEncoder
     /**
      * Deletes Vendor seo entry
      *
-     * @param \OxidEsales\Eshop\Application\Model\Vendor $vendor Vendor object
+     * @param Vendor $vendor Vendor object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function onDeleteVendor($vendor)
     {
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $database = DatabaseProvider::getDb();
         $vendorId = $vendor->getId();
         $database->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxvendor'", [
-            ':oxobjectid' => $vendorId
+            ':oxobjectid' => $vendorId,
         ]);
-        $database->execute("delete from oxobject2seodata where oxobjectid = :oxobjectid", [
-            ':oxobjectid' => $vendorId
+        $database->execute('delete from oxobject2seodata where oxobjectid = :oxobjectid', [
+            ':oxobjectid' => $vendorId,
         ]);
-        $database->execute("delete from oxseohistory where oxobjectid = :oxobjectid", [
-            ':oxobjectid' => $vendorId
+        $database->execute('delete from oxseohistory where oxobjectid = :oxobjectid', [
+            ':oxobjectid' => $vendorId,
         ]);
     }
 
@@ -161,16 +188,40 @@ class SeoEncoderVendor extends \OxidEsales\Eshop\Core\SeoEncoder
      * @param int    $languageId Language id
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getAltUri" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getAltUri()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getAltUri() to the canonical override
+      *             target and retires _getAltUri(); until then, _getAltUri() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getAltUri($vendorId, $languageId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $seoUrl = null;
-        $vendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
+        $vendor = oxNew(Vendor::class);
         if ($vendor->loadInLang($languageId, $vendorId)) {
             $seoUrl = $this->getVendorUri($vendor, $languageId, true);
         }
 
         return $seoUrl;
+    }
+
+    /**
+     * Returns alternative uri used while updating seo.
+     *
+     * @param string $vendorId   Vendor id
+     * @param int    $languageId Language id
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getAltUri(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getAltUri() the canonical override target.
+     */
+    protected function getAltUri($vendorId, $languageId)
+    {
+        return $this->_getAltUri($vendorId, $languageId);
     }
 }

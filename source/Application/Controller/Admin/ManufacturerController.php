@@ -21,12 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
+
 /**
  * Returns template, that arranges two other templates ("manufacturer_list.tpl"
  * and "manufacturer_main.tpl") to frame.
  * Admin Menu: Settings -> Manufacturers
  */
-class ManufacturerController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class ManufacturerController extends AdminController
 {
     /**
      * Current class template name.

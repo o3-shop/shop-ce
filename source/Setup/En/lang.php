@@ -20,11 +20,10 @@
  */
 
 $aLang = [
-
 'charset'                                       => 'UTF-8',
 'HEADER_META_MAIN_TITLE'                        => 'O3-Shop installation wizard',
 'HEADER_TEXT_SETUP_NOT_RUNS_AUTOMATICLY'        => 'If setup does not continue in a few seconds, please click ',
-'FOOTER_OXID_ESALES'                            => '&copy; O3-Shop 2022 - '.@date("Y").', &copy; OXID eSales AG 2003 - 2022',
+'FOOTER_OXID_ESALES'                            => '&copy; O3-Shop 2022 - ' . @date('Y') . ', &copy; OXID eSales AG 2003 - 2022',
 
 'TAB_0_TITLE'                                   => 'System Requirements',
 'TAB_1_TITLE'                                   => 'Welcome',
@@ -90,6 +89,7 @@ $aLang = [
 'MOD_MYSQL_CONNECT'                             => 'PDO_MySQL',
 'MOD_MYSQL_VERSION'                             => 'MySQL version 5.5, 5.7, 8.0 or MariaDB 10',
 'MOD_GD_INFO'                                   => 'GDlib v2 incl. JPEG support',
+'MOD_GD_FREETYPE'                               => 'GDlib FreeType support (imagettftext)',
 'MOD_INI_SET'                                   => 'ini_set allowed',
 'MOD_REGISTER_GLOBALS'                          => 'register_globals must be off',
 'MOD_MAGIC_QUOTES_GPC'                          => 'magic_quotes_gpc must be off',

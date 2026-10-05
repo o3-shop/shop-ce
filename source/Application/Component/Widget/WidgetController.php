@@ -21,11 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component\Widget;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Widget parent.
  * Gather functionality needed for all widgets but not for other views.
  */
-class WidgetController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class WidgetController extends FrontendController
 {
     /**
      * Names of components (classes) that are initiated and executed
@@ -54,7 +57,7 @@ class WidgetController extends \OxidEsales\Eshop\Application\Controller\Frontend
 
         if (!empty($this->_aComponentNames)) {
             foreach ($this->_aComponentNames as $sComponentName => $sCompCache) {
-                $oActTopView = $this->getConfig()->getTopActiveView();
+                $oActTopView = Registry::getConfig()->getTopActiveView();
                 if ($oActTopView) {
                     $this->_oaComponents[$sComponentName] = $oActTopView->getComponent($sComponentName);
                     if (!isset($this->_oaComponents[$sComponentName])) {
@@ -71,11 +74,28 @@ class WidgetController extends \OxidEsales\Eshop\Application\Controller\Frontend
     }
 
     /**
-     * In widgets we do not need to parse seo and do any work related to that
+     * In widgets, we do not need to parse seo and do any work related to that
      * Shop main control is responsible for that, and that has to be done once
-     * @deprecated underscore prefix violates PSR12, will be renamed to "processRequest" in next major
+     * @deprecated Use processRequest() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _processRequest().
      */
     protected function _processRequest() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+    }
+
+    /**
+     * In widgets, we do not need to parse seo and do any work related to that
+     * Shop main control is responsible for that, and that has to be done once
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::processRequest() (not the deprecated _processRequest()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function processRequest()
+    {
+        $this->_processRequest();
     }
 }

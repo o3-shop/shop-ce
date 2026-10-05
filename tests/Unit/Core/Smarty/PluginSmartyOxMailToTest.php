@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,10 +18,11 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Smarty;
 
-use \Smarty;
-use \oxRegistry;
+use oxRegistry;
+use Smarty;
 
 $filePath = oxRegistry::getConfig()->getConfigParam('sShopDir') . 'Core/Smarty/Plugin/function.oxmailto.php';
 if (file_exists($filePath)) {
@@ -33,7 +35,7 @@ class PluginSmartyOxMailToTest extends \OxidTestCase
 {
     public function testSmartyFunctionOxMailTo()
     {
-        $aParams = array();
+        $aParams = [];
         $aParams['encode'] = 'javascript';
         $aParams['address'] = 'admin@my-o3-shop.com';
         $aParams['cc'] = 'cc@my-o3-shop.com';
@@ -46,11 +48,11 @@ class PluginSmartyOxMailToTest extends \OxidTestCase
 
         $oSmarty = new Smarty();
 
-        $sMailTo = "admin@my-o3-shop.com?cc=cc@my-o3-shop.com&bcc=bcc@my-o3-shop.com&followupto=followupto@my-o3-shop.com";
-        $sMailTo .= "&subject=subject&newsgroups=newsgroups";
+        $sMailTo = 'admin@my-o3-shop.com?cc=cc@my-o3-shop.com&bcc=bcc@my-o3-shop.com&followupto=followupto@my-o3-shop.com';
+        $sMailTo .= '&subject=subject&newsgroups=newsgroups';
 
         $sString = 'document.write(\'<a href="mailto:' . $sMailTo . '" extra>text</a>\');';
-        $sEncodedString = "%" . wordwrap(current(unpack("H*", $sString)), 2, "%", true);
+        $sEncodedString = '%' . wordwrap(current(unpack('H*', $sString)), 2, '%', true);
         $sExpected = '<script type="text/javascript">eval(decodeURIComponent(\'' . $sEncodedString . '\'))</script>';
 
         $this->assertEquals($sExpected, smarty_function_oxmailto($aParams, $oSmarty));

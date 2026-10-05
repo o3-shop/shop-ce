@@ -21,16 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxDb;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin Contents manager.
  * Collects Content base information (Description), there is ability to filter
  * them by Description or delete them.
- * Admin Menu: Customerinformations -> Content.
+ * Admin Menu: Customer-Information -> Content.
  */
-class ContentList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class ContentList extends AdminListController
 {
     /**
      * Name of chosen object class (default null).
@@ -51,23 +53,24 @@ class ContentList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
      *
      * @var string
      */
-    protected $_sThisTemplate = "content_list.tpl";
+    protected $_sThisTemplate = 'content_list.tpl';
 
     /**
      * Executes parent method parent::render() and returns current class template
      * name.
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
         parent::render();
 
-        $sFolder = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("folder");
+        $sFolder = Registry::getRequest()->getRequestEscapedParameter('folder');
         $sFolder = $sFolder ? $sFolder : -1;
 
-        $this->_aViewData["folder"] = $sFolder;
-        $this->_aViewData["afolder"] = $this->getConfig()->getConfigParam('aCMSfolder');
+        $this->_aViewData['folder'] = $sFolder;
+        $this->_aViewData['afolder'] = Registry::getConfig()->getConfigParam('aCMSfolder');
 
         return $this->_sThisTemplate;
     }
@@ -75,26 +78,52 @@ class ContentList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
     /**
      * Adding folder check and empty folder field check.
      *
-     * @param array  $aWhere  SQL condition array
-     * @param string $sqlFull SQL query string
+     * @param array $whereQuery SQL condition array
+     * @param string $fullQuery SQL query string
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "prepareWhereQuery" in next major
+     * @throws DatabaseConnectionException
+     * @deprecated Use prepareWhereQuery() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _prepareWhereQuery().
      */
-    protected function _prepareWhereQuery($aWhere, $sqlFull) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sQ = parent::_prepareWhereQuery($aWhere, $sqlFull);
-        $sFolder = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('folder');
-        $sViewName = getviewName("oxcontents");
+        // NOTE: call parent::_prepareWhereQuery() (not parent::prepareWhereQuery()) to avoid
+        // infinite recursion through the parent's delegate. Restores baseline (ebe86dc0) call
+        // shape. See o3-shop/o3-shop#107 remediation.
+        $sQ = parent::_prepareWhereQuery($whereQuery, $fullQuery);
+        $sFolder = Registry::getRequest()->getRequestEscapedParameter('folder');
+        $sViewName = getviewName('oxcontents');
 
-        //searchong for empty oxfolder fields
+        // searching for empty oxfolder fields
         if ($sFolder == 'CMSFOLDER_NONE' || $sFolder == 'CMSFOLDER_NONE_RR') {
             $sQ .= " and {$sViewName}.oxfolder = '' ";
         } elseif ($sFolder && $sFolder != '-1') {
-            $sFolder = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quote($sFolder);
+            $sFolder = DatabaseProvider::getDb()->quote($sFolder);
             $sQ .= " and {$sViewName}.oxfolder = {$sFolder}";
         }
 
         return $sQ;
+    }
+
+    /**
+     * Adding folder check and empty folder field check.
+     *
+     * @param array $whereQuery SQL condition array
+     * @param string $fullQuery SQL query string
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::prepareWhereQuery() (not the deprecated _prepareWhereQuery()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function prepareWhereQuery($whereQuery, $fullQuery)
+    {
+        return $this->_prepareWhereQuery($whereQuery, $fullQuery);
     }
 }

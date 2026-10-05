@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,17 +18,16 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Component\Widget;
 
-use \oxTestModules;
-use RecommList;
+use oxTestModules;
 
 /**
  * Tests for oxwRecomm class
  */
 class RecommendationTest extends \OxidTestCase
 {
-
     /**
      * Testing oxwRecomm::getSimilarRecommLists()
      *
@@ -35,11 +35,11 @@ class RecommendationTest extends \OxidTestCase
      */
     public function testGetSimilarRecommLists_empty()
     {
-        $aParams["aArticleIds"] = array();
+        $aParams['aArticleIds'] = [];
         $oRecomm = oxNew('oxwRecommendation');
         $oRecomm->setViewParameters($aParams);
         $oRecommList = $oRecomm->getSimilarRecommLists();
-        $this->assertTrue(!isset($oRecommList), "Should be empty if no articles id given");
+        $this->assertTrue(!isset($oRecommList), 'Should be empty if no articles id given');
     }
 
     /**
@@ -49,16 +49,16 @@ class RecommendationTest extends \OxidTestCase
      */
     public function testGetSimilarRecommLists()
     {
-        $oRecommList = $this->getMock(\OxidEsales\Eshop\Application\Model\RecommendationList::class, array("getRecommListsByIds"));
-        $oRecommList->expects($this->once())->method("getRecommListsByIds")->with($this->equalTo(array("articleId")))->will($this->returnValue("oxRecommListMock"));
+        $oRecommList = $this->getMock(\OxidEsales\Eshop\Application\Model\RecommendationList::class, ['getRecommListsByIds']);
+        $oRecommList->expects($this->once())->method('getRecommListsByIds')->with($this->equalTo(['articleId']))->will($this->returnValue('oxRecommListMock'));
         oxTestModules::addModuleObject('oxrecommlist', $oRecommList);
 
-        $aParams["aArticleIds"] = array("articleId");
+        $aParams['aArticleIds'] = ['articleId'];
 
         $oRecomm = oxNew('oxwRecommendation');
         $oRecomm->setViewParameters($aParams);
 
-        $this->assertEquals("oxRecommListMock", $oRecomm->getSimilarRecommLists(), "Should try to create RecommList object.");
+        $this->assertEquals('oxRecommListMock', $oRecomm->getSimilarRecommLists(), 'Should try to create RecommList object.');
     }
 
     /**

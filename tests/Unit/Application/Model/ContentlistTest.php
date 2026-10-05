@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,9 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
+use oxField;
 
 class ContentlistTest extends \OxidTestCase
 {
@@ -77,7 +79,7 @@ class ContentlistTest extends \OxidTestCase
 
         // testing real data
         $this->assertEquals($oList->aList[$sOxid]->oxcontents__oxid->value, $sOxid);
-        $this->assertEquals($oList->aList[$sOxid]->oxcontents__oxloadid->value, "testid_Unit_oxcontentlistTest");
+        $this->assertEquals($oList->aList[$sOxid]->oxcontents__oxloadid->value, 'testid_Unit_oxcontentlistTest');
     }
 
     /**
@@ -102,7 +104,7 @@ class ContentlistTest extends \OxidTestCase
 
         // testing real data
         $this->assertEquals($oList->aList['testoxcontentlist'][0]->oxcontents__oxid->value, $sOxid);
-        $this->assertEquals($oList->aList['testoxcontentlist'][0]->oxcontents__oxloadid->value, "testid_Unit_oxcontentlistTest");
+        $this->assertEquals($oList->aList['testoxcontentlist'][0]->oxcontents__oxloadid->value, 'testid_Unit_oxcontentlistTest');
     }
 
     /**

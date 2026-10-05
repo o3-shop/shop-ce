@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -28,7 +29,6 @@ use OxidEsales\TestingLibrary\UnitTestCase;
  */
 class WordwrapLogicTest extends UnitTestCase
 {
-
     /** @var WordwrapLogic */
     private $wordWrapLogic;
 
@@ -46,10 +46,10 @@ class WordwrapLogicTest extends UnitTestCase
     public function nonAsciiProvider(): array
     {
         return [
-            ["HÖ\nHÖ", "HÖ HÖ", 2],
-            ["HÖ\na\nHÖ\na", "HÖa HÖa", 2, "\n", true],
-            ["HÖa\na\nHÖa\na", "HÖaa HÖaa", 3, "\n", true],
-            ["HÖa\nHÖa", "HÖa HÖa", 2]
+            ["HÖ\nHÖ", 'HÖ HÖ', 2],
+            ["HÖ\na\nHÖ\na", 'HÖa HÖa', 2, "\n", true],
+            ["HÖa\na\nHÖa\na", 'HÖaa HÖaa', 3, "\n", true],
+            ["HÖa\nHÖa", 'HÖa HÖa', 2],
         ];
     }
 
@@ -88,8 +88,8 @@ class WordwrapLogicTest extends UnitTestCase
                 "Pellentesque nisl non condimentum cursus.\n  consectetur a diam sit.\n finibus diam eu libero lobortis.\neu   ex   sit",
                 10,
                 "\n",
-                true
-            ]
+                true,
+            ],
         ];
     }
 

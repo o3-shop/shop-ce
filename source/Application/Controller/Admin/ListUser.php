@@ -21,15 +21,27 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxAdminList;
+use OxidEsales\Eshop\Application\Controller\Admin\UserList;
 
 /**
  * user list "view" class.
  */
-class ListUser extends \OxidEsales\Eshop\Application\Controller\Admin\UserList
+class ListUser extends UserList
 {
     /**
-     * Viewable list size getter
+     * Viewable list size getter.
+     *
+     * This deliberately calls getUserDefListSize() instead of the parent getViewListSize().
+     *
+     * Why: getViewListSize() reads the list page size from the session profile (the global
+     * admin preference stored at login). getUserDefListSize() reads it from the current
+     * request parameter "viewListSize", falling back to the class default. The user admin
+     * list needs the per-request variant so the page size can be changed on the fly.
+     *
+     * History: the original OXID code was `return $this->_getUserDefListSize();`.
+     * During the PSR-12 underscore removal the callee was mistakenly changed to
+     * getViewListSize() (commit d144f53, 2024-10-18) which broke the override.
+     * Restored to getUserDefListSize() to match the original intent.
      *
      * @return int
      * @deprecated underscore prefix violates PSR12, will be renamed to "getViewListSize" in next version
@@ -45,7 +57,7 @@ class ListUser extends \OxidEsales\Eshop\Application\Controller\Admin\UserList
      */
     public function init()
     {
-        oxAdminList::init();
+        AdminListController::init();
     }
 
     /**
@@ -57,8 +69,8 @@ class ListUser extends \OxidEsales\Eshop\Application\Controller\Admin\UserList
     public function render()
     {
         parent::render();
-        $this->_aViewData["menustructure"] = $this->getNavigation()->getDomXml()->documentElement->childNodes;
+        $this->_aViewData['menustructure'] = $this->getNavigation()->getDomXml()->documentElement->childNodes;
 
-        return "list_user.tpl";
+        return 'list_user.tpl';
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -20,9 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Codeception;
 
+use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidEsales\Codeception\Step\ProductNavigation;
 use OxidEsales\Codeception\Step\Start;
-use OxidEsales\Codeception\Module\Translation\Translator;
 
 class WishListCest
 {
@@ -41,7 +42,7 @@ class WishListCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 € *'
+            'price' => '50,00 € *',
         ];
 
         $userData = $this->getExistingUserData();
@@ -62,11 +63,11 @@ class WishListCest
 
         $userAccountPage = $detailsPage->openAccountPage();
         $I->see(Translator::translate('MY_WISH_LIST'));
-        $I->see(Translator::translate('PRODUCT').' 1');
+        $I->see(Translator::translate('PRODUCT') . ' 1');
 
         $userAccountPage->logoutUserInAccountPage()->login($userData['userLoginName'], $userData['userPassword']);
         $I->see(Translator::translate('MY_WISH_LIST'));
-        $I->see(Translator::translate('PRODUCT').' 1');
+        $I->see(Translator::translate('PRODUCT') . ' 1');
 
         $userAccountPage->openWishListPage()
             ->seeProductData($productData)
@@ -104,7 +105,7 @@ class WishListCest
             'id' => '10014',
             'title' => '14 EN product šÄßüл',
             'description' => '13 EN description šÄßüл',
-            'price' => 'from 15,00 €'
+            'price' => 'from 15,00 €',
         ];
 
         $userData = $this->getExistingUserData();
@@ -126,19 +127,19 @@ class WishListCest
                 ->closeAccountMenu()
                 ->openUserWishListPage()
                 ->seeProductData($productData);
-    
+
             //assert variant
             $productData = [
                 'id' => '10014-1-1',
                 'title' => '14 EN product šÄßüл S | black | lether',
                 'description' => '',
-                'price' => '25,00 €'
+                'price' => '25,00 €',
             ];
             $wishListPage->seeProductData($productData, 2);
-    
+
             $wishListPage->removeProductFromList(2)
                 ->removeProductFromList(1);
-    
+
             $I->see(Translator::translate('PAGE_TITLE_ACCOUNT_NOTICELIST'), $wishListPage->headerTitle);
             $I->see(Translator::translate('WISH_LIST_EMPTY'));
         } catch (\Throwable $th) {
@@ -152,5 +153,4 @@ class WishListCest
     {
         return \Codeception\Util\Fixtures::get('existingUser');
     }
-
 }

@@ -35,14 +35,14 @@
 */
 function smarty_function_oxmultilang($params, &$smarty)
 {
-    startProfile("smarty_function_oxmultilang");
+    startProfile('smarty_function_oxmultilang');
 
     $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
     $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
     $oShop = $oConfig->getActiveShop();
     $blAdmin = $oLang->isAdmin();
 
-    $sIdent  = isset($params['ident']) ? $params['ident'] : 'IDENT MISSING';
+    $sIdent = isset($params['ident']) ? $params['ident'] : 'IDENT MISSING';
     $aArgs = isset($params['args']) ? $params['args'] : false;
     $sSuffix = isset($params['suffix']) ? $params['suffix'] : 'NO_SUFFIX';
     $blShowError = isset($params['noerror']) ? !$params['noerror'] : true ;
@@ -84,7 +84,7 @@ function smarty_function_oxmultilang($params, &$smarty)
         $sTranslation = 'ERROR: Translation for ' . $sIdent . ' not found!';
     }
 
-    stopProfile("smarty_function_oxmultilang");
+    stopProfile('smarty_function_oxmultilang');
 
     return $sTranslation;
 }

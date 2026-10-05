@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: Brutto;
  * Price view mode: Brutto;
@@ -10,43 +11,42 @@
  *  1. Delivery;
  * 0004730: Orderrules with Quantity -> Items would be count double
  */
-$aData = array(
-
-    'categories' => array(
-        0 =>  array(
+$aData = [
+    'categories' => [
+        0 =>  [
             'oxid'       => 'vine',
             'oxparentid' => 'oxrootid',
             'oxshopid'   => 1,
             'oxactive'   => 1,
-            'oxarticles' => array( 'vine1' )
-        ),
-        1 =>  array(
+            'oxarticles' => [ 'vine1' ],
+        ],
+        1 =>  [
             'oxid'       => 'supplies',
             'oxparentid' => 'oxrootid',
             'oxshopid'   => 1,
             'oxactive'   => 1,
-            'oxarticles' => array( 'supply1' )
-        ),
-    ),
+            'oxarticles' => [ 'supply1' ],
+        ],
+    ],
 
-    'articles' => array(
-        0 => array(
+    'articles' => [
+        0 => [
             'oxid'                     => 'vine1',
             'oxprice'                  => 5,
             'oxvat'                    => 10,
             'amount'                   => 6,
-        ),
-        1 => array(
+        ],
+        1 => [
             'oxid'                     => 'supply1',
             'oxprice'                  => 10,
             'oxvat'                    => 10,
             'amount'                   => 1,
-        ),
-    ),
+        ],
+    ],
 
-    'costs' => array(
-        'delivery' => array(
-            0 => array(
+    'costs' => [
+        'delivery' => [
+            0 => [
                 'oxtitle' => 'more than 12 Bottles',
                 'oxactive' => 1,
                 'oxaddsum' => 0,
@@ -56,11 +56,11 @@ $aData = array(
                 'oxparam' => 12, //from
                 'oxparamend' => 99999, //to
                 'oxsort' => 1,
-                'oxcategories' => array(
-                    'vine'
-                ),
-            ),
-            1 => array(
+                'oxcategories' => [
+                    'vine',
+                ],
+            ],
+            1 => [
                 'oxtitle' => '4 - 11 Bottles',
                 'oxactive' => 1,
                 'oxaddsum' => 5.9,
@@ -70,11 +70,11 @@ $aData = array(
                 'oxparam' => 4, //from
                 'oxparamend' => 11, //to
                 'oxsort' => 1,
-                'oxcategories' => array(
-                    'vine'
-                ),
-            ),
-            2 => array(
+                'oxcategories' => [
+                    'vine',
+                ],
+            ],
+            2 => [
                 'oxtitle' => '1 - 3 Bottles',
                 'oxactive' => 1,
                 'oxaddsum' => 4.9,
@@ -84,11 +84,11 @@ $aData = array(
                 'oxparam' => 1, //from
                 'oxparamend' => 3, //to
                 'oxsort' => 1,
-                'oxcategories' => array(
-                    'vine'
-                ),
-            ),
-            3 => array(
+                'oxcategories' => [
+                    'vine',
+                ],
+            ],
+            3 => [
                 'oxtitle' => 'supplies',
                 'oxactive' => 1,
                 'oxaddsum' => 2.9,
@@ -98,37 +98,37 @@ $aData = array(
                 'oxparam' => 0, //from
                 'oxparamend' => 99999, //to
                 'oxsort' => 4,
-                'oxcategories' => array(
-                    'supplies'
-                ),
-            ),
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-            'vine1' => array( '5,00', '30,00' ),
-            'supply1' => array( '10,00', '10,00' )
-        ),
-        'totals' => array(
+                'oxcategories' => [
+                    'supplies',
+                ],
+            ],
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+            'vine1' => [ '5,00', '30,00' ],
+            'supply1' => [ '10,00', '10,00' ],
+        ],
+        'totals' => [
             'totalBrutto' => '40,00',
             'totalNetto'  => '36,36',
-            'vats' => array(
+            'vats' => [
                 10 => '3,64',
-            ),
-            'delivery' => array(
+            ],
+            'delivery' => [
                 'brutto' => '5,90',
-            ),
-            'grandTotal'  => '45,90'
-        ),
-    ),
-    'options' => array(
+            ],
+            'grandTotal'  => '45,90',
+        ],
+    ],
+    'options' => [
         'activeCurrencyRate' => 1,
-        'config' => array(
+        'config' => [
             'blEnterNetPrice' => false,
             'blShowNetPrice' => false,
             'blShowVATForWrapping' => false,
             'blShowVATForDelivery' => false,
             'sAdditionalServVATCalcMethod' => 'biggest_net',
-        ),
-    ),
-);
+        ],
+    ],
+];

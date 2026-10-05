@@ -21,17 +21,21 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
-use oxRegistry;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Delivery list manager.
  *
  */
-class DeliveryList extends \OxidEsales\Eshop\Core\Model\ListModel
+class DeliveryList extends ListModel
 {
     /**
-     * Session user Id
+     * Session user ID
      *
      * @var string
      */
@@ -54,7 +58,7 @@ class DeliveryList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * User object
      *
-     * @var \OxidEsales\Eshop\Application\Model\User
+     * @var User
      */
     protected $_oUser = null;
 
@@ -73,7 +77,6 @@ class DeliveryList extends \OxidEsales\Eshop\Core\Model\ListModel
      */
     protected $_blCollectFittingDeliveriesSets = false;
 
-
     /**
      * Calls parent constructor and sets home country
      */
@@ -82,7 +85,7 @@ class DeliveryList extends \OxidEsales\Eshop\Core\Model\ListModel
         parent::__construct('oxdelivery');
 
         // load or not delivery list
-        $this->setHomeCountry($this->getConfig()->getConfigParam('aHomeCountry'));
+        $this->setHomeCountry(Registry::getConfig()->getConfigParam('aHomeCountry'));
     }
 
     /**
@@ -102,16 +105,18 @@ class DeliveryList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Returns active delivery list
      *
-     * Loads all active delivery in list. Additionally
+     * Loads all active delivery in list. Additionally,
      * checks if set has user customized parameters like
      * assigned users, countries or user groups. Performs
      * additional filtering according to these parameters
      *
-     * @param \OxidEsales\Eshop\Application\Model\User $oUser      session user object
-     * @param string                                   $sCountryId user country id
-     * @param string                                   $sDelSet    user chosen delivery set
+     * @param null $oUser session user object
+     * @param null $sCountryId user country id
+     * @param null $sDelSet user chosen delivery set
      *
-     * @return array
+     * @return DeliveryList
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getActiveDeliveryList" in next major
      */
     protected function _getList($oUser = null, $sCountryId = null, $sDelSet = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -148,20 +153,21 @@ class DeliveryList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Creates delivery list filter SQL to load current state delivery list
      *
-     * @param \OxidEsales\Eshop\Application\Model\User $oUser      session user object
-     * @param string                                   $sCountryId user country id
-     * @param string                                   $sDelSet    user chosen delivery set
+     * @param User $oUser session user object
+     * @param string $sCountryId user country id
+     * @param string $sDelSet user chosen delivery set
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getFilterSelect" in next major
      */
     protected function _getFilterSelect($oUser, $sCountryId, $sDelSet) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
-        $sTable = getViewName('oxdelivery');
+        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxdelivery');
         $sQ = "select $sTable.* from ( select distinct $sTable.* from $sTable left join oxdel2delset on oxdel2delset.oxdelid=$sTable.oxid ";
-        $sQ .= "where " . $this->getBaseObject()->getSqlActiveSnippet() . " and oxdel2delset.oxdelsetid = " . $oDb->quote($sDelSet) . " ";
+        $sQ .= 'where ' . $this->getBaseObject()->getSqlActiveSnippet() . ' and oxdel2delset.oxdelsetid = ' . $oDb->quote($sDelSet) . ' ';
 
         // defining initial filter parameters
         $sUserId = null;
@@ -172,7 +178,7 @@ class DeliveryList extends \OxidEsales\Eshop\Core\Model\ListModel
             // user ID
             $sUserId = $oUser->getId();
 
-            // user groups ( maybe would be better to fetch by function \OxidEsales\Eshop\Application\Model\User::getUserGroups() ? )
+            // user groups ( maybe would be better to fetch by function User::getUserGroups() ? )
             $aGroupIds = $oUser->getUserGroups();
         }
 
@@ -183,13 +189,13 @@ class DeliveryList extends \OxidEsales\Eshop\Core\Model\ListModel
             }
         }
 
-        $sUserTable = getViewName('oxuser');
-        $sGroupTable = getViewName('oxgroups');
-        $sCountryTable = getViewName('oxcountry');
+        $sUserTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxuser');
+        $sGroupTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxgroups');
+        $sCountryTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxcountry');
 
-        $sCountrySql = $sCountryId ? "EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxcountry' and oxobject2delivery.OXOBJECTID=" . $oDb->quote($sCountryId) . ")" : '0';
-        $sUserSql = $sUserId ? "EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxuser' and oxobject2delivery.OXOBJECTID=" . $oDb->quote($sUserId) . ")" : '0';
-        $sGroupSql = count($aIds) ? "EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxgroups' and oxobject2delivery.OXOBJECTID in (" . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aIds)) . ") )" : '0';
+        $sCountrySql = $sCountryId ? "EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxcountry' and oxobject2delivery.OXOBJECTID=" . $oDb->quote($sCountryId) . ')' : '0';
+        $sUserSql = $sUserId ? "EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxuser' and oxobject2delivery.OXOBJECTID=" . $oDb->quote($sUserId) . ')' : '0';
+        $sGroupSql = count($aIds) ? "EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxgroups' and oxobject2delivery.OXOBJECTID in (" . implode(', ', DatabaseProvider::getDb()->quoteArray($aIds)) . ') )' : '0';
 
         $sQ .= " order by $sTable.oxsort asc ) as $sTable where (
                 if(EXISTS(select 1 from oxobject2delivery, $sCountryTable where $sCountryTable.oxid=oxobject2delivery.oxobjectid and oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxcountry' LIMIT 1),
@@ -216,8 +222,8 @@ class DeliveryList extends \OxidEsales\Eshop\Core\Model\ListModel
      *  - first checks if delivery loading is enabled in config -
      *    $myConfig->bl_perfLoadDelivery is TRUE;
      *  - loads delivery set list by calling this::GetDeliverySetList(...);
-     *  - checks if there is any active (eg. chosen delivery set in order
-     *    process etc) delivery set defined and if its set - rearranges
+     *  - checks if there is any active (e.g. chosen delivery set in order
+     *    process etc.) delivery set defined and if its set - rearranges
      *    delivery set list by storing active set at the beginning in the
      *    list.
      *  - goes through delivery sets and loads its deliveries, checks if any
@@ -232,12 +238,14 @@ class DeliveryList extends \OxidEsales\Eshop\Core\Model\ListModel
      *    NOTICE: for performance reasons deliveries is cached in
      *    $myConfig->aDeliveryList.
      *
-     * @param object                                   $oBasket     basket object
-     * @param \OxidEsales\Eshop\Application\Model\User $oUser       session user
-     * @param string                                   $sDelCountry user country id
-     * @param string                                   $sDelSet     delivery set id
+     * @param object $oBasket basket object
+     * @param User|null $oUser session user
+     * @param string|null $sDelCountry user country id
+     * @param string|null $sDelSet delivery set id
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getDeliveryList($oBasket, $oUser = null, $sDelCountry = null, $sDelSet = null)
     {
@@ -246,7 +254,7 @@ class DeliveryList extends \OxidEsales\Eshop\Core\Model\ListModel
         $aFittingDelSets = [];
         $this->_aDeliveries = [];
 
-        $aDelSetList = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\DeliverySetList::class)->getDeliverySetList($oUser, $sDelCountry, $sDelSet);
+        $aDelSetList = Registry::get(DeliverySetList::class)->getDeliverySetList($oUser, $sDelCountry, $sDelSet);
 
         // must choose right delivery set to use its delivery list
         foreach ($aDelSetList as $sDeliverySetId => $oDeliverySet) {
@@ -284,7 +292,7 @@ class DeliveryList extends \OxidEsales\Eshop\Core\Model\ListModel
                     $aFittingDelSets[$sDeliverySetId] = $oDeliverySet;
                 } else {
                     // return collected fitting deliveries
-                    \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('sShipSet', $sDeliverySetId);
+                    Registry::getSession()->setVariable('sShipSet', $sDeliverySetId);
 
                     return $this->_aDeliveries;
                 }
@@ -310,12 +318,14 @@ class DeliveryList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Checks if deliveries in list fits for current basket and delivery set
      *
-     * @param \OxidEsales\Eshop\Application\Model\Basket $oBasket        shop basket
-     * @param \OxidEsales\Eshop\Application\Model\User   $oUser          session user
-     * @param string                                     $sDelCountry    delivery country
-     * @param string                                     $sDeliverySetId delivery set id to check its relation to delivery list
+     * @param Basket $oBasket shop basket
+     * @param User $oUser session user
+     * @param string $sDelCountry delivery country
+     * @param string $sDeliverySetId delivery set id to check its relation to delivery list
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function hasDeliveries($oBasket, $oUser, $sDelCountry, $sDeliverySetId)
     {
@@ -338,7 +348,7 @@ class DeliveryList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Get current user object. If user is not set, try to get current user.
      *
-     * @return \OxidEsales\Eshop\Application\Model\User
+     * @return User
      */
     public function getUser()
     {
@@ -352,7 +362,7 @@ class DeliveryList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Set current user object
      *
-     * @param \OxidEsales\Eshop\Application\Model\User $oUser user object
+     * @param User|null $oUser user object
      */
     public function setUser($oUser)
     {
@@ -381,11 +391,11 @@ class DeliveryList extends \OxidEsales\Eshop\Core\Model\ListModel
         $dSize = $oProduct->getSize();
         $dWeight = $oProduct->getWeight();
 
-        $sTable = getViewName('oxdelivery');
+        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxdelivery');
         $params = [];
 
         $sQ = "select $sTable.* from $sTable";
-        $sQ .= " where " . $this->getBaseObject()->getSqlActiveSnippet();
+        $sQ .= ' where ' . $this->getBaseObject()->getSqlActiveSnippet();
         $sQ .= " and ($sTable.oxdeltype != 'a' || ( $sTable.oxparam <= 1 && $sTable.oxparamend >= 1))";
         if ($dPrice) {
             $sQ .= " and ($sTable.oxdeltype != 'p' || ( $sTable.oxparam <= :dprice && $sTable.oxparamend >= :dprice))";

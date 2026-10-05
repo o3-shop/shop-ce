@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
 /**
@@ -26,14 +28,14 @@ class RequiredAddressFieldsTest extends \OxidTestCase
 {
     public function testGetRequiredFieldsWhenNoFieldsAreSetInConfig()
     {
-        $aRequiredFields = array(
+        $aRequiredFields = [
             'oxuser__oxfname',
             'oxuser__oxlname',
             'oxuser__oxstreetnr',
             'oxuser__oxstreet',
             'oxuser__oxzip',
-            'oxuser__oxcity'
-        );
+            'oxuser__oxcity',
+        ];
 
         $this->getConfig()->setConfigParam('aMustFillFields', '');
 
@@ -44,7 +46,7 @@ class RequiredAddressFieldsTest extends \OxidTestCase
 
     public function testGetRequiredFieldsWhenFieldsAreSetInConfig()
     {
-        $aRequiredFields = array('oxuser__oxfname');
+        $aRequiredFields = ['oxuser__oxfname'];
 
         $this->getConfig()->setConfigParam('aMustFillFields', $aRequiredFields);
 
@@ -55,8 +57,8 @@ class RequiredAddressFieldsTest extends \OxidTestCase
 
     public function testGetRequiredFieldsWhenFieldsAreSetBySetter()
     {
-        $aRequiredFields = array('oxuser__oxfname');
-        $this->getConfig()->setConfigParam('aMustFillFields', array('someField'));
+        $aRequiredFields = ['oxuser__oxfname'];
+        $this->getConfig()->setConfigParam('aMustFillFields', ['someField']);
 
         $oAddressValidator = oxNew('oxRequiredAddressFields');
         $oAddressValidator->setRequiredFields($aRequiredFields);
@@ -66,8 +68,8 @@ class RequiredAddressFieldsTest extends \OxidTestCase
 
     public function testGetUserAddressRequiredFields()
     {
-        $aAllRequiredFields = array('oxuser__oxfname', 'oxuser__oxlname', 'oxaddress__oxfname', 'oxaddress__oxlname', 'oxsomeother__sname');
-        $aUserRequiredFields = array('oxuser__oxfname', 'oxuser__oxlname');
+        $aAllRequiredFields = ['oxuser__oxfname', 'oxuser__oxlname', 'oxaddress__oxfname', 'oxaddress__oxlname', 'oxsomeother__sname'];
+        $aUserRequiredFields = ['oxuser__oxfname', 'oxuser__oxlname'];
 
         $oAddressValidator = oxNew('oxRequiredAddressFields');
         $oAddressValidator->setRequiredFields($aAllRequiredFields);
@@ -77,8 +79,8 @@ class RequiredAddressFieldsTest extends \OxidTestCase
 
     public function testGetDeliveryAddressRequiredFields()
     {
-        $aAllRequiredFields = array('oxuser__oxfname', 'oxuser__oxlname', 'oxaddress__oxfname', 'oxaddress__oxlname', 'oxsomeother__sname');
-        $aUserRequiredFields = array('oxaddress__oxfname', 'oxaddress__oxlname');
+        $aAllRequiredFields = ['oxuser__oxfname', 'oxuser__oxlname', 'oxaddress__oxfname', 'oxaddress__oxlname', 'oxsomeother__sname'];
+        $aUserRequiredFields = ['oxaddress__oxfname', 'oxaddress__oxlname'];
 
         $oAddressValidator = oxNew('oxRequiredAddressFields');
         $oAddressValidator->setRequiredFields($aAllRequiredFields);

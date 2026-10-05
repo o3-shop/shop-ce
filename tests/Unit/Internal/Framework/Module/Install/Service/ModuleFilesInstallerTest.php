@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -18,7 +20,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\Install;
+namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\Install\Service;
 
 use org\bovigo\vfs\vfsStream;
 use OxidEsales\EshopCommunity\Internal\Framework\FileSystem\FinderFactoryInterface;
@@ -39,11 +41,11 @@ class ModuleFilesInstallerTest extends TestCase
         $packageName = 'myvendor/mymodule';
         $packagePath = '/var/www/vendor/myvendor/mymodule';
         $blackListFilters = [
-            "documentation/**/*.*",
-            "CHANGELOG.md",
-            "composer.json",
-            "CONTRIBUTING.md",
-            "README.md"
+            'documentation/**/*.*',
+            'CHANGELOG.md',
+            'composer.json',
+            'CONTRIBUTING.md',
+            'README.md',
         ];
 
         $package = new OxidEshopPackage($packageName, $packagePath);

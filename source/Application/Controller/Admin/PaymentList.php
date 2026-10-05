@@ -21,12 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+
 /**
  * Admin payment list manager.
  * Performs collection and managing (such as filtering or deleting) function.
  * Admin Menu: Shop Settings -> Payment Methods.
  */
-class PaymentList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class PaymentList extends AdminListController
 {
     /**
      * Current class template name.
@@ -47,5 +49,5 @@ class PaymentList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
      *
      * @var string
      */
-    protected $_sDefSortField = "oxdesc";
+    protected $_sDefSortField = 'oxdesc';
 }

@@ -19,8 +19,8 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-require "_header.php"; ?>
-<textarea readonly="readonly" cols="180" rows="20" class="edittext" style="width: 98%; padding: 7px;"><?php echo $this->getViewParam("aLicenseText"); ?></textarea>
+require '_header.php'; ?>
+<textarea readonly="readonly" cols="180" rows="20" class="edittext" style="width: 98%; padding: 7px;"><?php echo $this->getViewParam('aLicenseText'); ?></textarea>
 <form action="index.php" method="post">
   <input type="hidden" name="istep" value="<?php $this->getSetupStep('STEP_DB_INFO'); ?>">
   <input type="radio" name="iEula" value="1"><?php $this->getText('BUTTON_RADIO_LICENCE_ACCEPT'); ?><br>
@@ -28,4 +28,4 @@ require "_header.php"; ?>
   <input type="hidden" name="sid" value="<?php $this->getSid(); ?>">
   <input type="submit" id="step2Submit" class="edittext" value="<?php $this->getText('BUTTON_LICENCE'); ?>">
 </form>
-<?php require "_footer.php";
+<?php require '_footer.php';

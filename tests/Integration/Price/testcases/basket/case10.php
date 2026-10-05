@@ -1,4 +1,5 @@
 <?php
+
 /*
 /**
  * Price enter mode: bruto
@@ -17,33 +18,33 @@
  * Short description:
  * From articlePrice.csv: article final price calculations. 9206 - 1st
  */
-$aData = array(
-    'articles' => array(
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
                 'oxid'                     => 9206,
                 'oxprice'                  => 103,
                 'oxvat'                    => 19,
                 'amount'                   => 1,
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-                 9206 => array( '103,00', '103,00' ),
-        ),
-        'totals' => array(
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+                 9206 => [ '103,00', '103,00' ],
+        ],
+        'totals' => [
                 'totalBrutto' => '103,00',
                 'totalNetto'  => '86,55',
-                'vats' => array(
+                'vats' => [
                         19 => '16,45',
-                ),
-                'grandTotal'  => '103,00'
-        ),
-    ),
-    'options' => array(
-        'config' => array(
+                ],
+                'grandTotal'  => '103,00',
+        ],
+    ],
+    'options' => [
+        'config' => [
                 'blEnterNetPrice' => false,
-                'blShowNetPrice' => false
-        ),
+                'blShowNetPrice' => false,
+        ],
         'activeCurrencyRate' => 1,
-    ),
-);
+    ],
+];

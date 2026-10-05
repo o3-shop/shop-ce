@@ -51,7 +51,7 @@ class Theme extends \OxidEsales\Eshop\Core\Base
      */
     public function load($sOXID)
     {
-        $sFilePath = $this->getConfig()->getViewsDir() . $sOXID . "/theme.php";
+        $sFilePath = $this->getConfig()->getViewsDir() . $sOXID . '/theme.php';
         if (file_exists($sFilePath) && is_readable($sFilePath)) {
             $aTheme = [];
             include $sFilePath;
@@ -78,11 +78,11 @@ class Theme extends \OxidEsales\Eshop\Core\Base
         }
         $sParent = $this->getInfo('parentTheme');
         if ($sParent) {
-            $this->getConfig()->saveShopConfVar("str", 'sTheme', $sParent);
-            $this->getConfig()->saveShopConfVar("str", 'sCustomTheme', $this->getId());
+            $this->getConfig()->saveShopConfVar('str', 'sTheme', $sParent);
+            $this->getConfig()->saveShopConfVar('str', 'sCustomTheme', $this->getId());
         } else {
-            $this->getConfig()->saveShopConfVar("str", 'sTheme', $this->getId());
-            $this->getConfig()->saveShopConfVar("str", 'sCustomTheme', '');
+            $this->getConfig()->saveShopConfVar('str', 'sTheme', $this->getId());
+            $this->getConfig()->saveShopConfVar('str', 'sCustomTheme', '');
         }
         $settingsHandler = oxNew(\OxidEsales\Eshop\Core\SettingsHandler::class);
         $settingsHandler->setModuleType('theme')->run($this);
@@ -97,7 +97,7 @@ class Theme extends \OxidEsales\Eshop\Core\Base
     {
         $this->_aThemeList = [];
         $sOutDir = $this->getConfig()->getViewsDir();
-        foreach (glob($sOutDir . "*", GLOB_ONLYDIR) as $sDir) {
+        foreach (glob($sOutDir . '*', GLOB_ONLYDIR) as $sDir) {
             $oTheme = oxNew(\OxidEsales\Eshop\Core\Theme::class);
             if ($oTheme->load(basename($sDir))) {
                 $this->_aThemeList[$sDir] = $oTheme;
@@ -219,6 +219,6 @@ class Theme extends \OxidEsales\Eshop\Core\Base
      */
     public function getId()
     {
-        return $this->getInfo("id");
+        return $this->getInfo('id');
     }
 }

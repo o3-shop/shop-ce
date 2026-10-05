@@ -21,19 +21,23 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Application\Model\OrderFile;
+use OxidEsales\Eshop\Application\Model\OrderFileList;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin order article manager.
  * Collects order articles information, updates it on user submit, etc.
  * Admin Menu: Orders -> Display Orders -> Articles.
  */
-class OrderDownloads extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class OrderDownloads extends AdminDetailsController
 {
     /**
      * Active order object
      *
-     * @var oxorder
+     * @var Order
      */
     protected $_oEditObject = null;
 
@@ -48,22 +52,22 @@ class OrderDownloads extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
         parent::render();
 
         if ($oOrder = $this->getEditObject()) {
-            $this->_aViewData["edit"] = $oOrder;
+            $this->_aViewData['edit'] = $oOrder;
         }
 
-        return "order_downloads.tpl";
+        return 'order_downloads.tpl';
     }
 
     /**
      * Returns editable order object
      *
-     * @return oxorder
+     * @return Order
      */
     public function getEditObject()
     {
         $soxId = $this->getEditObjectId();
-        if ($this->_oEditObject === null && isset($soxId) && $soxId != "-1") {
-            $this->_oEditObject = oxNew(\OxidEsales\Eshop\Application\Model\OrderFileList::class);
+        if ($this->_oEditObject === null && isset($soxId) && $soxId != '-1') {
+            $this->_oEditObject = oxNew(OrderFileList::class);
             $this->_oEditObject->loadOrderFiles($soxId);
         }
 
@@ -75,8 +79,8 @@ class OrderDownloads extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
      */
     public function resetDownloadLink()
     {
-        $sOrderFileId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxorderfileid');
-        $oOrderFile = oxNew(\OxidEsales\Eshop\Application\Model\OrderFile::class);
+        $sOrderFileId = Registry::getRequest()->getRequestEscapedParameter('oxorderfileid');
+        $oOrderFile = oxNew(OrderFile::class);
         if ($oOrderFile->load($sOrderFileId)) {
             $oOrderFile->reset();
             $oOrderFile->save();

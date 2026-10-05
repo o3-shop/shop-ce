@@ -33,22 +33,22 @@
 function smarty_modifier_oxfilesize($iSize)
 {
     if ($iSize < 1024) {
-        return $iSize . " B";
+        return $iSize . ' B';
     }
 
     $iSize = $iSize / 1024;
 
     if ($iSize < 1024) {
-        return sprintf("%.1f KB", $iSize);
+        return sprintf('%.1f KB', $iSize);
     }
 
     $iSize = $iSize / 1024;
 
     if ($iSize < 1024) {
-        return sprintf("%.1f MB", $iSize);
+        return sprintf('%.1f MB', $iSize);
     }
 
     $iSize = $iSize / 1024;
 
-    return sprintf("%.1f GB", $iSize);
+    return sprintf('%.1f GB', $iSize);
 }

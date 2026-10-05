@@ -21,15 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\GenericImportMain;
+
 /**
  * Admin dyn General import manager.
  */
-class GenericImport extends \OxidEsales\Eshop\Application\Controller\Admin\GenericImportMain
+class GenericImport extends GenericImportMain
 {
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = "genimport_main.tpl";
+    protected $_sThisTemplate = 'genimport_main.tpl';
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -20,11 +22,9 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Domain\Authentication\Service;
 
-use Exception;
-use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Exception\PasswordHashException;
+use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Policy\PasswordPolicyInterface;
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Service\Argon2IPasswordHashService;
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Service\PasswordHashServiceInterface;
-use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Policy\PasswordPolicyInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -32,7 +32,6 @@ use PHPUnit\Framework\TestCase;
  */
 class Argon2IPasswordHashServiceTest extends TestCase
 {
-
     /**
      * Currently, Continuous Integration does not have Argon2I compiled into PHP 7.2. This leads to failing tests
      * due to skipTestIfArgon2IAvailable(). As a fast solution we skip all
@@ -40,23 +39,11 @@ class Argon2IPasswordHashServiceTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->markTestSkipped("Argon2I not available currently on PHP 7.2.");
-    }
+        parent::setUp();
 
-    /**
-     * @expectedException \OxidEsales\EshopCommunity\Internal\Domain\Authentication\Exception\UnavailablePasswordHashException
-     */
-    public function testConstructorThrowsExceptionIfArgon2INotAvailable()
-    {
-        $this->skipTestIfArgon2IAvailable();
-        $passwordPolicyMock = $this->getPasswordPolicyMock();
-
-        new Argon2IPasswordHashService(
-            $passwordPolicyMock,
-            1024,
-            2,
-            2
-        );
+        if (!defined('PASSWORD_ARGON2I')) {
+            $this->markTestSkipped('PASSWORD_ARGON2I is not available in this PHP build.');
+        }
     }
 
     public function testHashForGivenPasswordIsEncryptedWithProperAlgorithm()
@@ -93,12 +80,21 @@ class Argon2IPasswordHashServiceTest extends TestCase
 
     /**
      * Invalid values as a memory cost value of 2^32 + 1 can cause the method hash to fail.
+     * PHP 8+ throws \ValueError; PHP 7.x emits a warning (converted by PHPUnit's error handler).
      */
     public function testHashThrowsExceptionOnInvalidSettings()
     {
         $this->skipTestIfArgon2INotAvailable();
 
-        $this->expectException(\PHPUnit\Framework\Error\Warning::class);
+        if (PHP_MAJOR_VERSION >= 8) {
+            $this->expectException(\ValueError::class);
+        } else {
+            // PHP 7.4: password_hash() emits a warning for invalid settings and
+            // returns false/null, but the method's `: string` return type then
+            // triggers a TypeError which supersedes the warning.
+            $this->expectException(\TypeError::class);
+        }
+
         $passwordPolicyMock = $this->getPasswordPolicyMock();
 
         $passwordHashService = new Argon2IPasswordHashService(
@@ -135,7 +131,7 @@ class Argon2IPasswordHashServiceTest extends TestCase
             [
                 'memory_cost' => PASSWORD_ARGON2_DEFAULT_MEMORY_COST,
                 'time_cost' => PASSWORD_ARGON2_DEFAULT_TIME_COST,
-                'threads' => PASSWORD_ARGON2_DEFAULT_THREADS
+                'threads' => PASSWORD_ARGON2_DEFAULT_THREADS,
             ],
             $info['options']
         );
@@ -184,14 +180,5 @@ class Argon2IPasswordHashServiceTest extends TestCase
     }
 
     /**
-     * PHP > 7.2 is compiled by default with support for ARGON2I. Instead of checking for the constant PASSWORD_ARGON2I,
-     * we check for the PHP version in order to run this test and get an alarm if ARGON2I is not compiled into
-     * the PHP version on the server.
      */
-    private function skipTestIfArgon2IAvailable()
-    {
-        if (version_compare(PHP_VERSION, '7.2') >= 0) {
-            $this->markTestSkipped('This test can not be executed because the password hashing algorithm "PASSWORD_ARGON2I" is available.');
-        }
-    }
 }

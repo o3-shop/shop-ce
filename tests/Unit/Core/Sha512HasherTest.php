@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 class Sha512HasherTest extends \OxidTestCase
@@ -24,7 +26,7 @@ class Sha512HasherTest extends \OxidTestCase
     public function testEncrypt()
     {
         $sHash = 'b32e441399b4601e11846563bea5c6597b7fbeeb8d443a05cdaf0c5615f6bd9c168eac63856945c2b188f933db330f8202bbd4a2a4abadef0ed96f6247970622';
-        $oHasher = oxNew('oxSha512Hasher');
+        $oHasher = oxNew(\OxidEsales\Eshop\Core\Sha512Hasher::class);
 
         $this->assertSame($sHash, $oHasher->hash('somestring05853e9aba10b9c25a3b8af5618ec9fa'));
     }

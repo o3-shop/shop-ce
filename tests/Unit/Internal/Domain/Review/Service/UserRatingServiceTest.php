@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * This file is part of O3-Shop.
+ *
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
+ *
+ * @copyright  Copyright (c) 2026 O3-Shop (https://www.o3-shop.com)
+ * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
+ */
+
+declare(strict_types=1);
+
+namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Domain\Review\Service;
+
+use Doctrine\Common\Collections\ArrayCollection;
+use OxidEsales\EshopCommunity\Internal\Domain\Review\Dao\RatingDaoInterface;
+use OxidEsales\EshopCommunity\Internal\Domain\Review\Service\UserRatingService;
+use PHPUnit\Framework\TestCase;
+
+class UserRatingServiceTest extends TestCase
+{
+    public function testGetRatingsDelegatesToDao(): void
+    {
+        $expected = new ArrayCollection(['rating-1', 'rating-2']);
+        $dao = $this->createMock(RatingDaoInterface::class);
+        $dao->expects($this->once())
+            ->method('getRatingsByUserId')
+            ->with('user-7')
+            ->willReturn($expected);
+
+        $service = new UserRatingService($dao);
+        $this->assertSame($expected, $service->getRatings('user-7'));
+    }
+}

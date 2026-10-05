@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,21 +18,21 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller;
 
-use \Exception;
-use \oxfield;
-use \oxException;
-use \oxDb;
-use \oxRegistry;
-use \oxTestModules;
+use Exception;
+use oxDb;
+use oxException;
+use oxfield;
+use oxRegistry;
+use oxTestModules;
 
 /**
  * Testing forgotpwd class
  */
 class ForgotpwdTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      *
@@ -108,7 +109,7 @@ class ForgotpwdTest extends \OxidTestCase
     public function testUpdatePasswordProblemsWithPass()
     {
         // overriding utility function
-        oxTestModules::addFunction("oxUtilsView", "addErrorToDisplay", "{ throw new Exception( \$aA[0] ); }");
+        oxTestModules::addFunction('oxUtilsView', 'addErrorToDisplay', '{ throw new Exception( $aA[0] ); }');
 
         $oView = oxNew('forgotpwd');
 
@@ -123,9 +124,9 @@ class ForgotpwdTest extends \OxidTestCase
         }
         $this->assertTrue($blExcp);
 
-        // pass does not match
-        $this->setRequestParameter('password_new', 'aaaaaa');
-        $this->setRequestParameter('password_new_confirm', 'bbbbbb');
+        // pass does not match — passwords are long enough (≥ iPasswordLength) so only the mismatch fires
+        $this->setRequestParameter('password_new', 'aaaaaaaaaaaa');
+        $this->setRequestParameter('password_new_confirm', 'bbbbbbbbbbbb');
         try {
             $blExcp = false;
             $oView->updatePassword();
@@ -155,11 +156,11 @@ class ForgotpwdTest extends \OxidTestCase
     public function testUpdatePasswordUnableToLoadUserByUid()
     {
         // overriding utility function
-        oxTestModules::addFunction("oxUtilsView", "addErrorToDisplay", "{ throw new Exception( \$aA[0] ); }");
+        oxTestModules::addFunction('oxUtilsView', 'addErrorToDisplay', '{ throw new Exception( $aA[0] ); }');
 
         $this->setRequestParameter('uid', 'aaaaaa');
-        $this->setRequestParameter('password_new', 'aaaaaa');
-        $this->setRequestParameter('password_new_confirm', 'aaaaaa');
+        $this->setRequestParameter('password_new', 'aaaaaaaaaaaa');
+        $this->setRequestParameter('password_new_confirm', 'aaaaaaaaaaaa');
 
         $oView = oxNew('forgotpwd');
 
@@ -183,13 +184,13 @@ class ForgotpwdTest extends \OxidTestCase
         $oUser = oxNew('oxuser');
         $oUser->setId('_testArt');
         $oUser->oxuser__oxshopid = new oxfield($this->getConfig()->getShopId());
-        $oUser->setPassword('xxxxxx');
+        $oUser->setPassword('xxxxxxxxxxxx');
         $oUser->setUpdateKey();
 
         // overriding utility function
         $this->setRequestParameter('uid', $oUser->getUpdateId());
-        $this->setRequestParameter('password_new', 'aaaaaa');
-        $this->setRequestParameter('password_new_confirm', 'aaaaaa');
+        $this->setRequestParameter('password_new', 'aaaaaaaaaaaa');
+        $this->setRequestParameter('password_new_confirm', 'aaaaaaaaaaaa');
 
         $oView = oxNew('forgotpwd');
         $this->assertEquals('forgotpwd?success=1', $oView->updatePassword());
@@ -221,7 +222,7 @@ class ForgotpwdTest extends \OxidTestCase
         $this->setRequestParameter('password_new', $sPass);
         $this->setRequestParameter('password_new_confirm', $sPass);
 
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array('checkPassword'));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['checkPassword']);
         oxTestModules::addModuleObject('oxuser', $oUser);
 
         $oInputValidator = $this->getMock('oxInputValidator');
@@ -252,7 +253,7 @@ class ForgotpwdTest extends \OxidTestCase
      */
     public function testGetTitle()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ForgotPasswordController::class, array('showUpdateScreen', 'updateSuccess'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ForgotPasswordController::class, ['showUpdateScreen', 'updateSuccess']);
         $oView->expects($this->any())->method('showUpdateScreen')->will($this->returnValue(false));
         $oView->expects($this->any())->method('updateSuccess')->will($this->returnValue(false));
 
@@ -264,7 +265,7 @@ class ForgotpwdTest extends \OxidTestCase
      */
     public function testGetTitle_ShowUpdateScreen()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ForgotPasswordController::class, array('showUpdateScreen', 'updateSuccess'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ForgotPasswordController::class, ['showUpdateScreen', 'updateSuccess']);
         $oView->expects($this->any())->method('showUpdateScreen')->will($this->returnValue(true));
         $oView->expects($this->any())->method('updateSuccess')->will($this->returnValue(true));
 
@@ -276,7 +277,7 @@ class ForgotpwdTest extends \OxidTestCase
      */
     public function testGetTitle_UpdateSuccess()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ForgotPasswordController::class, array('showUpdateScreen', 'updateSuccess'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ForgotPasswordController::class, ['showUpdateScreen', 'updateSuccess']);
         $oView->expects($this->any())->method('showUpdateScreen')->will($this->returnValue(false));
         $oView->expects($this->any())->method('updateSuccess')->will($this->returnValue(true));
 

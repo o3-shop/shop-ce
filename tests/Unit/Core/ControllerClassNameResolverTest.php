@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 use OxidEsales\TestingLibrary\UnitTestCase;
@@ -107,9 +109,9 @@ class ControllerClassNameResolverTest extends UnitTestCase
      */
     private function getShopControllerMapProviderMock()
     {
-        $map = array('aAa' => 'OxidEsales\EshopCommunity\Application\SomeController',
+        $map = ['aAa' => 'OxidEsales\EshopCommunity\Application\SomeController',
                      'bbb' => 'OxidEsales\EshopCommunity\Application\SomeOtherController',
-                     'CCC' => 'OxidEsales\EshopCommunity\Application\SomeDifferentController');
+                     'CCC' => 'OxidEsales\EshopCommunity\Application\SomeDifferentController'];
 
         $mock = $this->getMock(\OxidEsales\Eshop\Core\Routing\ShopControllerMapProvider::class, ['getControllerMap'], [], '', false);
         $mock->expects($this->any())->method('getControllerMap')->will($this->returnValue($map));
@@ -124,9 +126,9 @@ class ControllerClassNameResolverTest extends UnitTestCase
      */
     private function getModuleControllerMapProviderMock()
     {
-        $map = array('cCc' => 'Vendor1\Testmodule\SomeController',
+        $map = ['cCc' => 'Vendor1\Testmodule\SomeController',
                      'DDD' => 'Vendor1\OtherTestModule\SomeOtherController',
-                     'eee' => 'Vendor2\OtherTestModule\SomeDifferentController');
+                     'eee' => 'Vendor2\OtherTestModule\SomeDifferentController'];
 
         $mock = $this->getMock(\OxidEsales\Eshop\Core\Routing\ModuleControllerMapProvider::class, ['getControllerMap'], [], '', false);
         $mock->expects($this->any())->method('getControllerMap')->will($this->returnValue($map));

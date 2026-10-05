@@ -21,8 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Registry;
+
 /**
- * Diagnostic tool result outputer
+ * Diagnostic tool result output
  * Performs OutputKey check of shop files and generates report file.
  *
  */
@@ -33,15 +35,14 @@ class DiagnosticsOutput
      *
      * @var string
      */
-    protected $_sOutputKey = "diagnostic_tool_result";
-
+    protected $_sOutputKey = 'diagnostic_tool_result';
 
     /**
      * Result file path
      *
      * @var string
      */
-    protected $_sOutputFileName = "diagnostic_tool_result.html";
+    protected $_sOutputFileName = 'diagnostic_tool_result.html';
 
     /**
      * Utils object
@@ -55,7 +56,7 @@ class DiagnosticsOutput
      */
     public function __construct()
     {
-        $this->_oUtils = \OxidEsales\Eshop\Core\Registry::getUtils();
+        $this->_oUtils = Registry::getUtils();
     }
 
     /**
@@ -135,16 +136,16 @@ class DiagnosticsOutput
     {
         $sCurrentKey = (empty($sOutputKey)) ? $this->_sOutputKey : $sOutputKey;
 
-        $this->_oUtils = \OxidEsales\Eshop\Core\Registry::getUtils();
+        $this->_oUtils = Registry::getUtils();
         $iFileSize = filesize($this->_oUtils->getCacheFilePath($sCurrentKey));
 
-        $this->_oUtils->setHeader("Pragma: public");
-        $this->_oUtils->setHeader("Expires: 0");
-        $this->_oUtils->setHeader("Cache-Control: must-revalidate, post-check=0, pre-check=0, private");
+        $this->_oUtils->setHeader('Pragma: public');
+        $this->_oUtils->setHeader('Expires: 0');
+        $this->_oUtils->setHeader('Cache-Control: must-revalidate, post-check=0, pre-check=0, private');
         $this->_oUtils->setHeader('Content-Disposition: attachment;filename=' . $this->_sOutputFileName);
-        $this->_oUtils->setHeader("Content-Type:text/html;charset=utf-8");
+        $this->_oUtils->setHeader('Content-Type:text/html;charset=utf-8');
         if ($iFileSize) {
-            $this->_oUtils->setHeader("Content-Length: " . $iFileSize);
+            $this->_oUtils->setHeader('Content-Length: ' . $iFileSize);
         }
         echo $this->_oUtils->fromFileCache($sCurrentKey);
     }

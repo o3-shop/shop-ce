@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Checkout;
 
 use oxBasket;
@@ -31,7 +33,7 @@ class PersonalisableArticlesBasketAmountTest extends \OxidTestCase
     /**
      * Make a copy of The Barrel for testing, it is already configurable
      */
-    const SOURCE_ARTICLE_ID = 'f4f73033cf5045525644042325355732';
+    public const SOURCE_ARTICLE_ID = 'f4f73033cf5045525644042325355732';
 
     /**
      * Generated oxid for test article
@@ -165,16 +167,16 @@ class PersonalisableArticlesBasketAmountTest extends \OxidTestCase
      */
     private function getPersistent()
     {
-        $firstPersistent = array('details' => 'first');
-        $secondPersistent = array('details' => 'second');
-        $thirdPersistent = array('details' => 'third');
-        $fourthPersistent = array('details' => 'fourth');
+        $firstPersistent = ['details' => 'first'];
+        $secondPersistent = ['details' => 'second'];
+        $thirdPersistent = ['details' => 'third'];
+        $fourthPersistent = ['details' => 'fourth'];
 
-        $ret = array();
-        $ret['first']  = array($this->generateItemKey($firstPersistent)  => $firstPersistent);
-        $ret['second'] = array($this->generateItemKey($secondPersistent) => $secondPersistent);
-        $ret['third']  = array($this->generateItemKey($thirdPersistent)  => $thirdPersistent);
-        $ret['fourth'] = array($this->generateItemKey($fourthPersistent) => $fourthPersistent);
+        $ret = [];
+        $ret['first'] = [$this->generateItemKey($firstPersistent)  => $firstPersistent];
+        $ret['second'] = [$this->generateItemKey($secondPersistent) => $secondPersistent];
+        $ret['third'] = [$this->generateItemKey($thirdPersistent)  => $thirdPersistent];
+        $ret['fourth'] = [$this->generateItemKey($fourthPersistent) => $fourthPersistent];
 
         return $ret;
     }
@@ -189,7 +191,7 @@ class PersonalisableArticlesBasketAmountTest extends \OxidTestCase
         $basket = oxNew('oxBasket');
 
         $amount = 1;
-        $selectList = array();
+        $selectList = [];
         $override = true;
         $bundle = false;
         $oldBasketItemId = null;
@@ -227,11 +229,11 @@ class PersonalisableArticlesBasketAmountTest extends \OxidTestCase
      *
      * @return string
      */
-    private function generateItemKey($personal = array())
+    private function generateItemKey($personal = [])
     {
         $basket = oxNew('oxBasket');
 
-        $selectList = array();
+        $selectList = [];
         $bundle = false;
 
         return $basket->getItemKey($this->testArticleId, $selectList, $personal, $bundle);
@@ -248,27 +250,27 @@ class PersonalisableArticlesBasketAmountTest extends \OxidTestCase
         $thirdItemKey = $this->getItemKey('third');
         $fourthItemKey = $this->getItemKey('fourth');
 
-        $products = array();
-        $products[$firstItemKey] = array('persparam'    => $this->getPersistentParameters('first'),
+        $products = [];
+        $products[$firstItemKey] = ['persparam'    => $this->getPersistentParameters('first'),
                                          'aid'          => $this->testArticleId,
                                          'basketitemid' => $firstItemKey,
                                          'override'     => 1,
-                                         'am'           => 1);
-        $products[$secondItemKey] = array('persparam'    => $this->getPersistentParameters('second'),
+                                         'am'           => 1];
+        $products[$secondItemKey] = ['persparam'    => $this->getPersistentParameters('second'),
                                           'aid'          => $this->testArticleId,
                                           'basketitemid' => $secondItemKey,
                                           'override'     => 1,
-                                          'am'           => 1);
-        $products[$thirdItemKey] = array('persparam'    => $this->getPersistentParameters('third'),
+                                          'am'           => 1];
+        $products[$thirdItemKey] = ['persparam'    => $this->getPersistentParameters('third'),
                                          'aid'          => $this->testArticleId,
                                          'basketitemid' => $thirdItemKey,
                                          'override'     => 1,
-                                         'am'           => 1);
-        $products[$fourthItemKey] = array('persparam'    => $this->getPersistentParameters('fourth'),
+                                         'am'           => 1];
+        $products[$fourthItemKey] = ['persparam'    => $this->getPersistentParameters('fourth'),
                                           'aid'          => $this->testArticleId,
                                           'basketitemid' => $fourthItemKey,
                                           'override'     => 1,
-                                          'am'           => 1);
+                                          'am'           => 1];
 
         return $products;
     }

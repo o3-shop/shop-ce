@@ -21,15 +21,19 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxField;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Country;
+use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin user extended settings manager.
  * Collects user extended settings, updates it on user submit, etc.
  * Admin Menu: User Administration -> Users -> Extended.
  */
-class UserExtend extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class UserExtend extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates oxuser object and
@@ -42,30 +46,31 @@ class UserExtend extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDet
         parent::render();
 
         $soxId = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             // load object
-            $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+            $oUser = oxNew(User::class);
             $oUser->load($soxId);
 
             //show country in active language
-            $oCountry = oxNew(\OxidEsales\Eshop\Application\Model\Country::class);
-            $oCountry->loadInLang(\OxidEsales\Eshop\Core\Registry::getLang()->getObjectTplLanguage(), $oUser->oxuser__oxcountryid->value);
-            $oUser->oxuser__oxcountry = new \OxidEsales\Eshop\Core\Field($oCountry->oxcountry__oxtitle->value);
+            $oCountry = oxNew(Country::class);
+            $oCountry->loadInLang(Registry::getLang()->getObjectTplLanguage(), $oUser->oxuser__oxcountryid->value);
+            $oUser->oxuser__oxcountry = new Field($oCountry->oxcountry__oxtitle->value);
 
-            $this->_aViewData["edit"] = $oUser;
+            $this->_aViewData['edit'] = $oUser;
         }
 
         if (!$this->_allowAdminEdit($soxId)) {
             $this->_aViewData['readonly'] = true;
         }
 
-        return "user_extend.tpl";
+        return 'user_extend.tpl';
     }
 
     /**
      * Saves user extended information.
      *
-     * @return mixed
+     * @return bool|void
+     * @throws DatabaseConnectionException
      */
     public function save()
     {
@@ -77,10 +82,10 @@ class UserExtend extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDet
             return false;
         }
 
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
-        $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
-        if ($soxId != "-1") {
+        $oUser = oxNew(User::class);
+        if ($soxId != '-1') {
             $oUser->load($soxId);
         } else {
             $aParams['oxuser__oxid'] = null;
@@ -89,11 +94,11 @@ class UserExtend extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDet
         // checkbox handling
         $aParams['oxuser__oxactive'] = $oUser->oxuser__oxactive->value;
 
-        $blNewsParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editnews");
+        $blNewsParams = Registry::getRequest()->getRequestEscapedParameter('editnews');
         if (isset($blNewsParams)) {
             $oNewsSubscription = $oUser->getNewsSubscription();
             $oNewsSubscription->setOptInStatus((int) $blNewsParams);
-            $oNewsSubscription->setOptInEmailStatus((int) \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("emailfailed"));
+            $oNewsSubscription->setOptInEmailStatus((int) Registry::getRequest()->getRequestEscapedParameter('emailfailed'));
         }
 
         $oUser->assign($aParams);

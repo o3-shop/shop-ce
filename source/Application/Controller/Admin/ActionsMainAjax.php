@@ -21,15 +21,21 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxDb;
-use oxField;
 use Exception;
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Application\Model\RssFeed;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
 
 /**
  * Class controls article assignment to action
  */
-class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class ActionsMainAjax extends ListComponentAjax
 {
     /**
      * If true extended column selection will be build
@@ -43,43 +49,52 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
-        ['oxartnum', 'oxarticles', 1, 0, 0],
-        ['oxtitle', 'oxarticles', 1, 1, 0],
-        ['oxean', 'oxarticles', 1, 0, 0],
-        ['oxmpn', 'oxarticles', 0, 0, 0],
-        ['oxprice', 'oxarticles', 0, 0, 0],
-        ['oxstock', 'oxarticles', 0, 0, 0],
-        ['oxid', 'oxarticles', 0, 0, 1]
-    ],
-                                 'container2' => [
-                                     ['oxartnum', 'oxarticles', 1, 0, 0],
-                                     ['oxsort', 'oxactions2article', 1, 0, 0],
-                                     ['oxtitle', 'oxarticles', 1, 1, 0],
-                                     ['oxean', 'oxarticles', 1, 0, 0],
-                                     ['oxmpn', 'oxarticles', 0, 0, 0],
-                                     ['oxprice', 'oxarticles', 0, 0, 0],
-                                     ['oxstock', 'oxarticles', 0, 0, 0],
-                                     ['oxid', 'oxactions2article', 0, 0, 1]
-                                 ]
+    protected $_aColumns = [
+        'container1' => [
+            // field , table, visible, multilanguage, ident
+            ['oxartnum', 'oxarticles', 1, 0, 0],
+            ['oxtitle', 'oxarticles', 1, 1, 0],
+            ['oxean', 'oxarticles', 1, 0, 0],
+            ['oxmpn', 'oxarticles', 0, 0, 0],
+            ['oxprice', 'oxarticles', 0, 0, 0],
+            ['oxstock', 'oxarticles', 0, 0, 0],
+            ['oxid', 'oxarticles', 0, 0, 1],
+        ],
+        'container2' => [
+            ['oxartnum', 'oxarticles', 1, 0, 0],
+            ['oxsort', 'oxactions2article', 1, 0, 0],
+            ['oxtitle', 'oxarticles', 1, 1, 0],
+            ['oxean', 'oxarticles', 1, 0, 0],
+            ['oxmpn', 'oxarticles', 0, 0, 0],
+            ['oxprice', 'oxarticles', 0, 0, 0],
+            ['oxstock', 'oxarticles', 0, 0, 0],
+            ['oxid', 'oxactions2article', 0, 0, 1],
+        ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
+     * @throws DatabaseConnectionException
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $myConfig = Registry::getConfig();
+        $oDb = DatabaseProvider::getDb();
         // looking for table/view
-        $sArtTable = $this->_getViewName('oxarticles');
-        $sView = $this->_getViewName('oxobject2category');
+        $sArtTable = $this->getViewName('oxarticles');
+        $sView = $this->getViewName('oxobject2category');
 
-        $sSelId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchSelId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+        $sSelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchSelId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sSelId) {
@@ -98,18 +113,34 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
             } else {
                 $sQAdd = " from {$sArtTable} left join oxactions2article " .
                          "on {$sArtTable}.oxid=oxactions2article.oxartid " .
-                         " where oxactions2article.oxactionid = " . $oDb->quote($sSelId) .
+                         ' where oxactions2article.oxactionid = ' . $oDb->quote($sSelId) .
                          " and oxactions2article.oxshopid = '" . $myConfig->getShopID() . "' ";
             }
         }
 
         if ($sSynchSelId && $sSynchSelId != $sSelId) {
             $sQAdd .= " and {$sArtTable}.oxid not in ( select oxactions2article.oxartid from oxactions2article " .
-                      " where oxactions2article.oxactionid = " . $oDb->quote($sSynchSelId) .
+                      ' where oxactions2article.oxactionid = ' . $oDb->quote($sSynchSelId) .
                       " and oxactions2article.oxshopid = '" . $myConfig->getShopID() . "' ) ";
         }
 
         return $sQAdd;
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
+     */
+    protected function getQuery()
+    {
+        return $this->_getQuery();
     }
 
     /**
@@ -118,18 +149,25 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
      * @param string $sQ query to add filter condition
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "addFilter" in next major
+     * @throws DatabaseConnectionException
+     * @deprecated Transitional during #107. Modules SHOULD override _addFilter()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes addFilter() to the canonical override
+      *             target and retires _addFilter(); until then, _addFilter() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _addFilter($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sQ = parent::_addFilter($sQ);
 
         // display variants or not ?
-        if ($this->getConfig()->getConfigParam('blVariantsSelection')) {
-            $sQ .= ' group by ' . $this->_getViewName('oxarticles') . '.oxid ';
+        if (Registry::getConfig()->getConfigParam('blVariantsSelection')) {
+            $sQ .= ' group by ' . $this->getViewName('oxarticles') . '.oxid ';
 
-            $oStr = getStr();
-            if ($oStr->strpos($sQ, "select count( * ) ") === 0) {
+            $oStr = Str::getStr();
+            if ($oStr->strpos($sQ, 'select count( * ) ') === 0) {
                 $sQ = "select count( * ) from ( {$sQ} ) as _cnttable";
             }
         }
@@ -138,20 +176,62 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
     }
 
     /**
+     * Adds filter SQL to current query
+     *
+     * @param string $sQ query to add filter condition
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _addFilter(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make addFilter() the canonical override target.
+     */
+    protected function addFilter($sQ)
+    {
+        return $this->_addFilter($sQ);
+    }
+
+    /**
      * Returns SQL query addon for sorting
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getSorting" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getSorting()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getSorting() to the canonical override
+      *             target and retires _getSorting(); until then, _getSorting() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getSorting() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sOxIdParameter = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchOxidParameter = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+        $sOxIdParameter = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchOxidParameter = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
         if ($sOxIdParameter && !$sSynchOxidParameter) {
             return 'order by oxactions2article.oxsort ';
         }
 
+        // NOTE: call parent::_getSorting() (not parent::getSorting()) to avoid infinite
+        // recursion through the parent's delegate. Restores baseline (ebe86dc0) call shape.
+        // See o3-shop/o3-shop#107 remediation.
         return parent::_getSorting();
+    }
+
+    /**
+     * Returns SQL query addon for sorting
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getSorting(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getSorting() the canonical override target.
+     */
+    protected function getSorting()
+    {
+        return $this->_getSorting();
     }
 
     /**
@@ -160,17 +240,17 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
     public function removeArtFromAct()
     {
         $aChosenArt = $this->_getActionIds('oxactions2article.oxid');
-        $sOxid = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
+        $sOxid = Registry::getRequest()->getRequestEscapedParameter('oxid');
 
-        $this->_getOxRssFeed()->removeCacheFile($sOxid);
+        $this->getOxRssFeed()->removeCacheFile($sOxid);
 
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('all')) {
-            $sQ = parent::_addFilter("delete oxactions2article.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
+            $sQ = parent::addFilter('delete oxactions2article.* ' . $this->getQuery());
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
-            $sChosenArticles = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenArt));
-            $sQ = "delete from oxactions2article where oxactions2article.oxid in (" . $sChosenArticles . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            $sChosenArticles = implode(', ', DatabaseProvider::getDb()->quoteArray($aChosenArt));
+            $sQ = 'delete from oxactions2article where oxactions2article.oxid in (' . $sChosenArticles . ') ';
+            DatabaseProvider::getDb()->Execute($sQ);
         }
     }
 
@@ -183,43 +263,43 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
      */
     public function addArtToAct()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $aArticles = $this->_getActionIds('oxarticles.oxid');
-        $soxId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
-        $this->_getOxRssFeed()->removeCacheFile($soxId);
+        $this->getOxRssFeed()->removeCacheFile($soxId);
 
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('all')) {
-            $sArtTable = $this->_getViewName('oxarticles');
-            $aArticles = $this->_getAll($this->_addFilter("select $sArtTable.oxid " . $this->_getQuery()));
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
+            $sArtTable = $this->getViewName('oxarticles');
+            $aArticles = $this->_getAll($this->_addFilter("select $sArtTable.oxid " . $this->getQuery()));
         }
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804 and ESDEV-3822).
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
-        $sArtTable = $this->_getViewName('oxarticles');
+        $database = DatabaseProvider::getMaster();
+        $sArtTable = $this->getViewName('oxarticles');
         $sQ = "select max(oxactions2article.oxsort) from oxactions2article join {$sArtTable} " .
               "on {$sArtTable}.oxid=oxactions2article.oxartid " .
-              "where oxactions2article.oxactionid = :oxactionid " .
-              "and oxactions2article.oxshopid = :oxshopid " .
+              'where oxactions2article.oxactionid = :oxactionid ' .
+              'and oxactions2article.oxshopid = :oxshopid ' .
               "and $sArtTable.oxid is not null";
 
         $parameters = [
             ':oxactionid' => $soxId,
-            ':oxshopid' => $myConfig->getShopId()
+            ':oxshopid' => $myConfig->getShopId(),
         ];
 
         $iSort = ((int) $database->getOne($sQ, $parameters)) + 1;
 
         $articleAdded = false;
-        if ($soxId && $soxId != "-1" && is_array($aArticles)) {
+        if ($soxId && $soxId != '-1' && is_array($aArticles)) {
             $sShopId = $myConfig->getShopId();
             foreach ($aArticles as $sAdd) {
-                $oNewGroup = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+                $oNewGroup = oxNew(BaseModel::class);
                 $oNewGroup->init('oxactions2article');
-                $oNewGroup->oxactions2article__oxshopid = new \OxidEsales\Eshop\Core\Field($sShopId);
-                $oNewGroup->oxactions2article__oxactionid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oNewGroup->oxactions2article__oxartid = new \OxidEsales\Eshop\Core\Field($sAdd);
-                $oNewGroup->oxactions2article__oxsort = new \OxidEsales\Eshop\Core\Field($iSort++);
+                $oNewGroup->oxactions2article__oxshopid = new Field($sShopId);
+                $oNewGroup->oxactions2article__oxactionid = new Field($soxId);
+                $oNewGroup->oxactions2article__oxartid = new Field($sAdd);
+                $oNewGroup->oxactions2article__oxsort = new Field($iSort++);
                 $oNewGroup->save();
             }
             $articleAdded = true;
@@ -233,18 +313,18 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
      */
     public function setSorting()
     {
-        $myConfig = $this->getConfig();
-        $sArtTable = $this->_getViewName('oxarticles');
-        $sSelId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
+        $myConfig = Registry::getConfig();
+        $sArtTable = $this->getViewName('oxarticles');
+        $sSelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSelect = "select * from $sArtTable left join oxactions2article on $sArtTable.oxid=oxactions2article.oxartid ";
-        $sSelect .= "where oxactions2article.oxactionid = :oxactionid " .
-                    "and oxactions2article.oxshopid = :oxshopid " . $this->_getSorting();
+        $sSelect .= 'where oxactions2article.oxactionid = :oxactionid ' .
+                    'and oxactions2article.oxshopid = :oxshopid ' . $this->_getSorting();
 
-        $oList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
-        $oList->init("oxbase", "oxactions2article");
+        $oList = oxNew(ListModel::class);
+        $oList->init('oxbase', 'oxactions2article');
         $oList->selectString($sSelect, [
             ':oxactionid' => $sSelId,
-            ':oxshopid' => $myConfig->getShopID()
+            ':oxshopid' => $myConfig->getShopID(),
         ]);
 
         // fixing indexes
@@ -262,8 +342,8 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
         }
 
         //
-        if (($iKey = array_search(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('sortoxid'), $aIdx2Id)) !== false) {
-            $iDir = (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('direction') == 'up') ? ($iKey - 1) : ($iKey + 1);
+        if (($iKey = array_search(Registry::getRequest()->getRequestEscapedParameter('sortoxid'), $aIdx2Id)) !== false) {
+            $iDir = (Registry::getRequest()->getRequestEscapedParameter('direction') == 'up') ? ($iKey - 1) : ($iKey + 1);
             if (isset($aIdx2Id[$iDir])) {
                 // exchanging indexes
                 $oDir1 = $oList->offsetGet($aIdx2Id[$iDir]);
@@ -278,22 +358,32 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
             }
         }
 
-        $sQAdd = $this->_getQuery();
+        $sQAdd = $this->getQuery();
 
         $sQ = 'select ' . $this->_getQueryCols() . $sQAdd;
         $sCountQ = 'select count( * ) ' . $sQAdd;
 
-        $this->_outputResponse($this->_getData($sCountQ, $sQ));
+        $this->_outputResponse($this->getData($sCountQ, $sQ));
     }
 
     /**
      * Getter for the rss feed handler.
      *
-     * @return \OxidEsales\Eshop\Application\Model\RssFeed The rss feed handler.
+     * @return RssFeed The rss feed handler.
      * @deprecated underscore prefix violates PSR12, will be renamed to "getOxRssFeed" in next major
      */
     protected function _getOxRssFeed() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return oxNew(\OxidEsales\Eshop\Application\Model\RssFeed::class);
+        return $this->getOxRssFeed();
+    }
+
+    /**
+     * Getter for the rss feed handler.
+     *
+     * @return RssFeed The rss feed handler.
+     */
+    protected function getOxRssFeed()
+    {
+        return oxNew(RssFeed::class);
     }
 }

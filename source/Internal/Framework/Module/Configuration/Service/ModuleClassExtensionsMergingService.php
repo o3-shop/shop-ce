@@ -23,12 +23,12 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Service;
 
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleConfigurationNotFoundException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ClassExtensionsChain;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ShopConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\ClassExtension;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ShopConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ExtensionNotInChainException;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleConfigurationNotFoundException;
 
 class ModuleClassExtensionsMergingService implements ModuleClassExtensionsMergingServiceInterface
 {
@@ -44,7 +44,6 @@ class ModuleClassExtensionsMergingService implements ModuleClassExtensionsMergin
         ShopConfiguration $shopConfiguration,
         ModuleConfiguration $moduleConfiguration
     ): ClassExtensionsChain {
-
         $chain = $shopConfiguration->getClassExtensionsChain();
 
         if (!$shopConfiguration->hasModuleConfiguration($moduleConfiguration->getId())) {

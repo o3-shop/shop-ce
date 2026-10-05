@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -18,7 +20,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\FormConfiguration;
+namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\FormConfiguration;
 
 use OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FieldConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FormConfiguration;

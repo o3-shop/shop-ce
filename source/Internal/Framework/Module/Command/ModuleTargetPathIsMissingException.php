@@ -28,5 +28,4 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Command;
  */
 class ModuleTargetPathIsMissingException extends \Exception
 {
-
 }

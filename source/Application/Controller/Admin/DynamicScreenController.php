@@ -21,7 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
+use OxidEsales\Eshop\Core\UtilsUrl;
 
 /**
  * Admin dynscreen manager.
@@ -33,7 +36,7 @@ use oxRegistry;
  * @deprecated since v5.3 (2016-05-20); Dynpages will be removed.
  *
  */
-class DynamicScreenController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class DynamicScreenController extends AdminListController
 {
     /**
      * Current class template name.
@@ -46,15 +49,21 @@ class DynamicScreenController extends \OxidEsales\Eshop\Application\Controller\A
      * Sets up navigation for current view
      *
      * @param string $sNode None name
-     * @deprecated underscore prefix violates PSR12, will be renamed to "setupNavigation" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _setupNavigation()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes setupNavigation() to the canonical override
+      *             target and retires _setupNavigation(); until then, _setupNavigation() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _setupNavigation($sNode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $myAdminNavig = $this->getNavigation();
-        $sNode = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("menu");
+        $sNode = Registry::getRequest()->getRequestEscapedParameter('menu');
 
         // active tab
-        $iActTab = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('actedit');
+        $iActTab = Registry::getRequest()->getRequestEscapedParameter('actedit');
         $iActTab = $iActTab ? $iActTab : $this->_iDefEdit;
 
         $sActTab = $iActTab ? "&actedit=$iActTab" : '';
@@ -64,10 +73,10 @@ class DynamicScreenController extends \OxidEsales\Eshop\Application\Controller\A
 
         // edit url
         $sEditUrl = $myAdminNavig->getEditUrl($sNode, $iActTab) . $sActTab;
-        if (!getStr()->preg_match("/^http(s)?:\/\//", $sEditUrl)) {
+        if (!Str::getStr()->preg_match("/^http(s)?:\/\//", $sEditUrl)) {
             //internal link, adding path
-            /** @var \OxidEsales\Eshop\Core\UtilsUrl $oUtilsUrl */
-            $oUtilsUrl = \OxidEsales\Eshop\Core\Registry::getUtilsUrl();
+            /** @var UtilsUrl $oUtilsUrl */
+            $oUtilsUrl = Registry::getUtilsUrl();
             $sSelfLinkParameter = $this->getViewConfig()->getViewConfigParam('selflink');
             $sEditUrl = $oUtilsUrl->appendParamSeparator($sSelfLinkParameter) . $sEditUrl;
         }
@@ -83,11 +92,26 @@ class DynamicScreenController extends \OxidEsales\Eshop\Application\Controller\A
         // default tab
         $this->_aViewData['default_edit'] = $myAdminNavig->getActiveTab($sNode, $this->_iDefEdit);
 
-        // passign active tab number
+        // passing active tab number
         $this->_aViewData['actedit'] = $iActTab;
 
         // buttons
         $this->_aViewData['bottom_buttons'] = $myAdminNavig->getBtn($sNode);
+    }
+
+    /**
+     * Sets up navigation for current view
+     *
+     * @param string $sNode None name
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _setupNavigation(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make setupNavigation() the canonical override target.
+     */
+    protected function setupNavigation($sNode)
+    {
+        $this->_setupNavigation($sNode);
     }
 
     /**

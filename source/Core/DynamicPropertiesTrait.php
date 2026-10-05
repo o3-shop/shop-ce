@@ -39,7 +39,8 @@ trait DynamicPropertiesTrait
         trigger_error(
             'Undefined property via __get(): ' . $name .
             ' in ' . $trace[0]['file'] .
-            ' on line ' . $trace[0]['line']);
+            ' on line ' . $trace[0]['line']
+        );
 
         return null;
     }

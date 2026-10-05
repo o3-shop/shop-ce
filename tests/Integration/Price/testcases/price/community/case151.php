@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Price enter mode: brutto
  * Price view mode: brutto
@@ -8,202 +9,197 @@
  * Parent buyable: no
  * Short description: 1st variant is not active
  */
-$aData = array(
-        'articles' => array(
-
-                1 => array(
+$aData = [
+        'articles' => [
+                1 => [
                         'oxid'                     => '_testId_1',
-                        'oxprice'                  => 0
-                ),
-                2 => array(
+                        'oxprice'                  => 0,
+                ],
+                2 => [
                         'oxid'                     => '_testId_1_child_1',
                         'oxprice'                  => 0,
                         'oxparentid'               => '_testId_1',
-                        'oxactive'                 => false
-                ),
+                        'oxactive'                 => false,
+                ],
 
-                3 => array(
+                3 => [
                         'oxid'                     => '_testId_2',
-                        'oxprice'                  => 0
-                ),
-                4 => array(
+                        'oxprice'                  => 0,
+                ],
+                4 => [
                         'oxid'                     => '_testId_2_child_1',
                         'oxprice'                  => 6,
                         'oxparentid'               => '_testId_2',
-                        'oxactive'                 => false
-                ),
+                        'oxactive'                 => false,
+                ],
 
-                5 => array(
+                5 => [
                         'oxid'                     => '_testId_3',
-                        'oxprice'                  => 0
-                ),
-                6 => array(
+                        'oxprice'                  => 0,
+                ],
+                6 => [
                         'oxid'                     => '_testId_3_child_1',
                         'oxprice'                  => 0,
                         'oxparentid'               => '_testId_3',
-                        'oxactive'                 => false
-                ),
-                7 => array(
+                        'oxactive'                 => false,
+                ],
+                7 => [
                         'oxid'                     => '_testId_3_child_2',
                         'oxprice'                  => 0,
-                        'oxparentid'               => '_testId_3'
-                ),
+                        'oxparentid'               => '_testId_3',
+                ],
 
-                8 => array(
+                8 => [
                         'oxid'                     => '_testId_4',
-                        'oxprice'                  => 0
-                ),
-                9 => array(
+                        'oxprice'                  => 0,
+                ],
+                9 => [
                         'oxid'                     => '_testId_4_child_1',
                         'oxprice'                  => 0,
                         'oxparentid'               => '_testId_4',
-                        'oxactive'                 => false
-                ),
-                10 => array(
+                        'oxactive'                 => false,
+                ],
+                10 => [
                         'oxid'                     => '_testId_4_child_2',
                         'oxprice'                  => 6,
-                        'oxparentid'               => '_testId_4'
-                ),
+                        'oxparentid'               => '_testId_4',
+                ],
 
-                11 => array(
+                11 => [
                         'oxid'                     => '_testId_5',
-                        'oxprice'                  => 0
-                ),
-                12 => array(
+                        'oxprice'                  => 0,
+                ],
+                12 => [
                         'oxid'                     => '_testId_5_child_1',
                         'oxprice'                  => 6,
                         'oxparentid'               => '_testId_5',
-                        'oxactive'                 => false
-                ),
-                13 => array(
+                        'oxactive'                 => false,
+                ],
+                13 => [
                         'oxid'                     => '_testId_5_child_2',
                         'oxprice'                  => 0,
-                        'oxparentid'               => '_testId_5'
-                ),
+                        'oxparentid'               => '_testId_5',
+                ],
 
-                14 => array(
+                14 => [
                         'oxid'                     => '_testId_6',
-                        'oxprice'                  => 0
-                ),
-                15 => array(
+                        'oxprice'                  => 0,
+                ],
+                15 => [
                         'oxid'                     => '_testId_6_child_1',
                         'oxprice'                  => 6,
                         'oxparentid'               => '_testId_6',
-                        'oxactive'                 => false
-                ),
-                16 => array(
+                        'oxactive'                 => false,
+                ],
+                16 => [
                         'oxid'                     => '_testId_6_child_2',
                         'oxprice'                  => 27,
-                        'oxparentid'               => '_testId_6'
-                ),
+                        'oxparentid'               => '_testId_6',
+                ],
 
-                17 => array(
+                17 => [
                         'oxid'                     => '_testId_7',
-                        'oxprice'                  => 0
-                ),
-                18 => array(
+                        'oxprice'                  => 0,
+                ],
+                18 => [
                         'oxid'                     => '_testId_7_child_1',
                         'oxprice'                  => 27,
                         'oxparentid'               => '_testId_7',
-                        'oxactive'                 => false
-                ),
-                19 => array(
+                        'oxactive'                 => false,
+                ],
+                19 => [
                         'oxid'                     => '_testId_7_child_2',
                         'oxprice'                  => 6,
-                        'oxparentid'               => '_testId_7'
-                ),
+                        'oxparentid'               => '_testId_7',
+                ],
 
-                20 => array(
+                20 => [
                         'oxid'                     => '_testId_8',
-                        'oxprice'                  => 0
-                ),
-                21 => array(
+                        'oxprice'                  => 0,
+                ],
+                21 => [
                         'oxid'                     => '_testId_8_child_1',
                         'oxprice'                  => 27,
                         'oxparentid'               => '_testId_8',
-                        'oxactive'                 => false
-                ),
-                22 => array(
+                        'oxactive'                 => false,
+                ],
+                22 => [
                         'oxid'                     => '_testId_8_child_2',
                         'oxprice'                  => 27,
-                        'oxparentid'               => '_testId_8'
-                ),
+                        'oxparentid'               => '_testId_8',
+                ],
+        ],
 
-        ),
-
-        'expected' => array(
-
-                '_testId_1' => array(
+        'expected' => [
+                '_testId_1' => [
                         'base_price' => '0,00',
                         'price' => '0,00',
                         'min_price' => '0,00',
                         'var_min_price' => '0,00',
-                        'is_range_price' => false
-                ),
+                        'is_range_price' => false,
+                ],
 
-                '_testId_2' => array(
+                '_testId_2' => [
                         'base_price' => '0,00',
                         'price' => '0,00',
                         'min_price' => '0,00',
                         'var_min_price' => '0,00',
-                        'is_range_price' => false
-                ),
+                        'is_range_price' => false,
+                ],
 
-                '_testId_3' => array(
+                '_testId_3' => [
                         'base_price' => '0,00',
                         'price' => '0,00',
                         'min_price' => '0,00',
                         'var_min_price' => '0,00',
-                        'is_range_price' => false
-                ),
+                        'is_range_price' => false,
+                ],
 
-                '_testId_4' => array(
+                '_testId_4' => [
                         'base_price' => '0,00',
                         'price' => '0,00',
                         'min_price' => '0,00',
                         'var_min_price' => '6,00',
-                        'is_range_price' => false
-                ),
+                        'is_range_price' => false,
+                ],
 
-                '_testId_5' => array(
+                '_testId_5' => [
                         'base_price' => '0,00',
                         'price' => '0,00',
                         'min_price' => '0,00',
                         'var_min_price' => '0,00',
-                        'is_range_price' => false
-                ),
+                        'is_range_price' => false,
+                ],
 
-                '_testId_6' => array(
+                '_testId_6' => [
                         'base_price' => '0,00',
                         'price' => '0,00',
                         'min_price' => '0,00',
                         'var_min_price' => '27,00',
-                        'is_range_price' => false
-                ),
+                        'is_range_price' => false,
+                ],
 
-                '_testId_7' => array(
+                '_testId_7' => [
                         'base_price' => '0,00',
                         'price' => '0,00',
                         'min_price' => '0,00',
                         'var_min_price' => '6,00',
-                        'is_range_price' => false
-                ),
+                        'is_range_price' => false,
+                ],
 
-                '_testId_8' => array(
+                '_testId_8' => [
                         'base_price' => '0,00',
                         'price' => '0,00',
                         'min_price' => '0,00',
                         'var_min_price' => '27,00',
-                        'is_range_price' => false
-                ),
-
-        ),
-        'options' => array(
-                'config' => array(
+                        'is_range_price' => false,
+                ],
+        ],
+        'options' => [
+                'config' => [
                         'blEnterNetPrice' => false,
                         'blShowNetPrice' => false,
-                        'blVariantParentBuyable' => 0
-                ),
-
-        ),
-);
+                        'blVariantParentBuyable' => 0,
+                ],
+        ],
+];

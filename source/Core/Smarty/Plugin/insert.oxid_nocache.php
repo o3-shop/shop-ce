@@ -38,17 +38,17 @@ function smarty_insert_oxid_nocache($params, &$smarty)
     $smarty->caching = false;
 
     // #1184M - specialchar search
-    $sSearchParamForHTML = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("searchparam");
-    $sSearchParamForLink = rawurlencode(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("searchparam", true));
+    $sSearchParamForHTML = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('searchparam');
+    $sSearchParamForLink = rawurlencode(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('searchparam', true));
     if ($sSearchParamForHTML) {
-        $smarty->assign_by_ref("searchparamforhtml", $sSearchParamForHTML);
-        $smarty->assign_by_ref("searchparam", $sSearchParamForLink);
+        $smarty->assign_by_ref('searchparamforhtml', $sSearchParamForHTML);
+        $smarty->assign_by_ref('searchparam', $sSearchParamForLink);
     }
 
-    $sSearchCat = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("searchcnid");
+    $sSearchCat = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('searchcnid');
     if ($sSearchCat) {
         $decodedSearchCat = rawurldecode($sSearchCat);
-        $smarty->assign_by_ref("searchcnid", $decodedSearchCat);
+        $smarty->assign_by_ref('searchcnid', $decodedSearchCat);
     }
 
     foreach (array_keys($params) as $key) {

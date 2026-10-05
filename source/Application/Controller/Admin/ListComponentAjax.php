@@ -21,12 +21,20 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Base;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\SeoEncoder;
+use OxidEsales\Eshop\Core\Str;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AfterAdminAjaxRequestProcessedEvent;
 
 /**
  * AJAX call processor class
  */
-class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
+class ListComponentAjax extends Base
 {
     /**
      * Possible sort keys
@@ -87,21 +95,46 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
     /**
      * Required data fields are returned by indexes/position in _aColumns array. This method
      * translates "table_name.col_name" into index definition and fetches request data according
-     * to it. This is usefull while using AJAX across versions.
+     * to it. This is useful while using AJAX across versions.
      *
      * @param string $sId "table_name.col_name"
      *
-     * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getActionIds" in next major
+     * @return array|null
+     * @deprecated Transitional during #107. Modules SHOULD override _getActionIds()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getActionIds() to the canonical override
+      *             target and retires _getActionIds(); until then, _getActionIds() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getActionIds($sId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aColumns = $this->_getColNames();
         foreach ($aColumns as $iPos => $aCol) {
             if (isset($aCol[4]) && $aCol[4] == 1 && $sId == $aCol[1] . '.' . $aCol[0]) {
-                return \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('_' . $iPos);
+                return Registry::getRequest()->getRequestEscapedParameter('_' . $iPos);
             }
         }
+    }
+
+    /**
+     * Required data fields are returned by indexes/position in _aColumns array. This method
+     * translates "table_name.col_name" into index definition and fetches request data according
+     * to it. This is useful while using AJAX across versions.
+     *
+     * @param string $sId "table_name.col_name"
+     *
+     * @return array|void
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getActionIds(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getActionIds() the canonical override target.
+     */
+    protected function getActionIds($sId)
+    {
+        return $this->_getActionIds($sId);
     }
 
     /**
@@ -118,11 +151,32 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * Empty function, developer should override this method according requirements
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return '';
+    }
+
+    /**
+     * Empty function, developer should override this method according requirements
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
+     */
+    protected function getQuery()
+    {
+        return $this->_getQuery();
     }
 
     /**
@@ -131,11 +185,34 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * @param string $sQ part of initial query
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getDataQuery" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getDataQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getDataQuery() to the canonical override
+      *             target and retires _getDataQuery(); until then, _getDataQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getDataQuery($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return 'select ' . $this->_getQueryCols() . $sQ;
+    }
+
+    /**
+     * Return fully formatted query for data loading
+     *
+     * @param string $sQ part of initial query
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getDataQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getDataQuery() the canonical override target.
+     */
+    protected function getDataQuery($sQ)
+    {
+        return $this->_getDataQuery($sQ);
     }
 
     /**
@@ -144,7 +221,13 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * @param string $sQ part of initial query
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getCountQuery" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getCountQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getCountQuery() to the canonical override
+      *             target and retires _getCountQuery(); until then, _getCountQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getCountQuery($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -152,9 +235,28 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
+     * Return fully formatted query for data records count
+     *
+     * @param string $sQ part of initial query
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getCountQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getCountQuery() the canonical override target.
+     */
+    protected function getCountQuery($sQ)
+    {
+        return $this->_getCountQuery($sQ);
+    }
+
+    /**
      * AJAX call processor function
      *
-     * @param string $function name of action to execute (optional)
+     * @param null $function name of action to execute (optional)
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function processRequest($function = null)
     {
@@ -162,13 +264,23 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
             $this->$function();
             $this->dispatchEvent(new AfterAdminAjaxRequestProcessedEvent());
         } else {
+            // Restored to the baseline form from ebe86dc (initial commit
+            // line 154: `$sQAdd = $this->_getQuery();`). #107 (commit
+            // 45e71ae) had moved the body INTO _getQuery() and made
+            // getQuery() a delegate-down — that inversion broke subclass
+            // overrides and test mocks of getQuery(). Per the BC-shim
+            // contract, _getQuery() is the deprecated wrapper that
+            // delegates UP to getQuery(); internal call sites must use
+            // _getQuery() so module overrides of either form continue to
+            // win. Broader audit of similar #107 inversions tracked in
+            // the reopened o3-shop/o3-shop#107.
             $sQAdd = $this->_getQuery();
 
             // formatting SQL queries
             $sQ = $this->_getDataQuery($sQAdd);
             $sCountQ = $this->_getCountQuery($sQAdd);
 
-            $this->_outputResponse($this->_getData($sCountQ, $sQ));
+            $this->_outputResponse($this->getData($sCountQ, $sQ));
         }
     }
 
@@ -176,32 +288,58 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * Returns column id to sort
      *
      * @return int
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getSortCol" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getSortCol()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getSortCol() to the canonical override
+      *             target and retires _getSortCol(); until then, _getSortCol() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getSortCol() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aVisibleNames = $this->_getVisibleColNames();
-        $iCol = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('sort');
+        $iCol = Registry::getRequest()->getRequestEscapedParameter('sort');
         $iCol = $iCol ? ((int) str_replace('_', '', $iCol)) : 0;
         $iCol = (!isset($aVisibleNames[$iCol])) ? 0 : $iCol;
 
         return $iCol;
     }
 
+    /**
+     * Returns column id to sort
+     *
+     * @return int
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getSortCol(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getSortCol() the canonical override target.
+     */
+    protected function getSortCol()
+    {
+        return $this->_getSortCol();
+    }
 
     /**
-     * Returns array of cotainer DB cols which must be loaded. If id is not
+     * Returns array of container DB cols which must be loaded. If id is not
      * passed - all possible containers cols will be returned
      *
      * @param string $sId container id (optional)
      *
      * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getColNames" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getColNames()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getColNames() to the canonical override
+      *             target and retires _getColNames(); until then, _getColNames() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getColNames($sId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($sId === null) {
-            $sId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('cmpid');
+            $sId = Registry::getRequest()->getRequestEscapedParameter('cmpid');
         }
 
         if ($sId && isset($this->_aColumns[$sId])) {
@@ -212,11 +350,35 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
+     * Returns array of container DB cols which must be loaded. If id is not
+     * passed - all possible containers cols will be returned
+     *
+     * @param string $sId container id (optional)
+     *
+     * @return array
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getColNames(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getColNames() the canonical override target.
+     */
+    protected function getColNames($sId = null)
+    {
+        return $this->_getColNames($sId);
+    }
+
+    /**
      * Returns array of identifiers which are used as identifiers for specific actions
      * in AJAX and further in this processor class
      *
      * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getIdentColNames" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getIdentColNames()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getIdentColNames() to the canonical override
+      *             target and retires _getIdentColNames(); until then, _getIdentColNames() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getIdentColNames() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -233,20 +395,42 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
+     * Returns array of identifiers which are used as identifiers for specific actions
+     * in AJAX and further in this processor class
+     *
+     * @return array
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getIdentColNames(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getIdentColNames() the canonical override target.
+     */
+    protected function getIdentColNames()
+    {
+        return $this->_getIdentColNames();
+    }
+
+    /**
      * Returns array of col names which are requested by AJAX call and will be fetched from DB
      *
      * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getVisibleColNames" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getVisibleColNames()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getVisibleColNames() to the canonical override
+      *             target and retires _getVisibleColNames(); until then, _getVisibleColNames() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getVisibleColNames() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aColNames = $this->_getColNames();
-        $aUserCols = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('aCols');
+        $aUserCols = Registry::getRequest()->getRequestEscapedParameter('aCols');
         $aVisibleCols = [];
 
         // user defined some cols to load ?
         if (is_array($aUserCols)) {
-            foreach ($aUserCols as $iKey => $sCol) {
+            foreach ($aUserCols as $sCol) {
                 $iCol = (int) str_replace('_', '', $sCol);
                 if (isset($aColNames[$iCol]) && !$aColNames[$iCol][4]) {
                     $aVisibleCols[$iCol] = $aColNames[$iCol];
@@ -254,11 +438,11 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
             }
         }
 
-        // no user defined valid cols ? setting defauls ..
+        // no user defined valid cols ? setting defaults ..
         if (!count($aVisibleCols)) {
             foreach ($aColNames as $sName => $aCol) {
                 // visible ?
-                if ($aCol[1] && !$aColNames[$sName][4]) {
+                if ($aCol[1] && !$aCol[4]) {
                     $aVisibleCols[$sName] = $aCol;
                 }
             }
@@ -268,18 +452,55 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
+     * Returns array of col names which are requested by AJAX call and will be fetched from DB
+     *
+     * @return array
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getVisibleColNames(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getVisibleColNames() the canonical override target.
+     */
+    protected function getVisibleColNames()
+    {
+        return $this->_getVisibleColNames();
+    }
+
+    /**
      * Formats and returns chunk of SQL query string with definition of
      * fields to load from DB
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQueryCols" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getQueryCols()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQueryCols() to the canonical override
+      *             target and retires _getQueryCols(); until then, _getQueryCols() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQueryCols() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sQ = $this->_buildColsQuery($this->_getVisibleColNames(), false) . ", ";
+        $sQ = $this->_buildColsQuery($this->_getVisibleColNames(), false) . ', ';
         $sQ .= $this->_buildColsQuery($this->_getIdentColNames());
 
         return " $sQ ";
+    }
+
+    /**
+     * Formats and returns chunk of SQL query string with definition of
+     * fields to load from DB
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQueryCols(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQueryCols() the canonical override target.
+     */
+    protected function getQueryCols()
+    {
+        return $this->_getQueryCols();
     }
 
     /**
@@ -289,7 +510,13 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * @param bool  $blIdentCols if true, means ident columns part is build
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "buildColsQuery" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _buildColsQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes buildColsQuery() to the canonical override
+      *             target and retires _buildColsQuery(); until then, _buildColsQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _buildColsQuery($aIdentCols, $blIdentCols = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -299,7 +526,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
                 $sQ .= ', ';
             }
 
-            $sViewTable = $this->_getViewName($aCol[1]);
+            $sViewTable = $this->getViewName($aCol[1]);
             if (!$blIdentCols && $this->_isExtendedColumn($aCol[0])) {
                 $sQ .= $this->_getExtendedColQuery($sViewTable, $aCol[0], $iCnt);
             } else {
@@ -311,19 +538,61 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
+     * Builds column selection query
+     *
+     * @param array $aIdentCols  columns
+     * @param bool  $blIdentCols if true, means ident columns part is build
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _buildColsQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make buildColsQuery() the canonical override target.
+     */
+    protected function buildColsQuery($aIdentCols, $blIdentCols = true)
+    {
+        return $this->_buildColsQuery($aIdentCols, $blIdentCols);
+    }
+
+    /**
      * Checks if current column is extended
      * (currently checks if variants must be shown in lists and column name is "oxtitle")
      *
      * @param string $sColumn column name
      *
      * @return bool
-     * @deprecated underscore prefix violates PSR12, will be renamed to "isExtendedColumn" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _isExtendedColumn()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes isExtendedColumn() to the canonical override
+      *             target and retires _isExtendedColumn(); until then, _isExtendedColumn() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _isExtendedColumn($sColumn) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $blVariantsSelectionParameter = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blVariantsSelection');
+        $blVariantsSelectionParameter = Registry::getConfig()->getConfigParam('blVariantsSelection');
 
         return $this->_blAllowExtColumns && $blVariantsSelectionParameter && $sColumn == 'oxtitle';
+    }
+
+    /**
+     * Checks if current column is extended
+     * (currently checks if variants must be shown in lists and column name is "oxtitle")
+     *
+     * @param string $sColumn column name
+     *
+     * @return bool
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _isExtendedColumn(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make isExtendedColumn() the canonical override target.
+     */
+    protected function isExtendedColumn($sColumn)
+    {
+        return $this->_isExtendedColumn($sColumn);
     }
 
     /**
@@ -335,7 +604,13 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * @param int    $iCnt       column count
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getExtendedColQuery" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getExtendedColQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getExtendedColQuery() to the canonical override
+      *             target and retires _getExtendedColQuery(); until then, _getExtendedColQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getExtendedColQuery($sViewTable, $sColumn, $iCnt) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -348,14 +623,55 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
+     * Returns extended query part for given view/column combination
+     * (if variants must be shown in lists and column name is "oxtitle")
+     *
+     * @param string $sViewTable view name
+     * @param string $sColumn    column name
+     * @param int    $iCnt       column count
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getExtendedColQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getExtendedColQuery() the canonical override target.
+     */
+    protected function getExtendedColQuery($sViewTable, $sColumn, $iCnt)
+    {
+        return $this->_getExtendedColQuery($sViewTable, $sColumn, $iCnt);
+    }
+
+    /**
      * Formats and returns part of SQL query for sorting
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getSorting" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getSorting()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getSorting() to the canonical override
+      *             target and retires _getSorting(); until then, _getSorting() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getSorting() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return ' order by _' . $this->_getSortCol() . ' ' . $this->_getSortDir() . ' ';
+        return ' order by _' . $this->_getSortCol() . ' ' . $this->getSortDir() . ' ';
+    }
+
+    /**
+     * Formats and returns part of SQL query for sorting
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getSorting(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getSorting() the canonical override target.
+     */
+    protected function getSorting()
+    {
+        return $this->_getSorting();
     }
 
     /**
@@ -364,31 +680,60 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * @param int $iStart start position
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getLimit" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getLimit()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getLimit() to the canonical override
+      *             target and retires _getLimit(); until then, _getLimit() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getLimit($iStart) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $iLimit = (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("results");
+        $iLimit = (int) Registry::getRequest()->getRequestEscapedParameter('results');
         $iLimit = $iLimit ? $iLimit : $this->_iSqlLimit;
 
         return " limit $iStart, $iLimit ";
     }
 
     /**
+     * Returns part of SQL query for limiting number of entries from DB
+     *
+     * @param int $iStart start position
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getLimit(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getLimit() the canonical override target.
+     */
+    protected function getLimit($iStart)
+    {
+        return $this->_getLimit($iStart);
+    }
+
+    /**
      * Returns part of SQL query for filtering DB data
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getFilter" in next major
+     * @throws DatabaseConnectionException
+     * @deprecated Transitional during #107. Modules SHOULD override _getFilter()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getFilter() to the canonical override
+      *             target and retires _getFilter(); until then, _getFilter() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getFilter() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sQ = '';
-        $oConfig = $this->getConfig();
-        $aFilter = $oConfig->getRequestParameter('aFilter');
+        $aFilter = Registry::getRequest()->getRequestEscapedParameter('aFilter');
         if (is_array($aFilter) && count($aFilter)) {
             $aCols = $this->_getVisibleColNames();
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $oStr = getStr();
+            $oDb = DatabaseProvider::getDb();
+            $oStr = Str::getStr();
 
             foreach ($aFilter as $sCol => $sValue) {
                 // skipping empty filters
@@ -405,10 +750,10 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
                     // escaping special characters
                     $sValue = str_replace(['%', '_'], ['\%', '\_'], $sValue);
 
-                    // possibility to search in the middle ..
+                    // possibility to search in the middle ...
                     $sValue = $oStr->preg_replace('/^\*/', '%', $sValue);
 
-                    $sQ .= $this->_getViewName($aCols[$iCol][1]) . '.' . $aCols[$iCol][0];
+                    $sQ .= $this->getViewName($aCols[$iCol][1]) . '.' . $aCols[$iCol][0];
                     $sQ .= ' like ' . $oDb->Quote('%' . $sValue . '%') . ' ';
                 }
             }
@@ -418,12 +763,35 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
+     * Returns part of SQL query for filtering DB data
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getFilter(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getFilter() the canonical override target.
+     */
+    protected function getFilter()
+    {
+        return $this->_getFilter();
+    }
+
+    /**
      * Adds filter SQL to current query
      *
      * @param string $sQ query to add filter condition
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "addFilter" in next major
+     * @throws DatabaseConnectionException
+     * @deprecated Transitional during #107. Modules SHOULD override _addFilter()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes addFilter() to the canonical override
+      *             target and retires _addFilter(); until then, _addFilter() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _addFilter($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -435,18 +803,44 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
+     * Adds filter SQL to current query
+     *
+     * @param string $sQ query to add filter condition
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _addFilter(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make addFilter() the canonical override target.
+     */
+    protected function addFilter($sQ)
+    {
+        return $this->_addFilter($sQ);
+    }
+
+    /**
      * Returns DB records as plain indexed array
      *
      * @param string $sQ SQL query
      *
      * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getAll" in next major
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @deprecated Transitional during #107. Modules SHOULD override _getAll()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getAll() to the canonical override
+      *             target and retires _getAll(); until then, _getAll() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getAll($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aReturn = [];
-        $rs = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->select($sQ);
-        if ($rs != false && $rs->count() > 0) {
+        $rs = DatabaseProvider::getDb()->select($sQ);
+        if ($rs && $rs->count() > 0) {
             while (!$rs->EOF) {
                 $aReturn[] = $rs->fields[0];
                 $rs->fetchRow();
@@ -457,6 +851,25 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
+     * Returns DB records as plain indexed array
+     *
+     * @param string $sQ SQL query
+     *
+     * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getAll(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getAll() the canonical override target.
+     */
+    protected function getAll($sQ)
+    {
+        return $this->_getAll($sQ);
+    }
+
+    /**
      * Checks user input and returns SQL sorting direction key
      *
      * @return string
@@ -464,7 +877,17 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getSortDir() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sDir = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('dir');
+        return $this->getSortDir();
+    }
+
+    /**
+     * Checks user input and returns SQL sorting direction key
+     *
+     * @return string
+     */
+    protected function getSortDir()
+    {
+        $sDir = Registry::getRequest()->getRequestEscapedParameter('dir');
         if (!in_array($sDir, $this->_aPosDir)) {
             $sDir = $this->_aPosDir[0];
         }
@@ -480,7 +903,17 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getStartIndex() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('startIndex');
+        return $this->getStartIndex();
+    }
+
+    /**
+     * Returns position from where data must be loaded
+     *
+     * @return int
+     */
+    protected function getStartIndex()
+    {
+        return (int) Registry::getRequest()->getRequestEscapedParameter('startIndex');
     }
 
     /**
@@ -489,9 +922,23 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * @param string $sQ SQL query
      *
      * @return int
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getTotalCount" in next major
      */
     protected function _getTotalCount($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getTotalCount($sQ);
+    }
+
+    /**
+     * Returns amount of records which can be found according to passed SQL query
+     *
+     * @param string $sQ SQL query
+     *
+     * @return int
+     * @throws DatabaseConnectionException
+     */
+    protected function getTotalCount($sQ)
     {
         // TODO: implement caching here
 
@@ -500,7 +947,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
         // $sCountCacheKey = md5( $sQ );
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-        return (int) \OxidEsales\Eshop\Core\DatabaseProvider::getMaster()->getOne($sQ);
+        return (int) DatabaseProvider::getMaster()->getOne($sQ);
     }
 
     /**
@@ -509,12 +956,33 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * @param string $sQ SQL query
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getDataFields" in next major
      */
     protected function _getDataFields($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-        return \OxidEsales\Eshop\Core\DatabaseProvider::getMaster(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC)->getAll($sQ, false);
+        return DatabaseProvider::getMaster(DatabaseProvider::FETCH_MODE_ASSOC)->getAll($sQ, false);
+    }
+
+    /**
+     * Returns array with DB records
+     *
+     * @param string $sQ SQL query
+     *
+     * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getDataFields(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getDataFields() the canonical override target.
+     */
+    protected function getDataFields($sQ)
+    {
+        return $this->_getDataFields($sQ);
     }
 
     /**
@@ -524,6 +992,16 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * @deprecated underscore prefix violates PSR12, will be renamed to "outputResponse" in next major
      */
     protected function _outputResponse($aData) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->outputResponse($aData);
+    }
+
+    /**
+     * Outputs JSON encoded data
+     *
+     * @param array $aData data to output
+     */
+    protected function outputResponse($aData)
     {
         $this->_output(json_encode($aData));
     }
@@ -535,6 +1013,16 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * @deprecated underscore prefix violates PSR12, will be renamed to "output" in next major
      */
     protected function _output($sOut) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->output($sOut);
+    }
+
+    /**
+     * Echoes given string
+     *
+     * @param string $sOut string to echo
+     */
+    protected function output($sOut)
     {
         echo $sOut;
     }
@@ -549,28 +1037,57 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getViewName($sTable) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return getViewName($sTable, \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('editlanguage'));
+        return $this->getViewName($sTable);
+    }
+
+    /**
+     * Return the view name of the given table if a view exists, otherwise the table name itself
+     *
+     * @param string $sTable table name
+     *
+     * @return string
+     */
+    protected function getViewName($sTable)
+    {
+        return Registry::get(TableViewNameGenerator::class)->getViewName($sTable, Registry::getRequest()->getRequestEscapedParameter('editlanguage'));
     }
 
     /**
      * Formats data array which later will be processed by _outputResponse method
      *
      * @param string $sCountQ count query
-     * @param string $sQ      data load query
+     * @param string $sQ data load query
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getData" in next major
      */
     protected function _getData($sCountQ, $sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getData($sCountQ, $sQ);
+    }
+
+    /**
+     * Formats data array which later will be processed by _outputResponse method
+     *
+     * @param string $sCountQ count query
+     * @param string $sQ data load query
+     *
+     * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function getData($sCountQ, $sQ)
+    {
         $sQ = $this->_addFilter($sQ);
         $sCountQ = $this->_addFilter($sCountQ);
 
-        $aResponse['startIndex'] = $iStart = $this->_getStartIndex();
+        $aResponse['startIndex'] = $iStart = $this->getStartIndex();
         $aResponse['sort'] = '_' . $this->_getSortCol();
-        $aResponse['dir'] = $this->_getSortDir();
+        $aResponse['dir'] = $this->getSortDir();
 
-        $iDebug = $this->getConfig()->getConfigParam('iDebug');
+        $iDebug = Registry::getConfig()->getConfigParam('iDebug');
         if ($iDebug) {
             $aResponse['countsql'] = $sCountQ;
         }
@@ -578,7 +1095,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
         $aResponse['records'] = [];
 
         // skip further execution if no records were found ...
-        if (($iTotal = $this->_getTotalCount($sCountQ))) {
+        if (($iTotal = $this->getTotalCount($sCountQ))) {
             $sQ .= $this->_getSorting();
             $sQ .= $this->_getLimit($iStart);
 
@@ -600,7 +1117,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * @param array $aArtIds article id's
      * @param array $aCatIds ids if categories, which must be removed from oxseo
      *
-     * @return null
+     * @return void
      */
     public function resetArtSeoUrl($aArtIds, $aCatIds = null)
     {
@@ -612,10 +1129,10 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
             $aArtIds = [$aArtIds];
         }
 
-        $sShopId = $this->getConfig()->getShopId();
+        $sShopId = Registry::getConfig()->getShopId();
         foreach ($aArtIds as $sArtId) {
-            /** @var \OxidEsales\Eshop\Core\SeoEncoder $oSeoEncoder */
-            \OxidEsales\Eshop\Core\Registry::getSeoEncoder()->markAsExpired($sArtId, $sShopId, 1, null, "oxtype='oxarticle'");
+            /** @var SeoEncoder $oSeoEncoder */
+            Registry::getSeoEncoder()->markAsExpired($sArtId, $sShopId, 1, null, "oxtype='oxarticle'");
         }
     }
 
@@ -624,12 +1141,12 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     public function resetContentCache()
     {
-        $blDeleteCacheOnLogout = $this->getConfig()->getConfigParam('blClearCacheOnLogout');
+        $blDeleteCacheOnLogout = Registry::getConfig()->getConfigParam('blClearCacheOnLogout');
 
         if (!$blDeleteCacheOnLogout) {
             $this->_resetCaches();
 
-            \OxidEsales\Eshop\Core\Registry::getUtils()->oxResetFileCache();
+            Registry::getUtils()->oxResetFileCache();
         }
     }
 
@@ -642,10 +1159,10 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     public function resetCounter($sCounterType, $sValue = null)
     {
-        $blDeleteCacheOnLogout = $this->getConfig()->getConfigParam('blClearCacheOnLogout');
+        $blDeleteCacheOnLogout = Registry::getConfig()->getConfigParam('blClearCacheOnLogout');
 
         if (!$blDeleteCacheOnLogout) {
-            $myUtilsCount = \OxidEsales\Eshop\Core\Registry::getUtilsCount();
+            $myUtilsCount = Registry::getUtilsCount();
             switch ($sCounterType) {
                 case 'priceCatArticle':
                     $myUtilsCount->resetPriceCatArticleCount($sValue);
@@ -678,6 +1195,13 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * @deprecated underscore prefix violates PSR12, will be renamed to "resetCaches" in next major
      */
     protected function _resetCaches() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+    }
+
+    /**
+     * Resets output caches
+     */
+    protected function resetCaches()
     {
     }
 }

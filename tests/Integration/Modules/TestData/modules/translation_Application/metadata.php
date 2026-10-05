@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -26,15 +27,15 @@ $sMetadataVersion = '2.0';
 /**
  * Module information
  */
-$aModule = array(
+$aModule = [
     'id'           => 'translation_Application',
     'title'        => 'Translations in Application folder',
     'description'  => 'In this module the translations lay in the Application folder.',
     'thumbnail'    => 'picture.png',
     'version'      => '1.0',
     'author'       => 'OXID eSales AG',
-    'extend' => array(
+    'extend' => [
         // This one is needed, cause if the module is not extending anything, we don't search for the translations!
         'oxarticle' => 'translation_Application/myarticle',
-    )
-);
+    ],
+];

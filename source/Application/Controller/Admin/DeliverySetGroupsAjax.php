@@ -3,13 +3,13 @@
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -21,51 +21,64 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxDb;
-use oxField;
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class manages deliveryset groups
  */
-class DeliverySetGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class DeliverySetGroupsAjax extends ListComponentAjax
 {
     /**
      * Columns array
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,  visible, multilanguage, ident
-        ['oxtitle', 'oxgroups', 1, 0, 0],
-        ['oxid', 'oxgroups', 0, 0, 0],
-        ['oxid', 'oxgroups', 0, 0, 1],
-    ],
-                                 'container2' => [
-                                     ['oxtitle', 'oxgroups', 1, 0, 0],
-                                     ['oxid', 'oxgroups', 0, 0, 0],
-                                     ['oxid', 'oxobject2delivery', 0, 0, 1],
-                                 ]
+    protected $_aColumns = [
+        'container1' => [
+            // field , table, visible, multilanguage, ident
+            ['oxtitle', 'oxgroups', 1, 0, 0],
+            ['oxid', 'oxgroups', 0, 0, 0],
+            ['oxid', 'oxgroups', 0, 0, 1],
+         ],
+         'container2' => [
+             ['oxtitle', 'oxgroups', 1, 0, 0],
+             ['oxid', 'oxgroups', 0, 0, 0],
+             ['oxid', 'oxobject2delivery', 0, 0, 1],
+         ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
+     * @throws DatabaseConnectionException
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sId = $this->getConfig()->getRequestParameter('oxid');
-        $sSynchId = $this->getConfig()->getRequestParameter('synchoxid');
+        $oDb = DatabaseProvider::getDb();
+        $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
-        $sgroupTable = $this->_getViewName('oxgroups');
+        $sgroupTable = $this->getViewName('oxgroups');
 
         // category selected or not ?
         if (!$sId) {
             $sQAdd = " from $sgroupTable where 1 ";
         } else {
             $sQAdd = " from oxobject2delivery, {$sgroupTable} " .
-                     "where oxobject2delivery.oxdeliveryid = " . $oDb->quote($sId) .
+                     'where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sId) .
                      " and oxobject2delivery.oxobjectid = {$sgroupTable}.oxid " .
                      "and oxobject2delivery.oxtype = 'oxdelsetg' ";
         }
@@ -73,7 +86,7 @@ class DeliverySetGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Adm
         if ($sSynchId && $sSynchId != $sId) {
             $sQAdd .= " and {$sgroupTable}.oxid not in ( select {$sgroupTable}.oxid " .
                       "from oxobject2delivery, {$sgroupTable} " .
-                      "where oxobject2delivery.oxdeliveryid = " . $oDb->quote($sSynchId) .
+                      'where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sSynchId) .
                       " and oxobject2delivery.oxobjectid = $sgroupTable.oxid " .
                       "and oxobject2delivery.oxtype = 'oxdelsetg' ) ";
         }
@@ -82,18 +95,34 @@ class DeliverySetGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Adm
     }
 
     /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
+     */
+    protected function getQuery()
+    {
+        return $this->_getQuery();
+    }
+
+    /**
      * Removes user group from delivery sets config
      */
     public function removeGroupFromSet()
     {
         $aRemoveGroups = $this->_getActionIds('oxobject2delivery.oxid');
-        if ($this->getConfig()->getRequestParameter('all')) {
-            $sQ = $this->_addFilter("delete oxobject2delivery.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
+            $sQ = $this->_addFilter('delete oxobject2delivery.* ' . $this->getQuery());
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sRemoveGroups = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups));
-            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . $sRemoveGroups . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            $sRemoveGroups = implode(', ', DatabaseProvider::getDb()->quoteArray($aRemoveGroups));
+            $sQ = 'delete from oxobject2delivery where oxobject2delivery.oxid in (' . $sRemoveGroups . ') ';
+            DatabaseProvider::getDb()->Execute($sQ);
         }
     }
 
@@ -103,20 +132,20 @@ class DeliverySetGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Adm
     public function addGroupToSet()
     {
         $aChosenCat = $this->_getActionIds('oxgroups.oxid');
-        $soxId = $this->getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
-        if ($this->getConfig()->getRequestParameter('all')) {
-            $sGroupTable = $this->_getViewName('oxgroups');
-            $aChosenCat = $this->_getAll($this->_addFilter("select $sGroupTable.oxid " . $this->_getQuery()));
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
+            $sGroupTable = $this->getViewName('oxgroups');
+            $aChosenCat = $this->_getAll($this->_addFilter("select $sGroupTable.oxid " . $this->getQuery()));
         }
-        if ($soxId && $soxId != "-1" && is_array($aChosenCat)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenCat)) {
             foreach ($aChosenCat as $sChosenCat) {
-                $oObject2Delivery = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+                $oObject2Delivery = oxNew(BaseModel::class);
                 $oObject2Delivery->init('oxobject2delivery');
-                $oObject2Delivery->oxobject2delivery__oxdeliveryid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oObject2Delivery->oxobject2delivery__oxobjectid = new \OxidEsales\Eshop\Core\Field($sChosenCat);
-                $oObject2Delivery->oxobject2delivery__oxtype = new \OxidEsales\Eshop\Core\Field("oxdelsetg");
+                $oObject2Delivery->oxobject2delivery__oxdeliveryid = new Field($soxId);
+                $oObject2Delivery->oxobject2delivery__oxobjectid = new Field($sChosenCat);
+                $oObject2Delivery->oxobject2delivery__oxtype = new Field('oxdelsetg');
                 $oObject2Delivery->save();
             }
         }

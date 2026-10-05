@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: brutto
  * Price view mode: brutto
@@ -9,29 +10,29 @@
  * Short description: Brutto-Brutto user group Price C,
  * Test case is moved from selenium test "testFrontendPriceC"
  */
-$aData = array(
-        'articles' => array(
-                0 => array(
-                        'oxid'            => "variantDiscountTestParentArticle",
+$aData = [
+        'articles' => [
+                0 => [
+                        'oxid'            => 'variantDiscountTestParentArticle',
                         'oxprice'         => 50.00,
-                ),
-                1 => array(
+                ],
+                1 => [
                         'oxid'            => 'variantDiscountTestChildArticle',
                         'oxparentid'      => 1000,
                         'oxprice'         => 50.00,
-                ),
-        ),
-        'categories' => array(
-                0 =>  array(
-                        'oxid'       => "variantDiscountTestCategory",
+                ],
+        ],
+        'categories' => [
+                0 =>  [
+                        'oxid'       => 'variantDiscountTestCategory',
                         'oxparentid' => 'oxrootid',
                         'oxshopid'   => 1,
                         'oxactive'   => 1,
-                        'oxarticles' => array( 'variantDiscountTestChildArticle' )
-                ),
-        ),
-        'discounts' => array(
-                0 => array(
+                        'oxarticles' => [ 'variantDiscountTestChildArticle' ],
+                ],
+        ],
+        'discounts' => [
+                0 => [
                         'oxid'         => 'variantDiscountDiscountId',
                         'oxaddsum'     => 20,
                         'oxaddsumtype' => 'abs',
@@ -40,21 +41,21 @@ $aData = array(
                         'oxamount' => 0,
                         'oxamountto' => 99999,
                         'oxactive' => 1,
-                        'oxcategories' => array( 'variantDiscountTestCategory' ),
+                        'oxcategories' => [ 'variantDiscountTestCategory' ],
                         'oxsort'       => 10,
-                ),
-        ),
-        'expected' => array(
-            1001 => array(
+                ],
+        ],
+        'expected' => [
+            1001 => [
                         'base_price'        => '50,00',
                         'price'             => '30,00',
-                ),
-        ),
-        'options' => array(
-                'config' => array(
+                ],
+        ],
+        'options' => [
+                'config' => [
                         'blEnterNetPrice' => false,
                         'blShowNetPrice' => false,
-                ),
+                ],
                 'activeCurrencyRate' => 1,
-        ),
-);
+        ],
+];

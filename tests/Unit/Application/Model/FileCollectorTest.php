@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,11 +18,11 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
 class FileCollectorTest extends \OxidTestCase
 {
-
     /**
      * Testing directory file list collecting     *
      */
@@ -29,10 +30,10 @@ class FileCollectorTest extends \OxidTestCase
     {
         //TODO check adding directories recursively
 
-        $oDirReader = oxNew("oxFileCollector");
-        $oDirReader->setBaseDirectory($this->getConfig()->getConfigParam("sShopDir"));
+        $oDirReader = oxNew('oxFileCollector');
+        $oDirReader->setBaseDirectory($this->getConfig()->getConfigParam('sShopDir'));
 
-        $oDirReader->addDirectoryFiles('bin/', array('php', 'tpl'));
+        $oDirReader->addDirectoryFiles('bin/', ['php', 'tpl']);
         $aResultExistingPHP = $oDirReader->getFiles();
 
         $this->assertEquals(1, count($aResultExistingPHP));
@@ -44,8 +45,8 @@ class FileCollectorTest extends \OxidTestCase
      */
     public function testAddDirectoryFilesWithoutExtensions()
     {
-        $oDirReader = oxNew("oxFileCollector");
-        $oDirReader->setBaseDirectory($this->getConfig()->getConfigParam("sShopDir"));
+        $oDirReader = oxNew('oxFileCollector');
+        $oDirReader->setBaseDirectory($this->getConfig()->getConfigParam('sShopDir'));
 
         $oDirReader->addDirectoryFiles('bin/');
         $aResultExistingAll = $oDirReader->getFiles();
@@ -61,8 +62,8 @@ class FileCollectorTest extends \OxidTestCase
      */
     public function testAddFile()
     {
-        $oDirReader = oxNew("oxFileCollector");
-        $oDirReader->setBaseDirectory($this->getConfig()->getConfigParam("sShopDir"));
+        $oDirReader = oxNew('oxFileCollector');
+        $oDirReader->setBaseDirectory($this->getConfig()->getConfigParam('sShopDir'));
 
         $oDirReader->addFile('index.php');
         $oDirReader->addFile('bin/nofile.php');

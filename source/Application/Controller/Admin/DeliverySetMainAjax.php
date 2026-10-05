@@ -21,63 +21,91 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxDb;
-use oxField;
 use Exception;
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class manages deliveryset and delivery configuration
  */
-class DeliverySetMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class DeliverySetMainAjax extends ListComponentAjax
 {
     /**
      * Columns array
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
-        ['oxtitle', 'oxdelivery', 1, 1, 0],
-        ['oxaddsum', 'oxdelivery', 1, 0, 0],
-        ['oxaddsumtype', 'oxdelivery', 1, 0, 0],
-        ['oxid', 'oxdelivery', 0, 0, 1]
-    ],
-                                 'container2' => [
-                                     ['oxtitle', 'oxdelivery', 1, 1, 0],
-                                     ['oxaddsum', 'oxdelivery', 1, 0, 0],
-                                     ['oxaddsumtype', 'oxdelivery', 1, 0, 0],
-                                     ['oxid', 'oxdel2delset', 0, 0, 1]
-                                 ]
+    protected $_aColumns = [
+        'container1' => [
+            // field, table, visible, multilanguage, ident
+            ['oxtitle', 'oxdelivery', 1, 1, 0],
+            ['oxaddsum', 'oxdelivery', 1, 0, 0],
+            ['oxaddsumtype', 'oxdelivery', 1, 0, 0],
+            ['oxid', 'oxdelivery', 0, 0, 1],
+         ],
+         'container2' => [
+             ['oxtitle', 'oxdelivery', 1, 1, 0],
+             ['oxaddsum', 'oxdelivery', 1, 0, 0],
+             ['oxaddsumtype', 'oxdelivery', 1, 0, 0],
+             ['oxid', 'oxdel2delset', 0, 0, 1],
+         ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
+     * @throws DatabaseConnectionException
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sId = $this->getConfig()->getRequestParameter('oxid');
-        $sSynchId = $this->getConfig()->getRequestParameter('synchoxid');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
+        $oDb = DatabaseProvider::getDb();
 
-        $sDeliveryViewName = $this->_getViewName('oxdelivery');
+        $sDeliveryViewName = $this->getViewName('oxdelivery');
 
         // category selected or not ?
         if (!$sId) {
             $sQAdd = " from $sDeliveryViewName where 1 ";
         } else {
             $sQAdd = " from $sDeliveryViewName left join oxdel2delset on oxdel2delset.oxdelid=$sDeliveryViewName.oxid ";
-            $sQAdd .= "where oxdel2delset.oxdelsetid = " . $oDb->quote($sId);
+            $sQAdd .= 'where oxdel2delset.oxdelsetid = ' . $oDb->quote($sId);
         }
 
         if ($sSynchId && $sSynchId != $sId) {
             $sQAdd .= "and $sDeliveryViewName.oxid not in ( select $sDeliveryViewName.oxid from $sDeliveryViewName left join oxdel2delset on oxdel2delset.oxdelid=$sDeliveryViewName.oxid ";
-            $sQAdd .= "where oxdel2delset.oxdelsetid = " . $oDb->quote($sSynchId) . " ) ";
+            $sQAdd .= 'where oxdel2delset.oxdelsetid = ' . $oDb->quote($sSynchId) . ' ) ';
         }
 
         return $sQAdd;
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
+     */
+    protected function getQuery()
+    {
+        return $this->_getQuery();
     }
 
     /**
@@ -86,12 +114,12 @@ class DeliverySetMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin
     public function removeFromSet()
     {
         $aRemoveGroups = $this->_getActionIds('oxdel2delset.oxid');
-        if ($this->getConfig()->getRequestParameter('all')) {
-            $sQ = $this->_addFilter("delete oxdel2delset.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
+            $sQ = $this->_addFilter('delete oxdel2delset.* ' . $this->getQuery());
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sQ = "delete from oxdel2delset where oxdel2delset.oxid in (" . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            $sQ = 'delete from oxdel2delset where oxdel2delset.oxid in (' . implode(', ', DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ') ';
+            DatabaseProvider::getDb()->Execute($sQ);
         }
     }
 
@@ -103,28 +131,28 @@ class DeliverySetMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin
     public function addToSet()
     {
         $aChosenSets = $this->_getActionIds('oxdelivery.oxid');
-        $soxId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
-        if ($this->getConfig()->getRequestParameter('all')) {
-            $sDeliveryViewName = $this->_getViewName('oxdelivery');
-            $aChosenSets = $this->_getAll($this->_addFilter("select $sDeliveryViewName.oxid " . $this->_getQuery()));
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
+            $sDeliveryViewName = $this->getViewName('oxdelivery');
+            $aChosenSets = $this->_getAll($this->_addFilter("select $sDeliveryViewName.oxid " . $this->getQuery()));
         }
-        if ($soxId && $soxId != "-1" && is_array($aChosenSets)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenSets)) {
             // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804 and ESDEV-3822).
-            $database = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
+            $database = DatabaseProvider::getMaster();
             foreach ($aChosenSets as $sChosenSet) {
                 // check if we have this entry already in
                 // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-                $sID = $database->getOne("select oxid from oxdel2delset where oxdelid = :oxdelid and oxdelsetid = :oxdelsetid", [
+                $sID = $database->getOne('select oxid from oxdel2delset where oxdelid = :oxdelid and oxdelsetid = :oxdelsetid', [
                     ':oxdelid' => $sChosenSet,
-                    ':oxdelsetid' => $soxId
+                    ':oxdelsetid' => $soxId,
                 ]);
                 if (!isset($sID) || !$sID) {
-                    $oDel2delset = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+                    $oDel2delset = oxNew(BaseModel::class);
                     $oDel2delset->init('oxdel2delset');
-                    $oDel2delset->oxdel2delset__oxdelid = new \OxidEsales\Eshop\Core\Field($sChosenSet);
-                    $oDel2delset->oxdel2delset__oxdelsetid = new \OxidEsales\Eshop\Core\Field($soxId);
+                    $oDel2delset->oxdel2delset__oxdelid = new Field($sChosenSet);
+                    $oDel2delset->oxdel2delset__oxdelsetid = new Field($soxId);
                     $oDel2delset->save();
                 }
             }

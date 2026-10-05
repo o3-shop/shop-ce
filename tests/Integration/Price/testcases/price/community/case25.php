@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Price enter mode: netto
  * Price view mode: brutto
@@ -6,22 +7,21 @@
  *  1. shop; abs
  *  2. shop; %
  */
-$aData = array(
-        'articles' => array(
-                0 => array(
+$aData = [
+        'articles' => [
+                0 => [
                         'oxid'                     => '1001_a',
                         'oxprice'                  => 100.55,
                         'oxvat'                    => 20,
-                ),
-                1 => array(
+                ],
+                1 => [
                         'oxid'                     => '1001_b',
                         'oxprice'                  => 100.55,
                         'oxvat'                    => 20,
-                ),
-
-        ),
-        'discounts' => array(
-                0 => array(
+                ],
+        ],
+        'discounts' => [
+                0 => [
                         'oxid'         => 'abs',
                         'oxaddsum'     => -10,
                         'oxaddsumtype' => 'abs',
@@ -30,10 +30,10 @@ $aData = array(
                         'oxamount' => 0,
                         'oxamountto' => 99999,
                         'oxactive' => 1,
-                        'oxarticles' => array( '1001_a' ),
+                        'oxarticles' => [ '1001_a' ],
                         'oxsort'       => 10,
-                ),
-                1 => array(
+                ],
+                1 => [
                         'oxid'         => 'percent',
                         'oxaddsum'     => -10,
                         'oxaddsumtype' => '%',
@@ -42,25 +42,25 @@ $aData = array(
                         'oxamount' => 0,
                         'oxamountto' => 99999,
                         'oxactive' => 1,
-                        'oxarticles' => array( '1001_b' ),
+                        'oxarticles' => [ '1001_b' ],
                         'oxsort'       => 20,
-                ),
-        ),
-        'expected' => array(
-                '1001_a' => array(
+                ],
+        ],
+        'expected' => [
+                '1001_a' => [
                         'base_price' => '100,55',
                         'price' => '130,66',
-                ),
-                '1001_b' => array(
+                ],
+                '1001_b' => [
                         'base_price' => '100,55',
                         'price' => '132,73',
-                ),
-        ),
-        'options' => array(
-                'config' => array(
+                ],
+        ],
+        'options' => [
+                'config' => [
                         'blEnterNetPrice' => true,
                         'blShowNetPrice' => false,
-                ),
+                ],
                 'activeCurrencyRate' => 1,
-        ),
-);
+        ],
+];

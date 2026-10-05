@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -36,40 +37,40 @@ abstract class DatabaseInterfaceImplementationBaseTest extends UnitTestCase
     /**
      * @var string The name of the table, we use to test the database.
      */
-    const TABLE_NAME = 'oxdoctrinetest';
+    public const TABLE_NAME = 'oxdoctrinetest';
 
     /**
      * @var string The first fixture oxId.
      */
-    const FIXTURE_OXID_1 = 'OXID_1';
+    public const FIXTURE_OXID_1 = 'OXID_1';
 
     /**
      * @var string The second fixture oxId.
      */
-    const FIXTURE_OXID_2 = 'OXID_2';
+    public const FIXTURE_OXID_2 = 'OXID_2';
 
     /**
      * @var string The third fixture oxId.
      */
-    const FIXTURE_OXID_3 = 'OXID_3';
+    public const FIXTURE_OXID_3 = 'OXID_3';
 
     /**
      * @var string The first fixture oxUserId.
      */
-    const FIXTURE_OXUSERID_1 = 'OXUSERID_1';
+    public const FIXTURE_OXUSERID_1 = 'OXUSERID_1';
 
     /**
      * @var string The first fixture oxUserId.
      */
-    const FIXTURE_OXUSERID_2 = 'OXUSERID_2';
+    public const FIXTURE_OXUSERID_2 = 'OXUSERID_2';
 
     /**
      * @var string The first fixture oxUserId.
      */
-    const FIXTURE_OXUSERID_3 = 'OXUSERID_3';
+    public const FIXTURE_OXUSERID_3 = 'OXUSERID_3';
 
-    const EXPECTED_MYSQL_SYNTAX_ERROR_CODE  = 1064;
-    const EXPECTED_MYSQL_SYNTAX_ERROR_MESSAGE  = 'You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'INVALID SQL QUERY\' at line 1';
+    public const EXPECTED_MYSQL_SYNTAX_ERROR_CODE = 1064;
+    public const EXPECTED_MYSQL_SYNTAX_ERROR_MESSAGE = 'You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'INVALID SQL QUERY\' at line 1';
 
     /**
      * @var array Holds the errors caught by the user-defined error handler
@@ -109,8 +110,8 @@ abstract class DatabaseInterfaceImplementationBaseTest extends UnitTestCase
     public function setup(): void
     {
         /** Set a user-defined error handler in order to handle errors triggered with trigger_error */
-        $this->errors = array();
-        set_error_handler(array($this, "errorHandler"));
+        $this->errors = [];
+        set_error_handler([$this, 'errorHandler']);
 
         parent::setUp();
 
@@ -165,11 +166,11 @@ abstract class DatabaseInterfaceImplementationBaseTest extends UnitTestCase
     public function errorHandler($errorLevel, $errorMessage, $errorFile = '', $errorLine = 0, $errorContext = [])
     {
         $this->errors[] = compact(
-            "errorLevel",
-            "errorMessage",
-            "errorFile",
-            "errorLine",
-            "errorContext"
+            'errorLevel',
+            'errorMessage',
+            'errorFile',
+            'errorLine',
+            'errorContext'
         );
     }
 
@@ -182,7 +183,7 @@ abstract class DatabaseInterfaceImplementationBaseTest extends UnitTestCase
     protected static function getDatabaseHandler()
     {
         $configFile = Registry::get('oxConfigFile');
-        $dsn = 'mysql:host='. $configFile->getVar('dbHost') .';port='. $configFile->getVar('dbPort') .';dbname=' .$configFile->getVar('dbName') ;
+        $dsn = 'mysql:host=' . $configFile->getVar('dbHost') . ';port=' . $configFile->getVar('dbPort') . ';dbname=' . $configFile->getVar('dbName') ;
         $username = $configFile->getVar('dbUser');
         $password = $configFile->getVar('dbPwd');
 
@@ -235,13 +236,13 @@ abstract class DatabaseInterfaceImplementationBaseTest extends UnitTestCase
         }
         $this->truncateTestTable();
 
-        $values = array(
+        $values = [
             self::FIXTURE_OXID_1 => self::FIXTURE_OXUSERID_1,
             self::FIXTURE_OXID_2 => self::FIXTURE_OXUSERID_2,
-            self::FIXTURE_OXID_3 => self::FIXTURE_OXUSERID_3
-        );
+            self::FIXTURE_OXID_3 => self::FIXTURE_OXUSERID_3,
+        ];
 
-        $queryValuesParts = array();
+        $queryValuesParts = [];
 
         foreach ($values as $oxId => $oxUserId) {
             $queryValuesParts[] = "('$oxId','$oxUserId')";
@@ -249,7 +250,7 @@ abstract class DatabaseInterfaceImplementationBaseTest extends UnitTestCase
 
         $queryValuesPart = implode(',', $queryValuesParts);
 
-        $query = "INSERT INTO " . self::TABLE_NAME . "(OXID, OXUSERID) VALUES $queryValuesPart;";
+        $query = 'INSERT INTO ' . self::TABLE_NAME . "(OXID, OXUSERID) VALUES $queryValuesPart;";
 
         $database->execute($query);
     }

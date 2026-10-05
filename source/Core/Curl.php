@@ -28,10 +28,10 @@ namespace OxidEsales\EshopCommunity\Core;
 class Curl
 {
     /** Curl option for setting the timeout of whole execution process. */
-    const EXECUTION_TIMEOUT_OPTION = 'CURLOPT_TIMEOUT';
+    public const EXECUTION_TIMEOUT_OPTION = 'CURLOPT_TIMEOUT';
 
     /** Curl option for setting the timeout for connect. */
-    const CONNECT_TIMEOUT_OPTION = 'CURLOPT_CONNECTTIMEOUT';
+    public const CONNECT_TIMEOUT_OPTION = 'CURLOPT_CONNECTTIMEOUT';
 
     /**
      * Curl instance.
@@ -73,7 +73,7 @@ class Curl
      *
      * @var string
      */
-    protected $_sConnectionCharset = "UTF-8";
+    protected $_sConnectionCharset = 'UTF-8';
 
     /**
      * Curl call header.
@@ -122,8 +122,8 @@ class Curl
      */
     public function getUrl()
     {
-        if ($this->getMethod() == "GET" && $this->getQuery()) {
-            $this->_sUrl = $this->_sUrl . "?" . $this->getQuery();
+        if ($this->getMethod() == 'GET' && $this->getQuery()) {
+            $this->_sUrl = $this->_sUrl . '?' . $this->getQuery();
         }
 
         return $this->_sUrl;
@@ -147,10 +147,10 @@ class Curl
     public function getQuery()
     {
         if (is_null($this->_sQuery)) {
-            $query = "";
+            $query = '';
             if ($params = $this->getParameters()) {
                 $params = $this->_prepareQueryParameters($params);
-                $query = http_build_query($params, "", "&");
+                $query = http_build_query($params, '', '&');
             }
             $this->setQuery($query);
         }
@@ -206,7 +206,7 @@ class Curl
      */
     public function setHeader($header = null)
     {
-        if (is_null($header) && $this->getMethod() == "POST") {
+        if (is_null($header) && $this->getMethod() == 'POST') {
             $host = $this->getHost();
 
             $header = [];
@@ -385,7 +385,7 @@ class Curl
         }
         $this->_setOpt(CURLOPT_URL, $this->getUrl());
 
-        if ($this->getMethod() == "POST") {
+        if ($this->getMethod() == 'POST') {
             $this->_setOpt(CURLOPT_POST, 1);
             $this->_setOpt(CURLOPT_POSTFIELDS, $this->getQuery());
         }
