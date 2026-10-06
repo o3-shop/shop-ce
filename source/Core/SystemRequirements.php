@@ -167,7 +167,7 @@ class SystemRequirements
      * @var array
      */
     protected $_aPreparationInfoMap = [
-        'server_permissions' => 'adjusting-file-and-directory-permissions',
+        'server_permissions' => 'adjust-file-and-directory-permissions',
     ];
 
     /**
