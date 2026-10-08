@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Exception;
 
 use OxidEsales\Eshop\Core\Exception\StandardException;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\TestingLibrary\UnitTestCase;
 
 class ExceptionTest extends UnitTestCase
@@ -51,6 +52,34 @@ class ExceptionTest extends UnitTestCase
         $testObject->debugOut();
 
         $this->assertTrue($this->testLogHandler->hasErrorThatContains($message));
+    }
+
+    /**
+     * debugOut() logs an exception that was already handled; when the logger
+     * itself fails, the caller must go on (o3-shop/o3-shop#259).
+     */
+    public function testDebugOutReturnsFalseWhenTheLoggerFails()
+    {
+        $failingLogger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
+        $failingLogger->method('error')->willThrowException(new \UnexpectedValueException('Log dir missing.'));
+        $previousLogger = Registry::getLogger();
+        Registry::set('logger', $failingLogger);
+        $file = tempnam(sys_get_temp_dir(), 'errorlog');
+        $previousErrorLog = ini_set('error_log', $file);
+
+        try {
+            $result = oxNew(StandardException::class, 'Mail failed.')->debugOut();
+        } finally {
+            ini_set('error_log', (string) $previousErrorLog);
+            Registry::set('logger', $previousLogger);
+        }
+        $errorLog = (string) file_get_contents($file);
+        unlink($file);
+
+        $this->assertFalse($result);
+        $this->assertStringContainsString('StandardException::debugOut - ', $errorLog);
+        $this->assertStringContainsString("Logging the exception failed: 'Log dir missing.'.", $errorLog);
+        $this->assertStringContainsString("Original message: 'Mail failed.'.", $errorLog);
     }
 
     // Test set & get message

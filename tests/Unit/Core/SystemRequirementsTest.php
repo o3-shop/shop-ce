@@ -265,13 +265,13 @@ class SystemRequirementsTest extends \OxidTestCase
     public function testGetReqInfoUrlWithServerPermissionsParameterWillAddAnchorToUrl(): void
     {
         $parameter = 'server_permissions';
-        $anchor = '#adjusting-file-and-directory-permissions';
+        $anchor = '#adjust-file-and-directory-permissions';
 
         $url = (new SystemRequirements())->getReqInfoUrl($parameter);
 
         $this->assertStringContainsString($anchor, $url);
         // server_permissions uses the preparation info URL, not the regular one
-        $this->assertStringContainsString('PrepareInstallation.html', $url);
+        $this->assertStringContainsString('NewInstallation.html', $url);
     }
 
     public function testGetReqInfoUrlWithUnknownParameterWillReturnUnchangedUrl(): void

@@ -984,6 +984,42 @@ class SearchTest extends UnitTestCase
         }
     }
 
+    public function testGetSearchSuggestionsReturnsPlaintextQuotesFromRawStorage()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+        $this->_insertSearchableArticle('_testSuggRawQuote', 'SuggRaw "Bar" & Co');
+        $this->addToDatabase(
+            "UPDATE oxarticles SET oxvarselect = 'Size \"L\"' WHERE oxid = '_testSuggRawQuote'",
+            'oxarticles'
+        );
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('SuggRaw');
+
+        $this->assertCount(1, $aSuggestions);
+        $this->assertSame('SuggRaw "Bar" & Co Size "L"', $aSuggestions[0]['title']);
+    }
+
+    public function testGetSearchSuggestionsDecodesHtmlEntitiesFromStoredData()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+        $this->_insertSearchableArticle(
+            '_testSuggEntities',
+            'SuggEnt &quot;Bar&quot; &amp; Co &#039;x&#039; <b>bold</b>'
+        );
+        $this->addToDatabase(
+            "UPDATE oxarticles SET oxvarselect = 'Var &quot;L&quot; &amp; Co' WHERE oxid = '_testSuggEntities'",
+            'oxarticles'
+        );
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('SuggEnt');
+
+        $this->assertCount(1, $aSuggestions);
+        $this->assertSame(
+            'SuggEnt "Bar" & Co \'x\' <b>bold</b> Var "L" & Co',
+            $aSuggestions[0]['title']
+        );
+    }
+
     public function testGetSearchSuggestionsRespectsLimit()
     {
         $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);

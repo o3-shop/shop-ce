@@ -507,10 +507,11 @@ class Search extends Base
         $oArtList->selectString($sSelect);
 
         foreach ($oArtList as $oSuggestion) {
+            $sTitle = html_entity_decode((string) $oSuggestion->getRawFieldData('oxtitle'), ENT_QUOTES);
+            $sVarSelect = html_entity_decode((string) $oSuggestion->getRawFieldData('oxvarselect'), ENT_QUOTES);
             $aResult = [
                 'id'    => $oSuggestion->oxarticles__oxid->value,
-                'title' => $oSuggestion->oxarticles__oxtitle->value
-                    . ($oSuggestion->oxarticles__oxvarselect->value ? ' ' . $oSuggestion->oxarticles__oxvarselect->value : ''),
+                'title' => $sTitle . ($sVarSelect ? ' ' . $sVarSelect : ''),
                 'icon'  => $oSuggestion->getThumbnailUrl(),
                 'link'  => htmlspecialchars_decode($oSuggestion->getLink(), ENT_QUOTES),
             ];

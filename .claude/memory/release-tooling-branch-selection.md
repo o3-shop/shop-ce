@@ -50,9 +50,10 @@ It is not read-only. A behind-only branch is fast-forwarded
 (`git merge --ff-only`) during the run, including runs that go on to abort.
 The `WARN ... fast-forwarded to match` lines are edits that already happened.
 
-## The merge-back PR's head IS the release branch
+## Merge-backs whose head is the release branch
 
-`b-1.6` is the head branch of `Merge v1.6.x release into main`. If
+Before o3-shop/o3-shop#241, `b-1.6` was the head branch of
+`Merge v1.6.x release into main` (hand-opened merge-backs may still be). If
 `delete_branch_on_merge` were `true`, merging it deletes the maintenance
 line. Keep it `false` on every release repo; `DeleteBranchOnMergeGate`
 enforces this and fails closed. That gate is scoped to repos whose release
@@ -61,3 +62,25 @@ so auto-delete there is harmless feature-branch hygiene and must not block
 the release.
 
 See also [[release-tooling-intermediate-node-retag-gap]].
+
+## The auto-opened merge-back PR goes stale (2026-10-04)
+
+Before o3-shop/o3-shop#241, `bin/release` opened `Merge vX.Y.Z release into
+main` with head = the moving release branch (`b-1.7`), not the tag. If it sat
+unmerged, the release branch moved on and the PR silently dragged unreleased
+commits into `main` (v1.7.1: #234 had 10 post-release commits). Meanwhile
+`MergeBackPrGate` blocked the next release. Fix used: close the stale PR, push
+a branch pointing exactly at the tag (`git push origin
+'vX.Y.Z^{commit}:refs/heads/merge-back-vX.Y.Z'`), open a PR with the same
+title (the gate matches `MergeBackPrTitlePattern`), merge it with a merge
+commit (never rebase — the tag must become an ancestor of `main`). Check with
+`git merge-tree --write-tree origin/main vX.Y.Z` + `git diff` that the result
+equals the tag. Lasting fix: open merge-backs from the tag.
+
+Implemented in o3-shop/o3-shop#241: `PerRepoActions::openMergeBackPr()` pushes
+`merge-back-<package tag>` at the tag and opens the PR from it; repos released
+from `main` get no merge-back; `MergeBackPrGate` matches by title only
+(`--search '"release into main" in:title'`), no `--head` filter. A failed
+merge-back no longer stops the others: the run reports all failures at the
+end. `MergeBackPolicy::BASE_BRANCH` holds "main" for the skip and the PR base;
+the title pattern and the gate's search string still spell it out.

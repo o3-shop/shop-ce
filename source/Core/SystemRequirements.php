@@ -121,14 +121,14 @@ class SystemRequirements
      *
      * @var string
      */
-    protected $_sReqInfoUrl = 'https://docs.o3-shop.com/en/latest/user/installation/NewInstallation/SystemRequirements.html';
+    protected $_sReqInfoUrl = 'https://docs.o3-shop.com/en/latest/User/Installation/SystemRequirements.html';
 
     /**
      * Installation preparation info url
      *
      * @var string
      */
-    protected $_sPreparationInfoUrl = 'https://docs.o3-shop.com/en/latest/user/installation/NewInstallation/PrepareInstallation.html';
+    protected $_sPreparationInfoUrl = 'https://docs.o3-shop.com/en/latest/User/Installation/NewInstallation.html';
 
     /**
      * Module or system configuration mapping with installation requirements info url anchor
@@ -167,7 +167,7 @@ class SystemRequirements
      * @var array
      */
     protected $_aPreparationInfoMap = [
-        'server_permissions' => 'adjusting-file-and-directory-permissions',
+        'server_permissions' => 'adjust-file-and-directory-permissions',
     ];
 
     /**

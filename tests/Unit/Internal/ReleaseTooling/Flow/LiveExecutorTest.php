@@ -46,6 +46,8 @@ use PHPUnit\Framework\TestCase;
  */
 final class LiveExecutorTest extends TestCase
 {
+    private const TAG_SHA = '1111111111111111111111111111111111111111';
+
     /** @var array<int,string> dirs created during the test, cleaned up in tearDown */
     private array $tmpDirs = [];
 
@@ -159,7 +161,10 @@ final class LiveExecutorTest extends TestCase
     {
         $shopCePath = $this->mkRepo('{"require":{}}');
         $o3ShopPath = $this->mkRepo('{"require":{}}');
-        $exec = new FakeProcessExecutor([], new ProcessOutcome(0, 'https://example.invalid/url', ''));
+        $exec = new FakeProcessExecutor(
+            $this->mergeBackGitResponses(['v1.6.1']),
+            new ProcessOutcome(0, 'https://example.invalid/url', '')
+        );
 
         $plan = $this->buildPlan(
             'v1.6.0',
@@ -181,16 +186,155 @@ final class LiveExecutorTest extends TestCase
             'o3-shop/o3-shop' => $o3ShopPath,
         ]);
 
-        $prCalls = array_values(array_filter(
-            $exec->commands(),
-            static fn (array $cmd): bool => isset($cmd[1]) && $cmd[1] === 'pr' && $cmd[2] === 'create'
-        ));
+        $prCalls = $this->prCreateCalls($exec);
         // One per candidate + one for o3-shop = 2
         $this->assertCount(2, $prCalls);
-        $repoSlugs = array_map(static fn (array $cmd): string => $cmd[array_search('--repo', $cmd, true) + 1], $prCalls);
+        $repoSlugs = array_map(fn (array $cmd): string => $this->optionValue($cmd, '--repo'), $prCalls);
         $this->assertContains('o3-shop/shop-ce', $repoSlugs);
         $this->assertContains('o3-shop/o3-shop', $repoSlugs);
         $this->assertCount(2, $executor->mergeBackUrls());
+
+        // The PR head is a branch pinned to the tag, never the moving release branch.
+        foreach ($prCalls as $cmd) {
+            $this->assertSame('merge-back-v1.6.1', $this->optionValue($cmd, '--head'));
+        }
+        $pushes = array_values(array_filter(
+            $this->cmdStrings($exec),
+            static fn (string $cmd): bool => $cmd === 'git push origin ' . self::TAG_SHA . ':refs/heads/merge-back-v1.6.1'
+        ));
+        $this->assertCount(2, $pushes, 'one tag-pinned branch pushed per repo');
+    }
+
+    public function testFinalShopToMergeBackUsesEachCandidatesOwnTag(): void
+    {
+        $wrapperPath = $this->mkRepo('{"require":{}}');
+        $o3ShopPath = $this->mkRepo('{"require":{}}');
+        $exec = new FakeProcessExecutor(
+            $this->mergeBackGitResponses(['v1.0.3', 'v1.6.1']),
+            new ProcessOutcome(0, 'https://example.invalid/url', '')
+        );
+
+        $plan = $this->buildPlan(
+            'v1.6.0',
+            'v1.6.1',
+            [
+                $this->cuttingCandidate('o3-shop/shop-doctrine-migration-wrapper', 'v1.0.2', 'v1.0.3'),
+            ],
+            [],
+            ''
+        );
+
+        $executor = new LiveExecutor(
+            new PerRepoActions($exec),
+            new ComposerJsonConstraintWriter(),
+            new DefaultBranchResolver()
+        );
+        $executor->execute($plan, [
+            'o3-shop/shop-doctrine-migration-wrapper' => $wrapperPath,
+            'o3-shop/o3-shop' => $o3ShopPath,
+        ]);
+
+        $headsByRepo = [];
+        foreach ($this->prCreateCalls($exec) as $cmd) {
+            $headsByRepo[$this->optionValue($cmd, '--repo')] = $this->optionValue($cmd, '--head');
+            $this->assertSame('Merge v1.6.1 release into main', $this->optionValue($cmd, '--title'));
+        }
+        $this->assertSame([
+            'o3-shop/shop-doctrine-migration-wrapper' => 'merge-back-v1.0.3',
+            'o3-shop/o3-shop' => 'merge-back-v1.6.1',
+        ], $headsByRepo);
+
+        // Each repo's tag is resolved and pushed in that repo's own clone:
+        // the same tag name can exist in several repos at different commits.
+        $cwdByCommand = [];
+        foreach ($exec->calls as $call) {
+            $cwdByCommand[implode(' ', $call['command'])] = $call['cwd'];
+        }
+        $this->assertSame($wrapperPath, $cwdByCommand['git rev-parse --verify v1.0.3^{commit}']);
+        $this->assertSame($wrapperPath, $cwdByCommand['git push origin ' . self::TAG_SHA . ':refs/heads/merge-back-v1.0.3']);
+        $this->assertSame($o3ShopPath, $cwdByCommand['git rev-parse --verify v1.6.1^{commit}']);
+        $this->assertSame($o3ShopPath, $cwdByCommand['git push origin ' . self::TAG_SHA . ':refs/heads/merge-back-v1.6.1']);
+    }
+
+    public function testFailedMergeBackDoesNotStopTheRemainingRepos(): void
+    {
+        $wrapperPath = $this->mkRepo('{"require":{}}');
+        $o3ShopPath = $this->mkRepo('{"require":{}}');
+        $responses = $this->mergeBackGitResponses(['v1.0.3', 'v1.6.1']);
+        $responses['git rev-parse --verify v1.0.3^{commit}'] = new ProcessOutcome(128, '', 'fatal: Needed a single revision');
+        $exec = new FakeProcessExecutor($responses, new ProcessOutcome(0, 'https://example.invalid/url', ''));
+
+        $plan = $this->buildPlan(
+            'v1.6.0',
+            'v1.6.1',
+            [
+                $this->cuttingCandidate('o3-shop/shop-doctrine-migration-wrapper', 'v1.0.2', 'v1.0.3'),
+            ],
+            [],
+            ''
+        );
+
+        $executor = new LiveExecutor(
+            new PerRepoActions($exec),
+            new ComposerJsonConstraintWriter(),
+            new DefaultBranchResolver()
+        );
+
+        $thrown = null;
+        try {
+            $executor->execute($plan, [
+                'o3-shop/shop-doctrine-migration-wrapper' => $wrapperPath,
+                'o3-shop/o3-shop' => $o3ShopPath,
+            ]);
+        } catch (\RuntimeException $e) {
+            $thrown = $e;
+        }
+
+        $this->assertNotNull($thrown, 'the failed merge-back is still reported');
+        $this->assertStringStartsWith('1 merge-back PR(s) failed. For each: fix the cause, push merge-back-<tag>', $thrown->getMessage());
+        $this->assertStringContainsString('o3-shop/shop-doctrine-migration-wrapper (v1.0.3)', $thrown->getMessage());
+        $this->assertStringContainsString('git rev-parse --verify v1.0.3^{commit} failed', $thrown->getMessage());
+        $this->assertNotNull($thrown->getPrevious(), 'original failure is chained');
+        $this->assertStringContainsString('git rev-parse --verify v1.0.3^{commit} failed', $thrown->getPrevious()->getMessage());
+        $this->assertSame(['o3-shop/o3-shop'], array_keys($executor->mergeBackUrls()), 'o3-shop still gets its PR');
+    }
+
+    public function testFinalShopToSkipsMergeBackForMainLineRepos(): void
+    {
+        $themePath = $this->mkRepo('{"require":{}}');
+        $o3ShopPath = $this->mkRepo('{"require":{}}');
+        $exec = new FakeProcessExecutor(
+            $this->mergeBackGitResponses(['v1.6.1']),
+            new ProcessOutcome(0, 'https://example.invalid/url', '')
+        );
+
+        $plan = $this->buildPlan(
+            'v1.6.0',
+            'v1.6.1',
+            [
+                // o3-theme releases straight from main: nothing to merge back.
+                $this->cuttingCandidate('o3-shop/o3-theme', 'v1.3.0', 'v1.3.1'),
+            ],
+            [],
+            ''
+        );
+
+        $executor = new LiveExecutor(
+            new PerRepoActions($exec),
+            new ComposerJsonConstraintWriter(),
+            new DefaultBranchResolver()
+        );
+        $executor->execute($plan, [
+            'o3-shop/o3-theme' => $themePath,
+            'o3-shop/o3-shop' => $o3ShopPath,
+        ]);
+
+        $repoSlugs = array_map(fn (array $cmd): string => $this->optionValue($cmd, '--repo'), $this->prCreateCalls($exec));
+        $this->assertSame(['o3-shop/o3-shop'], $repoSlugs);
+        $this->assertSame(['o3-shop/o3-shop'], array_keys($executor->mergeBackUrls()));
+        foreach ($this->cmdStrings($exec) as $cmd) {
+            $this->assertStringNotContainsString('merge-back-v1.3.1', $cmd);
+        }
     }
 
     public function testMissingRepoPathForCandidateThrows(): void
@@ -355,6 +499,41 @@ final class LiveExecutorTest extends TestCase
             $aggregatedNotes,
             []
         );
+    }
+
+    /**
+     * Git outcomes for the merge-back step: each tag resolves to TAG_SHA
+     * and no merge-back branch exists on the remote yet.
+     *
+     * @param  array<int,string>            $tags
+     * @return array<string,ProcessOutcome>
+     */
+    private function mergeBackGitResponses(array $tags): array
+    {
+        $responses = [];
+        foreach ($tags as $tag) {
+            $responses["git rev-parse --verify {$tag}^{commit}"] = new ProcessOutcome(0, self::TAG_SHA . "\n", '');
+            $responses["git ls-remote --heads origin refs/heads/merge-back-{$tag}"] = new ProcessOutcome(0, '', '');
+            $responses['git push origin ' . self::TAG_SHA . ":refs/heads/merge-back-{$tag}"] = new ProcessOutcome(0, '', '');
+        }
+        return $responses;
+    }
+
+    /** @return array<int,array<int,string>> */
+    private function prCreateCalls(FakeProcessExecutor $exec): array
+    {
+        return array_values(array_filter(
+            $exec->commands(),
+            static fn (array $cmd): bool => isset($cmd[1], $cmd[2]) && $cmd[1] === 'pr' && $cmd[2] === 'create'
+        ));
+    }
+
+    /** @param array<int,string> $cmd */
+    private function optionValue(array $cmd, string $option): string
+    {
+        $idx = array_search($option, $cmd, true);
+        $this->assertNotFalse($idx, "option {$option} missing");
+        return $cmd[$idx + 1];
     }
 
     private function cuttingCandidate(string $package, string $fromPin, string $newTag): CandidatePlan

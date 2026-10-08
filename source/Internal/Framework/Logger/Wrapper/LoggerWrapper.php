@@ -50,7 +50,9 @@ class LoggerWrapper implements LoggerInterface
      */
     public function emergency($message, array $context = [])
     {
-        $this->logger->emergency($message, $context);
+        $this->writeSafely('emergency', $message, function () use ($message, $context) {
+            $this->logger->emergency($message, $context);
+        });
     }
 
     /**
@@ -65,7 +67,9 @@ class LoggerWrapper implements LoggerInterface
      */
     public function alert($message, array $context = [])
     {
-        $this->logger->alert($message, $context);
+        $this->writeSafely('alert', $message, function () use ($message, $context) {
+            $this->logger->alert($message, $context);
+        });
     }
 
     /**
@@ -79,7 +83,9 @@ class LoggerWrapper implements LoggerInterface
      */
     public function critical($message, array $context = [])
     {
-        $this->logger->critical($message, $context);
+        $this->writeSafely('critical', $message, function () use ($message, $context) {
+            $this->logger->critical($message, $context);
+        });
     }
 
     /**
@@ -92,7 +98,9 @@ class LoggerWrapper implements LoggerInterface
      */
     public function error($message, array $context = [])
     {
-        $this->logger->error($message, $context);
+        $this->writeSafely('error', $message, function () use ($message, $context) {
+            $this->logger->error($message, $context);
+        });
     }
 
     /**
@@ -107,7 +115,9 @@ class LoggerWrapper implements LoggerInterface
      */
     public function warning($message, array $context = [])
     {
-        $this->logger->warning($message, $context);
+        $this->writeSafely('warning', $message, function () use ($message, $context) {
+            $this->logger->warning($message, $context);
+        });
     }
 
     /**
@@ -119,7 +129,9 @@ class LoggerWrapper implements LoggerInterface
      */
     public function notice($message, array $context = [])
     {
-        $this->logger->notice($message, $context);
+        $this->writeSafely('notice', $message, function () use ($message, $context) {
+            $this->logger->notice($message, $context);
+        });
     }
 
     /**
@@ -133,7 +145,9 @@ class LoggerWrapper implements LoggerInterface
      */
     public function info($message, array $context = [])
     {
-        $this->logger->info($message, $context);
+        $this->writeSafely('info', $message, function () use ($message, $context) {
+            $this->logger->info($message, $context);
+        });
     }
 
     /**
@@ -145,7 +159,9 @@ class LoggerWrapper implements LoggerInterface
      */
     public function debug($message, array $context = [])
     {
-        $this->logger->debug($message, $context);
+        $this->writeSafely('debug', $message, function () use ($message, $context) {
+            $this->logger->debug($message, $context);
+        });
     }
 
     /**
@@ -158,6 +174,46 @@ class LoggerWrapper implements LoggerInterface
      */
     public function log($level, $message, array $context = [])
     {
-        $this->logger->log($level, $message, $context);
+        $this->writeSafely((string) $level, $message, function () use ($level, $message, $context) {
+            $this->logger->log($level, $message, $context);
+        });
+    }
+
+    /**
+     * Logging is secondary: a failing log write (unwritable or missing log
+     * dir, full disk) must not change the outcome of the request that tried
+     * to log. Falls back to PHP's error_log(), never to this logger again.
+     *
+     * @param string $level
+     * @param mixed  $message
+     */
+    private function writeSafely(string $level, $message, callable $write): void
+    {
+        try {
+            $write();
+        } catch (\Throwable $exception) {
+            error_log(
+                __METHOD__ . " - Writing a '$level' log entry failed: '"
+                . $this->toSingleLine($exception->getMessage()) . "'. Original message: '"
+                . $this->toSingleLine($this->messageToString($message)) . "'."
+            );
+        }
+    }
+
+    /**
+     * @param mixed $message
+     */
+    private function messageToString($message): string
+    {
+        if (is_scalar($message) || $message === null || (is_object($message) && method_exists($message, '__toString'))) {
+            return (string) $message;
+        }
+
+        return '(' . gettype($message) . ')';
+    }
+
+    private function toSingleLine(string $text): string
+    {
+        return trim((string) preg_replace('/\s*[\r\n]+\s*/', ' ', $text));
     }
 }

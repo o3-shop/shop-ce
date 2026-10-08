@@ -28,7 +28,7 @@ Shared memory for all Claude agents working in this repository. Read this first,
 - [Contact page Google Map](architecture_contact-page-google-maps.md) — map uses per-theme sGoogleMapsAddr (placeholder default), never the shop contact address; o3-shop#196
 - [!] [Theme repos are external](architecture_theme-repos.md) — wave + o3-theme live in separate GitHub repos; their dirs in shop-ce are gitignored snapshots
 - [!] [o3-theme migration](project_o3-theme-migration.md) — wave → o3-theme cutover before 2026-05-01; keep new storefront templates portable
-- [o3-theme npm audit](project_o3-theme-dep-audit.md) — pre-existing brace-expansion vulnerability blocks test-all-coverage; use test --fast for PHP-only changes
+- [o3-theme npm audit](project_o3-theme-dep-audit.md) — gate audits only runtime deps (--omit=dev) since #243; build-tool advisories (gulp/braces) no longer block test-all
 - [!] [bin/release branch selection & execution gotchas](release-tooling-branch-selection.md) — `--to` does NOT pick the branch (only DefaultBranchResolver does); pre-flight runs last so a missing branch is a `Plan failed:` 404, not a gate error; live mode fires with no confirmation and bare `--dry-run` skips pre-flight entirely
 - [bin/release intermediate-node re-tag gap](release-tooling-intermediate-node-retag-gap.md) — resolver "reuses" an intermediate fat node (the metapackage) while bumping its child pin → orphaned edit; force a re-tag during the fold-out cut (#169)
 - [!] [cs-fixer dirties nested clones](cs-fixer-pollutes-nested-clones.md) — ./docker.sh cs-fixer reformats testing-library/themes/demodata clones → aborts bin/release pre-flight; clean them before a cut
