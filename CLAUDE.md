@@ -20,6 +20,7 @@ Workflow skills are bundled in `.claude/skills/` and trigger automatically. See 
 | `receiving-code-review`          | After getting review feedback                  |
 | `/finish`                        | Quality gate: cs-fixer + full tests + coverage |
 | `/push-pr`                       | Only if the user prompt to run it              |
+| `/release`                       | Only if the user asks to cut a release/RC      |
 
 ## Quick Start
 
