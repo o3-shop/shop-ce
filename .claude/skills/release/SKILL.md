@@ -1,6 +1,6 @@
 ---
 name: release
-description: Cut an O3-Shop release or release candidate with bin/release. Derives --from/--to, runs the dry-run with pre-flight gates, summarises the plan, and stops for explicit approval before every git write or public step (clone fast-forwards, the live cut, publishing the drafts, merge-backs, the milestone, the docs.o3-shop.com PR). Use when the user says "/release vX.Y.Z", "cut a release", "cut RC<n>", or "publish the release".
+description: Cut an O3-Shop release or release candidate with bin/release. Derives --from/--to, runs the dry-run with pre-flight gates, summarises the plan, and stops for explicit approval before every git write or public step (clone fast-forwards, the live cut, publishing the drafts, merge-backs, the milestone, the docs.o3-shop.com PR). Use only when the user explicitly asks to cut or publish an O3-Shop release ("/release vX.Y.Z", "cut a release", "cut RC<n>").
 ---
 
 # /release — cut an O3-Shop release
@@ -17,8 +17,9 @@ the steps below guard against:
 - `.claude/memory/release-tooling-branch-selection.md`: branch selection, live
   mode without confirmation, bare dry-run skips the gates, `UpToDateGate`
   fast-forwards, merge-back PRs.
-- `.claude/memory/release-tooling-intermediate-node-retag-gap.md`: why an
-  intermediate package must be re-tagged when its own `composer.json` changes.
+- `.claude/memory/release-tooling-intermediate-node-retag-gap.md`: why every
+  package with a constraint edit needs a cut row (fixed in shop-ce#157, still
+  checked in Step 3.4).
 - `.claude/memory/cs-fixer-pollutes-nested-clones.md`: a cs-fixer run dirties
   the nested clones and aborts the gates.
 - `.claude/memory/known-pitfalls.md`, sections *Packagist sync delay*, *Use
@@ -34,8 +35,8 @@ session never counts.
 | Gate | Before | Why |
 |---|---|---|
 | A | the gated dry-run | `UpToDateGate` runs `git merge --ff-only` in the listed clones |
-| B | the live `bin/release` run | it pushes commits and tags with no prompt of its own |
-| C | publishing the draft releases | public; Packagist picks the tags up |
+| B | the live `bin/release` run | it pushes commits and tags with no prompt of its own; Packagist indexes pushed tags, so they become installable within 5–60 min |
+| C | publishing the draft releases | public release pages (the tags are already public since gate B) |
 | D | merging the merge-back PRs (final only) | writes to `main` |
 | E | closing the milestone (final only) | public bookkeeping |
 | F | the docs branch and commit (final only) | git writes |
@@ -66,7 +67,10 @@ For a draft or PR, take the GitHub repo from its URL.
 
 Run from the **main shop-ce checkout**, not a git worktree: `--repo-path`
 requires a `.git` directory (in a worktree it is a file, and the run exits `2`),
-and the sibling clones are found next to the main checkout.
+and the sibling clones are found next to the main checkout. From a worktree,
+set `SHOP_CE` directly to the main checkout instead of the first line below:
+`SHOP_CE=$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")`
+(point 4 checks its branch).
 
 Shell variables don't survive between Bash tool calls: re-set the ones a
 command uses at the top of that call, or substitute the literal values.
@@ -167,8 +171,9 @@ nested clone, as the tool's own discovery does, and run the checks in 2c on
 both. A plan package not found by name (a fork may keep its upstream name, e.g.
 the `paypal-module` clone declares `oxid-solution-catalysts/paypal-module`):
 match it by `git -C <dir> remote get-url origin` against its GitHub repo
-instead. A package with no clone at all: tell the user and ask them to clone it
-into `BASE`. Don't clone it yourself.
+instead, and key its `--repo-path` by the plan's name
+(`o3-shop/paypal-module`), not the clone's. A package with no clone at all:
+tell the user and ask them to clone it into `BASE`. Don't clone it yourself.
 
 **2c. Gated dry-run (gate A).** `UpToDateGate` runs
 `git merge --ff-only origin/<release branch>` on whatever branch is checked out,
@@ -236,12 +241,27 @@ the cause; then repeat Step 2c.
 
 ## Step 4: live run (gate B)
 
+The live run re-plans from the remotes and executes without a prompt. A commit
+that lands on any release branch after the dry-run becomes a tag the user never
+saw. So **repeat Step 2c, gate A question included, immediately before
+asking**, and base the question on that fresh plan. This narrows the window but
+can't close it, hence the comparison afterwards.
+
 Ask: "Run `bin/release --from $FROM --to $TO` live? It re-runs the gates
 (fast-forwarding the listed clones again), pushes commits and these tags:
-<list>, creates draft releases, and <for a final> pushes a
-`merge-back-<tag>` branch and opens a merge-back PR in <list>." Only on a yes,
-run the same command without `--dry-run`, with the same `--repo-path` and
-`--bump` flags, logged the same way.
+<list>, which become installable once Packagist indexes them (5–60 min),
+creates draft releases, and <for a final> pushes a `merge-back-<tag>` branch and
+opens a merge-back PR in <list>." Only on a yes, run the same command without
+`--dry-run`, with the same `--repo-path` and `--bump` flags, logged to its own
+file:
+
+```bash
+bin/release --from "$FROM" --to "$TO" <same flags> > "$LOG_DIR/release-live.log" 2>&1; echo "REAL_EXIT=$?"
+```
+
+Afterwards, compare the `Per-repo plan:` block in `release-live.log` with the
+one in `release-gates.log`. Report any difference to the user before anything
+else.
 
 From the end of the log, collect `Draft GitHub releases created:` and
 `Merge-back PRs opened:` (package → URL). A draft's URL never contains its tag
@@ -275,11 +295,13 @@ shop version:
 | pre-release tag (`-RC<n>`, `-alpha`, `-beta`, `-dev`, `-preview`, `-pre`, `-p`; `MergeBackPolicy::PRE_RELEASE_PATTERN`) | `--prerelease --latest=false` | tag |
 | final tag, highest final in its repo | `--prerelease=false --latest` | tag |
 | final tag on an older line | `--prerelease=false --latest=false` | tag |
-| `o3-shop/o3-shop`, final | as above | `O3-Shop vX.Y.Z` |
-| `o3-shop/o3-shop`, RC | `--prerelease --latest=false` | `O3-Shop vX.Y.Z-RC<n>` |
+| `o3-shop/o3-shop`, final | as above | see below |
+| `o3-shop/o3-shop`, RC | `--prerelease --latest=false` | see below |
 
-The `o3-shop` titles follow *How to contribute → Step 14*; past releases (e.g.
-`v1.7.2`) kept the bare tag. Name the title you will set in the gate C question.
+`o3-shop` title: *How to contribute → Step 14* says `O3-Shop vX.Y.Z`, but past
+releases (e.g. `v1.7.2`, `v1.7.3-RC1`) kept the bare tag (raised in
+o3-shop/o3-shop#271). Until that is decided, ask in the gate C question which
+one to use; without an answer, keep the bare tag.
 
 "Highest final in its repo": compare against
 `git ls-remote --tags --refs <repo url>` filtered to `vX.Y.Z` tags and sorted
@@ -292,8 +314,9 @@ gh release edit <tag> -R <github repo> --draft=false <flags> [--title "O3-Shop <
 
 Before each: `gh release view <tag> -R <github repo> --json isDraft,body` shows
 the draft with a non-empty body. Publish in the order the run printed them
-(leaves first), `o3-shop/o3-shop` **last**, so the project tag appears only
-after everything it pins.
+(leaves first), `o3-shop/o3-shop` **last**: its release page links the leaf
+releases, and publishing it starts the demo image build. (The tags themselves
+went public during the live run, in the same order.)
 
 Afterwards, verify each:
 `gh release view <tag> -R <github repo> --json isDraft,isPrerelease` matches
@@ -315,9 +338,12 @@ Docker Image* (~35 min):
 green, `docker manifest inspect ghcr.io/o3-shop/o3-shop-demo:<tag>` succeeds.
 `:latest` moves only for a release marked *Latest*: compare the digests of
 `docker buildx imagetools inspect ghcr.io/o3-shop/o3-shop-demo:latest` and
-`…:<tag>`; they match after a final release and differ after an RC.
+`…:<tag>`. Once that build is green, they match if and only if the `o3-shop`
+release was published with `--latest` (a manual `workflow_dispatch` with
+`latest=true` can also move it).
 
-**Packagist** needs 5–60 minutes. For every new tag:
+**Packagist** needs 5–60 minutes from the live run (it indexes the pushed tags,
+not the releases). For every new tag:
 
 ```bash
 curl -s https://repo.packagist.org/p2/<package>.json | grep -c '"version":"<tag>"'
@@ -327,7 +353,9 @@ Missing after an hour: give the user `https://packagist.org/packages/<package>`
 to press *Update*.
 
 **Smoke test (optional, after Packagist).** With shop-ce's bundled composer
-(2.2.x, as in production), not the one on `PATH`:
+(2.2.x, as in production), not the one on `PATH`. Plugins stay on:
+`o3-shop/shop-composer-plugin` builds the shop, which is the point of the test
+(the plugins come from the packages just released):
 
 ```bash
 "$SHOP_CE"/vendor/bin/composer create-project --no-scripts --no-interaction \

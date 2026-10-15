@@ -15,9 +15,9 @@ type: reference
 > `shop-ce` `^1.2`, which every 1.x satisfies). The `/release` skill still
 > checks every edited package has a cut row, as a safety net. The analysis
 > below is kept as background. Its `--bump shop-metapackage-ce=<version>`
-> remedy never worked: `--bump` only sets the version
-> of a cut that already happens (it never forces one), and `TagCutter` tags
-> shop-ce and the metapackage at `--to` unconditionally.
+> remedy never worked: `--bump` only sets the version of a cut that already
+> happens (it never forces one), and whenever shop-ce or the metapackage is
+> cut, `TagCutter` uses `--to` verbatim, overriding `--bump` and `.next-bump`.
 
 Discovered during the metapackage fold-OUT (issue o3-shop/o3-shop#169), where
 `o3-shop/shop-metapackage-ce` became a first-class intermediate node again
@@ -43,11 +43,10 @@ is the root and is skipped by the candidate loop (`ReleasePlanner` line ~111),
 so it was never "reused". An intermediate fat node (the metapackage) exposes
 the gap.
 
-**Implication for a clean cut:** force the metapackage (and decide shop-ce /
-the o3-shop tag) explicitly — e.g. `--bump shop-metapackage-ce=<version>` —
-or enhance the resolver so a package with a pending constraint edit is treated
-as `NEEDS_NEW_TAG` rather than reused. Also open: `o3-shop/o3-shop` is NOT a
-candidate (skipped), so how the thin o3-shop project itself gets its release
-tag needs confirming in `LiveExecutor`.
+**Implication at the time (historical, superseded — see the banner):** the
+resolver was enhanced (shop-ce#157) so a package with a pending constraint edit
+is cut rather than reused; the `--bump` workaround considered here never
+worked. `o3-shop/o3-shop` is not a candidate: `LiveExecutor` tags it at `--to`
+after all candidates.
 
 See also [[project_metapackage-fold-out]].
