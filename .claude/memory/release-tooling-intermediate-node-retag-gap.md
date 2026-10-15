@@ -1,10 +1,23 @@
 ---
 name: release-tooling-intermediate-node-retag-gap
-description: bin/release reuses an intermediate compilation node's latest tag even when it will bump that node's child pin → orphaned edit
+description: FIXED in shop-ce#157 — bin/release used to reuse an intermediate node's latest tag while bumping that node's child pin → orphaned edit; the planner now forces a cut
 type: reference
 ---
 
 # bin/release: intermediate "fat" nodes can get an orphaned constraint edit
+
+> **Fixed in shop-ce#157 (2026-05-27).** `ReleasePlanner` now forces a cut
+> when a package receives a downstream constraint edit
+> (`willReceiveDownstreamEdit()`); the dry-run labels it
+> `cut-new-tag (downstream changed)`. Covered by `ReleasePlannerTest`.
+> Exception: a child reached only over a back-edge is resolved after its
+> parent, so it can't force the parent's cut (harmless today: the leaves pin
+> `shop-ce` `^1.2`, which every 1.x satisfies). The `/release` skill still
+> checks every edited package has a cut row, as a safety net. The analysis
+> below is kept as background. Its `--bump shop-metapackage-ce=<version>`
+> remedy never worked: `--bump` only sets the version
+> of a cut that already happens (it never forces one), and `TagCutter` tags
+> shop-ce and the metapackage at `--to` unconditionally.
 
 Discovered during the metapackage fold-OUT (issue o3-shop/o3-shop#169), where
 `o3-shop/shop-metapackage-ce` became a first-class intermediate node again
