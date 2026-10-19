@@ -85,7 +85,7 @@
             "if [ -f ./vendor/bin/oe-eshop-ide_helper ]; then oe-eshop-ide_helper; fi"
         ],
         "oe:install:module:paypal": [
-            "composer require oxid-solution-catalysts/paypal-module ^2.6.0",
+            "composer require o3-shop/paypal-checkout ^2.10.0",
             "vendor/bin/oe-console oe:module:install-configuration source/modules/osc/paypal",
             "vendor/bin/oe-console oe:cache:clear"
         ]
@@ -126,5 +126,27 @@
     },
     "replace": {
         "oxid-esales/oxideshop-ce": "6.10.3"
-    }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "local-modules/paypal-checkout",
+            "options": {
+                "symlink": true,
+                "versions": {
+                    "o3-shop/paypal-checkout": "2.10.1"
+                }
+            }
+        },
+        {
+            "type": "path",
+            "url": "local-modules/paypal-client",
+            "options": {
+                "symlink": true,
+                "versions": {
+                    "o3-shop/paypal-client": "3.0.20"
+                }
+            }
+        }
+    ]
 }
