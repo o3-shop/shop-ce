@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 
+### Added
+- console command `oe:module:refresh-settings` to re-apply the installed module configuration
+  (templates, blocks, controllers, class extensions, events, services) to the shop without
+  changing the module activation state. Module settings configured in the admin are kept.
+
+### Fixed
+- installing a module configuration now refreshes the stored module settings of the shops
+  where the module is already active. Previously the shop kept serving the settings derived
+  from the previous configuration until the module was deactivated and activated again -
+  a template map missing templates added to metadata.php, for example, made module templates
+  render empty without any error.
+
 ## [v1.2.0] - 2023-04-25
 
 ### Added

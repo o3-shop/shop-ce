@@ -38,4 +38,14 @@ interface ModuleConfigurationHandlingServiceInterface
      * @param int                 $shopId
      */
     public function handleOnDeactivation(ModuleConfiguration $moduleConfiguration, int $shopId);
+
+    /**
+     * Re-applies the given configuration to the shop without changing the module's
+     * activation state, so the shop follows configuration changes made after the module
+     * was activated. Settings configured by the shop owner are left untouched.
+     *
+     * @param ModuleConfiguration $moduleConfiguration
+     * @param int                 $shopId
+     */
+    public function handleOnRefresh(ModuleConfiguration $moduleConfiguration, int $shopId);
 }

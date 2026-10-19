@@ -78,6 +78,18 @@ class ShopConfigurationClassesWithoutNamespaceHandler implements ModuleConfigura
      * @param ModuleConfiguration $configuration
      * @param int                 $shopId
      */
+    public function handleOnModuleRefresh(ModuleConfiguration $configuration, int $shopId)
+    {
+        // Activation is guarded by hasClassWithoutNamespaces(), so a class removed from
+        // the configuration would survive it. Deactivate first to re-derive the full list.
+        $this->handleOnModuleDeactivation($configuration, $shopId);
+        $this->handleOnModuleActivation($configuration, $shopId);
+    }
+
+    /**
+     * @param ModuleConfiguration $configuration
+     * @param int                 $shopId
+     */
     public function handleOnModuleDeactivation(ModuleConfiguration $configuration, int $shopId)
     {
         if ($configuration->hasClassWithoutNamespaces()) {

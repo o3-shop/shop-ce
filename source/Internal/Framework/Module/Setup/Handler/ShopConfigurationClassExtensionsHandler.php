@@ -68,6 +68,18 @@ class ShopConfigurationClassExtensionsHandler implements ModuleConfigurationHand
      * @param ModuleConfiguration $configuration
      * @param int                 $shopId
      */
+    public function handleOnModuleRefresh(ModuleConfiguration $configuration, int $shopId)
+    {
+        // Activation is guarded by hasClassExtensions(), so an extension removed from the
+        // configuration would survive it. Deactivate first to re-derive the full list.
+        $this->handleOnModuleDeactivation($configuration, $shopId);
+        $this->handleOnModuleActivation($configuration, $shopId);
+    }
+
+    /**
+     * @param ModuleConfiguration $configuration
+     * @param int                 $shopId
+     */
     public function handleOnModuleDeactivation(ModuleConfiguration $configuration, int $shopId)
     {
         if ($configuration->hasClassExtensions()) {

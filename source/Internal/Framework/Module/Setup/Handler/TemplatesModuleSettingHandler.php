@@ -81,6 +81,19 @@ class TemplatesModuleSettingHandler implements ModuleConfigurationHandlerInterfa
      * @param ModuleConfiguration $configuration
      * @param int $shopId
      */
+    public function handleOnModuleRefresh(ModuleConfiguration $configuration, int $shopId)
+    {
+        // Deactivation drops the module's whole template map entry, so templates removed
+        // from the configuration disappear as well. Activation replaces the entry, which
+        // makes this idempotent.
+        $this->handleOnModuleDeactivation($configuration, $shopId);
+        $this->handleOnModuleActivation($configuration, $shopId);
+    }
+
+    /**
+     * @param ModuleConfiguration $configuration
+     * @param int $shopId
+     */
     public function handleOnModuleDeactivation(ModuleConfiguration $configuration, int $shopId)
     {
         if ($configuration->hasTemplates()) {

@@ -23,7 +23,10 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\Command;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Command\InstallModuleConfigurationCommand;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ModuleConfigurationInstallerInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\ModuleConfigurationDaoInterface as MetaDataModuleConfigurationDaoInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleConfigurationRefreshServiceInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -53,11 +56,54 @@ class InstallModuleConfigurationCommandTest extends TestCase
         return $context;
     }
 
+    private function makeCommand(
+        ModuleConfigurationInstallerInterface $installer,
+        ?ModuleConfigurationRefreshServiceInterface $refreshService = null
+    ): InstallModuleConfigurationCommand {
+        $moduleConfiguration = new ModuleConfiguration();
+        $moduleConfiguration->setId('mymodule');
+
+        $metadataModuleConfigurationDao = $this->createMock(MetaDataModuleConfigurationDaoInterface::class);
+        $metadataModuleConfigurationDao->method('get')->willReturn($moduleConfiguration);
+
+        if ($refreshService === null) {
+            $refreshService = $this->createMock(ModuleConfigurationRefreshServiceInterface::class);
+            $refreshService->method('refreshActiveModule')->willReturn([]);
+        }
+
+        return new InstallModuleConfigurationCommand(
+            $installer,
+            $this->makeContext(),
+            $metadataModuleConfigurationDao,
+            $refreshService
+        );
+    }
+
+    public function testReportsRefreshedShopsForActiveModules(): void
+    {
+        $refreshService = $this->createMock(ModuleConfigurationRefreshServiceInterface::class);
+        $refreshService->expects($this->once())
+            ->method('refreshActiveModule')
+            ->with('mymodule')
+            ->willReturn([1]);
+
+        $tester = new CommandTester($this->makeCommand(
+            $this->createMock(ModuleConfigurationInstallerInterface::class),
+            $refreshService
+        ));
+
+        $tester->execute([
+            'module-source-path' => $this->modulesPath . '/mymodule',
+            'module-target-path' => $this->modulesPath . '/mymodule',
+        ]);
+
+        $this->assertStringContainsString('Refreshed settings of mymodule in shop 1.', $tester->getDisplay());
+    }
+
     public function testCommandNameAndDescription(): void
     {
-        $command = new InstallModuleConfigurationCommand(
-            $this->createMock(ModuleConfigurationInstallerInterface::class),
-            $this->makeContext()
+        $command = $this->makeCommand(
+            $this->createMock(ModuleConfigurationInstallerInterface::class)
         );
         $this->assertSame('oe:module:install-configuration', $command->getName());
     }
@@ -69,7 +115,7 @@ class InstallModuleConfigurationCommandTest extends TestCase
             ->method('install')
             ->with($this->modulesPath . '/mymodule', $this->modulesPath . '/mymodule');
 
-        $command = new InstallModuleConfigurationCommand($installer, $this->makeContext());
+        $command = $this->makeCommand($installer);
         $tester = new CommandTester($command);
 
         $exitCode = $tester->execute([
@@ -90,7 +136,7 @@ class InstallModuleConfigurationCommandTest extends TestCase
         $installer = $this->createMock(ModuleConfigurationInstallerInterface::class);
         $installer->expects($this->never())->method('install');
 
-        $command = new InstallModuleConfigurationCommand($installer, $this->makeContext());
+        $command = $this->makeCommand($installer);
         $tester = new CommandTester($command);
 
         // Single arg → the command tries to derive target from source. Source is
@@ -112,7 +158,7 @@ class InstallModuleConfigurationCommandTest extends TestCase
             ->method('install')
             ->with($this->modulesPath . '/mymodule', $this->modulesPath . '/mymodule');
 
-        $command = new InstallModuleConfigurationCommand($installer, $this->makeContext());
+        $command = $this->makeCommand($installer);
         $tester = new CommandTester($command);
 
         $exitCode = $tester->execute([
@@ -127,7 +173,7 @@ class InstallModuleConfigurationCommandTest extends TestCase
         $installer->method('install')
             ->willThrowException(new \RuntimeException('disk full'));
 
-        $command = new InstallModuleConfigurationCommand($installer, $this->makeContext());
+        $command = $this->makeCommand($installer);
         $tester = new CommandTester($command);
 
         $this->expectException(\RuntimeException::class);
@@ -149,7 +195,7 @@ class InstallModuleConfigurationCommandTest extends TestCase
         $installer = $this->createMock(ModuleConfigurationInstallerInterface::class);
         $installer->expects($this->never())->method('install');
 
-        $command = new InstallModuleConfigurationCommand($installer, $this->makeContext());
+        $command = $this->makeCommand($installer);
         $tester = new CommandTester($command);
 
         $this->expectException(\Throwable::class);

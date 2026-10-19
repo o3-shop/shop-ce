@@ -55,6 +55,17 @@ class SettingModuleSettingHandler implements ModuleConfigurationHandlerInterface
      * @param ModuleConfiguration $configuration
      * @param int                 $shopId
      */
+    public function handleOnModuleRefresh(ModuleConfiguration $configuration, int $shopId)
+    {
+        // Deliberately does nothing: module settings hold values configured by the shop
+        // owner. Re-saving the metadata defaults here would reset them, which is exactly
+        // what makes a deactivate/activate cycle unsuitable for refreshing a module.
+    }
+
+    /**
+     * @param ModuleConfiguration $configuration
+     * @param int                 $shopId
+     */
     public function handleOnModuleDeactivation(ModuleConfiguration $configuration, int $shopId): void
     {
         foreach ($configuration->getModuleSettings() as $setting) {

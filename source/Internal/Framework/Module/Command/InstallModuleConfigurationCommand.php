@@ -24,6 +24,8 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Command;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ModuleConfigurationInstallerInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\ModuleConfigurationDaoInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleConfigurationRefreshServiceInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -53,15 +55,31 @@ class InstallModuleConfigurationCommand extends Command
     private $context;
 
     /**
+     * @var ModuleConfigurationDaoInterface
+     */
+    private $metadataModuleConfigurationDao;
+
+    /**
+     * @var ModuleConfigurationRefreshServiceInterface
+     */
+    private $moduleConfigurationRefreshService;
+
+    /**
      * @param ModuleConfigurationInstallerInterface $moduleConfigurationInstaller
      * @param BasicContextInterface $context
+     * @param ModuleConfigurationDaoInterface $metadataModuleConfigurationDao
+     * @param ModuleConfigurationRefreshServiceInterface $moduleConfigurationRefreshService
      */
     public function __construct(
         ModuleConfigurationInstallerInterface $moduleConfigurationInstaller,
-        BasicContextInterface $context
+        BasicContextInterface $context,
+        ModuleConfigurationDaoInterface $metadataModuleConfigurationDao,
+        ModuleConfigurationRefreshServiceInterface $moduleConfigurationRefreshService
     ) {
         $this->moduleConfigurationInstaller = $moduleConfigurationInstaller;
         $this->context = $context;
+        $this->metadataModuleConfigurationDao = $metadataModuleConfigurationDao;
+        $this->moduleConfigurationRefreshService = $moduleConfigurationRefreshService;
 
         parent::__construct();
     }
@@ -110,12 +128,31 @@ class InstallModuleConfigurationCommand extends Command
 
             $this->moduleConfigurationInstaller->install($moduleSourcePath, $moduleTargetPath);
             $output->writeln('<info>' . self::MESSAGE_INSTALLATION_WAS_SUCCESSFUL . '</info>');
+
+            $this->refreshActiveModuleConfigurations($moduleSourcePath, $output);
         } catch (ModuleTargetPathIsMissingException $exception) {
             $output->writeln('<error>' . self::MESSAGE_TARGET_PATH_IS_REQUIRED . '</error>');
         } catch (\Throwable $throwable) {
             $output->writeln('<error>' . self::MESSAGE_INSTALLATION_FAILED . '</error>');
 
             throw $throwable;
+        }
+    }
+
+    /**
+     * Installing the configuration of a module that is already active would otherwise
+     * leave the shop on the settings it derived from the previous configuration: the
+     * stored module settings are only written when a module is activated.
+     *
+     * @param string          $moduleSourcePath
+     * @param OutputInterface $output
+     */
+    private function refreshActiveModuleConfigurations(string $moduleSourcePath, OutputInterface $output): void
+    {
+        $moduleId = $this->metadataModuleConfigurationDao->get($moduleSourcePath)->getId();
+
+        foreach ($this->moduleConfigurationRefreshService->refreshActiveModule($moduleId) as $shopId) {
+            $output->writeln(sprintf('<info>Refreshed settings of %s in shop %d.</info>', $moduleId, $shopId));
         }
     }
 

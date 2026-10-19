@@ -60,6 +60,19 @@ class TemplateBlockModuleSettingHandler implements ModuleConfigurationHandlerInt
      * @param ModuleConfiguration $configuration
      * @param int                 $shopId
      */
+    public function handleOnModuleRefresh(ModuleConfiguration $configuration, int $shopId)
+    {
+        // TemplateBlockExtensionDao::add() skips blocks that are already registered, so
+        // activation alone would keep stale block definitions. Deactivate first to
+        // re-derive the full list of blocks from the configuration.
+        $this->handleOnModuleDeactivation($configuration, $shopId);
+        $this->handleOnModuleActivation($configuration, $shopId);
+    }
+
+    /**
+     * @param ModuleConfiguration $configuration
+     * @param int                 $shopId
+     */
     public function handleOnModuleDeactivation(ModuleConfiguration $configuration, int $shopId)
     {
         if ($configuration->hasTemplateBlocks()) {

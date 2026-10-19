@@ -64,6 +64,19 @@ class ModuleConfigurationHandlingService implements ModuleConfigurationHandlingS
     }
 
     /**
+     * @param ModuleConfiguration $moduleConfiguration
+     * @param int                 $shopId
+     */
+    public function handleOnRefresh(ModuleConfiguration $moduleConfiguration, int $shopId)
+    {
+        $this->validateModuleConfiguration($moduleConfiguration, $shopId);
+
+        foreach ($this->handlers as $handler) {
+            $handler->handleOnModuleRefresh($moduleConfiguration, $shopId);
+        }
+    }
+
+    /**
      * @param ModuleConfigurationHandlerInterface $moduleSettingHandler
      */
     public function addHandler(ModuleConfigurationHandlerInterface $moduleSettingHandler)
