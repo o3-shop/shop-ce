@@ -378,13 +378,67 @@ class ModuleListTest extends \OxidTestCase
         );
     }
 
+    /**
+     * getDisabledModuleClasses() reads the shop's project configuration and the
+     * module state service (not the legacy aDisabledModules/aModuleExtensions
+     * config params), so the test has to drive it through a real, throw-away
+     * ModuleConfiguration: the extension class is reported while the module is
+     * inactive and disappears once the module is activated.
+     */
     public function testGetDisabledModuleClassesReadsAModuleExtensionsAndADisabledModules(): void
     {
-        // No disabled modules → empty array.
-        $this->getConfig()->setConfigParam('aDisabledModules', []);
-        $this->getConfig()->setConfigParam('aModuleExtensions', []);
-        $moduleList = oxNew(\OxidEsales\Eshop\Core\Module\ModuleList::class);
-        $this->assertSame([], $moduleList->getDisabledModuleClasses());
+        $moduleId = 'test_disabled_module_classes';
+        $extensionClass = $moduleId . '/ModuleArticle';
+
+        $container = \OxidEsales\EshopCommunity\Internal\Container\ContainerFactory::getInstance()->getContainer();
+        $shopConfigurationDao = $container->get(
+            \OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ShopConfigurationDaoBridgeInterface::class
+        );
+        $moduleStateService = $container->get(
+            \OxidEsales\EshopCommunity\Internal\Framework\Module\State\ModuleStateServiceInterface::class
+        );
+        $shopId = (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getShopId();
+
+        $moduleConfiguration = new \OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration();
+        $moduleConfiguration->setId($moduleId)->setPath('test/' . $moduleId);
+        $moduleConfiguration->addClassExtension(
+            new \OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\ClassExtension(
+                'ShopClass',
+                $extensionClass
+            )
+        );
+
+        $shopConfiguration = $shopConfigurationDao->get();
+        $shopConfiguration->addModuleConfiguration($moduleConfiguration);
+        // deleteModuleConfiguration() also removes the extensions from the chain,
+        // so register them here to keep cleanup symmetric.
+        $shopConfiguration->getClassExtensionsChain()->addExtensions($moduleConfiguration->getClassExtensions());
+        $shopConfigurationDao->save($shopConfiguration);
+
+        try {
+            if ($moduleStateService->isActive($moduleId, $shopId)) {
+                $moduleStateService->setDeactivated($moduleId, $shopId);
+            }
+            $this->assertContains(
+                $extensionClass,
+                oxNew(\OxidEsales\Eshop\Core\Module\ModuleList::class)->getDisabledModuleClasses()
+            );
+
+            $moduleStateService->setActive($moduleId, $shopId);
+            $this->assertNotContains(
+                $extensionClass,
+                oxNew(\OxidEsales\Eshop\Core\Module\ModuleList::class)->getDisabledModuleClasses()
+            );
+        } finally {
+            if ($moduleStateService->isActive($moduleId, $shopId)) {
+                $moduleStateService->setDeactivated($moduleId, $shopId);
+            }
+            $shopConfiguration = $shopConfigurationDao->get();
+            if ($shopConfiguration->hasModuleConfiguration($moduleId)) {
+                $shopConfiguration->deleteModuleConfiguration($moduleId);
+            }
+            $shopConfigurationDao->save($shopConfiguration);
+        }
     }
 
     public function testGetModuleReturnsNewModuleInstance(): void
