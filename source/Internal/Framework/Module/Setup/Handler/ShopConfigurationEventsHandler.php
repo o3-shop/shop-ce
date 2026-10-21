@@ -69,8 +69,9 @@ class ShopConfigurationEventsHandler implements ModuleConfigurationHandlerInterf
     public function handleOnModuleRefresh(ModuleConfiguration $configuration, int $shopId)
     {
         // Activation is guarded by hasEvents(), so an event removed from the configuration
-        // would survive it. Deactivate first to re-derive the full list.
-        $this->handleOnModuleDeactivation($configuration, $shopId);
+        // would survive it. Remove the stored entry first to re-derive the full list, then
+        // activate the new one.
+        $this->removeModuleEntry($configuration, $shopId);
         $this->handleOnModuleActivation($configuration, $shopId);
     }
 
@@ -81,15 +82,20 @@ class ShopConfigurationEventsHandler implements ModuleConfigurationHandlerInterf
     public function handleOnModuleDeactivation(ModuleConfiguration $configuration, int $shopId)
     {
         if ($configuration->hasEvents()) {
-            $shopConfigurationSetting = $this->getShopConfigurationSetting($shopId);
-
-            $shopSettingValue = $shopConfigurationSetting->getValue();
-            unset($shopSettingValue[$configuration->getId()]);
-
-            $shopConfigurationSetting->setValue($shopSettingValue);
-
-            $this->shopConfigurationSettingDao->save($shopConfigurationSetting);
+            $this->removeModuleEntry($configuration, $shopId);
         }
+    }
+
+    private function removeModuleEntry(ModuleConfiguration $configuration, int $shopId): void
+    {
+        $shopConfigurationSetting = $this->getShopConfigurationSetting($shopId);
+
+        $shopSettingValue = $shopConfigurationSetting->getValue();
+        unset($shopSettingValue[$configuration->getId()]);
+
+        $shopConfigurationSetting->setValue($shopSettingValue);
+
+        $this->shopConfigurationSettingDao->save($shopConfigurationSetting);
     }
 
     /**

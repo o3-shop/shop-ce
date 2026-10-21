@@ -83,29 +83,34 @@ class TemplatesModuleSettingHandler implements ModuleConfigurationHandlerInterfa
      */
     public function handleOnModuleRefresh(ModuleConfiguration $configuration, int $shopId)
     {
-        // Deactivation drops the module's whole template map entry, so templates removed
-        // from the configuration disappear as well. Activation replaces the entry, which
-        // makes this idempotent.
-        $this->handleOnModuleDeactivation($configuration, $shopId);
+        // Activation is guarded by hasTemplates(), so templates removed from the
+        // configuration would survive it. Remove the module's stored map entry first,
+        // then activate the new one.
+        $this->removeModuleEntry($configuration, $shopId);
         $this->handleOnModuleActivation($configuration, $shopId);
     }
 
     /**
      * @param ModuleConfiguration $configuration
-     * @param int $shopId
+     * @param int                 $shopId
      */
     public function handleOnModuleDeactivation(ModuleConfiguration $configuration, int $shopId)
     {
         if ($configuration->hasTemplates()) {
-            $shopConfigurationSetting = $this->getShopConfigurationSetting($shopId);
-
-            $shopSettingValue = $shopConfigurationSetting->getValue();
-            unset($shopSettingValue[$configuration->getId()]);
-
-            $shopConfigurationSetting->setValue($shopSettingValue);
-
-            $this->shopConfigurationSettingDao->save($shopConfigurationSetting);
+            $this->removeModuleEntry($configuration, $shopId);
         }
+    }
+
+    private function removeModuleEntry(ModuleConfiguration $configuration, int $shopId): void
+    {
+        $shopConfigurationSetting = $this->getShopConfigurationSetting($shopId);
+
+        $shopSettingValue = $shopConfigurationSetting->getValue();
+        unset($shopSettingValue[$configuration->getId()]);
+
+        $shopConfigurationSetting->setValue($shopSettingValue);
+
+        $this->shopConfigurationSettingDao->save($shopConfigurationSetting);
     }
 
     /**

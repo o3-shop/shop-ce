@@ -28,14 +28,17 @@ use OxidEsales\EshopCommunity\Internal\Framework\Config\DataObject\ShopConfigura
 use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopConfigurationDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\ClassExtension;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\Template;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ShopConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\Setting;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\SettingDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActivationBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\State\ModuleStateServiceInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use OxidEsales\TestingLibrary\Services\Library\DatabaseRestorer\DatabaseRestorer;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\PathUtil\Path;
 
 /**
@@ -114,6 +117,73 @@ final class RefreshModuleSettingsCommandTest extends ModuleCommandsTestCase
         );
     }
 
+    public function testRefreshRemovesTheLastTemplateWhenConfigurationDropsIt(): void
+    {
+        $this->configureTestModule(['testmodule/tpl/a.tpl' => 'testmodule/tpl/a.tpl']);
+        $this->get(ModuleActivationBridgeInterface::class)->activate($this->moduleId, 1);
+
+        // the module configuration no longer defines any templates
+        $this->configureTestModule([]);
+
+        $this->executeCommand([
+            'command' => 'oe:module:refresh-settings',
+            'module-id' => $this->moduleId,
+        ]);
+
+        $this->assertArrayNotHasKey($this->moduleId, $this->getRegisteredTemplates(1));
+    }
+
+    public function testRefreshFromMetadataBacksUpTheShopConfigurationOutsideTheShopsDirectory(): void
+    {
+        $this->configureTestModule(['testmodule/tpl/a.tpl' => 'testmodule/tpl/a.tpl']);
+        $this->get(ModuleActivationBridgeInterface::class)->activate($this->moduleId, 1);
+        $this->writeInstalledModuleMetadata(['testmodule/tpl/from-metadata.tpl' => 'testmodule/tpl/from-metadata.tpl']);
+
+        $configurationDirectory = $this->get(BasicContextInterface::class)->getProjectConfigurationDirectory();
+        $shopConfigurationPath = $configurationDirectory . 'shops/1.yaml';
+        $before = file_get_contents($shopConfigurationPath);
+
+        // leftovers from previous runs would make the backup count non-deterministic; glob()
+        // cannot be used here because the test configuration lives on the vfs:// stream
+        $fileSystem = new Filesystem();
+        foreach ($this->findBackupDirectories($configurationDirectory) as $leftover) {
+            $fileSystem->remove($configurationDirectory . $leftover);
+        }
+
+        $this->executeCommand([
+            'command' => 'oe:module:refresh-settings',
+            'module-id' => $this->moduleId,
+            '--from-metadata' => true,
+        ]);
+
+        // save() deletes the whole shops/ directory, so a backup kept inside it would be lost
+        $backupDirectories = $this->findBackupDirectories($configurationDirectory);
+        $this->assertCount(1, $backupDirectories, 'Expected one restorable backup of the shop configuration');
+        $this->assertSame($before, file_get_contents($configurationDirectory . $backupDirectories[0] . '/1.yaml'));
+        $this->assertNotSame($before, file_get_contents($shopConfigurationPath));
+    }
+
+    public function testRefreshFromMetadataUpdatesTheClassExtensionChain(): void
+    {
+        $shopClass = 'OxidEsales\\Eshop\\Application\\Model\\Article';
+        $installedClass = 'testmodule\\ModuleArticleInstalled';
+        $metadataClass = 'testmodule\\ModuleArticleFromMetadata';
+
+        $this->configureTestModule([], [$shopClass => $installedClass]);
+        $this->get(ModuleActivationBridgeInterface::class)->activate($this->moduleId, 1);
+
+        $this->writeInstalledModuleMetadata([], [$shopClass => $metadataClass]);
+
+        $this->executeCommand([
+            'command' => 'oe:module:refresh-settings',
+            'module-id' => $this->moduleId,
+            '--from-metadata' => true,
+        ]);
+
+        $this->assertSame([$metadataClass], $this->getClassExtensions(1)[$this->moduleId]);
+        $this->assertSame($metadataClass, $this->getClassExtensionChain(1)[$shopClass]);
+    }
+
     public function testRefreshSkipsInactiveModules(): void
     {
         $this->configureTestModule(['testmodule/tpl/a.tpl' => 'testmodule/tpl/a.tpl']);
@@ -128,9 +198,10 @@ final class RefreshModuleSettingsCommandTest extends ModuleCommandsTestCase
     }
 
     /**
-     * @param array $templates template key => template path
+     * @param array $templates  template key => template path
+     * @param array $extensions shop class => module class
      */
-    private function configureTestModule(array $templates): void
+    private function configureTestModule(array $templates, array $extensions = []): void
     {
         $moduleConfiguration = new ModuleConfiguration();
         $moduleConfiguration
@@ -143,6 +214,10 @@ final class RefreshModuleSettingsCommandTest extends ModuleCommandsTestCase
             $moduleConfiguration->addTemplate(new Template($templateKey, $templatePath));
         }
 
+        foreach ($extensions as $shopClass => $moduleClass) {
+            $moduleConfiguration->addClassExtension(new ClassExtension($shopClass, $moduleClass));
+        }
+
         $setting = new Setting();
         $setting
             ->setName('testSetting')
@@ -152,14 +227,16 @@ final class RefreshModuleSettingsCommandTest extends ModuleCommandsTestCase
 
         $shopConfiguration = new ShopConfiguration();
         $shopConfiguration->addModuleConfiguration($moduleConfiguration);
+        $shopConfiguration->getClassExtensionsChain()->addExtensions($moduleConfiguration->getClassExtensions());
 
         $this->get(ShopConfigurationDaoInterface::class)->save($shopConfiguration, 1);
     }
 
     /**
-     * @param array $templates template key => template path
+     * @param array $templates  template key => template path
+     * @param array $extensions shop class => module class
      */
-    private function writeInstalledModuleMetadata(array $templates): void
+    private function writeInstalledModuleMetadata(array $templates, array $extensions = []): void
     {
         $metadata = "<?php\n\n\$sMetadataVersion = '2.1';\n\n\$aModule = " . var_export(
             [
@@ -167,6 +244,7 @@ final class RefreshModuleSettingsCommandTest extends ModuleCommandsTestCase
                 'version' => '2.0',
                 'author' => 'O3-Shop',
                 'templates' => $templates,
+                'extend' => $extensions,
             ],
             true
         ) . ";\n";
@@ -208,6 +286,41 @@ final class RefreshModuleSettingsCommandTest extends ModuleCommandsTestCase
         }
 
         return (array)$setting->getValue();
+    }
+
+    private function getClassExtensions(int $shopId): array
+    {
+        return $this->getShopConfigurationSettingValue(ShopConfigurationSetting::MODULE_CLASS_EXTENSIONS, $shopId);
+    }
+
+    private function getClassExtensionChain(int $shopId): array
+    {
+        return $this->getShopConfigurationSettingValue(
+            ShopConfigurationSetting::MODULE_CLASS_EXTENSIONS_CHAIN,
+            $shopId
+        );
+    }
+
+    private function getShopConfigurationSettingValue(string $name, int $shopId): array
+    {
+        try {
+            $setting = $this->get(ShopConfigurationSettingDaoInterface::class)->get($name, $shopId);
+        } catch (EntryDoesNotExistDaoException $exception) {
+            return [];
+        }
+
+        return (array)$setting->getValue();
+    }
+
+    /**
+     * @return string[]
+     */
+    private function findBackupDirectories(string $configurationDirectory): array
+    {
+        return array_values(array_filter(
+            scandir($configurationDirectory),
+            static fn (string $entry): bool => str_starts_with($entry, 'shops.bak.')
+        ));
     }
 
     private function executeCommand(array $input): string

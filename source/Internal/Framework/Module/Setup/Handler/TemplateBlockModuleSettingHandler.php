@@ -63,9 +63,9 @@ class TemplateBlockModuleSettingHandler implements ModuleConfigurationHandlerInt
     public function handleOnModuleRefresh(ModuleConfiguration $configuration, int $shopId)
     {
         // TemplateBlockExtensionDao::add() skips blocks that are already registered, so
-        // activation alone would keep stale block definitions. Deactivate first to
-        // re-derive the full list of blocks from the configuration.
-        $this->handleOnModuleDeactivation($configuration, $shopId);
+        // activation alone would keep stale block definitions. Remove the stored blocks
+        // first to re-derive the full list from the configuration.
+        $this->removeModuleEntry($configuration, $shopId);
         $this->handleOnModuleActivation($configuration, $shopId);
     }
 
@@ -76,8 +76,13 @@ class TemplateBlockModuleSettingHandler implements ModuleConfigurationHandlerInt
     public function handleOnModuleDeactivation(ModuleConfiguration $configuration, int $shopId)
     {
         if ($configuration->hasTemplateBlocks()) {
-            $this->templateBlockExtensionDao->deleteExtensions($configuration->getId(), $shopId);
+            $this->removeModuleEntry($configuration, $shopId);
         }
+    }
+
+    private function removeModuleEntry(ModuleConfiguration $configuration, int $shopId): void
+    {
+        $this->templateBlockExtensionDao->deleteExtensions($configuration->getId(), $shopId);
     }
 
     /**

@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   from the previous configuration until the module was deactivated and activated again -
   a template map missing templates added to metadata.php, for example, made module templates
   render empty without any error.
+- `oe:module:refresh-settings --from-metadata` now backs the affected shop configuration
+  files up before writing and writes the project configuration once per run instead of once
+  per module. A module with unreadable metadata no longer aborts the whole refresh; it is
+  skipped and reported, and the command exits with a non-zero status.
 
 ## [v1.2.0] - 2023-04-25
 

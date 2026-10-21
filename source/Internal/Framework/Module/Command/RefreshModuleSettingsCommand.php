@@ -26,6 +26,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\Projec
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ProjectConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ShopConfiguration;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Service\ModuleConfigurationMergingServiceInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\ModuleConfigurationDaoInterface as MetaDataModuleConfigurationDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Path\ModulePathResolverInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleConfigurationRefreshServiceInterface;
@@ -54,6 +55,11 @@ class RefreshModuleSettingsCommand extends Command
      * @var ProjectConfigurationDaoInterface
      */
     private $projectConfigurationDao;
+
+    /**
+     * @var ModuleConfigurationMergingServiceInterface
+     */
+    private $moduleConfigurationMergingService;
 
     /**
      * @var ModuleStateServiceInterface
@@ -90,6 +96,7 @@ class RefreshModuleSettingsCommand extends Command
      */
     public function __construct(
         ProjectConfigurationDaoInterface $projectConfigurationDao,
+        ModuleConfigurationMergingServiceInterface $moduleConfigurationMergingService,
         ModuleStateServiceInterface $moduleStateService,
         ModuleConfigurationRefreshServiceInterface $moduleConfigurationRefreshService,
         ModulePathResolverInterface $modulePathResolver,
@@ -99,6 +106,7 @@ class RefreshModuleSettingsCommand extends Command
         parent::__construct();
 
         $this->projectConfigurationDao = $projectConfigurationDao;
+        $this->moduleConfigurationMergingService = $moduleConfigurationMergingService;
         $this->moduleStateService = $moduleStateService;
         $this->moduleConfigurationRefreshService = $moduleConfigurationRefreshService;
         $this->modulePathResolver = $modulePathResolver;
@@ -145,8 +153,9 @@ class RefreshModuleSettingsCommand extends Command
             return 1;
         }
 
-        $refreshedCount = 0;
+        $refreshTargets = [];
         $foundConfigured = false;
+        $skipped = [];
 
         foreach ($shopIds as $shopId) {
             $shopConfiguration = $projectConfiguration->getShopConfiguration($shopId);
@@ -161,10 +170,53 @@ class RefreshModuleSettingsCommand extends Command
                     continue;
                 }
 
-                $this->moduleConfigurationRefreshService->refresh(
-                    $this->getModuleConfiguration($shopConfiguration, $id, $shopId, $fromMetadata),
-                    $shopId
-                );
+                if ($fromMetadata) {
+                    // Merge the on-disk metadata into the project configuration first: the
+                    // class-extension chain is rebuilt from the project configuration, so
+                    // refreshing it from metadata without this step would leave aModules stale.
+                    // A module with unreadable metadata must not stop the other modules from
+                    // being refreshed, so it is reported and skipped instead.
+                    try {
+                        $this->moduleConfigurationMergingService->merge(
+                            $shopConfiguration,
+                            $this->getModuleConfiguration($shopConfiguration, $id, $shopId, true)
+                        );
+                    } catch (\Throwable $exception) {
+                        $skipped[] = sprintf('%s (shop %d): %s', $id, $shopId, $exception->getMessage());
+                        $output->writeln(sprintf(
+                            '<comment>Skipped %s in shop %d: %s</comment>',
+                            $id,
+                            $shopId,
+                            $exception->getMessage()
+                        ));
+                        continue;
+                    }
+                }
+
+                $refreshTargets[$shopId][] = $id;
+            }
+        }
+
+        // Persist the merged metadata once per run. ProjectConfigurationDao::save()
+        // rewrites every shop file (delete-all, then save each shop), so calling it
+        // inside the per-module loop would wipe the configuration written by the
+        // previous iterations. Back the files up first, then write once.
+        if ($fromMetadata && $refreshTargets !== []) {
+            foreach ($this->backupShopConfigurations($projectConfiguration) as $backup) {
+                $output->writeln(sprintf('<comment>Backed up %s</comment>', $backup));
+            }
+            $this->projectConfigurationDao->save($projectConfiguration);
+        }
+
+        $refreshedCount = 0;
+
+        foreach ($refreshTargets as $shopId => $moduleIds) {
+            foreach ($moduleIds as $id) {
+                $moduleConfiguration = $projectConfiguration
+                    ->getShopConfiguration($shopId)
+                    ->getModuleConfiguration($id);
+
+                $this->moduleConfigurationRefreshService->refresh($moduleConfiguration, $shopId);
                 $refreshedCount++;
 
                 $output->writeln(sprintf('<info>Refreshed settings of %s in shop %d.</info>', $id, $shopId));
@@ -176,9 +228,48 @@ class RefreshModuleSettingsCommand extends Command
             return 1;
         }
 
+        if ($skipped !== []) {
+            $output->writeln(sprintf('<error>Skipped %d module(s):</error>', count($skipped)));
+            foreach ($skipped as $skippedModule) {
+                $output->writeln(sprintf('<error>  - %s</error>', $skippedModule));
+            }
+        }
+
         $output->writeln(sprintf('Modules refreshed: %d', $refreshedCount));
 
-        return 0;
+        return $skipped === [] ? 0 : 1;
+    }
+
+    /**
+     * ProjectConfigurationDao::save() deletes the whole shops configuration directory
+     * before rewriting it, so the backups must live next to it, not inside it.
+     *
+     * @return string[]
+     */
+    private function backupShopConfigurations(ProjectConfiguration $projectConfiguration): array
+    {
+        $shopsDirectory = $this->context->getProjectConfigurationDirectory() . 'shops';
+        $backupDirectory = $shopsDirectory . '.bak.' . date('Ymd-His');
+        $backups = [];
+
+        foreach ($projectConfiguration->getShopConfigurationIds() as $shopId) {
+            $yamlPath = $shopsDirectory . '/' . $shopId . '.yaml';
+            if (is_file($yamlPath)) {
+                $backups[$yamlPath] = $backupDirectory . '/' . $shopId . '.yaml';
+            }
+        }
+
+        if ($backups === []) {
+            return [];
+        }
+
+        mkdir($backupDirectory, 0777, true);
+
+        foreach ($backups as $yamlPath => $backupPath) {
+            copy($yamlPath, $backupPath);
+        }
+
+        return array_values($backups);
     }
 
     /**

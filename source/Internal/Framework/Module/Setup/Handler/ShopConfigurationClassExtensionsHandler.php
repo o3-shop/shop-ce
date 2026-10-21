@@ -71,8 +71,9 @@ class ShopConfigurationClassExtensionsHandler implements ModuleConfigurationHand
     public function handleOnModuleRefresh(ModuleConfiguration $configuration, int $shopId)
     {
         // Activation is guarded by hasClassExtensions(), so an extension removed from the
-        // configuration would survive it. Deactivate first to re-derive the full list.
-        $this->handleOnModuleDeactivation($configuration, $shopId);
+        // configuration would survive it. Remove the stored entry first to re-derive the
+        // full list, then activate the new one.
+        $this->removeModuleEntry($configuration, $shopId);
         $this->handleOnModuleActivation($configuration, $shopId);
     }
 
@@ -83,15 +84,20 @@ class ShopConfigurationClassExtensionsHandler implements ModuleConfigurationHand
     public function handleOnModuleDeactivation(ModuleConfiguration $configuration, int $shopId)
     {
         if ($configuration->hasClassExtensions()) {
-            $shopConfigurationSetting = $this->getClassExtensionsShopConfigurationSetting($shopId);
-
-            $shopConfigurationSettingValue = $shopConfigurationSetting->getValue();
-            unset($shopConfigurationSettingValue[$configuration->getId()]);
-
-            $shopConfigurationSetting->setValue($shopConfigurationSettingValue);
-
-            $this->shopConfigurationSettingDao->save($shopConfigurationSetting);
+            $this->removeModuleEntry($configuration, $shopId);
         }
+    }
+
+    private function removeModuleEntry(ModuleConfiguration $configuration, int $shopId): void
+    {
+        $shopConfigurationSetting = $this->getClassExtensionsShopConfigurationSetting($shopId);
+
+        $shopConfigurationSettingValue = $shopConfigurationSetting->getValue();
+        unset($shopConfigurationSettingValue[$configuration->getId()]);
+
+        $shopConfigurationSetting->setValue($shopConfigurationSettingValue);
+
+        $this->shopConfigurationSettingDao->save($shopConfigurationSetting);
     }
 
     /**
