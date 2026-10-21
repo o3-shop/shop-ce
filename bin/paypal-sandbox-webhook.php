@@ -9,13 +9,9 @@
  * at a dead host. This script is run by bin/paypal-sandbox-tunnel.sh after the
  * shop is repointed at the new URL.
  *
- * Why not just call Webhook::ensureWebhook(): its lookup helper getHookForUrl()
- * has a bug - `foreach ($allClientHooks as $hook)` leaves $hook as the last
- * element, so when no webhook matches the current endpoint it returns that last
- * webhook instead of an empty array. ensureWebhook() then "reuses" a stale
- * webhook registered for a previous tunnel URL. This script looks the match up
- * itself, drops stale osc_paypal webhooks, and registers a fresh one only when
- * the current endpoint has none.
+ * Before refreshing, webhooks left over from a previous tunnel URL are removed;
+ * then Webhook::ensureWebhook() reuses the current endpoint's webhook or
+ * registers a fresh one for it.
  *
  * Prints the webhook id on success. Run inside the shop container:
  *   docker exec o3shop-shop-ce-shop-1 php /var/www/html/bin/paypal-sandbox-webhook.php
@@ -33,15 +29,6 @@ try {
 
     $allHooks = $webhook->getAllRegisteredWebhooks();
 
-    // Reuse an existing webhook for this exact endpoint, if there is one.
-    $existingId = '';
-    foreach ($allHooks as $hook) {
-        if (($hook['url'] ?? '') === $endpoint) {
-            $existingId = $hook['id'] ?? '';
-            break;
-        }
-    }
-
     // Drop osc_paypal webhooks left over from a previous tunnel URL so they do
     // not accumulate and cannot be picked up as the "current" one.
     foreach ($allHooks as $hook) {
@@ -53,17 +40,7 @@ try {
         }
     }
 
-    if ($existingId !== '') {
-        $webhook->saveWebhookId($existingId);
-        echo $existingId . "\n";
-        exit(0);
-    }
-
-    // registerWebhooks() is protected; call it directly so we always register
-    // for the current endpoint instead of going through the buggy lookup.
-    $register = new ReflectionMethod($webhook, 'registerWebhooks');
-    $register->setAccessible(true);
-    $newId = (string) $register->invoke($webhook);
+    $newId = (string) $webhook->ensureWebhook();
 
     if ($newId === '') {
         fwrite(STDERR, "ERROR: PayPal did not return a webhook id.\n");

@@ -392,7 +392,7 @@ class ModuleListTest extends \OxidTestCase
 
         $container = \OxidEsales\EshopCommunity\Internal\Container\ContainerFactory::getInstance()->getContainer();
         $shopConfigurationDao = $container->get(
-            \OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ShopConfigurationDaoBridgeInterface::class
+            \OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopConfigurationDaoInterface::class
         );
         $moduleStateService = $container->get(
             \OxidEsales\EshopCommunity\Internal\Framework\Module\State\ModuleStateServiceInterface::class
@@ -408,12 +408,12 @@ class ModuleListTest extends \OxidTestCase
             )
         );
 
-        $shopConfiguration = $shopConfigurationDao->get();
+        $shopConfiguration = $shopConfigurationDao->get($shopId);
         $shopConfiguration->addModuleConfiguration($moduleConfiguration);
         // deleteModuleConfiguration() also removes the extensions from the chain,
         // so register them here to keep cleanup symmetric.
         $shopConfiguration->getClassExtensionsChain()->addExtensions($moduleConfiguration->getClassExtensions());
-        $shopConfigurationDao->save($shopConfiguration);
+        $shopConfigurationDao->save($shopConfiguration, $shopId);
 
         try {
             if ($moduleStateService->isActive($moduleId, $shopId)) {
@@ -433,11 +433,11 @@ class ModuleListTest extends \OxidTestCase
             if ($moduleStateService->isActive($moduleId, $shopId)) {
                 $moduleStateService->setDeactivated($moduleId, $shopId);
             }
-            $shopConfiguration = $shopConfigurationDao->get();
+            $shopConfiguration = $shopConfigurationDao->get($shopId);
             if ($shopConfiguration->hasModuleConfiguration($moduleId)) {
                 $shopConfiguration->deleteModuleConfiguration($moduleId);
             }
-            $shopConfigurationDao->save($shopConfiguration);
+            $shopConfigurationDao->save($shopConfiguration, $shopId);
         }
     }
 

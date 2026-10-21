@@ -1,6 +1,10 @@
 #!/bin/bash
 # Configures the local PayPal module path repositories for development.
 #
+# Run from the host: when composer is not on PATH, the script re-executes itself
+# inside the shop container as the current user, so composer.json keeps its
+# ownership. Running it inside the container also works.
+#
 # The two path repositories are deliberately NOT committed: /local-modules/ is
 # gitignored and absent on fresh clones and CI, and Composer 2.2 fails on a
 # literal path repository whose directory does not exist. Run this script once
@@ -8,11 +12,19 @@
 # local-modules/paypal-client; it writes the repositories to the local,
 # uncommitted composer.json.
 #
-# After that:
+# After that, inside the container:
 #   composer run oe:install:module:paypal
 # installs the module into the shop.
 
 set -euo pipefail
+
+if ! command -v composer >/dev/null 2>&1; then
+  CONTAINER="${SHOP_CONTAINER:-o3shop-shop-ce-shop-1}"
+  exec docker exec -u "$(id -u):$(id -g)" \
+    -e COMPOSER_HOME=/tmp/composer \
+    -w /var/www/html "$CONTAINER" \
+    bash /var/www/html/bin/paypal-sandbox-setup.sh
+fi
 
 MY_DIR=$(cd -P "$(dirname "$0")/.." && pwd)
 cd "$MY_DIR"
@@ -65,4 +77,4 @@ composer config repositories.paypal-client \
   "{\"type\":\"path\",\"url\":\"local-modules/paypal-client\",\"options\":{\"symlink\":true,\"versions\":{\"o3-shop/paypal-client\":\"$CLIENT_VERSION\"}}}"
 
 echo "Configured local PayPal path repositories in composer.json (uncommitted)."
-echo "Next: composer run oe:install:module:paypal"
+echo "Next (in the container): composer run oe:install:module:paypal"
