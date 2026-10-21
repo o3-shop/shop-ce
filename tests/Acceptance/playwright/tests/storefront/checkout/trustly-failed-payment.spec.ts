@@ -16,6 +16,7 @@ test.describe('Trustly failed payment retry', () => {
   test('retry starts a new order instead of showing the thank-you page', async ({
     storefrontPage,
   }) => {
+    test.skip(process.env.PAYPAL_E2E !== '1', 'requires PAYPAL_E2E=1 with the PayPal module and sandbox');
     const page = storefrontPage;
     const checkout = new CheckoutPaymentPage(page);
 

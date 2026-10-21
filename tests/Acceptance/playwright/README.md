@@ -17,6 +17,17 @@ npm test
 
 You need the shop running first — `./docker.sh start` from the repo root.
 
+## PayPal-specific specs
+
+The Trustly specs (`tests/storefront/checkout/trustly-*.spec.ts`) need the PayPal
+module installed plus a sandbox/ngrok setup. They skip unless `PAYPAL_E2E=1` is set:
+
+```bash
+PAYPAL_E2E=1 SHOP_URL=https://<ngrok-host> npx playwright test \
+  storefront/checkout/trustly-visibility.spec.ts \
+  storefront/checkout/trustly-failed-payment.spec.ts
+```
+
 ## Directory layout
 
 ```

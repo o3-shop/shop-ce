@@ -28,6 +28,7 @@ test.describe('Trustly payment method visibility', () => {
   test('P0 shown for a Trustly country (DE) on the payment step', async ({
     storefrontPage,
   }) => {
+    test.skip(process.env.PAYPAL_E2E !== '1', 'requires PAYPAL_E2E=1 with the PayPal module and sandbox');
     const checkout = new CheckoutPaymentPage(storefrontPage);
     await checkout.setupAndGoto(DEMO_PRODUCT_ID, guestAddress('trustly-de', GERMANY));
 
@@ -41,6 +42,7 @@ test.describe('Trustly payment method visibility', () => {
   });
 
   test('P0 hidden for a non-Trustly country (CH)', async ({ storefrontPage, db }) => {
+    test.skip(process.env.PAYPAL_E2E !== '1', 'requires PAYPAL_E2E=1 with the PayPal module and sandbox');
     await db.execute("UPDATE oxcountry SET OXACTIVE = 1 WHERE OXISOALPHA2 = 'CH'");
     try {
       const checkout = new CheckoutPaymentPage(storefrontPage);
