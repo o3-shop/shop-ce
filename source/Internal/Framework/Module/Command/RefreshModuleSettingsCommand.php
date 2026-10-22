@@ -177,10 +177,18 @@ class RefreshModuleSettingsCommand extends Command
                     // A module with unreadable metadata must not stop the other modules from
                     // being refreshed, so it is reported and skipped instead.
                     try {
-                        $this->moduleConfigurationMergingService->merge(
-                            $shopConfiguration,
-                            $this->getModuleConfiguration($shopConfiguration, $id, $shopId, true)
-                        );
+                        $metadataModuleConfiguration = $this->getModuleConfiguration($shopConfiguration, $id, $shopId, true);
+                        // A metadata.php that was edited to a different id would be merged as a
+                        // second module next to the installed one and the installed id would still
+                        // be refreshed, silently wiring up a duplicate. Bail out instead.
+                        if ($metadataModuleConfiguration->getId() !== $id) {
+                            throw new \RuntimeException(sprintf(
+                                'metadata.php declares id "%s" but the module is installed as "%s"',
+                                $metadataModuleConfiguration->getId(),
+                                $id
+                            ));
+                        }
+                        $this->moduleConfigurationMergingService->merge($shopConfiguration, $metadataModuleConfiguration);
                     } catch (\Throwable $exception) {
                         $skipped[] = sprintf('%s (shop %d): %s', $id, $shopId, $exception->getMessage());
                         $output->writeln(sprintf(
@@ -200,26 +208,60 @@ class RefreshModuleSettingsCommand extends Command
         // Persist the merged metadata once per run. ProjectConfigurationDao::save()
         // rewrites every shop file (delete-all, then save each shop), so calling it
         // inside the per-module loop would wipe the configuration written by the
-        // previous iterations. Back the files up first, then write once.
+        // previous iterations. Back the files up first, then write once. The backup is
+        // the only way back if the save or a refresh fails, so a failed backup must stop
+        // the run before anything is written.
+        $backupDirectory = null;
         if ($fromMetadata && $refreshTargets !== []) {
-            foreach ($this->backupShopConfigurations($projectConfiguration) as $backup) {
+            $backupDirectory = $this->backupShopConfigurations($projectConfiguration);
+            if ($backupDirectory === null) {
+                $output->writeln('<error>Could not back up the shop configuration; nothing was written.</error>');
+                return 1;
+            }
+            foreach ($this->backedUpFiles($backupDirectory) as $backup) {
                 $output->writeln(sprintf('<comment>Backed up %s</comment>', $backup));
             }
             $this->projectConfigurationDao->save($projectConfiguration);
         }
 
         $refreshedCount = 0;
+        $refreshFailures = [];
 
         foreach ($refreshTargets as $shopId => $moduleIds) {
             foreach ($moduleIds as $id) {
-                $moduleConfiguration = $projectConfiguration
-                    ->getShopConfiguration($shopId)
-                    ->getModuleConfiguration($id);
+                // The configuration was already written above, so a module whose validation
+                // fails (invalid settings, a broken class extension, ...) must not stop the
+                // remaining modules from being refreshed. It is reported and the run will
+                // roll the written configuration back to the backup afterwards.
+                try {
+                    $moduleConfiguration = $projectConfiguration
+                        ->getShopConfiguration($shopId)
+                        ->getModuleConfiguration($id);
 
-                $this->moduleConfigurationRefreshService->refresh($moduleConfiguration, $shopId);
-                $refreshedCount++;
+                    $this->moduleConfigurationRefreshService->refresh($moduleConfiguration, $shopId);
+                    $refreshedCount++;
 
-                $output->writeln(sprintf('<info>Refreshed settings of %s in shop %d.</info>', $id, $shopId));
+                    $output->writeln(sprintf('<info>Refreshed settings of %s in shop %d.</info>', $id, $shopId));
+                } catch (\Throwable $exception) {
+                    $refreshFailures[] = sprintf('%s (shop %d): %s', $id, $shopId, $exception->getMessage());
+                    $output->writeln(sprintf(
+                        '<error>Failed to refresh %s in shop %d: %s</error>',
+                        $id,
+                        $shopId,
+                        $exception->getMessage()
+                    ));
+                }
+            }
+        }
+
+        if ($refreshFailures !== [] && $backupDirectory !== null) {
+            if ($this->restoreShopConfigurations($backupDirectory)) {
+                $output->writeln('<comment>Restored the shop configuration from the backup.</comment>');
+            } else {
+                $output->writeln(sprintf(
+                    '<error>Could not restore the shop configuration; a copy of the previous state is in %s.</error>',
+                    $backupDirectory
+                ));
             }
         }
 
@@ -237,39 +279,98 @@ class RefreshModuleSettingsCommand extends Command
 
         $output->writeln(sprintf('Modules refreshed: %d', $refreshedCount));
 
-        return $skipped === [] ? 0 : 1;
+        return $skipped === [] && $refreshFailures === [] ? 0 : 1;
     }
 
     /**
      * ProjectConfigurationDao::save() deletes the whole shops configuration directory
      * before rewriting it, so the backups must live next to it, not inside it.
      *
-     * @return string[]
+     * @return string|null the backup directory, or null if the backup could not be created
      */
-    private function backupShopConfigurations(ProjectConfiguration $projectConfiguration): array
+    private function backupShopConfigurations(ProjectConfiguration $projectConfiguration): ?string
     {
         $shopsDirectory = $this->context->getProjectConfigurationDirectory() . 'shops';
-        $backupDirectory = $shopsDirectory . '.bak.' . date('Ymd-His');
-        $backups = [];
+        $backupDirectory = $this->createUniqueBackupDirectory($shopsDirectory);
+
+        if ($backupDirectory === null) {
+            return null;
+        }
 
         foreach ($projectConfiguration->getShopConfigurationIds() as $shopId) {
             $yamlPath = $shopsDirectory . '/' . $shopId . '.yaml';
-            if (is_file($yamlPath)) {
-                $backups[$yamlPath] = $backupDirectory . '/' . $shopId . '.yaml';
+            if (!is_file($yamlPath)) {
+                continue;
+            }
+            if (!copy($yamlPath, $backupDirectory . '/' . $shopId . '.yaml')) {
+                return null;
             }
         }
 
-        if ($backups === []) {
-            return [];
+        return $backupDirectory;
+    }
+
+    /**
+     * The directory name is second precise. Two runs in the same second (a script, a retry)
+     * must not write into - and overwrite - the same backup directory, so an existing one is
+     * never reused.
+     */
+    private function createUniqueBackupDirectory(string $shopsDirectory): ?string
+    {
+        $timestamp = date('Ymd-His');
+
+        for ($attempt = 0; $attempt < 100; $attempt++) {
+            $suffix = $attempt === 0 ? '' : '-' . $attempt;
+            $backupDirectory = $shopsDirectory . '.bak.' . $timestamp . $suffix;
+
+            if (is_dir($backupDirectory)) {
+                continue;
+            }
+
+            if (!@mkdir($backupDirectory, 0777, true) && !is_dir($backupDirectory)) {
+                return null;
+            }
+
+            return $backupDirectory;
         }
 
-        mkdir($backupDirectory, 0777, true);
+        return null;
+    }
 
-        foreach ($backups as $yamlPath => $backupPath) {
-            copy($yamlPath, $backupPath);
+    /**
+     * @return string[]
+     */
+    private function backedUpFiles(string $backupDirectory): array
+    {
+        $files = [];
+        foreach (scandir($backupDirectory) as $entry) {
+            if ($entry === '.' || $entry === '..') {
+                continue;
+            }
+            $files[] = $backupDirectory . '/' . $entry;
         }
 
-        return array_values($backups);
+        return $files;
+    }
+
+    /**
+     * Copies the backed up shop files over the live ones, undoing a save() whose refresh
+     * failed halfway. The saved files are kept in place when a copy fails so the backup
+     * directory remains the source of truth.
+     */
+    private function restoreShopConfigurations(string $backupDirectory): bool
+    {
+        $shopsDirectory = $this->context->getProjectConfigurationDirectory() . 'shops';
+        $restored = true;
+
+        foreach ($this->backedUpFiles($backupDirectory) as $backupPath) {
+            $target = $shopsDirectory . '/' . basename($backupPath);
+            if (!@copy($backupPath, $target)) {
+                $restored = false;
+            }
+        }
+
+        return $restored;
     }
 
     /**

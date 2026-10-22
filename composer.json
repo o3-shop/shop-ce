@@ -126,5 +126,27 @@
     },
     "replace": {
         "oxid-esales/oxideshop-ce": "6.10.3"
+    },
+    "repositories": {
+        "paypal-client": {
+            "type": "path",
+            "url": "local-modules/paypal-client",
+            "options": {
+                "symlink": true,
+                "versions": {
+                    "o3-shop/paypal-client": "3.0.21"
+                }
+            }
+        },
+        "paypal-checkout": {
+            "type": "path",
+            "url": "local-modules/paypal-checkout",
+            "options": {
+                "symlink": true,
+                "versions": {
+                    "o3-shop/paypal-checkout": "2.10.2"
+                }
+            }
+        }
     }
 }
