@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Command;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ProjectConfigurationDaoInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopConfigurationDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ProjectConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ShopConfiguration;
@@ -57,6 +58,11 @@ class RefreshModuleSettingsCommand extends Command
     private $projectConfigurationDao;
 
     /**
+     * @var ShopConfigurationDaoInterface
+     */
+    private $shopConfigurationDao;
+
+    /**
      * @var ModuleConfigurationMergingServiceInterface
      */
     private $moduleConfigurationMergingService;
@@ -87,12 +93,14 @@ class RefreshModuleSettingsCommand extends Command
     private $context;
 
     /**
-     * @param ProjectConfigurationDaoInterface       $projectConfigurationDao
-     * @param ModuleStateServiceInterface            $moduleStateService
+     * @param ProjectConfigurationDaoInterface           $projectConfigurationDao
+     * @param ModuleStateServiceInterface                $moduleStateService
      * @param ModuleConfigurationRefreshServiceInterface $moduleConfigurationRefreshService
-     * @param ModulePathResolverInterface            $modulePathResolver
-     * @param MetaDataModuleConfigurationDaoInterface $metadataModuleConfigurationDao
-     * @param BasicContextInterface                  $context
+     * @param ModulePathResolverInterface                $modulePathResolver
+     * @param MetaDataModuleConfigurationDaoInterface    $metadataModuleConfigurationDao
+     * @param BasicContextInterface                      $context
+     * @param ModuleConfigurationMergingServiceInterface $moduleConfigurationMergingService
+     * @param ShopConfigurationDaoInterface              $shopConfigurationDao
      */
     public function __construct(
         ProjectConfigurationDaoInterface $projectConfigurationDao,
@@ -101,7 +109,8 @@ class RefreshModuleSettingsCommand extends Command
         ModuleConfigurationRefreshServiceInterface $moduleConfigurationRefreshService,
         ModulePathResolverInterface $modulePathResolver,
         MetaDataModuleConfigurationDaoInterface $metadataModuleConfigurationDao,
-        BasicContextInterface $context
+        BasicContextInterface $context,
+        ShopConfigurationDaoInterface $shopConfigurationDao = null
     ) {
         parent::__construct();
 
@@ -112,6 +121,7 @@ class RefreshModuleSettingsCommand extends Command
         $this->modulePathResolver = $modulePathResolver;
         $this->metadataModuleConfigurationDao = $metadataModuleConfigurationDao;
         $this->context = $context;
+        $this->shopConfigurationDao = $shopConfigurationDao;
     }
 
     protected function configure(): void
@@ -257,6 +267,24 @@ class RefreshModuleSettingsCommand extends Command
         if ($refreshFailures !== [] && $backupDirectory !== null) {
             if ($this->restoreShopConfigurations($backupDirectory)) {
                 $output->writeln('<comment>Restored the shop configuration from the backup.</comment>');
+                // The YAML no longer matches the DB rows that refresh() wrote (templates,
+                // blocks, events, extensions, etc.), so re-apply the restored configuration
+                // to bring the database back in line with the restored files.
+                if ($this->shopConfigurationDao !== null) {
+                    foreach ($refreshTargets as $shopId => $moduleIds) {
+                        foreach ($moduleIds as $id) {
+                            if (in_array(sprintf('%s (shop %d):', $id, $shopId), array_map(static function ($failure) use ($id, $shopId) {
+                                $parts = explode(':', $failure);
+                                return trim($parts[0]) . ' (shop ' . $shopId . '):';
+                            }, $refreshFailures), true)) {
+                                continue;
+                            }
+                            // only re-apply modules that actually succeeded
+                        }
+                    }
+                    // restore in-memory state and refresh from the restored config
+                    $this->restoreAndRefreshFromBackup($projectConfiguration, $refreshTargets, $refreshFailures, $output);
+                }
             } else {
                 $output->writeln(sprintf(
                     '<error>Could not restore the shop configuration; a copy of the previous state is in %s.</error>',
@@ -412,6 +440,61 @@ class RefreshModuleSettingsCommand extends Command
         }
 
         return $shopConfiguration->getModuleIdsOfModuleConfigurations();
+    }
+
+    /**
+     * @param string[] $refreshFailures
+     */
+    private function restoreAndRefreshFromBackup(
+        ProjectConfiguration $projectConfiguration,
+        array $refreshTargets,
+        array $refreshFailures,
+        OutputInterface $output
+    ): void {
+        $failed = [];
+        foreach ($refreshFailures as $failure) {
+            if (preg_match('/^(.+?) \(shop (\d+)\):/', $failure, $matches)) {
+                $failed[(int)$matches[2]][$matches[1]] = true;
+            }
+        }
+
+        if ($this->shopConfigurationDao !== null) {
+            foreach (array_keys($refreshTargets) as $shopId) {
+                $this->shopConfigurationDao->get((int)$shopId);
+            }
+        }
+        try {
+            $restoredProject = $this->projectConfigurationDao->getConfiguration();
+        } catch (\Throwable $exception) {
+            return;
+        }
+
+        foreach ($refreshTargets as $shopId => $moduleIds) {
+            foreach ($moduleIds as $id) {
+                if (isset($failed[(int)$shopId][$id])) {
+                    continue;
+                }
+                try {
+                    $shopConfiguration = $restoredProject->getShopConfiguration((int)$shopId);
+                    if (!$shopConfiguration->hasModuleConfiguration($id)) {
+                        continue;
+                    }
+                    if (!$this->moduleStateService->isActive($id, (int)$shopId)) {
+                        continue;
+                    }
+                    $moduleConfiguration = $shopConfiguration->getModuleConfiguration($id);
+                    $this->moduleConfigurationRefreshService->refresh($moduleConfiguration, (int)$shopId);
+                    $output->writeln(sprintf('<comment>Reverted %s in shop %d to the backed-up configuration.</comment>', $id, (int)$shopId));
+                } catch (\Throwable $exception) {
+                    $output->writeln(sprintf(
+                        '<comment>Could not revert %s in shop %d to the backed-up configuration: %s</comment>',
+                        $id,
+                        (int)$shopId,
+                        $exception->getMessage()
+                    ));
+                }
+            }
+        }
     }
 
     /**
