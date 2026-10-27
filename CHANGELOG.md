@@ -25,6 +25,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   files up before writing and writes the project configuration once per run instead of once
   per module. A module with unreadable metadata no longer aborts the whole refresh; it is
   skipped and reported, and the command exits with a non-zero status.
+- `oe:module:refresh-settings --from-metadata` validates the merged configuration before
+  writing anything and refuses to run when the backup cannot be created, so an invalid or
+  unrestorable configuration is never left on disk. If writing the configuration or a
+  refresh fails, the shop configuration is restored from the backup (recreating the shops
+  directory when the failed write removed it) and the database is re-applied from it. A
+  `metadata.php` that declares a different module id is rejected instead of silently
+  adding a second module entry, and shop ids that the database knows but the project
+  configuration does not are skipped instead of aborting the run.
+- `oe:module:refresh-settings --from-metadata` names each backup directory uniquely, so two
+  runs within the same second no longer overwrite the first backup.
+- `oe:module:refresh-settings --from-metadata` creates the backup directory with owner-only
+  permissions (0700), since the shop configuration can contain credentials.
+- A failed module configuration merge no longer leaves a partially updated class-extension
+  chain behind: the chain is merged on a copy and only swapped in when every step succeeds.
 
 ## [v1.2.0] - 2023-04-25
 

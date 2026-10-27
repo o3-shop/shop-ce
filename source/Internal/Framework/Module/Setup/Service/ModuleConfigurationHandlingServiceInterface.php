@@ -48,4 +48,12 @@ interface ModuleConfigurationHandlingServiceInterface
      * @param int                 $shopId
      */
     public function handleOnRefresh(ModuleConfiguration $moduleConfiguration, int $shopId);
+
+    /**
+     * Validates the module configuration without applying any changes to the shop.
+     *
+     * @param ModuleConfiguration $moduleConfiguration
+     * @param int                 $shopId
+     */
+    public function validate(ModuleConfiguration $moduleConfiguration, int $shopId): void;
 }

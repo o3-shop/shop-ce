@@ -77,6 +77,15 @@ class ModuleConfigurationHandlingService implements ModuleConfigurationHandlingS
     }
 
     /**
+     * @param ModuleConfiguration $moduleConfiguration
+     * @param int                 $shopId
+     */
+    public function validate(ModuleConfiguration $moduleConfiguration, int $shopId): void
+    {
+        $this->validateModuleConfiguration($moduleConfiguration, $shopId);
+    }
+
+    /**
      * @param ModuleConfigurationHandlerInterface $moduleSettingHandler
      */
     public function addHandler(ModuleConfigurationHandlerInterface $moduleSettingHandler)

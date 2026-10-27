@@ -27,6 +27,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\ClassExtension;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ShopConfiguration;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ExtensionNotInChainException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Service\{
     ModuleConfigurationMergingServiceInterface
 };
@@ -352,6 +353,41 @@ final class ModuleConfigurationMergingServiceTest extends TestCase
 
         $this->assertTrue(
             $shopConfiguration->getModuleConfiguration('test')->isConfigured()
+        );
+    }
+
+    public function testFailedMergeLeavesTheClassExtensionChainUnchanged(): void
+    {
+        $moduleConfiguration = new ModuleConfiguration();
+        $moduleConfiguration->setId('installedModule');
+        // added to the chain before the removal of the deleted extensions throws
+        $moduleConfiguration->addClassExtension(
+            new ClassExtension('shopClassWithNewExtension', 'newExtension')
+        );
+
+        $shopConfiguration = $this->getShopConfigurationWithAlreadyInstalledModule();
+        // an installed extension that is missing from the chain: removing it throws
+        $shopConfiguration->getModuleConfiguration('installedModule')->addClassExtension(
+            new ClassExtension('shopClassNotInChain', 'extensionNotInChain')
+        );
+
+        $chainBefore = $shopConfiguration->getClassExtensionsChain()->getChain();
+
+        try {
+            $this->getMergingService()->merge($shopConfiguration, $moduleConfiguration);
+            $this->fail('Expected the merge to fail on the extension that is missing from the chain');
+        } catch (ExtensionNotInChainException $exception) {
+            // expected
+        }
+
+        $this->assertSame(
+            $chainBefore,
+            $shopConfiguration->getClassExtensionsChain()->getChain(),
+            'A failed merge must not leave a partially updated chain behind'
+        );
+        $this->assertArrayNotHasKey(
+            'shopClassWithNewExtension',
+            $shopConfiguration->getClassExtensionsChain()->getChain()
         );
     }
 
