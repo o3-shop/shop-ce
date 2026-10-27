@@ -29,14 +29,22 @@ try {
 
     $allHooks = $webhook->getAllRegisteredWebhooks();
 
-    // Drop osc_paypal webhooks left over from a previous tunnel URL so they do
-    // not accumulate and cannot be picked up as the "current" one.
-    foreach ($allHooks as $hook) {
-        $url = $hook['url'] ?? '';
-        $id = $hook['id'] ?? '';
-        if ($id !== '' && $url !== $endpoint && strpos($url, 'oscpaypalwebhook') !== false) {
-            fwrite(STDERR, "Removing stale webhook {$id} ({$url})\n");
-            $webhook->removeWebhook($id);
+    // Remove only this shop's previously stored webhook, and only when it points
+    // at a different endpoint. Deleting every webhook whose URL contains
+    // "oscpaypalwebhook" would also delete webhooks of other developers who
+    // share the same PayPal sandbox app.
+    $previousId = $webhook->getStoredWebhookId();
+    if ($previousId !== '') {
+        foreach ($allHooks as $hook) {
+            if (($hook['id'] ?? '') !== $previousId) {
+                continue;
+            }
+            $url = $hook['url'] ?? '';
+            if ($url !== $endpoint) {
+                fwrite(STDERR, "Removing previous webhook {$previousId} ({$url})\n");
+                $webhook->removeWebhook($previousId);
+            }
+            break;
         }
     }
 
