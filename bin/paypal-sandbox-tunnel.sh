@@ -11,14 +11,17 @@
 
 set -euo pipefail
 
+# Logs/PID files are created by this user; keep them owner-only.
+umask 077
+
 MY_DIR=$(cd -P "$(dirname "$0")/.." && pwd)
 ENV_FILE="$MY_DIR/.env"
 CONTAINER="${SHOP_CONTAINER:-o3shop-shop-ce-shop-1}"
 PORT="${SHOP_PORT:-8080}"
 API="http://127.0.0.1:4040/api/tunnels"
-LOG="/tmp/ngrok.log"
-# Scope the PID file per user and checkout: two shop-ce checkouts (or two users)
-# must not reuse or stop each other's tunnel.
+# Scope every file per user and checkout: two shop-ce checkouts (or two users)
+# must not reuse or stop each other's tunnel, and a predictable /tmp path would
+# let another user pre-create a symlink for us to follow.
 PROJECT_HASH=$(printf '%s' "$MY_DIR" | cksum | awk '{print $1}')
 PID_FILE="${TMPDIR:-/tmp}/paypal-sandbox-tunnel-$(id -u)-${PROJECT_HASH}.pid"
 
@@ -90,18 +93,37 @@ done
 
 command -v ngrok >/dev/null 2>&1 || { echo "ERROR: ngrok not found on PATH." >&2; exit 1; }
 
+# mktemp creates an unpredictable, owner-only file, so another local user cannot
+# win a symlink race against a fixed /tmp/ngrok.log or /tmp/*.err path.
+LOG=$(mktemp "${TMPDIR:-/tmp}/paypal-sandbox-tunnel-$(id -u)-${PROJECT_HASH}-XXXXXX.log")
+WEBHOOK_ERR=$(mktemp "${TMPDIR:-/tmp}/paypal-sandbox-tunnel-$(id -u)-${PROJECT_HASH}-XXXXXX.err")
+
+# Two concurrent starts in the same checkout would race on the PID file and
+# leave one ngrok orphaned. Hold an exclusive lock for the whole start sequence.
+LOCK_FILE="${PID_FILE}.lock"
+if command -v flock >/dev/null 2>&1; then
+  exec 9>"$LOCK_FILE"
+  if ! flock -n 9; then
+    echo "Another tunnel start is already in progress for this checkout." >&2
+    exit 1
+  fi
+fi
+
 # A leftover PID file from a crashed run must not be mistaken for a running
 # tunnel on a later invocation.
 drop_stale_pid_file
 
+STARTED=0
 URL=$(current_url)
 if [ -z "$URL" ]; then
   echo "Starting ngrok tunnel to :$PORT ..."
+  STARTED=1
   rm -f "$PID_FILE"
   # Write the PID from inside the session leader before exec'ing ngrok, so the
   # recorded PID is ngrok itself and --stop can target exactly this process.
+  # fd 9 (the start lock) is closed in the child so the lock is not inherited.
   PID_FILE="$PID_FILE" PORT="$PORT" LOG="$LOG" setsid bash -c \
-    'echo $$ > "$PID_FILE"; exec ngrok http "$PORT" --log="$LOG" --log-format=logfmt' \
+    'exec 9>&-; echo $$ > "$PID_FILE"; exec ngrok http "$PORT" --log="$LOG" --log-format=logfmt' \
     </dev/null >/dev/null 2>&1 &
   disown 2>/dev/null || true
   for _ in $(seq 1 15); do
@@ -111,7 +133,18 @@ if [ -z "$URL" ]; then
   done
 fi
 
-[ -n "$URL" ] || { echo "ERROR: could not obtain ngrok URL. See $LOG" >&2; exit 1; }
+if [ -z "$URL" ]; then
+  # We launched ngrok but could not reach its API: do not leave it orphaned.
+  if [ "$STARTED" = 1 ] && [ -f "$PID_FILE" ]; then
+    PID=$(cat "$PID_FILE" 2>/dev/null || true)
+    if pid_is_ngrok "$PID"; then
+      kill "$PID" 2>/dev/null || true
+    fi
+    rm -f "$PID_FILE"
+  fi
+  echo "ERROR: could not obtain ngrok URL. See $LOG" >&2
+  exit 1
+fi
 
 echo "Public URL: $URL"
 
@@ -122,14 +155,14 @@ sed -i "s|^O3SHOP_CONF_SHOPURL=.*|O3SHOP_CONF_SHOPURL=\"$ESCAPED_URL\"|" "$ENV_F
 sed -i "s|^O3SHOP_CONF_SSLSHOPURL=.*|O3SHOP_CONF_SSLSHOPURL=\"$ESCAPED_URL\"|" "$ENV_FILE"
 echo "Updated $ENV_FILE"
 
-docker exec "$CONTAINER" bin/oe-console oe:cache:clear 2>&1 | grep -v "Deprecated:" || true
+docker exec -u www-data "$CONTAINER" bin/oe-console oe:cache:clear 2>&1 | grep -v "Deprecated:" || true
 
 # The PayPal webhook endpoint is built from the shop's SSL URL, so the webhook
 # registered for the previous tunnel now points at a dead host. Re-register (or
 # reuse) it for the new URL. Best effort: a failure here does not tear down the
 # tunnel, it only leaves the webhook stale.
 echo "Re-registering PayPal webhook for $URL ..."
-if WEBHOOK_ID=$(docker exec "$CONTAINER" php /var/www/html/bin/paypal-sandbox-webhook.php 2>/tmp/paypal-webhook.err); then
+if WEBHOOK_ID=$(docker exec -u www-data "$CONTAINER" php /var/www/html/bin/paypal-sandbox-webhook.php 2>"$WEBHOOK_ERR"); then
   echo "Webhook id: $WEBHOOK_ID"
   SANDBOX_ENV="$MY_DIR/.paypal-sandbox.env"
   if [ -f "$SANDBOX_ENV" ] && grep -q '^OSC_PAYPAL_SANDBOX_WEBHOOK_ID=' "$SANDBOX_ENV"; then
@@ -139,7 +172,7 @@ if WEBHOOK_ID=$(docker exec "$CONTAINER" php /var/www/html/bin/paypal-sandbox-we
   fi
 else
   echo "WARNING: webhook re-registration failed (tunnel is still up)." >&2
-  sed 's/^/  /' /tmp/paypal-webhook.err >&2 || true
+  sed 's/^/  /' "$WEBHOOK_ERR" >&2 || true
 fi
 
 echo

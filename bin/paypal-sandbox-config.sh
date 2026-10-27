@@ -34,11 +34,15 @@ done
 
 echo "Applying sandbox credentials to module osc_paypal in $CONTAINER ..."
 
-docker exec \
-  -e "OSC_PAYPAL_SANDBOX_CLIENT_ID=${OSC_PAYPAL_SANDBOX_CLIENT_ID:-}" \
-  -e "OSC_PAYPAL_SANDBOX_CLIENT_SECRET=${OSC_PAYPAL_SANDBOX_CLIENT_SECRET:-}" \
-  -e "OSC_PAYPAL_SANDBOX_MERCHANT_ID=${OSC_PAYPAL_SANDBOX_MERCHANT_ID:-}" \
-  -e "OSC_PAYPAL_SANDBOX_WEBHOOK_ID=${OSC_PAYPAL_SANDBOX_WEBHOOK_ID:-}" \
+# Pass the variable *names* only: docker reads the values from this process's
+# environment, so the client secret never appears on the docker/ps command line.
+# Run as www-data so the module log is created by the web-server user instead of
+# root (a root-owned source/log/paypal/*.log breaks later checkouts).
+if ! OUTPUT=$(docker exec -u www-data \
+  -e OSC_PAYPAL_SANDBOX_CLIENT_ID \
+  -e OSC_PAYPAL_SANDBOX_CLIENT_SECRET \
+  -e OSC_PAYPAL_SANDBOX_MERCHANT_ID \
+  -e OSC_PAYPAL_SANDBOX_WEBHOOK_ID \
   "$CONTAINER" php -r '
 require "/var/www/html/vendor/autoload.php";
 require "/var/www/html/source/bootstrap.php";
@@ -53,10 +57,16 @@ echo "isSandbox: ".var_export($settings->isSandbox(), true)."\n";
 echo "clientId: ".(string)$settings->getClientId()."\n";
 echo "merchant: ".(string)$settings->getMerchantId()."\n";
 echo "webhook: ".(string)$settings->getWebhookId()."\n";
-' 2>&1 | grep -v "Deprecated:"
+' 2>&1); then
+  echo "$OUTPUT" >&2
+  echo "ERROR: applying the sandbox credentials failed." >&2
+  exit 1
+fi
+
+echo "$OUTPUT" | grep -v "Deprecated:" || true
 
 echo "Clearing shop cache ..."
-docker exec "$CONTAINER" bin/oe-console oe:cache:clear 2>&1 | grep -v "Deprecated:" || true
+docker exec -u www-data "$CONTAINER" bin/oe-console oe:cache:clear 2>&1 | grep -v "Deprecated:" || true
 
 echo
 echo "Verify in admin: Extensions > Modules > PayPal Checkout"
