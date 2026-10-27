@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   render empty without any error. Refreshing also removes stored settings that the current
   module configuration no longer contains (including the last one), so dropped templates,
   blocks, events and class extensions do not linger.
+- `oe:module:install-configuration` now reports a failed post-install refresh separately from
+  a failed installation and isolates it per shop, instead of aborting the remaining shops and
+  reporting the already-installed configuration as an installation failure.
 - `oe:module:refresh-settings --from-metadata` now backs the affected shop configuration
   files up before writing and writes the project configuration once per run instead of once
   per module. A module with unreadable metadata no longer aborts the whole refresh; it is

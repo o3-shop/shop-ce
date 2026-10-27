@@ -92,7 +92,31 @@ class ModuleConfigurationRefreshService implements ModuleConfigurationRefreshSer
      */
     public function refreshActiveModule(string $moduleId): array
     {
+        $result = $this->refreshActiveModuleWithFailures($moduleId);
+
+        if ($result['failures'] !== []) {
+            $shopId = (int)array_key_first($result['failures']);
+
+            throw new \RuntimeException(sprintf(
+                'Refreshing module "%s" failed in shop %d: %s',
+                $moduleId,
+                $shopId,
+                $result['failures'][$shopId]
+            ));
+        }
+
+        return $result['refreshed'];
+    }
+
+    /**
+     * @param string $moduleId
+     *
+     * @return array{refreshed: int[], failures: array<int, string>}
+     */
+    public function refreshActiveModuleWithFailures(string $moduleId): array
+    {
         $refreshedShopIds = [];
+        $failures = [];
         $projectConfiguration = $this->projectConfigurationDao->getConfiguration();
 
         foreach ($projectConfiguration->getShopConfigurationIds() as $shopId) {
@@ -106,10 +130,14 @@ class ModuleConfigurationRefreshService implements ModuleConfigurationRefreshSer
                 continue;
             }
 
-            $this->refresh($shopConfiguration->getModuleConfiguration($moduleId), $shopId);
-            $refreshedShopIds[] = $shopId;
+            try {
+                $this->refresh($shopConfiguration->getModuleConfiguration($moduleId), $shopId);
+                $refreshedShopIds[] = $shopId;
+            } catch (\Throwable $exception) {
+                $failures[$shopId] = $exception->getMessage();
+            }
         }
 
-        return $refreshedShopIds;
+        return ['refreshed' => $refreshedShopIds, 'failures' => $failures];
     }
 }

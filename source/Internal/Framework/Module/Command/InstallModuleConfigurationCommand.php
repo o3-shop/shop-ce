@@ -40,6 +40,8 @@ class InstallModuleConfigurationCommand extends Command
 {
     public const MESSAGE_INSTALLATION_WAS_SUCCESSFUL = 'Module configuration has been installed.';
     public const MESSAGE_INSTALLATION_FAILED = 'An error occurred while installing module configuration.';
+    public const MESSAGE_REFRESH_FAILED = 'Module configuration was installed, but refreshing its settings ' .
+        'failed for some shops.';
     public const MESSAGE_TARGET_PATH_IS_REQUIRED = 'The given module source path is not inside the shop modules ' .
         'directory. Please provide a second parameter with the modules ' .
         'target path inside the shop modules directory.';
@@ -129,9 +131,11 @@ class InstallModuleConfigurationCommand extends Command
             $this->moduleConfigurationInstaller->install($moduleSourcePath, $moduleTargetPath);
             $output->writeln('<info>' . self::MESSAGE_INSTALLATION_WAS_SUCCESSFUL . '</info>');
 
-            $this->refreshActiveModuleConfigurations($moduleSourcePath, $output);
+            return $this->refreshActiveModuleConfigurations($moduleSourcePath, $output);
         } catch (ModuleTargetPathIsMissingException $exception) {
             $output->writeln('<error>' . self::MESSAGE_TARGET_PATH_IS_REQUIRED . '</error>');
+
+            return 1;
         } catch (\Throwable $throwable) {
             $output->writeln('<error>' . self::MESSAGE_INSTALLATION_FAILED . '</error>');
 
@@ -147,13 +151,32 @@ class InstallModuleConfigurationCommand extends Command
      * @param string          $moduleSourcePath
      * @param OutputInterface $output
      */
-    private function refreshActiveModuleConfigurations(string $moduleSourcePath, OutputInterface $output): void
+    private function refreshActiveModuleConfigurations(string $moduleSourcePath, OutputInterface $output): int
     {
-        $moduleId = $this->metadataModuleConfigurationDao->get($moduleSourcePath)->getId();
+        try {
+            $moduleId = $this->metadataModuleConfigurationDao->get($moduleSourcePath)->getId();
+            $result = $this->moduleConfigurationRefreshService->refreshActiveModuleWithFailures($moduleId);
+        } catch (\Throwable $exception) {
+            $output->writeln('<error>' . self::MESSAGE_REFRESH_FAILED . '</error>');
+            $output->writeln(sprintf('<error>  - %s</error>', $exception->getMessage()));
 
-        foreach ($this->moduleConfigurationRefreshService->refreshActiveModule($moduleId) as $shopId) {
+            return 1;
+        }
+
+        foreach ($result['refreshed'] as $shopId) {
             $output->writeln(sprintf('<info>Refreshed settings of %s in shop %d.</info>', $moduleId, $shopId));
         }
+
+        if ($result['failures'] !== []) {
+            $output->writeln('<error>' . self::MESSAGE_REFRESH_FAILED . '</error>');
+            foreach ($result['failures'] as $shopId => $message) {
+                $output->writeln(sprintf('<error>  - shop %d: %s</error>', $shopId, $message));
+            }
+
+            return 1;
+        }
+
+        return 0;
     }
 
     /**

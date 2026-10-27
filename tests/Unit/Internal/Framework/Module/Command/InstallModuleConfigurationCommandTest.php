@@ -68,7 +68,8 @@ class InstallModuleConfigurationCommandTest extends TestCase
 
         if ($refreshService === null) {
             $refreshService = $this->createMock(ModuleConfigurationRefreshServiceInterface::class);
-            $refreshService->method('refreshActiveModule')->willReturn([]);
+            $refreshService->method('refreshActiveModuleWithFailures')
+                ->willReturn(['refreshed' => [], 'failures' => []]);
         }
 
         return new InstallModuleConfigurationCommand(
@@ -83,9 +84,9 @@ class InstallModuleConfigurationCommandTest extends TestCase
     {
         $refreshService = $this->createMock(ModuleConfigurationRefreshServiceInterface::class);
         $refreshService->expects($this->once())
-            ->method('refreshActiveModule')
+            ->method('refreshActiveModuleWithFailures')
             ->with('mymodule')
-            ->willReturn([1]);
+            ->willReturn(['refreshed' => [1], 'failures' => []]);
 
         $tester = new CommandTester($this->makeCommand(
             $this->createMock(ModuleConfigurationInstallerInterface::class),
@@ -98,6 +99,35 @@ class InstallModuleConfigurationCommandTest extends TestCase
         ]);
 
         $this->assertStringContainsString('Refreshed settings of mymodule in shop 1.', $tester->getDisplay());
+    }
+
+    public function testReportsRefreshFailuresSeparatelyFromInstallation(): void
+    {
+        $refreshService = $this->createMock(ModuleConfigurationRefreshServiceInterface::class);
+        $refreshService->method('refreshActiveModuleWithFailures')->willReturn([
+            'refreshed' => [1],
+            'failures' => [2 => 'invalid class extension'],
+        ]);
+
+        $tester = new CommandTester($this->makeCommand(
+            $this->createMock(ModuleConfigurationInstallerInterface::class),
+            $refreshService
+        ));
+
+        $exitCode = $tester->execute([
+            'module-source-path' => $this->modulesPath . '/mymodule',
+            'module-target-path' => $this->modulesPath . '/mymodule',
+        ]);
+
+        $display = $tester->getDisplay();
+        $this->assertSame(1, $exitCode);
+        $this->assertStringContainsString(InstallModuleConfigurationCommand::MESSAGE_INSTALLATION_WAS_SUCCESSFUL, $display);
+        $this->assertStringContainsString('Refreshed settings of mymodule in shop 1.', $display);
+        $this->assertStringContainsString('shop 2: invalid class extension', $display);
+        $this->assertStringNotContainsString(
+            InstallModuleConfigurationCommand::MESSAGE_INSTALLATION_FAILED,
+            $display
+        );
     }
 
     public function testCommandNameAndDescription(): void

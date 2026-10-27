@@ -48,6 +48,17 @@ interface ModuleConfigurationRefreshServiceInterface
      * @param string $moduleId
      *
      * @return int[] ids of the shops that were refreshed
+     * @throws \RuntimeException when the module cannot be refreshed in a shop
      */
     public function refreshActiveModule(string $moduleId): array;
+
+    /**
+     * Refreshes the given module in every shop where it is configured and active,
+     * isolating a failure in one shop from the remaining shops.
+     *
+     * @param string $moduleId
+     *
+     * @return array{refreshed: int[], failures: array<int, string>}
+     */
+    public function refreshActiveModuleWithFailures(string $moduleId): array;
 }
