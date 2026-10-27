@@ -163,6 +163,23 @@ class RefreshModuleSettingsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        // Read-merge-write must not interleave with another run: both would read
+        // the same project configuration and the second save would silently drop
+        // the first one's changes.
+        $lockHandle = $this->acquireLock($output);
+        if ($lockHandle === null) {
+            return 1;
+        }
+
+        try {
+            return $this->executeLocked($input, $output);
+        } finally {
+            $this->releaseLock($lockHandle);
+        }
+    }
+
+    private function executeLocked(InputInterface $input, OutputInterface $output): int
+    {
         $moduleId = $input->getArgument('module-id');
         $fromMetadata = (bool)$input->getOption('from-metadata');
         $projectConfiguration = $this->projectConfigurationDao->getConfiguration();
@@ -337,6 +354,45 @@ class RefreshModuleSettingsCommand extends Command
         $output->writeln(sprintf('Modules refreshed: %d', $refreshedCount));
 
         return $skipped === [] && $refreshFailures === [] ? 0 : 1;
+    }
+
+    /**
+     * @return resource|null
+     */
+    private function acquireLock(OutputInterface $output)
+    {
+        // Keep the lock out of the project configuration directory: that directory
+        // may be read-only, and the lock must still work for the backup-failure path.
+        $lockFile = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR)
+            . DIRECTORY_SEPARATOR
+            . 'o3-refresh-settings-'
+            . md5($this->context->getProjectConfigurationDirectory())
+            . '.lock';
+        $handle = @fopen($lockFile, 'c');
+
+        if ($handle === false) {
+            $output->writeln(sprintf('<error>Could not open the lock file %s.</error>', $lockFile));
+
+            return null;
+        }
+
+        if (!flock($handle, LOCK_EX | LOCK_NB)) {
+            fclose($handle);
+            $output->writeln('<error>Another oe:module:refresh-settings run is already in progress.</error>');
+
+            return null;
+        }
+
+        return $handle;
+    }
+
+    /**
+     * @param resource $handle
+     */
+    private function releaseLock($handle): void
+    {
+        flock($handle, LOCK_UN);
+        fclose($handle);
     }
 
     /**

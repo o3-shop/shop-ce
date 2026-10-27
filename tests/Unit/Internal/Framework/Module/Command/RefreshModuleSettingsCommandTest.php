@@ -422,6 +422,46 @@ final class RefreshModuleSettingsCommandTest extends TestCase
         $this->assertStringContainsString('Refreshed settings of mymodule in shop 1.', $tester->getDisplay());
     }
 
+    public function testRefreshIsRejectedWhileAnotherRunHoldsTheLock(): void
+    {
+        $lockFile = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR)
+            . DIRECTORY_SEPARATOR
+            . 'o3-refresh-settings-'
+            . md5($this->tmpDir . '/var/configuration/')
+            . '.lock';
+        $handle = fopen($lockFile, 'c');
+        $this->assertNotFalse($handle);
+        $this->assertTrue(flock($handle, LOCK_EX | LOCK_NB));
+
+        try {
+            $projectConfiguration = $this->makeProjectConfiguration(['mymodule']);
+
+            $projectConfigurationDao = $this->createMock(ProjectConfigurationDaoInterface::class);
+            $projectConfigurationDao->method('getConfiguration')->willReturn($projectConfiguration);
+            $projectConfigurationDao->expects($this->never())->method('save');
+
+            $refreshService = $this->createMock(ModuleConfigurationRefreshServiceInterface::class);
+            $refreshService->expects($this->never())->method('refresh');
+
+            $tester = $this->makeTester(
+                $projectConfigurationDao,
+                $this->createMock(ModuleConfigurationMergingServiceInterface::class),
+                $this->makeMetadataDao(),
+                $refreshService
+            );
+            $tester->execute(['module-id' => 'mymodule'], ['interactive' => false]);
+
+            $this->assertSame(1, $tester->getStatusCode());
+            $this->assertStringContainsString(
+                'Another oe:module:refresh-settings run is already in progress.',
+                $tester->getDisplay()
+            );
+        } finally {
+            flock($handle, LOCK_UN);
+            fclose($handle);
+        }
+    }
+
     /**
      * @param string|null $brokenModuleId module whose metadata read must fail
      */

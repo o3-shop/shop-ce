@@ -35,6 +35,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   configuration does not are skipped instead of aborting the run.
 - `oe:module:refresh-settings --from-metadata` names each backup directory uniquely, so two
   runs within the same second no longer overwrite the first backup.
+- `oe:module:refresh-settings` takes an exclusive lock for the whole read-merge-write cycle,
+  so two concurrent runs cannot overwrite each other's configuration.
 - `oe:module:refresh-settings --from-metadata` creates the backup directory with owner-only
   permissions (0700), since the shop configuration can contain credentials.
 - A failed module configuration merge no longer leaves a partially updated class-extension
