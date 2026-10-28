@@ -43,6 +43,10 @@ test.describe('Trustly payment method visibility', () => {
 
   test('P0 hidden for a non-Trustly country (CH)', async ({ storefrontPage, db }) => {
     test.skip(process.env.PAYPAL_E2E !== '1', 'requires PAYPAL_E2E=1 with the PayPal module and sandbox');
+    const previous = await db.query<{ OXACTIVE: number }>(
+      "SELECT OXACTIVE FROM oxcountry WHERE OXISOALPHA2 = 'CH' LIMIT 1",
+    );
+    const wasActive = previous[0]?.OXACTIVE ?? 0;
     await db.execute("UPDATE oxcountry SET OXACTIVE = 1 WHERE OXISOALPHA2 = 'CH'");
     try {
       const checkout = new CheckoutPaymentPage(storefrontPage);
@@ -55,7 +59,10 @@ test.describe('Trustly payment method visibility', () => {
 
       await expect(checkout.paymentRadio('oscpaypal')).toHaveCount(1);
     } finally {
-      await db.execute("UPDATE oxcountry SET OXACTIVE = 0 WHERE OXISOALPHA2 = 'CH'");
+      await db.execute(
+        "UPDATE oxcountry SET OXACTIVE = ? WHERE OXISOALPHA2 = 'CH'",
+        [wasActive],
+      );
     }
   });
 });
