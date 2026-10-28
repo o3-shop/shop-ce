@@ -502,6 +502,9 @@ class RefreshModuleSettingsCommand extends Command
             if (!copy($yamlPath, $backupDirectory . '/' . $shopId . '.yaml')) {
                 return null;
             }
+            // The backup can contain secrets (PayPal client secret etc.); the
+            // directory is already 0700, this keeps the files owner-only too.
+            @chmod($backupDirectory . '/' . $shopId . '.yaml', 0600);
         }
 
         return $backupDirectory;

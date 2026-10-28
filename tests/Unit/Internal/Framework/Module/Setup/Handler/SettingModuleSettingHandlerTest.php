@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\Setup\Handler;
 
+use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\Setting;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\SettingDaoInterface;
@@ -68,6 +69,36 @@ final class SettingModuleSettingHandlerTest extends TestCase
 
         $handler = new SettingModuleSettingHandler($shopModuleSettingDao);
         $handler->handleOnModuleDeactivation($moduleConfiguration, 1);
+    }
+
+    public function testRefreshSeedsOnlyMissingSettings(): void
+    {
+        $existing = (new Setting())->setName('existing')->setValue('configured')->setType('str');
+        $new = (new Setting())->setName('new')->setValue('default')->setType('str');
+
+        $settingDao = $this->createMock(SettingDaoInterface::class);
+        $settingDao->method('get')->willReturnCallback(
+            function (string $name): Setting {
+                if ($name === 'new') {
+                    throw new EntryDoesNotExistDaoException('missing');
+                }
+
+                return (new Setting())->setName($name)->setValue('configured')->setType('str');
+            }
+        );
+        $settingDao->expects($this->once())
+            ->method('save')
+            ->with(
+                $this->callback(static fn (Setting $setting): bool => $setting->getName() === 'new'),
+                'mymodule',
+                1
+            );
+
+        $moduleConfiguration = (new ModuleConfiguration())->setId('mymodule');
+        $moduleConfiguration->addModuleSetting($existing);
+        $moduleConfiguration->addModuleSetting($new);
+
+        (new SettingModuleSettingHandler($settingDao))->handleOnModuleRefresh($moduleConfiguration, 1);
     }
 
     private function getTestSetting(): Setting

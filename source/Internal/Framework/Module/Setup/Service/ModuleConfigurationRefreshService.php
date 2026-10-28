@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service;
 
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Cache\ModuleCacheServiceInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ProjectConfigurationDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\State\ModuleStateServiceInterface;
@@ -54,24 +55,32 @@ class ModuleConfigurationRefreshService implements ModuleConfigurationRefreshSer
     private $moduleStateService;
 
     /**
+     * @var ModuleCacheServiceInterface
+     */
+    private $moduleCacheService;
+
+    /**
      * @param ModuleConfigurationHandlingServiceInterface $moduleConfigurationHandlingService
      * @param ModuleServicesActivationServiceInterface   $moduleServicesActivationService
      * @param ExtensionChainServiceInterface              $classExtensionChainService
      * @param ProjectConfigurationDaoInterface            $projectConfigurationDao
      * @param ModuleStateServiceInterface                 $moduleStateService
+     * @param ModuleCacheServiceInterface                 $moduleCacheService
      */
     public function __construct(
         ModuleConfigurationHandlingServiceInterface $moduleConfigurationHandlingService,
         ModuleServicesActivationServiceInterface $moduleServicesActivationService,
         ExtensionChainServiceInterface $classExtensionChainService,
         ProjectConfigurationDaoInterface $projectConfigurationDao,
-        ModuleStateServiceInterface $moduleStateService
+        ModuleStateServiceInterface $moduleStateService,
+        ModuleCacheServiceInterface $moduleCacheService
     ) {
         $this->moduleConfigurationHandlingService = $moduleConfigurationHandlingService;
         $this->moduleServicesActivationService = $moduleServicesActivationService;
         $this->classExtensionChainService = $classExtensionChainService;
         $this->projectConfigurationDao = $projectConfigurationDao;
         $this->moduleStateService = $moduleStateService;
+        $this->moduleCacheService = $moduleCacheService;
     }
 
     /**
@@ -83,29 +92,10 @@ class ModuleConfigurationRefreshService implements ModuleConfigurationRefreshSer
         $this->moduleConfigurationHandlingService->handleOnRefresh($moduleConfiguration, $shopId);
         $this->moduleServicesActivationService->activateModuleServices($moduleConfiguration->getId(), $shopId);
         $this->classExtensionChainService->updateChain($shopId);
-    }
 
-    /**
-     * @param string $moduleId
-     *
-     * @return int[]
-     */
-    public function refreshActiveModule(string $moduleId): array
-    {
-        $result = $this->refreshActiveModuleWithFailures($moduleId);
-
-        if ($result['failures'] !== []) {
-            $shopId = (int)array_key_first($result['failures']);
-
-            throw new \RuntimeException(sprintf(
-                'Refreshing module "%s" failed in shop %d: %s',
-                $moduleId,
-                $shopId,
-                $result['failures'][$shopId]
-            ));
-        }
-
-        return $result['refreshed'];
+        // The shop reads aModules/aModuleTemplates/... from the module cache; without
+        // this an updated module only becomes visible after a manual cache clear.
+        $this->moduleCacheService->invalidateModuleCache($moduleConfiguration->getId(), $shopId);
     }
 
     /**

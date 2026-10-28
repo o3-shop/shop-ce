@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   `--from-metadata` additionally merges the module's own metadata configuration into the
   project configuration first.
 
+### Changed
+- `oe:module:install-configuration` now refreshes the stored settings of the shops where the
+  module is already active and exits non-zero when a refresh failed. Unlike the standalone
+  `oe:module:refresh-settings`, this path takes no lock and keeps no backup; deployment
+  scripts need to account for the new exit code.
+
 ### Fixed
 - installing a module configuration now refreshes the stored module settings of the shops
   where the module is already active. Previously the shop kept serving the settings derived
@@ -40,6 +46,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   runs within the same second no longer overwrite the first backup.
 - `oe:module:refresh-settings` takes an exclusive lock for the whole read-merge-write cycle,
   so two concurrent runs cannot overwrite each other's configuration.
+- `oe:module:refresh-settings` now invalidates the module cache after refreshing, so new
+  templates, blocks and controllers become visible without a manual `oe:cache:clear`.
+- `oe:module:refresh-settings` now seeds settings that are new in `metadata.php` with their
+  defaults, while keeping the values configured by the shop owner.
+- `oe:module:refresh-settings --from-metadata` writes the backup files with owner-only
+  permissions as well, not just the backup directory.
+- the unused `refreshActiveModule()` method was removed from the refresh service interface;
+  callers use `refreshActiveModuleWithFailures()` and get the per-shop failures.
 - `oe:module:refresh-settings --from-metadata` creates the backup directory with owner-only
   permissions (0700), since the shop configuration can contain credentials.
 - A failed module configuration merge no longer leaves a partially updated class-extension

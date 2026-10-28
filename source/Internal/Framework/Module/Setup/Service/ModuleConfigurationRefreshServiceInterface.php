@@ -42,17 +42,6 @@ interface ModuleConfigurationRefreshServiceInterface
     public function refresh(ModuleConfiguration $moduleConfiguration, int $shopId);
 
     /**
-     * Refreshes the given module in every shop where it is configured and active. Shops
-     * that do not have the module configured or activated are left alone.
-     *
-     * @param string $moduleId
-     *
-     * @return int[] ids of the shops that were refreshed
-     * @throws \RuntimeException when the module cannot be refreshed in a shop
-     */
-    public function refreshActiveModule(string $moduleId): array;
-
-    /**
      * Refreshes the given module in every shop where it is configured and active,
      * isolating a failure in one shop from the remaining shops.
      *

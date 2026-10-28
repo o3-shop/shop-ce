@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Handler;
 
+use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\SettingDaoInterface;
 
@@ -57,9 +58,17 @@ class SettingModuleSettingHandler implements ModuleConfigurationHandlerInterface
      */
     public function handleOnModuleRefresh(ModuleConfiguration $configuration, int $shopId)
     {
-        // Deliberately does nothing: module settings hold values configured by the shop
-        // owner. Re-saving the metadata defaults here would reset them, which is exactly
-        // what makes a deactivate/activate cycle unsuitable for refreshing a module.
+        // Seed settings that are new in metadata.php with their default, but never
+        // overwrite a value the shop owner configured. Without this a setting added
+        // in an update is not in oxconfig, so getConfigParam() returns null until the
+        // admin saves the module configuration once.
+        foreach ($configuration->getModuleSettings() as $setting) {
+            try {
+                $this->settingDao->get($setting->getName(), $configuration->getId(), $shopId);
+            } catch (EntryDoesNotExistDaoException $exception) {
+                $this->settingDao->save($setting, $configuration->getId(), $shopId);
+            }
+        }
     }
 
     /**

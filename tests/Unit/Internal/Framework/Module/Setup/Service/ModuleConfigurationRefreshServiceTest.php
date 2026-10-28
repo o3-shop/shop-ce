@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\Setup\Service;
 
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Cache\ModuleCacheServiceInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ProjectConfigurationDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ProjectConfiguration;
@@ -46,17 +47,33 @@ final class ModuleConfigurationRefreshServiceTest extends TestCase
         $this->assertSame([2 => 'shop 2 broken'], $result['failures']);
     }
 
-    public function testRefreshActiveModuleReturnsAllShopsWhenNothingFails(): void
+    public function testRefreshInvalidatesTheModuleCache(): void
     {
-        $this->assertSame([1, 2, 3], $this->createService()->refreshActiveModule('mymodule'));
-    }
+        $handlingService = $this->createMock(ModuleConfigurationHandlingServiceInterface::class);
+        $handlingService->expects($this->once())
+            ->method('handleOnRefresh')
+            ->with($this->isInstanceOf(ModuleConfiguration::class), 1);
 
-    public function testRefreshActiveModuleStillThrowsWhenAShopFails(): void
-    {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('shop 2 broken');
+        $moduleServicesActivationService = $this->createMock(ModuleServicesActivationServiceInterface::class);
+        $moduleServicesActivationService->expects($this->once())->method('activateModuleServices');
+        $classExtensionChainService = $this->createMock(ExtensionChainServiceInterface::class);
+        $classExtensionChainService->expects($this->once())->method('updateChain')->with(1);
 
-        $this->createService(2)->refreshActiveModule('mymodule');
+        $moduleCacheService = $this->createMock(ModuleCacheServiceInterface::class);
+        $moduleCacheService->expects($this->once())
+            ->method('invalidateModuleCache')
+            ->with('mymodule', 1);
+
+        $service = new ModuleConfigurationRefreshService(
+            $handlingService,
+            $moduleServicesActivationService,
+            $classExtensionChainService,
+            $this->createMock(ProjectConfigurationDaoInterface::class),
+            $this->createMock(ModuleStateServiceInterface::class),
+            $moduleCacheService
+        );
+
+        $service->refresh((new ModuleConfiguration())->setId('mymodule'), 1);
     }
 
     private function createServiceWithFailingShop(int $failingShopId): ModuleConfigurationRefreshService
@@ -86,6 +103,7 @@ final class ModuleConfigurationRefreshServiceTest extends TestCase
                 $this->createMock(ExtensionChainServiceInterface::class),
                 $projectConfigurationDao,
                 $moduleStateService,
+                $this->createMock(ModuleCacheServiceInterface::class),
             ])
             ->onlyMethods(['refresh'])
             ->getMock();
