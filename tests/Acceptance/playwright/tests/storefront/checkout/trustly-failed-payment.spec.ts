@@ -5,15 +5,17 @@ const DEMO_PRODUCT_ID = '01c9499c21914ae7de1b2412ea4b019f';
 const GERMANY = 'a7c40f631fc920687.20179984';
 
 /**
- * Regression for the failed-Trustly-payment retry bug: after PayPal's
- * "Test Failed Payment" APM simulation the customer lands on the payment
- * step with payerror=2. Retrying must start a new shop/PayPal order and
- * return to PayPal — not reuse the abandoned order and show `thankyou`.
+ * PayPal's "Test Failed Payment" APM simulation leaves the Trustly capture
+ * PENDING when the customer returns to the shop (a PAYMENT.CAPTURE.DENIED
+ * arrives later). A PENDING capture is not a failed payment: the shop must not
+ * show payerror=2 and invite a retry, because that would create a second order
+ * while the first capture can still complete. It must show the pending /
+ * thank-you state and let the webhook settle the order.
  */
-test.describe('Trustly failed payment retry', () => {
+test.describe('Trustly failed payment is treated as pending', () => {
   test.setTimeout(90_000);
 
-  test('retry starts a new order instead of showing the thank-you page', async ({
+  test('shows the pending state instead of starting a second order', async ({
     storefrontPage,
   }) => {
     test.skip(process.env.PAYPAL_E2E !== '1', 'requires PAYPAL_E2E=1 with the PayPal module and sandbox');
@@ -47,23 +49,11 @@ test.describe('Trustly failed payment retry', () => {
       page.waitForLoadState('domcontentloaded'),
       page.locator('#Failed').click(),
     ]);
-    await page.waitForURL(/[?&]cl=payment/, { timeout: 30_000 });
-    expect(page.url()).toContain('payerror=2');
 
-    // Retry: payment step -> order step -> submit.
-    await Promise.all([
-      page.waitForLoadState('domcontentloaded'),
-      page.locator('button[name="userform"]').click(),
-    ]);
-    await page.waitForURL(/[?&]cl=order/, { timeout: 20_000 });
-    const submit = page.locator('.order__navi button[type=submit]');
-    await expect(submit).toHaveCount(1);
-    await Promise.all([
-      page.waitForLoadState('domcontentloaded'),
-      submit.click(),
-    ]);
-
-    await page.waitForURL(/sandbox\.paypal\.com/, { timeout: 25_000 });
-    expect(page.url()).not.toContain('cl=thankyou');
+    // The capture is PENDING at this point; the shop must keep the session
+    // order and show the pending/thank-you state instead of payment?payerror=2.
+    await page.waitForURL(/[?&]cl=thankyou/, { timeout: 30_000 });
+    expect(page.url()).not.toContain('sandbox.paypal.com');
+    expect(page.url()).not.toContain('payerror=2');
   });
 });
