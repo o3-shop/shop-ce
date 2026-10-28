@@ -159,8 +159,12 @@ phase_provision() {
                 "deb http://archive.debian.org/debian bullseye-updates main" \
                 "deb http://archive.debian.org/debian-security bullseye-security main" \
                 > /etc/apt/sources.list
+            # The archived Release files are past their Valid-Until date; without
+            # this apt refuses to update and the provisioning phase aborts.
+            apt-get -o Acquire::Check-Valid-Until=false update -qq
+        else
+            apt-get update -qq
         fi
-        apt-get update -qq
         apt-get install -y -qq git unzip libzip-dev libpng-dev libjpeg-dev libfreetype6-dev \
             libonig-dev libxml2-dev libicu-dev libxslt1-dev default-mysql-client >/dev/null
         docker-php-ext-configure gd --with-freetype --with-jpeg >/dev/null
