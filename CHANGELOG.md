@@ -15,8 +15,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - `oe:module:install-configuration` now refreshes the stored settings of the shops where the
-  module is already active and exits non-zero when a refresh failed. Unlike the standalone
-  `oe:module:refresh-settings`, this path takes no lock and keeps no backup; deployment
+  module is already active and exits non-zero when a refresh failed. It takes the same run lock
+  and pre-write backup as `oe:module:refresh-settings --from-metadata`, restores the backup when
+  the install or refresh fails, and deletes it only after a fully successful run. Deployment
   scripts need to account for the new exit code.
 
 ### Fixed

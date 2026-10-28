@@ -23,6 +23,10 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\Command;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Command\InstallModuleConfigurationCommand;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ProjectConfigurationDaoInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ProjectConfiguration;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ShopConfiguration;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ProjectConfigurationIsEmptyException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ModuleConfigurationInstallerInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\ModuleConfigurationDaoInterface as MetaDataModuleConfigurationDaoInterface;
@@ -41,6 +45,7 @@ class InstallModuleConfigurationCommandTest extends TestCase
         $this->tmpRoot = sys_get_temp_dir() . '/o3-install-' . uniqid();
         $this->modulesPath = $this->tmpRoot . '/modules';
         mkdir($this->modulesPath . '/mymodule', 0777, true);
+        mkdir($this->tmpRoot . '/var/configuration/shops', 0777, true);
     }
 
     protected function tearDown(): void
@@ -53,12 +58,15 @@ class InstallModuleConfigurationCommandTest extends TestCase
         $context = $this->createMock(BasicContextInterface::class);
         $context->method('getShopRootPath')->willReturn($this->tmpRoot);
         $context->method('getModulesPath')->willReturn($this->modulesPath);
+        $context->method('getProjectConfigurationDirectory')
+            ->willReturn($this->tmpRoot . '/var/configuration/');
         return $context;
     }
 
     private function makeCommand(
         ModuleConfigurationInstallerInterface $installer,
-        ?ModuleConfigurationRefreshServiceInterface $refreshService = null
+        ?ModuleConfigurationRefreshServiceInterface $refreshService = null,
+        ?ProjectConfigurationDaoInterface $projectConfigurationDao = null
     ): InstallModuleConfigurationCommand {
         $moduleConfiguration = new ModuleConfiguration();
         $moduleConfiguration->setId('mymodule');
@@ -72,11 +80,18 @@ class InstallModuleConfigurationCommandTest extends TestCase
                 ->willReturn(['refreshed' => [], 'failures' => []]);
         }
 
+        if ($projectConfigurationDao === null) {
+            $projectConfigurationDao = $this->createMock(ProjectConfigurationDaoInterface::class);
+            $projectConfigurationDao->method('getConfiguration')
+                ->willThrowException(new ProjectConfigurationIsEmptyException('empty'));
+        }
+
         return new InstallModuleConfigurationCommand(
             $installer,
             $this->makeContext(),
             $metadataModuleConfigurationDao,
-            $refreshService
+            $refreshService,
+            $projectConfigurationDao
         );
     }
 
@@ -127,6 +142,72 @@ class InstallModuleConfigurationCommandTest extends TestCase
         $this->assertStringNotContainsString(
             InstallModuleConfigurationCommand::MESSAGE_INSTALLATION_FAILED,
             $display
+        );
+    }
+
+    public function testDeletesBackupAfterSuccessfulRefresh(): void
+    {
+        $shopsDirectory = $this->tmpRoot . '/var/configuration/shops';
+        file_put_contents($shopsDirectory . '/1.yaml', 'modules: [mymodule]');
+
+        $refreshService = $this->createMock(ModuleConfigurationRefreshServiceInterface::class);
+        $refreshService->method('refreshActiveModuleWithFailures')
+            ->willReturn(['refreshed' => [1], 'failures' => []]);
+
+        $projectConfiguration = new ProjectConfiguration();
+        $projectConfiguration->addShopConfiguration(1, new ShopConfiguration());
+        $projectConfigurationDao = $this->createMock(ProjectConfigurationDaoInterface::class);
+        $projectConfigurationDao->method('getConfiguration')->willReturn($projectConfiguration);
+
+        $tester = new CommandTester($this->makeCommand(
+            $this->createMock(ModuleConfigurationInstallerInterface::class),
+            $refreshService,
+            $projectConfigurationDao
+        ));
+        $exitCode = $tester->execute([
+            'module-source-path' => $this->modulesPath . '/mymodule',
+            'module-target-path' => $this->modulesPath . '/mymodule',
+        ]);
+
+        $this->assertSame(0, $exitCode);
+        $this->assertCount(0, glob($shopsDirectory . '.bak.*'), 'A successful run must clean its backup up');
+        $this->assertSame('modules: [mymodule]', file_get_contents($shopsDirectory . '/1.yaml'));
+    }
+
+    public function testRestoresBackupAndKeepsItWhenRefreshFails(): void
+    {
+        $shopsDirectory = $this->tmpRoot . '/var/configuration/shops';
+        $original = 'modules: [mymodule]';
+        file_put_contents($shopsDirectory . '/1.yaml', $original);
+
+        $refreshService = $this->createMock(ModuleConfigurationRefreshServiceInterface::class);
+        $refreshService->method('refreshActiveModuleWithFailures')
+            ->willReturn(['refreshed' => [], 'failures' => [2 => 'invalid class extension']]);
+
+        $projectConfiguration = new ProjectConfiguration();
+        $projectConfiguration->addShopConfiguration(1, new ShopConfiguration());
+        $projectConfigurationDao = $this->createMock(ProjectConfigurationDaoInterface::class);
+        $projectConfigurationDao->method('getConfiguration')->willReturn($projectConfiguration);
+
+        $installer = $this->createMock(ModuleConfigurationInstallerInterface::class);
+        $installer->method('install')->willReturnCallback(
+            function () use ($shopsDirectory): void {
+                file_put_contents($shopsDirectory . '/1.yaml', 'modules: [broken]');
+            }
+        );
+
+        $tester = new CommandTester($this->makeCommand($installer, $refreshService, $projectConfigurationDao));
+        $exitCode = $tester->execute([
+            'module-source-path' => $this->modulesPath . '/mymodule',
+            'module-target-path' => $this->modulesPath . '/mymodule',
+        ]);
+
+        $this->assertSame(1, $exitCode);
+        $this->assertSame($original, file_get_contents($shopsDirectory . '/1.yaml'));
+        $this->assertCount(1, glob($shopsDirectory . '.bak.*'), 'A failed run must keep the backup');
+        $this->assertStringContainsString(
+            'Restored the shop configuration from the backup.',
+            $tester->getDisplay()
         );
     }
 
