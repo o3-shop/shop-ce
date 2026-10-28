@@ -36,6 +36,16 @@ escape_sed_replacement() {
   printf '%s' "$1" | sed -e 's/[\\&|]/\\&/g'
 }
 
+# GNU sed takes -i EXPRESSION; BSD/macOS sed needs an explicit (empty) backup
+# suffix: sed -i '' EXPRESSION. Detect GNU rather than hard-coding either.
+sed_inplace() {
+  if sed --version >/dev/null 2>&1; then
+    sed -i "$1" "$2"
+  else
+    sed -i '' "$1" "$2"
+  fi
+}
+
 # The PID file can outlive ngrok (crash, or a tunnel started by an older version
 # of this script), and after a crash its PID can be reused by an unrelated
 # process. Only treat the recorded PID as ours while it is alive and its
@@ -49,7 +59,7 @@ pid_is_ngrok() {
     exe=$(ps -p "$pid" -o comm= 2>/dev/null || true)
   fi
   exe=${exe% (deleted)}
-  [ "$(basename -- "$exe")" = "ngrok" ]
+  [ "$(basename "$exe")" = "ngrok" ]
 }
 
 drop_stale_pid_file() {
@@ -95,8 +105,8 @@ command -v ngrok >/dev/null 2>&1 || { echo "ERROR: ngrok not found on PATH." >&2
 
 # mktemp creates an unpredictable, owner-only file, so another local user cannot
 # win a symlink race against a fixed /tmp/ngrok.log or /tmp/*.err path.
-LOG=$(mktemp "${TMPDIR:-/tmp}/paypal-sandbox-tunnel-$(id -u)-${PROJECT_HASH}-XXXXXX.log")
-WEBHOOK_ERR=$(mktemp "${TMPDIR:-/tmp}/paypal-sandbox-tunnel-$(id -u)-${PROJECT_HASH}-XXXXXX.err")
+LOG=$(mktemp "${TMPDIR:-/tmp}/paypal-sandbox-tunnel-$(id -u)-${PROJECT_HASH}-XXXXXX")
+WEBHOOK_ERR=$(mktemp "${TMPDIR:-/tmp}/paypal-sandbox-tunnel-$(id -u)-${PROJECT_HASH}-XXXXXX")
 
 # Two concurrent starts in the same checkout would race on the PID file and
 # leave one ngrok orphaned. Hold an exclusive lock for the whole start sequence.
@@ -122,7 +132,7 @@ if [ -z "$URL" ]; then
   # Write the PID from inside the session leader before exec'ing ngrok, so the
   # recorded PID is ngrok itself and --stop can target exactly this process.
   # fd 9 (the start lock) is closed in the child so the lock is not inherited.
-  PID_FILE="$PID_FILE" PORT="$PORT" LOG="$LOG" setsid bash -c \
+  PID_FILE="$PID_FILE" PORT="$PORT" LOG="$LOG" nohup bash -c \
     'exec 9>&-; echo $$ > "$PID_FILE"; exec ngrok http "$PORT" --log="$LOG" --log-format=logfmt' \
     </dev/null >/dev/null 2>&1 &
   disown 2>/dev/null || true
@@ -151,8 +161,8 @@ echo "Public URL: $URL"
 # Repoint the shop at the tunnel (both plain and SSL URL — the PayPal module
 # builds its redirect/webhook URLs from getSslShopUrl()).
 ESCAPED_URL=$(escape_sed_replacement "$URL")
-sed -i "s|^O3SHOP_CONF_SHOPURL=.*|O3SHOP_CONF_SHOPURL=\"$ESCAPED_URL\"|" "$ENV_FILE"
-sed -i "s|^O3SHOP_CONF_SSLSHOPURL=.*|O3SHOP_CONF_SSLSHOPURL=\"$ESCAPED_URL\"|" "$ENV_FILE"
+sed_inplace "s|^O3SHOP_CONF_SHOPURL=.*|O3SHOP_CONF_SHOPURL=\"$ESCAPED_URL\"|" "$ENV_FILE"
+sed_inplace "s|^O3SHOP_CONF_SSLSHOPURL=.*|O3SHOP_CONF_SSLSHOPURL=\"$ESCAPED_URL\"|" "$ENV_FILE"
 echo "Updated $ENV_FILE"
 
 docker exec -u www-data "$CONTAINER" bin/oe-console oe:cache:clear 2>&1 | grep -v "Deprecated:" || true
@@ -167,7 +177,7 @@ if WEBHOOK_ID=$(docker exec -u www-data "$CONTAINER" php /var/www/html/bin/paypa
   SANDBOX_ENV="$MY_DIR/.paypal-sandbox.env"
   if [ -f "$SANDBOX_ENV" ] && grep -q '^OSC_PAYPAL_SANDBOX_WEBHOOK_ID=' "$SANDBOX_ENV"; then
     ESCAPED_WEBHOOK_ID=$(escape_sed_replacement "$WEBHOOK_ID")
-    sed -i "s|^OSC_PAYPAL_SANDBOX_WEBHOOK_ID=.*|OSC_PAYPAL_SANDBOX_WEBHOOK_ID=\"$ESCAPED_WEBHOOK_ID\"|" "$SANDBOX_ENV"
+    sed_inplace "s|^OSC_PAYPAL_SANDBOX_WEBHOOK_ID=.*|OSC_PAYPAL_SANDBOX_WEBHOOK_ID=\"$ESCAPED_WEBHOOK_ID\"|" "$SANDBOX_ENV"
     echo "Updated $SANDBOX_ENV"
   fi
 else
