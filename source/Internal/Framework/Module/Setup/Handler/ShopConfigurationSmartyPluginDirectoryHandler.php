@@ -72,18 +72,36 @@ class ShopConfigurationSmartyPluginDirectoryHandler implements ModuleConfigurati
      * @param ModuleConfiguration $configuration
      * @param int                 $shopId
      */
+    public function handleOnModuleRefresh(ModuleConfiguration $configuration, int $shopId)
+    {
+        // Activation is guarded by canHandle(), so a directory removed from the
+        // configuration would survive it. Remove the stored entry first to re-derive the
+        // full list, then activate the new one.
+        $this->removeModuleEntry($configuration, $shopId);
+        $this->handleOnModuleActivation($configuration, $shopId);
+    }
+
+    /**
+     * @param ModuleConfiguration $configuration
+     * @param int                 $shopId
+     */
     public function handleOnModuleDeactivation(ModuleConfiguration $configuration, int $shopId)
     {
         if ($this->canHandle($configuration)) {
-            $shopConfigurationSetting = $this->getShopConfigurationSetting($shopId);
-
-            $shopSettingValue = $shopConfigurationSetting->getValue();
-            unset($shopSettingValue[$configuration->getId()]);
-
-            $shopConfigurationSetting->setValue($shopSettingValue);
-
-            $this->shopConfigurationSettingDao->save($shopConfigurationSetting);
+            $this->removeModuleEntry($configuration, $shopId);
         }
+    }
+
+    private function removeModuleEntry(ModuleConfiguration $configuration, int $shopId): void
+    {
+        $shopConfigurationSetting = $this->getShopConfigurationSetting($shopId);
+
+        $shopSettingValue = $shopConfigurationSetting->getValue();
+        unset($shopSettingValue[$configuration->getId()]);
+
+        $shopConfigurationSetting->setValue($shopSettingValue);
+
+        $this->shopConfigurationSettingDao->save($shopConfigurationSetting);
     }
 
     /**

@@ -85,7 +85,7 @@
             "if [ -f ./vendor/bin/oe-eshop-ide_helper ]; then oe-eshop-ide_helper; fi"
         ],
         "oe:install:module:paypal": [
-            "composer require oxid-solution-catalysts/paypal-module ^2.6.0",
+            "composer require o3-shop/paypal-checkout ^2.10.0",
             "vendor/bin/oe-console oe:module:install-configuration source/modules/osc/paypal",
             "vendor/bin/oe-console oe:cache:clear"
         ]

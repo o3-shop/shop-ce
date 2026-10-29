@@ -6,6 +6,60 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 
+### Added
+- console command `oe:module:refresh-settings` to re-apply the installed module configuration
+  (templates, blocks, controllers, class extensions, events, services) to the shop without
+  changing the module activation state. Module settings configured in the admin are kept.
+  `--from-metadata` additionally merges the module's own metadata configuration into the
+  project configuration first.
+
+### Changed
+- `oe:module:install-configuration` now refreshes the stored settings of the shops where the
+  module is already active and exits non-zero when a refresh failed. It takes the same run lock
+  and pre-write backup as `oe:module:refresh-settings --from-metadata`, restores the backup when
+  the install or refresh fails, and deletes it only after a fully successful run. Deployment
+  scripts need to account for the new exit code.
+
+### Fixed
+- installing a module configuration now refreshes the stored module settings of the shops
+  where the module is already active. Previously the shop kept serving the settings derived
+  from the previous configuration until the module was deactivated and activated again -
+  a template map missing templates added to metadata.php, for example, made module templates
+  render empty without any error. Refreshing also removes stored settings that the current
+  module configuration no longer contains (including the last one), so dropped templates,
+  blocks, events and class extensions do not linger.
+- `oe:module:install-configuration` now reports a failed post-install refresh separately from
+  a failed installation and isolates it per shop, instead of aborting the remaining shops and
+  reporting the already-installed configuration as an installation failure.
+- `oe:module:refresh-settings --from-metadata` now backs the affected shop configuration
+  files up before writing and writes the project configuration once per run instead of once
+  per module. A module with unreadable metadata no longer aborts the whole refresh; it is
+  skipped and reported, and the command exits with a non-zero status.
+- `oe:module:refresh-settings --from-metadata` validates the merged configuration before
+  writing anything and refuses to run when the backup cannot be created, so an invalid or
+  unrestorable configuration is never left on disk. If writing the configuration or a
+  refresh fails, the shop configuration is restored from the backup (recreating the shops
+  directory when the failed write removed it) and the database is re-applied from it. A
+  `metadata.php` that declares a different module id is rejected instead of silently
+  adding a second module entry, and shop ids that the database knows but the project
+  configuration does not are skipped instead of aborting the run.
+- `oe:module:refresh-settings --from-metadata` names each backup directory uniquely, so two
+  runs within the same second no longer overwrite the first backup.
+- `oe:module:refresh-settings` takes an exclusive lock for the whole read-merge-write cycle,
+  so two concurrent runs cannot overwrite each other's configuration.
+- `oe:module:refresh-settings` now invalidates the module cache after refreshing, so new
+  templates, blocks and controllers become visible without a manual `oe:cache:clear`.
+- `oe:module:refresh-settings` now seeds settings that are new in `metadata.php` with their
+  defaults, while keeping the values configured by the shop owner.
+- `oe:module:refresh-settings --from-metadata` writes the backup files with owner-only
+  permissions as well, not just the backup directory.
+- the unused `refreshActiveModule()` method was removed from the refresh service interface;
+  callers use `refreshActiveModuleWithFailures()` and get the per-shop failures.
+- `oe:module:refresh-settings --from-metadata` creates the backup directory with owner-only
+  permissions (0700), since the shop configuration can contain credentials.
+- A failed module configuration merge no longer leaves a partially updated class-extension
+  chain behind: the chain is merged on a copy and only swapped in when every step succeeds.
+
 ## [v1.2.0] - 2023-04-25
 
 ### Added

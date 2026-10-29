@@ -63,19 +63,31 @@ class ModuleConfigurationMergingService implements ModuleConfigurationMergingSer
     ): ShopConfiguration {
         $moduleConfigurationClone = $this->cloneModuleConfiguration($moduleConfiguration);
 
-        $mergedClassExtensionChain = $this->classExtensionsMergingService->merge(
-            $shopConfiguration,
-            $moduleConfigurationClone
-        );
+        // The class-extension chain is a shared object: merging mutates it in place, and the
+        // removal of deleted extensions runs last and can throw. Work on a copy and swap the
+        // result in only once every step succeeded, so a failed merge leaves the caller's
+        // configuration untouched instead of half-updated.
+        $originalChain = $shopConfiguration->getClassExtensionsChain();
+        $shopConfiguration->setClassExtensionsChain(clone $originalChain);
+
+        try {
+            $mergedClassExtensionChain = $this->classExtensionsMergingService->merge(
+                $shopConfiguration,
+                $moduleConfigurationClone
+            );
+
+            $mergedModuleConfiguration = $this->settingsMergingService->merge(
+                $shopConfiguration,
+                $moduleConfigurationClone
+            );
+
+            $this->setConfiguredOptionToMergedConfiguration($shopConfiguration, $mergedModuleConfiguration);
+        } catch (\Throwable $exception) {
+            $shopConfiguration->setClassExtensionsChain($originalChain);
+            throw $exception;
+        }
+
         $shopConfiguration->setClassExtensionsChain($mergedClassExtensionChain);
-
-        $mergedModuleConfiguration = $this->settingsMergingService->merge(
-            $shopConfiguration,
-            $moduleConfigurationClone
-        );
-
-        $this->setConfiguredOptionToMergedConfiguration($shopConfiguration, $mergedModuleConfiguration);
-
         $shopConfiguration->addModuleConfiguration($mergedModuleConfiguration);
 
         return $shopConfiguration;

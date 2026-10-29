@@ -59,6 +59,17 @@ class ModuleVersionHandler implements ModuleConfigurationHandlerInterface
      * @param ModuleConfiguration $configuration
      * @param int                 $shopId
      */
+    public function handleOnModuleRefresh(ModuleConfiguration $configuration, int $shopId)
+    {
+        // Activation overwrites the stored version; nothing has to be removed while the
+        // module stays active.
+        $this->handleOnModuleActivation($configuration, $shopId);
+    }
+
+    /**
+     * @param ModuleConfiguration $configuration
+     * @param int                 $shopId
+     */
     public function handleOnModuleDeactivation(ModuleConfiguration $configuration, int $shopId)
     {
         $versionsSetting = $this->getShopConfigurationSetting($shopId);

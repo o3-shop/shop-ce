@@ -34,4 +34,13 @@ final class DIServiceWrapperTest extends TestCase
         $service = new DIServiceWrapper(TestEventSubscriber::class, []);
         $this->assertTrue($service->isShopAware());
     }
+
+    public function testAddActiveShopsDoesNotDuplicateShopIds()
+    {
+        $service = new DIServiceWrapper(TestEventSubscriber::class, []);
+
+        $service->addActiveShops([1]);
+
+        $this->assertSame([1], $service->addActiveShops([1]));
+    }
 }
