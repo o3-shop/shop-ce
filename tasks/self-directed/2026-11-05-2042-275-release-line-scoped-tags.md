@@ -63,3 +63,8 @@ Maintainer asked for #274's convention: one line per shop line, `vX.Y.n`, `main`
 - Mutation checks for every guard: each goes red without it. Final gate: 9980 tests OK,
   coverage 90.65%, cs-fixer 0; dry-run unchanged (paypal-checkout v1.0.1, paypal-client v1.0.0).
 - Commits: ec221832 (code), memory docs commit.
+- /mr-review: 1 WARNING (internal name in this log, tasks/ not export-ignored) fixed in
+  81583dba/e05f0e0b; 4 INFO (2 deferred to follow-ups, 1 fixed, 1 answered). PR marked ready.
+- Maintainer asked to resolve all threads: answered the 2 deferred INFO threads, resolved all 5.
+- 9ab122b0: memory aligned with the #274 decision (metapackage keeps exact pins).
+- Docs item (#276, o3-documentation#13) logged in the session handoff; that public repo gets no tasks/ folder.
