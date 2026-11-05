@@ -26,7 +26,8 @@ namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer;
  * Maps composer package names to their GitHub repo slugs. The
  * default is identity (`o3-shop/<name>`), but a few o3-shop repos
  * use mixed-case GitHub names while their composer package names
- * are all-lowercase. raw.githubusercontent.com URLs and
+ * are all-lowercase, and paypal-checkout lives in the paypal-module
+ * repo. raw.githubusercontent.com URLs and
  * `git ls-remote` are both case-sensitive, so every place that
  * builds a GitHub URL from a package name resolves through this.
  */
@@ -37,6 +38,7 @@ final class PackageRepoSlug
         'o3-shop/mink-selenium-driver' => 'o3-shop/MinkSeleniumDriver',
         'o3-shop/php-selenium' => 'o3-shop/PHP-Selenium',
         'o3-shop/o3-theme' => 'o3-shop/o3-Theme',
+        'o3-shop/paypal-checkout' => 'o3-shop/paypal-module',
     ];
 
     public static function resolve(string $packageName): string
