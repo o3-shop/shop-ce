@@ -42,9 +42,6 @@ class DefaultBranchResolverTest extends TestCase
         // A repo-name key never matches a package and falls back to main
         // (the paypal-module bug); keys must be composer package names.
         foreach (PackageRepoSlug::RENAMES as $package => $repo) {
-            if ($repo === $package) {
-                continue;
-            }
             $this->assertArrayNotHasKey($repo, DefaultBranchResolver::PACKAGE_TO_BRANCH, $repo . ' is a GitHub repo name; key it as ' . $package);
         }
     }
