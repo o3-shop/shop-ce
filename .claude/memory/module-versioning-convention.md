@@ -32,10 +32,14 @@ write-up: docs.o3-shop.com "Module versioning" (o3-shop/o3-documentation#13, #27
 
 **Status (2026-11-05):** `o3-shop/paypal-checkout` (repo `paypal-module`, fork of OXID's
 `osc_paypal`) is the first module on this convention; the others (gdpr-optin-module,
-usercentrics, …) follow. Not done yet: paypal-module still releases from `b-1.0` (tags
-`v1.0.x`), has shop-ce only in `require-dev` (`^1.7`), and the metapackage pins it exactly
-(`v1.0.1`). GitHub default branches are still `b-1.0` (paypal-module) and `b-7.0.x`
-(paypal-client), not `main`. paypal-client also has a divergent old `b-1.0` (4 ahead / 96
+usercentrics, …) follow. Done 2026-11-05: paypal-module has protected `b-1.7` (shop-ce
+`~1.7.0` in `require`, `metadata.php` 1.7.0) and `b-2.0` (`~2.0.0`, 2.0.0, untested on a 2.0
+shop); default branch `main` (still `v1.0.1` = `b-1.0` until `v1.7.0`'s merge-back); the map
+points at `b-1.7`. **The first release after that needs `--bump paypal-checkout=v1.7.0`**
+(no `v1.7.*` tag yet → `Plan failed:` otherwise). The metapackage pins it exactly (`v1.0.1`
+until then). No `b-1.6`/`b-1.5` yet: shop 1.5 ships the classic `o3-shop/paypal-module`
+(repo `o3-shop/paypal`), the 1.6 metapackage has no PayPal Checkout; `b-1.0-1.6-support`
+holds the old 1.6 patch. paypal-client also has a divergent old `b-1.0` (4 ahead / 96
 behind `b-7.0.x`; its `setTrackingId()` commit is not on `b-7.0.x`); never map it there. paypal-client's `main` is still the stale 2022 branch: reset it to `b-7.0.x`
 before its next cut in a final release, or that release opens a merge-back into it.
 
@@ -43,7 +47,7 @@ before its next cut in a final release, or that release opens a merge-back into 
 opt-in list. For those, on a `b-X.Y` branch only `vX.Y.*` tags count as the latest tag, and
 `TagCutter` refuses any new tag outside the line or not above the line's latest tag. An
 opted-in package mapped to anything but `b-X.Y` (`main` included, which is also the fallback
-for a missing map key) is a `Plan failed:` error. paypal-checkout's `b-1.0` counts as line `v1.0.*` (patch bumps only). The module's shop-ce
+for a missing map key) is a `Plan failed:` error. The module's shop-ce
 `~X.Y.0` constraint is convention, not checked; `ConstraintUpdater` keeps
 whatever operator a pin already has. A line that starts with an RC (`v1.7.0-RC1`) gets
 `v1.7.1` as its first final from a patch bump; use `--bump <slug>=v1.7.0` for `v1.7.0`.
