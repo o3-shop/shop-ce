@@ -84,3 +84,16 @@ from `main` get no merge-back; `MergeBackPrGate` matches by title only
 merge-back no longer stops the others: the run reports all failures at the
 end. `MergeBackPolicy::BASE_BRANCH` holds "main" for the skip and the PR base;
 the title pattern and the gate's search string still spell it out.
+
+## A new package missing from the map silently releases from `main` (2026-11-05)
+
+`DefaultBranchResolver` falls back to `main` for any package not in the map, and
+the map is keyed by **package name**, not GitHub repo. When PayPal Checkout became
+a default package (shop-ce 32cbabd3), two packages fell through:
+`o3-shop/paypal-checkout` (map had the repo name `o3-shop/paypal-module`) → 404 on
+a missing `main`; and `o3-shop/paypal-client`, whose real line is `b-7.0.x` but
+which has a stale 2022 `main` (96 commits behind `v1.0.0`) → the dry-run planned
+to cut `v1.0.1` from that stale `main`. Whenever a package joins the tree, add it
+to the map in the same PR, and in the dry-run check every new package's branch
+against its repo's default branch and its latest tag. Both PayPal entries were
+fixed in o3-shop/o3-shop#275; see [[module-versioning-convention]].
