@@ -48,8 +48,9 @@ class ReleaseLineTest extends TestCase
         ReleaseLine::tagPrefix('o3-shop/paypal-checkout', 'b-7.0.x');
     }
 
-    public function testPreConventionLineOfPaypalCheckoutIsVersionedAsItsOwnLine(): void
+    public function testAnyLineBranchShapeYieldsItsOwnPrefix(): void
     {
+        // b-1.0 is paypal-checkout's pre-convention line; the shape alone decides.
         $this->assertSame('v1.0.', ReleaseLine::tagPrefix('o3-shop/paypal-checkout', 'b-1.0'));
     }
 

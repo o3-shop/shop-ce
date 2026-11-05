@@ -33,7 +33,7 @@ class DefaultBranchResolverTest extends TestCase
     {
         // The repo is o3-shop/paypal-module, but the planner looks up the
         // composer package name; a repo-name key falls through to main.
-        $this->assertSame('b-1.0', (new DefaultBranchResolver())('o3-shop/paypal-checkout'));
+        $this->assertSame('b-1.7', (new DefaultBranchResolver())('o3-shop/paypal-checkout'));
         $this->assertArrayNotHasKey('o3-shop/paypal-module', DefaultBranchResolver::PACKAGE_TO_BRANCH);
     }
 
