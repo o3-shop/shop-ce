@@ -51,8 +51,8 @@ final class ReleaseLine
      * line-versioned and $branch is a line branch (`b-1.7`); null when the
      * package is not line-versioned.
      *
-     * `b-1.0` of paypal-checkout is its pre-convention line: it gets
-     * `v1.0.*`, i.e. patch bumps only, until the map moves to `b-1.7`.
+     * The prefix follows the branch name alone, so paypal-checkout's
+     * pre-convention `b-1.0` would get `v1.0.*`.
      *
      * @throws LogicException for a line-versioned package on any other
      *         branch, `main` included (the fallback for a missing map key;

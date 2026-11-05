@@ -23,27 +23,35 @@ write-up: docs.o3-shop.com "Module versioning" (o3-shop/o3-documentation#13, #27
    rewritten by `bin/release`: decided on #274 because a `~X.Y.0` pin is never rewritten
    by `ConstraintUpdater` (shop tags would stop recording the shipped module version) and
    `TagFromConstraint` would read it as `vX.Y.0` (release notes always from `.0`).
-   Older lines' merge-back PRs into `main` are closed unmerged; only the newest line's is
-   merged.
-4. **`main` = the newest line.** Protected, never committed to directly; moved by the
+   Older lines' merge-back PRs into `main` are closed unmerged; only the newest
+   **released** line's is merged.
+4. **`main` = the newest released line.** An unreleased line (e.g. `b-2.0` before shop 2.0
+   ships) doesn't count, so `v1.7.0`'s merge-back is merged. Protected, never committed to directly; moved by the
    merge-back PRs `bin/release` opens for final releases. Default branch = `main`.
 5. **Shop-independent libraries** (e.g. `o3-shop/paypal-client`, a pure PayPal REST
    client) keep a single line, no shop constraint.
 
 **Status (2026-11-05):** `o3-shop/paypal-checkout` (repo `paypal-module`, fork of OXID's
 `osc_paypal`) is the first module on this convention; the others (gdpr-optin-module,
-usercentrics, …) follow. Not done yet: paypal-module still releases from `b-1.0` (tags
-`v1.0.x`), has shop-ce only in `require-dev` (`^1.7`), and the metapackage pins it exactly
-(`v1.0.1`). GitHub default branches are still `b-1.0` (paypal-module) and `b-7.0.x`
-(paypal-client), not `main`. paypal-client also has a divergent old `b-1.0` (4 ahead / 96
-behind `b-7.0.x`; its `setTrackingId()` commit is not on `b-7.0.x`); never map it there. paypal-client's `main` is still the stale 2022 branch: reset it to `b-7.0.x`
-before its next cut in a final release, or that release opens a merge-back into it.
+usercentrics, …) follow. Done 2026-11-05: paypal-module has protected `b-1.7` (shop-ce
+`~1.7.0` in `require`, `metadata.php` 1.7.0) and `b-2.0` (`~2.0.0`, 2.0.0, untested on a 2.0
+shop); default branch `main` (still `v1.0.1` = `b-1.0` until `v1.7.0`'s merge-back); the map
+points at `b-1.7`. **The first release after that needs an exact bump** (no `v1.7.*` tag yet
+→ `Plan failed:` otherwise): `--bump paypal-checkout=v1.7.0` cuts a final module tag even
+in a shop RC run (fine for the module; use `v1.7.0-RC1` only if the module itself should be
+a pre-release, and then pass `=v1.7.0` again for the final, or a patch bump gives `v1.7.1`).
+`bin/release` never updates `metadata.php`: bump it by hand before each module release. The metapackage pins it exactly (`v1.0.1`
+until then). No `b-1.6`/`b-1.5` yet: shop 1.5 ships the classic `o3-shop/paypal-module`
+(repo `o3-shop/paypal`), the 1.6 metapackage has no PayPal Checkout; `b-1.0-1.6-support`
+holds the old 1.6 patch. paypal-client also has a divergent old `b-1.0` (4 ahead / 96
+behind `b-7.0.x`; its `setTrackingId()` commit is not on `b-7.0.x`); never map it there. paypal-client's `main` was reset to `b-7.0.x` on 2026-11-05 (the stale 2022 commit is
+kept as `archive/main-2022`); paypal-module's 58 upstream-only branches were pruned (#274).
 
 **What bin/release enforces (tags only):** `ReleaseLine::LINE_VERSIONED_PACKAGES` is the
 opt-in list. For those, on a `b-X.Y` branch only `vX.Y.*` tags count as the latest tag, and
 `TagCutter` refuses any new tag outside the line or not above the line's latest tag. An
 opted-in package mapped to anything but `b-X.Y` (`main` included, which is also the fallback
-for a missing map key) is a `Plan failed:` error. paypal-checkout's `b-1.0` counts as line `v1.0.*` (patch bumps only). The module's shop-ce
+for a missing map key) is a `Plan failed:` error. The module's shop-ce
 `~X.Y.0` constraint is convention, not checked; `ConstraintUpdater` keeps
 whatever operator a pin already has. A line that starts with an RC (`v1.7.0-RC1`) gets
 `v1.7.1` as its first final from a patch bump; use `--bump <slug>=v1.7.0` for `v1.7.0`.

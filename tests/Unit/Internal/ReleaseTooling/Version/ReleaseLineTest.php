@@ -32,6 +32,9 @@ class ReleaseLineTest extends TestCase
     {
         $this->assertSame('v1.7.', ReleaseLine::tagPrefix('o3-shop/paypal-checkout', 'b-1.7'));
         $this->assertSame('v2.0.', ReleaseLine::tagPrefix('o3-shop/paypal-checkout', 'b-2.0'));
+        // The shape alone decides, also for paypal-checkout's pre-convention line.
+        $this->assertSame('v1.0.', ReleaseLine::tagPrefix('o3-shop/paypal-checkout', 'b-1.0'));
+        $this->assertSame('v1.10.', ReleaseLine::tagPrefix('o3-shop/paypal-checkout', 'b-1.10'));
     }
 
     public function testLineVersionedPackageOnMainIsAMappingError(): void
@@ -46,11 +49,6 @@ class ReleaseLineTest extends TestCase
         // OXID-style names would otherwise switch the line check off silently.
         $this->expectException(LogicException::class);
         ReleaseLine::tagPrefix('o3-shop/paypal-checkout', 'b-7.0.x');
-    }
-
-    public function testPreConventionLineOfPaypalCheckoutIsVersionedAsItsOwnLine(): void
-    {
-        $this->assertSame('v1.0.', ReleaseLine::tagPrefix('o3-shop/paypal-checkout', 'b-1.0'));
     }
 
     public function testPackageNotOptedInHasNoPrefix(): void
