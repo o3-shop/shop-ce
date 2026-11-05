@@ -23,9 +23,10 @@ write-up: docs.o3-shop.com "Module versioning" (o3-shop/o3-documentation#13, #27
    rewritten by `bin/release`: decided on #274 because a `~X.Y.0` pin is never rewritten
    by `ConstraintUpdater` (shop tags would stop recording the shipped module version) and
    `TagFromConstraint` would read it as `vX.Y.0` (release notes always from `.0`).
-   Older lines' merge-back PRs into `main` are closed unmerged; only the newest line's is
-   merged.
-4. **`main` = the newest line.** Protected, never committed to directly; moved by the
+   Older lines' merge-back PRs into `main` are closed unmerged; only the newest
+   **released** line's is merged.
+4. **`main` = the newest released line.** An unreleased line (e.g. `b-2.0` before shop 2.0
+   ships) doesn't count, so `v1.7.0`'s merge-back is merged. Protected, never committed to directly; moved by the
    merge-back PRs `bin/release` opens for final releases. Default branch = `main`.
 5. **Shop-independent libraries** (e.g. `o3-shop/paypal-client`, a pure PayPal REST
    client) keep a single line, no shop constraint.
@@ -35,8 +36,11 @@ write-up: docs.o3-shop.com "Module versioning" (o3-shop/o3-documentation#13, #27
 usercentrics, …) follow. Done 2026-11-05: paypal-module has protected `b-1.7` (shop-ce
 `~1.7.0` in `require`, `metadata.php` 1.7.0) and `b-2.0` (`~2.0.0`, 2.0.0, untested on a 2.0
 shop); default branch `main` (still `v1.0.1` = `b-1.0` until `v1.7.0`'s merge-back); the map
-points at `b-1.7`. **The first release after that needs `--bump paypal-checkout=v1.7.0`**
-(no `v1.7.*` tag yet → `Plan failed:` otherwise). The metapackage pins it exactly (`v1.0.1`
+points at `b-1.7`. **The first release after that needs an exact bump** (no `v1.7.*` tag yet
+→ `Plan failed:` otherwise): `--bump paypal-checkout=v1.7.0` cuts a final module tag even
+in a shop RC run (fine for the module; use `v1.7.0-RC1` only if the module itself should be
+a pre-release, and then pass `=v1.7.0` again for the final, or a patch bump gives `v1.7.1`).
+`bin/release` never updates `metadata.php`: bump it by hand before each module release. The metapackage pins it exactly (`v1.0.1`
 until then). No `b-1.6`/`b-1.5` yet: shop 1.5 ships the classic `o3-shop/paypal-module`
 (repo `o3-shop/paypal`), the 1.6 metapackage has no PayPal Checkout; `b-1.0-1.6-support`
 holds the old 1.6 patch. paypal-client also has a divergent old `b-1.0` (4 ahead / 96
