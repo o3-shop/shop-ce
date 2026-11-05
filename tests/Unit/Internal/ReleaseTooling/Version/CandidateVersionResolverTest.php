@@ -226,6 +226,77 @@ class CandidateVersionResolverTest extends TestCase
         $this->assertSame(VersionResolution::CASE_UNCHANGED, $resolution->case());
         $this->assertSame('v1.0.4', $resolution->chosenVersion());
     }
+
+    /* ---------- Line-versioned packages (o3-shop/o3-shop#274) ---------- */
+
+    private function lineResolverWith(array $tags, string $branchName, ?string $branchHead): CandidateVersionResolver
+    {
+        $repos = new InMemoryRepoIntrospector([
+            'o3-shop/paypal-checkout' => [
+                'tags' => $tags,
+                'branches' => [$branchName => $branchHead],
+            ],
+        ]);
+        return new CandidateVersionResolver($repos);
+    }
+
+    public function testLineVersionedPackageIgnoresTagsOfOtherLines(): void
+    {
+        // b-1.7 sits exactly on v1.7.1. The newer line's v2.0.0 must not
+        // count, or the branch looks "beyond" it and v2.0.1 gets cut on b-1.7.
+        $resolver = $this->lineResolverWith(
+            ['v1.7.0' => 'sha-170', 'v1.7.1' => 'sha-171', 'v2.0.0' => 'sha-200'],
+            'b-1.7',
+            'sha-171',
+        );
+        $resolution = $resolver->resolve('o3-shop/paypal-checkout', 'v1.7.0', 'v1.7.3', 'b-1.7');
+
+        $this->assertSame(VersionResolution::CASE_USABLE_TAG, $resolution->case());
+        $this->assertSame('v1.7.1', $resolution->chosenVersion());
+        $this->assertSame('v1.7.1', $resolution->latestTag());
+    }
+
+    public function testLineVersionedPackageOnALineWithoutTagsHasNoLatestTag(): void
+    {
+        $resolver = $this->lineResolverWith(
+            ['v1.7.1' => 'sha-171'],
+            'b-2.0',
+            'sha-new',
+        );
+        $resolution = $resolver->resolve('o3-shop/paypal-checkout', 'v1.7.1', 'v2.0.0', 'b-2.0');
+
+        $this->assertSame(VersionResolution::CASE_NEEDS_NEW_TAG, $resolution->case());
+        $this->assertNull($resolution->latestTag());
+        $this->assertStringContainsString('--bump paypal-checkout=v2.0.0', implode(' ', $resolution->notes()));
+    }
+
+    public function testLineVersionedPackageOnMainIsRefusedNotResolvedRepoWide(): void
+    {
+        // main is DefaultBranchResolver's fallback for a missing key; resolving
+        // there would silently use every line's tags again.
+        $resolver = $this->lineResolverWith(
+            ['v1.7.1' => 'sha-171', 'v2.0.0' => 'sha-200'],
+            'main',
+            'sha-200',
+        );
+        $this->expectException(\LogicException::class);
+        $resolver->resolve('o3-shop/paypal-checkout', 'v2.0.0', 'v2.0.1', 'main');
+    }
+
+    public function testPackageNotOptedInKeepsTheHighestTagOfTheRepo(): void
+    {
+        // Shop-line repos branch b-1.7 but tag their own versions (v1.2.x);
+        // scoping them to v1.7.* would find no tag at all.
+        $resolver = $this->resolverWith(
+            ['v1.2.5' => 'sha-125', 'v1.2.6' => 'sha-126'],
+            'sha-126',
+            'b-1.7',
+        );
+        $resolution = $resolver->resolve('o3-shop/shop-facts', 'v1.2.6', 'v1.7.3', 'b-1.7');
+
+        $this->assertSame(VersionResolution::CASE_UNCHANGED, $resolution->case());
+        $this->assertSame('v1.2.6', $resolution->latestTag());
+    }
 }
 
 /**
