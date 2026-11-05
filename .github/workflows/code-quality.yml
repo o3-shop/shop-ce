@@ -302,7 +302,8 @@ jobs:
 
   e2e:
     name: E2E (Playwright, native)
-    runs-on: ubuntu-latest
+    # ponytail: ondrej/php PPA has no 26.04 release; move PHP install to packages.sury.org, then unpin
+    runs-on: ubuntu-24.04
     # ── Native e2e — NOT in the PHP matrix ────────────────────────────────────
     # Replicates the docker entrypoint's provisioning (composer + satellites +
     # bin/o3-setup + themes) directly on the runner, serves the shop with Apache
