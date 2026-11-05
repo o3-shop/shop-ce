@@ -38,6 +38,15 @@ namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning;
  * direction, a local checkout sitting on the wrong branch. The other
  * groups — `b-1.0`, `b-7.0.x`, `b-6.5.x`, `support/2.6`, `main` —
  * version independently of the shop line and do not move with it.
+ * Exception: line-versioned modules (ReleaseLine, o3-shop/o3-shop#274)
+ * get one `b-X.Y` branch per shop line and map to the line of the shop
+ * being released, i.e. the same `b-X.Y` as the shop-line group above
+ * (never `main`, never a newer line); paypal-checkout sits on its
+ * pre-convention `b-1.0` until `b-1.7` exists.
+ *
+ * Keys are composer package names, never GitHub repo names
+ * (PackageRepoSlug::RENAMES): a repo-name key never matches and the
+ * package silently falls back to `main`.
  *
  * Repos not in the map fall back to `main`.
  */
@@ -55,7 +64,9 @@ final class DefaultBranchResolver
         'o3-shop/shop-doctrine-migration-wrapper' => 'b-1.7',
         'o3-shop/shop-demodata-installer' => 'b-1.7',
         'o3-shop/gdpr-optin-module' => 'b-1.0',
-        'o3-shop/paypal-module' => 'b-1.0',
+        // Keyed by composer package name, not GitHub repo (repo: paypal-module).
+        // Line-versioned (ReleaseLine): moves to b-1.7 once that branch exists.
+        'o3-shop/paypal-checkout' => 'b-1.0',
         'o3-shop/usercentrics' => 'b-1.0',
         'o3-shop/codeception-modules' => 'b-1.0',
         'o3-shop/php-selenium' => 'b-1.0',
@@ -68,6 +79,8 @@ final class DefaultBranchResolver
         'o3-shop/smarty' => 'support/2.6',
         'o3-shop/mink-selenium-driver' => 'b-7.0.x',
         'o3-shop/developer-tools' => 'b-7.0.x',
+        // Its main is a stale 2022 branch; never fall back to it.
+        'o3-shop/paypal-client' => 'b-7.0.x',
         'o3-shop/codeception-page-objects' => 'b-6.5.x',
     ];
 

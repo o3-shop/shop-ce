@@ -292,6 +292,62 @@ class TagCutterTest extends TestCase
         );
         $this->assertSame('v1.0.0', $r->newTag());
     }
+
+    /* ---------- Line-versioned packages (o3-shop/o3-shop#274) ---------- */
+
+    public function testLineVersionedPackageTakesAPatchBumpOnItsLine(): void
+    {
+        $r = $this->cutter()->cut('o3-shop/paypal-checkout', 'v1.7.1', 'v1.7.3-RC2', [], 'b-1.7');
+        $this->assertSame('v1.7.2', $r->newTag());
+    }
+
+    public function testLineVersionedPackageRefusesAMinorBumpOffItsLine(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('outside release line b-1.7');
+        $this->cutter()->cut('o3-shop/paypal-checkout', 'v1.7.1', 'v1.7.3', ['paypal-checkout' => 'minor'], 'b-1.7');
+    }
+
+    public function testLineVersionedPackageRefusesANextBumpFileOffItsLine(): void
+    {
+        $cutter = $this->cutter(['o3-shop/paypal-checkout|b-1.7|.next-bump' => "major\n"]);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('outside release line b-1.7');
+        $cutter->cut('o3-shop/paypal-checkout', 'v1.7.1', 'v1.7.3', [], 'b-1.7');
+    }
+
+    public function testLineVersionedPackageRefusesAnExactBumpOfAnotherLine(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('outside release line b-1.7');
+        $this->cutter()->cut('o3-shop/paypal-checkout', 'v1.7.1', 'v1.7.3', ['paypal-checkout' => 'v2.0.0'], 'b-1.7');
+    }
+
+    public function testLineVersionedPackageWithoutATagOnItsLineNamesTheFirstTagBump(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('--bump paypal-checkout=v2.0.0');
+        $this->cutter()->cut('o3-shop/paypal-checkout', null, 'v2.0.0', [], 'b-2.0');
+    }
+
+    public function testLineVersionedPackageRefusesAnExactBumpThatIsNotAboveTheLatestTag(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('not above the latest tag v1.7.3');
+        $this->cutter()->cut('o3-shop/paypal-checkout', 'v1.7.3', 'v1.7.4', ['paypal-checkout' => 'v1.7.0'], 'b-1.7');
+    }
+
+    public function testLineVersionedPackageAcceptsAFinalAfterItsRcOnTheSameVersion(): void
+    {
+        $r = $this->cutter()->cut('o3-shop/paypal-checkout', 'v1.7.0-RC1', 'v1.7.0', ['paypal-checkout' => 'v1.7.0'], 'b-1.7');
+        $this->assertSame('v1.7.0', $r->newTag());
+    }
+
+    public function testLineVersionedPackageTakesItsFirstTagFromAnExactBump(): void
+    {
+        $r = $this->cutter()->cut('o3-shop/paypal-checkout', null, 'v2.0.0', ['paypal-checkout' => 'v2.0.0'], 'b-2.0');
+        $this->assertSame('v2.0.0', $r->newTag());
+    }
 }
 
 /**
