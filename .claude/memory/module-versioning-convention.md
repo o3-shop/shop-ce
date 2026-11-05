@@ -7,7 +7,7 @@ type: project
 # Module versioning: one release line per shop line
 
 Decided by Ralf Trapp on 2026-11-05 (o3-shop/o3-shop#274; tooling #275). Public
-write-up: o3-shop/o3-documentation, "Module versioning" page (PR for #274, pending
+write-up: docs.o3-shop.com "Module versioning" (o3-shop/o3-documentation#13, #276; open
 2026-11-05).
 
 **The standard**, for every module whose code depends on the shop version:
@@ -18,8 +18,13 @@ write-up: o3-shop/o3-documentation, "Module versioning" page (PR for #274, pendi
    `v1.7.0`, `v1.7.1`, …). Only the patch counts independently. Never a minor/major
    bump inside a line.
 3. **Each line declares its shop:** `"o3-shop/shop-ce": "~X.Y.0"` in the module's
-   `composer.json`; the metapackage on `b-X.Y` requires the module with `~X.Y.0`.
-   Composer then picks the right module line for any shop.
+   `composer.json` (in `require`), so Composer refuses a module line that doesn't fit the
+   shop. The metapackage keeps **exact** pins (`"o3-shop/paypal-checkout": "v1.7.4"`),
+   rewritten by `bin/release`: decided on #274 because a `~X.Y.0` pin is never rewritten
+   by `ConstraintUpdater` (shop tags would stop recording the shipped module version) and
+   `TagFromConstraint` would read it as `vX.Y.0` (release notes always from `.0`).
+   Older lines' merge-back PRs into `main` are closed unmerged; only the newest line's is
+   merged.
 4. **`main` = the newest line.** Protected, never committed to directly; moved by the
    merge-back PRs `bin/release` opens for final releases. Default branch = `main`.
 5. **Shop-independent libraries** (e.g. `o3-shop/paypal-client`, a pure PayPal REST
@@ -38,8 +43,8 @@ before its next cut in a final release, or that release opens a merge-back into 
 opt-in list. For those, on a `b-X.Y` branch only `vX.Y.*` tags count as the latest tag, and
 `TagCutter` refuses any new tag outside the line or not above the line's latest tag. An
 opted-in package mapped to anything but `b-X.Y` (`main` included, which is also the fallback
-for a missing map key) is a `Plan failed:` error. paypal-checkout's `b-1.0` counts as line `v1.0.*` (patch bumps only). The composer constraints (shop-ce
-`~X.Y.0`, the metapackage's `~X.Y.0`) are convention, not checked; `ConstraintUpdater` keeps
+for a missing map key) is a `Plan failed:` error. paypal-checkout's `b-1.0` counts as line `v1.0.*` (patch bumps only). The module's shop-ce
+`~X.Y.0` constraint is convention, not checked; `ConstraintUpdater` keeps
 whatever operator a pin already has. A line that starts with an RC (`v1.7.0-RC1`) gets
 `v1.7.1` as its first final from a patch bump; use `--bump <slug>=v1.7.0` for `v1.7.0`.
 The first tag of a new line is an exact bump: `--bump paypal-checkout=v2.0.0`. Moving a module onto the convention =
