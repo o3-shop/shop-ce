@@ -24,6 +24,11 @@ services:
     arguments:
       $classExtensionChainService: '@oxid_esales.module.setup.class_extension_chain_service'
 
+  OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleConfigurationRefreshServiceInterface:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleConfigurationRefreshService
+    arguments:
+      $classExtensionChainService: '@oxid_esales.module.setup.class_extension_chain_service'
+
   OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleConfigurationHandlingServiceInterface:
     class: OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleConfigurationHandlingService
     calls:

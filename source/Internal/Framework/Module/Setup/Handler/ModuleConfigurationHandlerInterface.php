@@ -38,4 +38,18 @@ interface ModuleConfigurationHandlerInterface
      * @param int                 $shopId
      */
     public function handleOnModuleDeactivation(ModuleConfiguration $configuration, int $shopId);
+
+    /**
+     * Re-derives this handler's settings for an already active module from the given
+     * configuration, so the shop follows metadata changes made after the module was
+     * activated (an in-place update or a patched module).
+     *
+     * Must be idempotent and must not change the module's activation state. Handlers
+     * holding values configured by the shop owner (module settings) must not touch
+     * them.
+     *
+     * @param ModuleConfiguration $configuration
+     * @param int                 $shopId
+     */
+    public function handleOnModuleRefresh(ModuleConfiguration $configuration, int $shopId);
 }

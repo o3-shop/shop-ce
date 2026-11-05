@@ -69,6 +69,18 @@ class ControllersModuleSettingHandler implements ModuleConfigurationHandlerInter
      * @param ModuleConfiguration $configuration
      * @param int                 $shopId
      */
+    public function handleOnModuleRefresh(ModuleConfiguration $configuration, int $shopId)
+    {
+        // Activation is guarded by hasControllers(), so a controller removed from the
+        // configuration would survive it. Deactivate first to re-derive the full list.
+        $this->handleOnModuleDeactivation($configuration, $shopId);
+        $this->handleOnModuleActivation($configuration, $shopId);
+    }
+
+    /**
+     * @param ModuleConfiguration $configuration
+     * @param int                 $shopId
+     */
     public function handleOnModuleDeactivation(ModuleConfiguration $configuration, int $shopId)
     {
         $shopControllers = $this->getShopConfigurationSetting($shopId);
