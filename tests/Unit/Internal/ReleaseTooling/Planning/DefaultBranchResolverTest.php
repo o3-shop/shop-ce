@@ -46,6 +46,16 @@ class DefaultBranchResolverTest extends TestCase
         }
     }
 
+    public function testEveryLineVersionedPackageIsMappedToTheShopLine(): void
+    {
+        // Mapping a module to a newer line than the shop (e.g. b-2.0 while the
+        // shop releases from b-1.7) would cut v2.0.n into a 1.7.x release.
+        $shopLine = DefaultBranchResolver::PACKAGE_TO_BRANCH['o3-shop/shop-ce'];
+        foreach (ReleaseLine::LINE_VERSIONED_PACKAGES as $package) {
+            $this->assertSame($shopLine, DefaultBranchResolver::PACKAGE_TO_BRANCH[$package] ?? null, $package);
+        }
+    }
+
     public function testEveryLineVersionedPackageIsMappedToALineBranch(): void
     {
         foreach (ReleaseLine::LINE_VERSIONED_PACKAGES as $package) {
@@ -54,7 +64,7 @@ class DefaultBranchResolverTest extends TestCase
         }
     }
 
-    public function testPaypalClientReleasesFromItsLineNotTheStaleMain(): void
+    public function testPaypalClientReleasesFromItsReleaseLine(): void
     {
         $this->assertSame('b-7.0.x', (new DefaultBranchResolver())('o3-shop/paypal-client'));
     }

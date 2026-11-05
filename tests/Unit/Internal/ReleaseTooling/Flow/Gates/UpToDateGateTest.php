@@ -59,6 +59,7 @@ final class UpToDateGateTest extends TestCase
             'git rev-list --left-right --count origin/b-1.6...HEAD'
                 => new ProcessOutcome(0, "5\t0", ''),
             'git status --porcelain' => new ProcessOutcome(0, '', ''),
+            'git rev-parse --abbrev-ref HEAD' => new ProcessOutcome(0, "b-1.6\n", ''),
             'git merge --ff-only origin/b-1.6' => new ProcessOutcome(0, "Fast-forward\n", ''),
         ]);
         $gate = new UpToDateGate($exec);
@@ -74,6 +75,26 @@ final class UpToDateGateTest extends TestCase
             ['git', 'merge', '--ff-only', 'origin/b-1.6'],
             $exec->commands()
         );
+    }
+
+    public function testBehindOnlyDoesNotFastForwardAnotherCheckedOutBranch(): void
+    {
+        // PreFlightRunner runs every gate even after BranchGate aborts. A clone
+        // still on an old release branch (b-1.0) whose successor line (b-1.7)
+        // is ahead of it must not get b-1.7's commits merged into b-1.0.
+        $exec = new FakeProcessExecutor([
+            'git fetch origin b-1.7' => new ProcessOutcome(0, '', ''),
+            'git rev-list --left-right --count origin/b-1.7...HEAD'
+                => new ProcessOutcome(0, "1\t0", ''),
+            'git status --porcelain' => new ProcessOutcome(0, '', ''),
+            'git rev-parse --abbrev-ref HEAD' => new ProcessOutcome(0, "b-1.0\n", ''),
+        ]);
+        $gate = new UpToDateGate($exec);
+        $outcome = $gate->evaluate('/tmp/repo', 'b-1.7', 'o3-shop/paypal-checkout');
+
+        $this->assertSame(GateOutcome::STATUS_ABORT, $outcome->status());
+        $this->assertStringContainsString("checked out is 'b-1.0'", implode("\n", $outcome->messages()));
+        $this->assertNotContains(['git', 'merge', '--ff-only', 'origin/b-1.7'], $exec->commands());
     }
 
     public function testBehindOnlyDoesNotTouchDirtyTree(): void
@@ -105,6 +126,7 @@ final class UpToDateGateTest extends TestCase
             'git rev-list --left-right --count origin/b-1.6...HEAD'
                 => new ProcessOutcome(0, "1\t0", ''),
             'git status --porcelain' => new ProcessOutcome(0, '', ''),
+            'git rev-parse --abbrev-ref HEAD' => new ProcessOutcome(0, "b-1.6\n", ''),
             'git merge --ff-only origin/b-1.6'
                 => new ProcessOutcome(128, '', "fatal: Not possible to fast-forward, aborting.\n"),
         ]);
