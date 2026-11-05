@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\Command;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Command\RefreshModuleSettingsCommand;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Command\ShopConfigurationBackupService;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Cache\ShopConfigurationCacheInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ProjectConfigurationDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
@@ -453,7 +454,7 @@ final class RefreshModuleSettingsCommandTest extends TestCase
 
             $this->assertSame(1, $tester->getStatusCode());
             $this->assertStringContainsString(
-                'Another oe:module:refresh-settings run is already in progress.',
+                'Another module configuration command is already in progress.',
                 $tester->getDisplay()
             );
         } finally {
@@ -537,7 +538,13 @@ final class RefreshModuleSettingsCommandTest extends TestCase
             $metadataDao,
             $context,
             $handlingService ?? $this->createMock(ModuleConfigurationHandlingServiceInterface::class),
-            $shopConfigurationCache ?? $this->createMock(ShopConfigurationCacheInterface::class)
+            new ShopConfigurationBackupService(
+                $context,
+                $projectConfigurationDao,
+                $shopConfigurationCache ?? $this->createMock(ShopConfigurationCacheInterface::class),
+                $stateService,
+                $refreshService
+            )
         );
 
         return new CommandTester($command);

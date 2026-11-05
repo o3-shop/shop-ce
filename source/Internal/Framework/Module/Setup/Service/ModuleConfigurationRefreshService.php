@@ -109,19 +109,23 @@ class ModuleConfigurationRefreshService implements ModuleConfigurationRefreshSer
         $failures = [];
         $projectConfiguration = $this->projectConfigurationDao->getConfiguration();
 
+        // Collect the active shops before refreshing any of them: a state lookup that
+        // fails (no database yet) must surface before the first shop was written to.
+        $moduleConfigurations = [];
         foreach ($projectConfiguration->getShopConfigurationIds() as $shopId) {
             $shopConfiguration = $projectConfiguration->getShopConfiguration($shopId);
 
-            if (!$shopConfiguration->hasModuleConfiguration($moduleId)) {
-                continue;
+            if (
+                $shopConfiguration->hasModuleConfiguration($moduleId)
+                && $this->moduleStateService->isActive($moduleId, $shopId)
+            ) {
+                $moduleConfigurations[$shopId] = $shopConfiguration->getModuleConfiguration($moduleId);
             }
+        }
 
-            if (!$this->moduleStateService->isActive($moduleId, $shopId)) {
-                continue;
-            }
-
+        foreach ($moduleConfigurations as $shopId => $moduleConfiguration) {
             try {
-                $this->refresh($shopConfiguration->getModuleConfiguration($moduleId), $shopId);
+                $this->refresh($moduleConfiguration, $shopId);
                 $refreshedShopIds[] = $shopId;
             } catch (\Throwable $exception) {
                 $failures[$shopId] = $exception->getMessage();

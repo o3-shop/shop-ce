@@ -37,6 +37,9 @@ services:
     tags:
       - { name: 'console.command', command: 'oe:module:rebuild-configuration' }
 
+  OxidEsales\EshopCommunity\Internal\Framework\Module\Command\ShopConfigurationBackupService:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Command\ShopConfigurationBackupService
+
   OxidEsales\EshopCommunity\Internal\Framework\Module\Command\RefreshModuleSettingsCommand:
     class: OxidEsales\EshopCommunity\Internal\Framework\Module\Command\RefreshModuleSettingsCommand
     tags:

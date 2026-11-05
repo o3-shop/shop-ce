@@ -47,6 +47,15 @@ final class ModuleConfigurationRefreshServiceTest extends TestCase
         $this->assertSame([2 => 'shop 2 broken'], $result['failures']);
     }
 
+    public function testRefreshActiveModuleWithFailuresChecksEveryShopBeforeRefreshingAny(): void
+    {
+        $service = $this->createService(null, 2);
+        $service->expects($this->never())->method('refresh');
+
+        $this->expectExceptionMessage('database is gone');
+        $service->refreshActiveModuleWithFailures('mymodule');
+    }
+
     public function testRefreshInvalidatesTheModuleCache(): void
     {
         $handlingService = $this->createMock(ModuleConfigurationHandlingServiceInterface::class);
@@ -81,8 +90,10 @@ final class ModuleConfigurationRefreshServiceTest extends TestCase
         return $this->createService($failingShopId);
     }
 
-    private function createService(?int $failingShopId = null): ModuleConfigurationRefreshService
-    {
+    private function createService(
+        ?int $failingShopId = null,
+        ?int $unreachableShopId = null
+    ): ModuleConfigurationRefreshService {
         $projectConfiguration = new ProjectConfiguration();
         foreach ([1, 2, 3] as $shopId) {
             $shopConfiguration = new ShopConfiguration();
@@ -94,7 +105,15 @@ final class ModuleConfigurationRefreshServiceTest extends TestCase
         $projectConfigurationDao->method('getConfiguration')->willReturn($projectConfiguration);
 
         $moduleStateService = $this->createMock(ModuleStateServiceInterface::class);
-        $moduleStateService->method('isActive')->willReturn(true);
+        $moduleStateService->method('isActive')->willReturnCallback(
+            function (string $moduleId, int $shopId) use ($unreachableShopId): bool {
+                if ($shopId === $unreachableShopId) {
+                    throw new \RuntimeException('database is gone');
+                }
+
+                return true;
+            }
+        );
 
         $service = $this->getMockBuilder(ModuleConfigurationRefreshService::class)
             ->setConstructorArgs([

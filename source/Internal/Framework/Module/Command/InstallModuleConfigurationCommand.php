@@ -23,8 +23,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Command;
 
+use Doctrine\DBAL\DBALException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ProjectConfigurationDaoInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ProjectConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ProjectConfigurationIsEmptyException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ModuleConfigurationInstallerInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\ModuleConfigurationDaoInterface;
@@ -43,8 +43,10 @@ class InstallModuleConfigurationCommand extends Command
 {
     public const MESSAGE_INSTALLATION_WAS_SUCCESSFUL = 'Module configuration has been installed.';
     public const MESSAGE_INSTALLATION_FAILED = 'An error occurred while installing module configuration.';
-    public const MESSAGE_REFRESH_FAILED = 'Module configuration was installed, but refreshing its settings ' .
-        'failed for some shops.';
+    public const MESSAGE_REFRESH_FAILED = 'Refreshing the module settings failed for some shops.';
+    public const MESSAGE_ROLLED_BACK = 'The module configuration installation was rolled back.';
+    public const MESSAGE_REFRESH_SKIPPED = 'The database is not reachable, so the settings of active modules were '
+        . 'not refreshed. Run oe:module:refresh-settings once the shop is set up.';
     public const MESSAGE_TARGET_PATH_IS_REQUIRED = 'The given module source path is not inside the shop modules ' .
         'directory. Please provide a second parameter with the modules ' .
         'target path inside the shop modules directory.';
@@ -75,24 +77,32 @@ class InstallModuleConfigurationCommand extends Command
     private $projectConfigurationDao;
 
     /**
+     * @var ShopConfigurationBackupService
+     */
+    private $shopConfigurationBackupService;
+
+    /**
      * @param ModuleConfigurationInstallerInterface $moduleConfigurationInstaller
      * @param BasicContextInterface $context
      * @param ModuleConfigurationDaoInterface $metadataModuleConfigurationDao
      * @param ModuleConfigurationRefreshServiceInterface $moduleConfigurationRefreshService
      * @param ProjectConfigurationDaoInterface $projectConfigurationDao
+     * @param ShopConfigurationBackupService $shopConfigurationBackupService
      */
     public function __construct(
         ModuleConfigurationInstallerInterface $moduleConfigurationInstaller,
         BasicContextInterface $context,
         ModuleConfigurationDaoInterface $metadataModuleConfigurationDao,
         ModuleConfigurationRefreshServiceInterface $moduleConfigurationRefreshService,
-        ProjectConfigurationDaoInterface $projectConfigurationDao
+        ProjectConfigurationDaoInterface $projectConfigurationDao,
+        ShopConfigurationBackupService $shopConfigurationBackupService
     ) {
         $this->moduleConfigurationInstaller = $moduleConfigurationInstaller;
         $this->context = $context;
         $this->metadataModuleConfigurationDao = $metadataModuleConfigurationDao;
         $this->moduleConfigurationRefreshService = $moduleConfigurationRefreshService;
         $this->projectConfigurationDao = $projectConfigurationDao;
+        $this->shopConfigurationBackupService = $shopConfigurationBackupService;
 
         parent::__construct();
     }
@@ -132,7 +142,7 @@ class InstallModuleConfigurationCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $lockHandle = $this->acquireLock($output);
+        $lockHandle = $this->shopConfigurationBackupService->acquireLock($output);
         if ($lockHandle === null) {
             return 1;
         }
@@ -155,28 +165,29 @@ class InstallModuleConfigurationCommand extends Command
                 $this->moduleConfigurationInstaller->install($moduleSourcePath, $moduleTargetPath);
                 $output->writeln('<info>' . self::MESSAGE_INSTALLATION_WAS_SUCCESSFUL . '</info>');
 
-                if ($this->refreshActiveModuleConfigurations($moduleSourcePath, $output) !== 0) {
-                    $this->restoreAndReport($backupDirectory, $output);
+                $touchedModules = $this->refreshActiveModuleConfigurations($moduleSourcePath, $output);
+                if ($touchedModules !== null) {
+                    $this->rollBack($backupDirectory, $touchedModules, $output);
 
                     return 1;
                 }
 
-                $this->deleteBackup($backupDirectory);
+                $this->shopConfigurationBackupService->discard($backupDirectory);
 
                 return 0;
             } catch (ModuleTargetPathIsMissingException $exception) {
                 $output->writeln('<error>' . self::MESSAGE_TARGET_PATH_IS_REQUIRED . '</error>');
-                $this->restoreAndReport($backupDirectory, $output);
+                $this->rollBack($backupDirectory, [], $output);
 
                 return 1;
             } catch (\Throwable $throwable) {
                 $output->writeln('<error>' . self::MESSAGE_INSTALLATION_FAILED . '</error>');
-                $this->restoreAndReport($backupDirectory, $output);
+                $this->rollBack($backupDirectory, [], $output);
 
                 throw $throwable;
             }
         } finally {
-            $this->releaseLock($lockHandle);
+            $this->shopConfigurationBackupService->releaseLock($lockHandle);
         }
     }
 
@@ -185,74 +196,67 @@ class InstallModuleConfigurationCommand extends Command
      * leave the shop on the settings it derived from the previous configuration: the
      * stored module settings are only written when a module is activated.
      *
+     * Without a reachable database (image build, provisioning before oe:setup) no module
+     * can be active yet, so the refresh is skipped and the install stays file-only.
+     *
      * @param string          $moduleSourcePath
      * @param OutputInterface $output
+     *
+     * @return array<int, string[]>|null null on success, otherwise the module ids per shop
+     *                                    whose DB state the refresh touched
      */
-    private function refreshActiveModuleConfigurations(string $moduleSourcePath, OutputInterface $output): int
+    private function refreshActiveModuleConfigurations(string $moduleSourcePath, OutputInterface $output): ?array
     {
         try {
             $moduleId = $this->metadataModuleConfigurationDao->get($moduleSourcePath)->getId();
             $result = $this->moduleConfigurationRefreshService->refreshActiveModuleWithFailures($moduleId);
+        } catch (DBALException $exception) {
+            $output->writeln('<comment>' . self::MESSAGE_REFRESH_SKIPPED . '</comment>');
+            $output->writeln(sprintf('<comment>  - %s</comment>', $exception->getMessage()));
+
+            return null;
         } catch (\Throwable $exception) {
             $output->writeln('<error>' . self::MESSAGE_REFRESH_FAILED . '</error>');
             $output->writeln(sprintf('<error>  - %s</error>', $exception->getMessage()));
 
-            return 1;
+            return [];
         }
 
         foreach ($result['refreshed'] as $shopId) {
             $output->writeln(sprintf('<info>Refreshed settings of %s in shop %d.</info>', $moduleId, $shopId));
         }
 
-        if ($result['failures'] !== []) {
-            $output->writeln('<error>' . self::MESSAGE_REFRESH_FAILED . '</error>');
-            foreach ($result['failures'] as $shopId => $message) {
-                $output->writeln(sprintf('<error>  - shop %d: %s</error>', $shopId, $message));
-            }
-
-            return 1;
-        }
-
-        return 0;
-    }
-
-    /**
-     * @return resource|null
-     */
-    private function acquireLock(OutputInterface $output)
-    {
-        // Same lock key as oe:module:refresh-settings: both write the same
-        // project configuration and must not interleave.
-        $lockFile = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR)
-            . DIRECTORY_SEPARATOR
-            . 'o3-refresh-settings-'
-            . md5($this->context->getProjectConfigurationDirectory())
-            . '.lock';
-        $handle = @fopen($lockFile, 'c');
-
-        if ($handle === false) {
-            $output->writeln(sprintf('<error>Could not open the lock file %s.</error>', $lockFile));
-
+        if ($result['failures'] === []) {
             return null;
         }
 
-        if (!flock($handle, LOCK_EX | LOCK_NB)) {
-            fclose($handle);
-            $output->writeln('<error>Another module configuration command is already in progress.</error>');
-
-            return null;
+        $output->writeln('<error>' . self::MESSAGE_REFRESH_FAILED . '</error>');
+        foreach ($result['failures'] as $shopId => $message) {
+            $output->writeln(sprintf('<error>  - shop %d: %s</error>', $shopId, $message));
         }
 
-        return $handle;
+        // A failed refresh may have written some DB rows before it threw, so the failed
+        // shops are reverted too, not only the ones that were refreshed completely.
+        $touchedModules = [];
+        foreach (array_merge($result['refreshed'], array_keys($result['failures'])) as $shopId) {
+            $touchedModules[$shopId] = [$moduleId];
+        }
+
+        return $touchedModules;
     }
 
     /**
-     * @param resource $handle
+     * @param array<int, string[]> $touchedModules
      */
-    private function releaseLock($handle): void
+    private function rollBack(?string $backupDirectory, array $touchedModules, OutputInterface $output): void
     {
-        flock($handle, LOCK_UN);
-        fclose($handle);
+        if ($backupDirectory === null) {
+            return;
+        }
+
+        if ($this->shopConfigurationBackupService->restore($backupDirectory, $touchedModules, $output)) {
+            $output->writeln('<comment>' . self::MESSAGE_ROLLED_BACK . '</comment>');
+        }
     }
 
     /**
@@ -267,125 +271,18 @@ class InstallModuleConfigurationCommand extends Command
             return [true, null];
         }
 
-        $backupDirectory = $this->backupShopConfigurations($projectConfiguration);
+        $backupDirectory = $this->shopConfigurationBackupService->backup($projectConfiguration);
         if ($backupDirectory === null) {
             $output->writeln('<error>Could not back up the shop configuration; nothing was written.</error>');
 
             return [false, null];
         }
 
-        foreach ($this->backedUpFiles($backupDirectory) as $backup) {
+        foreach ($this->shopConfigurationBackupService->backedUpFiles($backupDirectory) as $backup) {
             $output->writeln(sprintf('<comment>Backed up %s</comment>', $backup));
         }
 
         return [true, $backupDirectory];
-    }
-
-    private function backupShopConfigurations(ProjectConfiguration $projectConfiguration): ?string
-    {
-        $shopsDirectory = $this->context->getProjectConfigurationDirectory() . 'shops';
-        $backupDirectory = $this->createUniqueBackupDirectory($shopsDirectory);
-
-        if ($backupDirectory === null) {
-            return null;
-        }
-
-        foreach ($projectConfiguration->getShopConfigurationIds() as $shopId) {
-            $yamlPath = $shopsDirectory . '/' . $shopId . '.yaml';
-            if (!is_file($yamlPath)) {
-                continue;
-            }
-            if (!copy($yamlPath, $backupDirectory . '/' . $shopId . '.yaml')) {
-                return null;
-            }
-            @chmod($backupDirectory . '/' . $shopId . '.yaml', 0600);
-        }
-
-        return $backupDirectory;
-    }
-
-    private function createUniqueBackupDirectory(string $shopsDirectory): ?string
-    {
-        $timestamp = date('Ymd-His');
-        $attempt = 0;
-
-        while (true) {
-            $suffix = $attempt === 0 ? '' : '-' . $attempt;
-            $backupDirectory = $shopsDirectory . '.bak.' . $timestamp . $suffix;
-            $attempt++;
-
-            if (@mkdir($backupDirectory, 0700, true)) {
-                return $backupDirectory;
-            }
-
-            if (!is_dir($backupDirectory)) {
-                return null;
-            }
-        }
-    }
-
-    /**
-     * @return string[]
-     */
-    private function backedUpFiles(string $backupDirectory): array
-    {
-        $files = [];
-        foreach (scandir($backupDirectory) as $entry) {
-            if ($entry === '.' || $entry === '..') {
-                continue;
-            }
-            $files[] = $backupDirectory . '/' . $entry;
-        }
-
-        return $files;
-    }
-
-    private function restoreShopConfigurations(string $backupDirectory): bool
-    {
-        $shopsDirectory = $this->context->getProjectConfigurationDirectory() . 'shops';
-        if (!is_dir($shopsDirectory) && !@mkdir($shopsDirectory, 0700, true) && !is_dir($shopsDirectory)) {
-            return false;
-        }
-
-        $restored = true;
-
-        foreach ($this->backedUpFiles($backupDirectory) as $backupPath) {
-            $target = $shopsDirectory . '/' . basename($backupPath);
-            if (!@copy($backupPath, $target)) {
-                $restored = false;
-            }
-        }
-
-        return $restored;
-    }
-
-    private function restoreAndReport(?string $backupDirectory, OutputInterface $output): void
-    {
-        if ($backupDirectory === null) {
-            return;
-        }
-
-        $output->writeln(
-            $this->restoreShopConfigurations($backupDirectory)
-                ? '<comment>Restored the shop configuration from the backup.</comment>'
-                : sprintf(
-                    '<error>Could not restore the shop configuration; a copy of the previous state is in %s.</error>',
-                    $backupDirectory
-                )
-        );
-    }
-
-    private function deleteBackup(?string $backupDirectory): void
-    {
-        if ($backupDirectory === null || !is_dir($backupDirectory)) {
-            return;
-        }
-
-        foreach ($this->backedUpFiles($backupDirectory) as $backupPath) {
-            @unlink($backupPath);
-        }
-
-        @rmdir($backupDirectory);
     }
 
     /**

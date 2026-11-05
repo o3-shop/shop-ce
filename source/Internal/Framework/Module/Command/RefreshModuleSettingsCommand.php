@@ -22,7 +22,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Command;
 
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Cache\ShopConfigurationCacheInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ProjectConfigurationDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ProjectConfiguration;
@@ -59,9 +58,9 @@ class RefreshModuleSettingsCommand extends Command
     private $projectConfigurationDao;
 
     /**
-     * @var ShopConfigurationCacheInterface
+     * @var ShopConfigurationBackupService
      */
-    private $shopConfigurationCache;
+    private $shopConfigurationBackupService;
 
     /**
      * @var ModuleConfigurationHandlingServiceInterface
@@ -107,7 +106,7 @@ class RefreshModuleSettingsCommand extends Command
      * @param MetaDataModuleConfigurationDaoInterface        $metadataModuleConfigurationDao
      * @param BasicContextInterface                          $context
      * @param ModuleConfigurationHandlingServiceInterface    $moduleConfigurationHandlingService
-     * @param ShopConfigurationCacheInterface                $shopConfigurationCache
+     * @param ShopConfigurationBackupService                 $shopConfigurationBackupService
      */
     public function __construct(
         ProjectConfigurationDaoInterface $projectConfigurationDao,
@@ -118,7 +117,7 @@ class RefreshModuleSettingsCommand extends Command
         MetaDataModuleConfigurationDaoInterface $metadataModuleConfigurationDao,
         BasicContextInterface $context,
         ModuleConfigurationHandlingServiceInterface $moduleConfigurationHandlingService,
-        ShopConfigurationCacheInterface $shopConfigurationCache
+        ShopConfigurationBackupService $shopConfigurationBackupService
     ) {
         parent::__construct();
 
@@ -130,7 +129,7 @@ class RefreshModuleSettingsCommand extends Command
         $this->metadataModuleConfigurationDao = $metadataModuleConfigurationDao;
         $this->context = $context;
         $this->moduleConfigurationHandlingService = $moduleConfigurationHandlingService;
-        $this->shopConfigurationCache = $shopConfigurationCache;
+        $this->shopConfigurationBackupService = $shopConfigurationBackupService;
     }
 
     protected function configure(): void
@@ -166,7 +165,7 @@ class RefreshModuleSettingsCommand extends Command
         // Read-merge-write must not interleave with another run: both would read
         // the same project configuration and the second save would silently drop
         // the first one's changes.
-        $lockHandle = $this->acquireLock($output);
+        $lockHandle = $this->shopConfigurationBackupService->acquireLock($output);
         if ($lockHandle === null) {
             return 1;
         }
@@ -174,7 +173,7 @@ class RefreshModuleSettingsCommand extends Command
         try {
             return $this->executeLocked($input, $output);
         } finally {
-            $this->releaseLock($lockHandle);
+            $this->shopConfigurationBackupService->releaseLock($lockHandle);
         }
     }
 
@@ -264,12 +263,12 @@ class RefreshModuleSettingsCommand extends Command
         // the run before anything is written.
         $backupDirectory = null;
         if ($fromMetadata && $refreshTargets !== []) {
-            $backupDirectory = $this->backupShopConfigurations($projectConfiguration);
+            $backupDirectory = $this->shopConfigurationBackupService->backup($projectConfiguration);
             if ($backupDirectory === null) {
                 $output->writeln('<error>Could not back up the shop configuration; nothing was written.</error>');
                 return 1;
             }
-            foreach ($this->backedUpFiles($backupDirectory) as $backup) {
+            foreach ($this->shopConfigurationBackupService->backedUpFiles($backupDirectory) as $backup) {
                 $output->writeln(sprintf('<comment>Backed up %s</comment>', $backup));
             }
             try {
@@ -282,14 +281,7 @@ class RefreshModuleSettingsCommand extends Command
                     '<error>Could not write the shop configuration: %s</error>',
                     $exception->getMessage()
                 ));
-                $output->writeln(
-                    $this->restoreShopConfigurations($backupDirectory)
-                        ? '<comment>Restored the shop configuration from the backup.</comment>'
-                        : sprintf(
-                            '<error>Could not restore the shop configuration; a copy of the previous state is in %s.</error>',
-                            $backupDirectory
-                        )
-                );
+                $this->shopConfigurationBackupService->restore($backupDirectory, [], $output);
 
                 return 1;
             }
@@ -325,18 +317,9 @@ class RefreshModuleSettingsCommand extends Command
         }
 
         if ($refreshFailures !== [] && $backupDirectory !== null) {
-            $output->writeln(
-                $this->restoreShopConfigurations($backupDirectory)
-                    ? '<comment>Restored the shop configuration from the backup.</comment>'
-                    : sprintf(
-                        '<error>Could not restore the shop configuration; a copy of the previous state is in %s.</error>',
-                        $backupDirectory
-                    )
-            );
             // The refresh that ran before the failure already wrote DB rows (templates,
-            // blocks, events, extensions, ...). Re-apply the restored configuration so the
-            // database matches the restored files again.
-            $this->reapplyRestoredConfiguration($refreshTargets, $output);
+            // blocks, events, extensions, ...); restore() re-applies the restored files.
+            $this->shopConfigurationBackupService->restore($backupDirectory, $refreshTargets, $output);
         }
 
         if ($moduleId !== null && !$foundConfigured) {
@@ -354,45 +337,6 @@ class RefreshModuleSettingsCommand extends Command
         $output->writeln(sprintf('Modules refreshed: %d', $refreshedCount));
 
         return $skipped === [] && $refreshFailures === [] ? 0 : 1;
-    }
-
-    /**
-     * @return resource|null
-     */
-    private function acquireLock(OutputInterface $output)
-    {
-        // Keep the lock out of the project configuration directory: that directory
-        // may be read-only, and the lock must still work for the backup-failure path.
-        $lockFile = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR)
-            . DIRECTORY_SEPARATOR
-            . 'o3-refresh-settings-'
-            . md5($this->context->getProjectConfigurationDirectory())
-            . '.lock';
-        $handle = @fopen($lockFile, 'c');
-
-        if ($handle === false) {
-            $output->writeln(sprintf('<error>Could not open the lock file %s.</error>', $lockFile));
-
-            return null;
-        }
-
-        if (!flock($handle, LOCK_EX | LOCK_NB)) {
-            fclose($handle);
-            $output->writeln('<error>Another oe:module:refresh-settings run is already in progress.</error>');
-
-            return null;
-        }
-
-        return $handle;
-    }
-
-    /**
-     * @param resource $handle
-     */
-    private function releaseLock($handle): void
-    {
-        flock($handle, LOCK_UN);
-        fclose($handle);
     }
 
     /**
@@ -420,163 +364,6 @@ class RefreshModuleSettingsCommand extends Command
         }
 
         return $invalid;
-    }
-
-    /**
-     * @param array<int, string[]> $refreshTargets
-     */
-    private function reapplyRestoredConfiguration(
-        array $refreshTargets,
-        OutputInterface $output
-    ): void {
-        // The refresh loop repopulated the in-memory shop-configuration cache from the
-        // configuration that was just written. The files restored above are the old ones,
-        // so the cache has to be dropped before the configuration is read again.
-        foreach (array_keys($refreshTargets) as $shopId) {
-            $this->shopConfigurationCache->evict($shopId);
-        }
-
-        try {
-            $restoredConfiguration = $this->projectConfigurationDao->getConfiguration();
-        } catch (\Throwable $exception) {
-            $output->writeln(sprintf(
-                '<comment>Could not re-read the restored configuration: %s</comment>',
-                $exception->getMessage()
-            ));
-
-            return;
-        }
-
-        foreach ($refreshTargets as $shopId => $moduleIds) {
-            foreach ($moduleIds as $id) {
-                try {
-                    $shopConfiguration = $restoredConfiguration->getShopConfiguration($shopId);
-                    if (
-                        !$shopConfiguration->hasModuleConfiguration($id)
-                        || !$this->moduleStateService->isActive($id, $shopId)
-                    ) {
-                        continue;
-                    }
-
-                    $this->moduleConfigurationRefreshService->refresh(
-                        $shopConfiguration->getModuleConfiguration($id),
-                        $shopId
-                    );
-                    $output->writeln(sprintf(
-                        '<comment>Reverted %s in shop %d to the backed-up configuration.</comment>',
-                        $id,
-                        $shopId
-                    ));
-                } catch (\Throwable $exception) {
-                    $output->writeln(sprintf(
-                        '<error>Could not revert %s in shop %d: %s</error>',
-                        $id,
-                        $shopId,
-                        $exception->getMessage()
-                    ));
-                }
-            }
-        }
-    }
-
-    /**
-     * ProjectConfigurationDao::save() deletes the whole shops configuration directory
-     * before rewriting it, so the backups must live next to it, not inside it.
-     *
-     * @return string|null the backup directory, or null if the backup could not be created
-     */
-    private function backupShopConfigurations(ProjectConfiguration $projectConfiguration): ?string
-    {
-        $shopsDirectory = $this->context->getProjectConfigurationDirectory() . 'shops';
-        $backupDirectory = $this->createUniqueBackupDirectory($shopsDirectory);
-
-        if ($backupDirectory === null) {
-            return null;
-        }
-
-        foreach ($projectConfiguration->getShopConfigurationIds() as $shopId) {
-            $yamlPath = $shopsDirectory . '/' . $shopId . '.yaml';
-            if (!is_file($yamlPath)) {
-                continue;
-            }
-            if (!copy($yamlPath, $backupDirectory . '/' . $shopId . '.yaml')) {
-                return null;
-            }
-            // The backup can contain secrets (PayPal client secret etc.); the
-            // directory is already 0700, this keeps the files owner-only too.
-            @chmod($backupDirectory . '/' . $shopId . '.yaml', 0600);
-        }
-
-        return $backupDirectory;
-    }
-
-    /**
-     * The directory name is second precise. Two runs in the same second (a script, a retry)
-     * must not write into - and overwrite - the same backup directory, so an existing one is
-     * never reused. The suffix is unbounded: an artificial cap would fail the run even though
-     * a free name is still available.
-     */
-    private function createUniqueBackupDirectory(string $shopsDirectory): ?string
-    {
-        $timestamp = date('Ymd-His');
-        $attempt = 0;
-
-        while (true) {
-            $suffix = $attempt === 0 ? '' : '-' . $attempt;
-            $backupDirectory = $shopsDirectory . '.bak.' . $timestamp . $suffix;
-            $attempt++;
-
-            if (@mkdir($backupDirectory, 0700, true)) {
-                return $backupDirectory;
-            }
-
-            // A concurrent run took this name; try the next suffix. Any other failure
-            // (permissions, missing parent, disk full) is fatal.
-            if (!is_dir($backupDirectory)) {
-                return null;
-            }
-        }
-    }
-
-    /**
-     * @return string[]
-     */
-    private function backedUpFiles(string $backupDirectory): array
-    {
-        $files = [];
-        foreach (scandir($backupDirectory) as $entry) {
-            if ($entry === '.' || $entry === '..') {
-                continue;
-            }
-            $files[] = $backupDirectory . '/' . $entry;
-        }
-
-        return $files;
-    }
-
-    /**
-     * Copies the backed up shop files over the live ones, undoing a save() that failed
-     * halfway. The saved files are kept in place when a copy fails so the backup
-     * directory remains the source of truth. save() deletes the whole shops/ directory
-     * before rewriting it, so the directory is recreated here when it is gone.
-     */
-    private function restoreShopConfigurations(string $backupDirectory): bool
-    {
-        $shopsDirectory = $this->context->getProjectConfigurationDirectory() . 'shops';
-        if (!is_dir($shopsDirectory) && !@mkdir($shopsDirectory, 0700, true) && !is_dir($shopsDirectory)) {
-            return false;
-        }
-
-        $restored = true;
-
-        foreach ($this->backedUpFiles($backupDirectory) as $backupPath) {
-            $target = $shopsDirectory . '/' . basename($backupPath);
-            if (!@copy($backupPath, $target)) {
-                $restored = false;
-            }
-        }
-
-        return $restored;
     }
 
     /**

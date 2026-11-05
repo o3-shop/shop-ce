@@ -22,7 +22,10 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\Command;
 
+use Doctrine\DBAL\DBALException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Command\InstallModuleConfigurationCommand;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Command\ShopConfigurationBackupService;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Cache\ShopConfigurationCacheInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ProjectConfigurationDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ProjectConfiguration;
@@ -31,6 +34,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ModuleConfigurationInstallerInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\ModuleConfigurationDaoInterface as MetaDataModuleConfigurationDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleConfigurationRefreshServiceInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\State\ModuleStateServiceInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -66,7 +70,8 @@ class InstallModuleConfigurationCommandTest extends TestCase
     private function makeCommand(
         ModuleConfigurationInstallerInterface $installer,
         ?ModuleConfigurationRefreshServiceInterface $refreshService = null,
-        ?ProjectConfigurationDaoInterface $projectConfigurationDao = null
+        ?ProjectConfigurationDaoInterface $projectConfigurationDao = null,
+        ?ShopConfigurationCacheInterface $shopConfigurationCache = null
     ): InstallModuleConfigurationCommand {
         $moduleConfiguration = new ModuleConfiguration();
         $moduleConfiguration->setId('mymodule');
@@ -86,12 +91,24 @@ class InstallModuleConfigurationCommandTest extends TestCase
                 ->willThrowException(new ProjectConfigurationIsEmptyException('empty'));
         }
 
+        $moduleStateService = $this->createMock(ModuleStateServiceInterface::class);
+        $moduleStateService->method('isActive')->willReturn(true);
+
+        $context = $this->makeContext();
+
         return new InstallModuleConfigurationCommand(
             $installer,
-            $this->makeContext(),
+            $context,
             $metadataModuleConfigurationDao,
             $refreshService,
-            $projectConfigurationDao
+            $projectConfigurationDao,
+            new ShopConfigurationBackupService(
+                $context,
+                $projectConfigurationDao,
+                $shopConfigurationCache ?? $this->createMock(ShopConfigurationCacheInterface::class),
+                $moduleStateService,
+                $refreshService
+            )
         );
     }
 
@@ -209,6 +226,110 @@ class InstallModuleConfigurationCommandTest extends TestCase
             'Restored the shop configuration from the backup.',
             $tester->getDisplay()
         );
+    }
+
+    public function testInstallSucceedsWithoutRefreshWhenTheDatabaseIsNotReachable(): void
+    {
+        $shopsDirectory = $this->tmpRoot . '/var/configuration/shops';
+        file_put_contents($shopsDirectory . '/1.yaml', 'modules: []');
+
+        $refreshService = $this->createMock(ModuleConfigurationRefreshServiceInterface::class);
+        $refreshService->method('refreshActiveModuleWithFailures')
+            ->willThrowException(new DBALException('Connection refused'));
+        $refreshService->expects($this->never())->method('refresh');
+
+        $projectConfigurationDao = $this->createMock(ProjectConfigurationDaoInterface::class);
+        $projectConfigurationDao->method('getConfiguration')->willReturn($this->makeProjectConfiguration([1]));
+
+        $installer = $this->createMock(ModuleConfigurationInstallerInterface::class);
+        $installer->method('install')->willReturnCallback(
+            function () use ($shopsDirectory): void {
+                file_put_contents($shopsDirectory . '/1.yaml', 'modules: [mymodule]');
+            }
+        );
+
+        $tester = new CommandTester($this->makeCommand($installer, $refreshService, $projectConfigurationDao));
+        $exitCode = $tester->execute([
+            'module-source-path' => $this->modulesPath . '/mymodule',
+            'module-target-path' => $this->modulesPath . '/mymodule',
+        ]);
+
+        $display = $tester->getDisplay();
+        $this->assertSame(0, $exitCode, 'A shop without a database yet must still get the configuration installed');
+        $this->assertSame('modules: [mymodule]', file_get_contents($shopsDirectory . '/1.yaml'));
+        $this->assertStringContainsString(InstallModuleConfigurationCommand::MESSAGE_REFRESH_SKIPPED, $display);
+        $this->assertStringNotContainsString('Restored the shop configuration', $display);
+        $this->assertCount(0, glob($shopsDirectory . '.bak.*'));
+    }
+
+    public function testRollbackReappliesTheRestoredConfigurationToShopsAlreadyRefreshed(): void
+    {
+        $shopsDirectory = $this->tmpRoot . '/var/configuration/shops';
+        file_put_contents($shopsDirectory . '/1.yaml', 'modules: [mymodule]');
+        file_put_contents($shopsDirectory . '/2.yaml', 'modules: [mymodule]');
+
+        $refreshService = $this->createMock(ModuleConfigurationRefreshServiceInterface::class);
+        $refreshService->method('refreshActiveModuleWithFailures')->willReturn([
+            'refreshed' => [1],
+            'failures' => [2 => 'invalid class extension'],
+        ]);
+        $revertedShops = [];
+        $refreshService->method('refresh')->willReturnCallback(
+            function (ModuleConfiguration $moduleConfiguration, int $shopId) use (&$revertedShops): void {
+                $revertedShops[] = $shopId;
+            }
+        );
+
+        $projectConfigurationDao = $this->createMock(ProjectConfigurationDaoInterface::class);
+        $projectConfigurationDao->method('getConfiguration')->willReturn($this->makeProjectConfiguration([1, 2]));
+
+        $cache = $this->createMock(ShopConfigurationCacheInterface::class);
+        $evictedShops = [];
+        $cache->method('evict')->willReturnCallback(
+            function (int $shopId) use (&$evictedShops): void {
+                $evictedShops[] = $shopId;
+            }
+        );
+
+        $installer = $this->createMock(ModuleConfigurationInstallerInterface::class);
+        $installer->method('install')->willReturnCallback(
+            function () use ($shopsDirectory): void {
+                file_put_contents($shopsDirectory . '/1.yaml', 'modules: [new]');
+                file_put_contents($shopsDirectory . '/2.yaml', 'modules: [new]');
+            }
+        );
+
+        $tester = new CommandTester(
+            $this->makeCommand($installer, $refreshService, $projectConfigurationDao, $cache)
+        );
+        $exitCode = $tester->execute([
+            'module-source-path' => $this->modulesPath . '/mymodule',
+            'module-target-path' => $this->modulesPath . '/mymodule',
+        ]);
+
+        $display = $tester->getDisplay();
+        $this->assertSame(1, $exitCode);
+        $this->assertSame('modules: [mymodule]', file_get_contents($shopsDirectory . '/1.yaml'));
+        $this->assertSame([1, 2], $evictedShops, 'The cache must not serve the rolled back configuration');
+        $this->assertSame([1, 2], $revertedShops, 'The DB of every touched shop must match the restored files');
+        $this->assertStringContainsString('Reverted mymodule in shop 1', $display);
+        $this->assertStringContainsString(InstallModuleConfigurationCommand::MESSAGE_ROLLED_BACK, $display);
+        $this->assertStringNotContainsString('was installed, but', $display);
+    }
+
+    /**
+     * @param int[] $shopIds
+     */
+    private function makeProjectConfiguration(array $shopIds): ProjectConfiguration
+    {
+        $projectConfiguration = new ProjectConfiguration();
+        foreach ($shopIds as $shopId) {
+            $shopConfiguration = new ShopConfiguration();
+            $shopConfiguration->addModuleConfiguration((new ModuleConfiguration())->setId('mymodule'));
+            $projectConfiguration->addShopConfiguration($shopId, $shopConfiguration);
+        }
+
+        return $projectConfiguration;
     }
 
     public function testCommandNameAndDescription(): void
