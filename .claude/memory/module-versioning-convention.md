@@ -40,8 +40,8 @@ points at `b-1.7`. **The first release after that needs `--bump paypal-checkout=
 until then). No `b-1.6`/`b-1.5` yet: shop 1.5 ships the classic `o3-shop/paypal-module`
 (repo `o3-shop/paypal`), the 1.6 metapackage has no PayPal Checkout; `b-1.0-1.6-support`
 holds the old 1.6 patch. paypal-client also has a divergent old `b-1.0` (4 ahead / 96
-behind `b-7.0.x`; its `setTrackingId()` commit is not on `b-7.0.x`); never map it there. paypal-client's `main` is still the stale 2022 branch: reset it to `b-7.0.x`
-before its next cut in a final release, or that release opens a merge-back into it.
+behind `b-7.0.x`; its `setTrackingId()` commit is not on `b-7.0.x`); never map it there. paypal-client's `main` was reset to `b-7.0.x` on 2026-11-05 (the stale 2022 commit is
+kept as `archive/main-2022`); paypal-module's 58 upstream-only branches were pruned (#274).
 
 **What bin/release enforces (tags only):** `ReleaseLine::LINE_VERSIONED_PACKAGES` is the
 opt-in list. For those, on a `b-X.Y` branch only `vX.Y.*` tags count as the latest tag, and
