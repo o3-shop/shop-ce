@@ -10,7 +10,7 @@ Issue: o3-shop/o3-shop#275 (part of #274). Started 2026-11-05 20:42.
 - Queue: maintainer-given (#274 plan: tooling, docs, memory note)
 - Roster: maintainer `ralftrapp` (assign PRs; pushes run as this account)
 - Channels: none configured → run log + handoff carry the session
-- Files: tasks/self-directed/ (untracked, not gitignored); earlier tasks/ content
+- Files: tasks/self-directed/ (tracked, export-ignored from the dist); earlier tasks/ content
   (self-directed-run.md, todo.md) parked in the session scratchpad for the v1.7.3-RC2 cut
 - Language: English; branches `NNN-short-description` off b-1.7
 
@@ -35,11 +35,11 @@ Maintainer asked for #274's convention: one line per shop line, `vX.Y.n`, `main`
 ## Progress
 - Filed #274 (umbrella: convention + checklist) and #275 (this tooling fix). No duplicates found.
 - Implemented: `Version/ReleaseLine` (opt-in list, `tagPrefix()`), resolver filters tags to the
-  line + names the exact first-tag bump, TagCutter `onLine()` guard (flag, .next-bump, default),
+  line + names the exact first-tag bump, TagCutter `bumpOnLine()` guard (flag, .next-bump, default),
   map: paypal-checkout → b-1.0, paypal-client → b-7.0.x, dead paypal-module key dropped.
 - Remote-only dry-run `--from v1.7.2 --to v1.7.3-RC2` with the change: exit 0;
   paypal-checkout@b-1.0 reuse v1.0.1, paypal-client@b-7.0.x reuse v1.0.0 (no stale cut).
-- Env: `./docker.sh start` aborted on the Adminer port (8081 held by faruti-app); shop + db
+- Env: `./docker.sh start` aborted on the Adminer port (8081 already taken by another local container); shop + db
   came up anyway. `oe-console` then exited 255 silently: stale `source/tmp/container_cache.php`
   from before the b-1.7 fast-forward (InstallModuleConfigurationCommand ctor 2 → 6 args).
   Deleted the (gitignored) cache file; cache:clear + tests fine afterwards.
