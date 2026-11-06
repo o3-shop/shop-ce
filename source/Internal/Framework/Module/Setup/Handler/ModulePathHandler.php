@@ -59,6 +59,18 @@ class ModulePathHandler implements ModuleConfigurationHandlerInterface
      * @param ModuleConfiguration $configuration
      * @param int                 $shopId
      */
+    public function handleOnModuleRefresh(ModuleConfiguration $configuration, int $shopId)
+    {
+        // Activation overwrites the stored path, and the entry is only removed when the
+        // module is deactivated. Re-activating therefore re-derives it without leaving
+        // aModulePaths - which marks the module as active - empty in between.
+        $this->handleOnModuleActivation($configuration, $shopId);
+    }
+
+    /**
+     * @param ModuleConfiguration $configuration
+     * @param int                 $shopId
+     */
     public function handleOnModuleDeactivation(ModuleConfiguration $configuration, int $shopId)
     {
         $pathsSetting = $this->getShopConfigurationSetting($shopId);

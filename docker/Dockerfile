@@ -49,7 +49,7 @@ RUN pecl install xdebug \
 # (wave-theme build pipeline). Themes ship their own local gulp/grunt versions
 # via node_modules; the *-cli globals just give us `gulp` / `grunt` on PATH so
 # `npm run build` style commands and direct invocations both work.
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs \
     && npm install -g gulp-cli grunt-cli \
     && node --version && npm --version

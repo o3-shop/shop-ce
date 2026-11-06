@@ -22,8 +22,10 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Tag;
 
+use Composer\Semver\Comparator;
 use InvalidArgumentException;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\RawRepoFileFetcher;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Version\ReleaseLine;
 
 /**
  * Algorithm Step 4: decide what new tag to cut for a candidate.
@@ -33,7 +35,9 @@ use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\RawRepoFileFetche
  *                          compilation (shop-metapackage-ce) move in
  *                          lockstep with the shop version.
  *   any other candidate  → bump latest_tag by level resolved with
- *                          precedence: --bump flag > .next-bump file > patch
+ *                          precedence: --bump flag > .next-bump file > patch;
+ *                          a line-versioned package (ReleaseLine) must stay
+ *                          on its line's vX.Y.* tags
  *
  * The .next-bump file is consumed on use: when it was the chosen
  * source, the result flags `deleteNextBumpFile = true` so Section 11
@@ -58,7 +62,8 @@ class TagCutter
 
     /**
      * @param string                    $package     e.g. "o3-shop/shop-facts"
-     * @param string|null               $latestTag   highest semver tag on the repo (null = no tags yet)
+     * @param string|null               $latestTag   highest semver tag on the repo, or on the release line for a
+     *                                           line-versioned package (null = no tags yet)
      * @param string                    $shopTo      --to value; used for the shop-ce / metapackage verbatim case
      * @param array<string,string>      $bumpFlags   short-slug => raw bump level (e.g. ["shop-facts" => "minor"])
      * @param string                    $packageRef  release branch on this repo (e.g. "b-1.6")
@@ -87,13 +92,13 @@ class TagCutter
         // Precedence: flag > file > default patch.
         if (isset($bumpFlags[$slug])) {
             $level = BumpLevel::fromString($bumpFlags[$slug]);
-            $newTag = $this->applyBump($latestTag, $level);
+            $newTag = $this->bumpOnLine($package, $packageRef, $latestTag, $level);
             return new TagCutResult($newTag, false, TagCutResult::SOURCE_FLAG);
         }
 
         $fileLevel = $this->readNextBumpFile($package, $packageRef, $notes);
         if ($fileLevel !== null) {
-            $newTag = $this->applyBump($latestTag, $fileLevel);
+            $newTag = $this->bumpOnLine($package, $packageRef, $latestTag, $fileLevel);
             return new TagCutResult(
                 $newTag,
                 true,
@@ -103,7 +108,7 @@ class TagCutter
         }
 
         $level = BumpLevel::patch();
-        $newTag = $this->applyBump($latestTag, $level);
+        $newTag = $this->bumpOnLine($package, $packageRef, $latestTag, $level);
         return new TagCutResult(
             $newTag,
             false,
@@ -147,6 +152,48 @@ class TagCutter
             );
             return null;
         }
+    }
+
+    /**
+     * A line-versioned package (ReleaseLine) only takes tags of its line:
+     * a minor/major bump or an exact version of another line on `b-X.Y`
+     * would break the `vX.Y.n` <-> shop X.Y mapping.
+     */
+    private function bumpOnLine(string $package, string $packageRef, ?string $latestTag, BumpLevel $level): string
+    {
+        $prefix = ReleaseLine::tagPrefix($package, $packageRef);
+        if ($prefix !== null && $latestTag === null && !$level->isExact()) {
+            throw new InvalidArgumentException(sprintf(
+                'Release line %s of %s has no %s* tag yet. Cut its first tag with --bump %s=%s0.',
+                $packageRef,
+                $package,
+                $prefix,
+                $this->slug($package),
+                $prefix
+            ));
+        }
+        $newTag = $this->applyBump($latestTag, $level);
+        if ($prefix !== null && $latestTag !== null && !Comparator::greaterThan($newTag, $latestTag)) {
+            throw new InvalidArgumentException(sprintf(
+                "New tag '%s' for %s is not above the latest tag %s of release line %s.",
+                $newTag,
+                $package,
+                $latestTag,
+                $packageRef
+            ));
+        }
+        if ($prefix !== null && strpos($newTag, $prefix) !== 0) {
+            throw new InvalidArgumentException(sprintf(
+                "New tag '%s' for %s is outside release line %s (%s*). Line-versioned packages take patch bumps on their line; a new line's first tag is --bump %s=%s0 on its own b-X.Y branch.",
+                $newTag,
+                $package,
+                $packageRef,
+                $prefix,
+                $this->slug($package),
+                $prefix
+            ));
+        }
+        return $newTag;
     }
 
     private function applyBump(?string $latestTag, BumpLevel $level): string

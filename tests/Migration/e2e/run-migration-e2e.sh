@@ -150,6 +150,16 @@ phase_provision() {
     docker exec "$PHPC" bash -lc '
         set -e
         export DEBIAN_FRONTEND=noninteractive
+        # php:7.4-cli / php:8.0-cli are Debian 11 "bullseye", whose packages moved
+        # to archive.debian.org after its LTS ended (2026-08-31); deb.debian.org
+        # answers 404 for them (o3-shop/o3-shop#262). Newer images are untouched.
+        if grep -q "^VERSION_CODENAME=bullseye$" /etc/os-release; then
+            printf "%s\n" \
+                "deb http://archive.debian.org/debian bullseye main" \
+                "deb http://archive.debian.org/debian bullseye-updates main" \
+                "deb http://archive.debian.org/debian-security bullseye-security main" \
+                > /etc/apt/sources.list
+        fi
         apt-get update -qq
         apt-get install -y -qq git unzip libzip-dev libpng-dev libjpeg-dev libfreetype6-dev \
             libonig-dev libxml2-dev libicu-dev libxslt1-dev default-mysql-client >/dev/null

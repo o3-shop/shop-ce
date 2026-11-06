@@ -91,13 +91,17 @@ final class RepoCloneUrlResolverTest extends TestCase
     public function testCaseRenamePreservedInUrl(): void
     {
         $resolver = new RepoCloneUrlResolver(RepoCloneUrlResolver::SCHEME_HTTPS);
-        // PackageRepoSlug::RENAMES covers o3-theme, mink-selenium-driver, php-selenium
+        // PackageRepoSlug::RENAMES covers o3-theme, mink-selenium-driver, php-selenium, paypal-checkout
         $this->assertSame('https://github.com/o3-shop/o3-Theme.git', $resolver->urlFor('o3-shop/o3-theme'));
         $this->assertSame(
             'https://github.com/o3-shop/MinkSeleniumDriver.git',
             $resolver->urlFor('o3-shop/mink-selenium-driver')
         );
         $this->assertSame('https://github.com/o3-shop/PHP-Selenium.git', $resolver->urlFor('o3-shop/php-selenium'));
+        $this->assertSame(
+            'https://github.com/o3-shop/paypal-module.git',
+            $resolver->urlFor('o3-shop/paypal-checkout')
+        );
     }
 
     public function testCaseRenamePreservedInSshUrl(): void
