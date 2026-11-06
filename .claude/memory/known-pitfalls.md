@@ -184,3 +184,8 @@ type: feedback
 
 ## `oe:cache:clear` exits 255 silently after pulling DI changes (2026-11-05)
 - After pulling commits that change a service's constructor, `source/tmp/container_cache.php` still wires the old arguments. Every `oe-console` call, `oe:cache:clear` included, then dies with **exit 255 and no output**, so `./docker.sh test` aborts at "oe:cache:clear failed". The cause is only in `source/log/oxideshop.log` (`ArgumentCountError … container_cache.php`). Fix: `rm source/tmp/container_cache.php` (gitignored, rebuilt on the next boot), then clear the cache. Seen after fast-forwarding b-1.7 over #261/#264 (`InstallModuleConfigurationCommand` 2 → 6 args).
+
+## Release cut: untracked files abort `WorkingTreeGate`; docs files with CRLF (v1.7.3, 2026-11-06)
+- `WorkingTreeGate` runs `git status --porcelain`, so **untracked** files (e.g. local `tasks/` notes) abort the cut too. Keeping them is fine: add the path to `.git/info/exclude` (local only, nothing committed) instead of moving or deleting them.
+- Some o3-documentation pages (e.g. `source/User/Installation/Update.md`) have CRLF line endings: a `sed 's/…$/…/'` silently doesn't match. Use `LC_ALL=C sed -i '' $'s/old\r$/new\r/'` and check `git diff` afterwards.
+- A final cut right after an RC with no new commits only bumps the exact pins (metapackage → shop-ce, o3-shop → metapackage) from `-RC<n>` to the final; no leaf gets a new tag (each is `reuse-latest-tag` or `unchanged`).
