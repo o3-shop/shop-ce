@@ -13,8 +13,9 @@ Installation:
 See more detailed installation instructions in our manual:
 https://docs.o3-shop.com/en/latest/User/Installation/NewInstallation.html
 
-List of 3rd party licenses: run `composer licenses` in the project root (the directory
-that contains composer.json, one level above source/).
+List of 3rd party licenses: run `composer licenses --no-dev` in the project root (the
+directory that contains composer.json, one level above source/). It covers the Composer
+packages; JavaScript libraries bundled under source/out/ carry their license in their files.
 
 In case of any difficulties feel free to visit our community support forums at
 http://community.o3-shop.com/

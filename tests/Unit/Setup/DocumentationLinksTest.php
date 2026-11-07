@@ -28,8 +28,8 @@ use PHPUnit\Framework\TestCase;
  * The setup wizard, the admin's System health page and source/README link to
  * docs.o3-shop.com. The docs moved twice (eshop/…, then user/installation/…),
  * and every move left released shops with 404s. Links must use the current
- * scheme, /en/latest/User/…, and never the old www.o3-shop.com or OXID
- * manual pages.
+ * scheme, /en/latest/User/…, and never pages on www.o3-shop.com or on any
+ * oxid-esales.com host (www., docs., …).
  *
  * This guards the URL scheme only. It does not check that a page or anchor
  * exists (that needs the network); check new links by hand.
@@ -74,7 +74,7 @@ final class DocumentationLinksTest extends TestCase
         $contents = $this->read($file);
 
         $this->assertDoesNotMatchRegularExpression(
-            '#https?://(www\.)?(o3-shop|oxid-esales)\.com/[a-z]#',
+            '#https?://(www\.)?o3-shop\.com/[a-z]|https?://([a-z0-9-]+\.)*oxid-esales\.com/[a-z]#i',
             $contents,
             "'$file' links to a page on www.o3-shop.com or oxid-esales.com; their manual pages no longer exist."
         );
