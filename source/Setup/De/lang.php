@@ -106,7 +106,7 @@ $aLang = [
 'MOD_MEMORY_LIMIT'                              => 'PHP Memory limit (min. 32MB, 60MB empfohlen)',
 
 'STEP_0_ERROR_TEXT'                             => 'Ihr System erfüllt nicht alle nötigen Systemvoraussetzungen',
-'STEP_0_ERROR_URL'                              => 'https://docs.o3-shop.com/eshop/de/latest/installation/neu-installation/server-und-systemvoraussetzungen.html',
+'STEP_0_ERROR_URL'                              => 'https://docs.o3-shop.com/en/latest/User/Installation/SystemRequirements.html',
 'STEP_0_TEXT'                                   => '<ul class="req">' .
                                                    '<li class="pass"> - Die Voraussetzung ist erfüllt.</li>' .
                                                    '<li class="pmin"> - Die Voraussetzung ist nicht oder nur teilweise erfüllt. Der O3-Shop funktioniert trotzdem und kann installiert werden.</li>' .
