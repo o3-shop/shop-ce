@@ -128,7 +128,12 @@ install_o3_theme() {
 # Function to install dependencies
 install_dependencies() {
     log "${YELLOW}Installing Composer dependencies...${NC}"
-    COMPOSER_ROOT_VERSION=dev-b-1.6 composer install --no-interaction --optimize-autoloader || handle_error "Composer installation failed"
+    # The release line's branch alias (e.g. dev-b-1.7), also on feature branches,
+    # where composer would guess dev-main. See bin/composer-root-version.php.
+    local root_version
+    root_version=$(php bin/composer-root-version.php) || handle_error "Could not derive COMPOSER_ROOT_VERSION from composer.json"
+    log "Composer root version: '${root_version}'."
+    COMPOSER_ROOT_VERSION="$root_version" composer install --no-interaction --optimize-autoloader || handle_error "Composer installation failed"
     log "${GREEN}Dependencies installed successfully${NC}"
 }
 
