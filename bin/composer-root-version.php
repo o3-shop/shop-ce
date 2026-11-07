@@ -16,7 +16,7 @@
  * branches (b-1.4 and before carry OXID's `dev-b-7.0.x` aliases) don't
  * follow the rule.
  *
- * Used by docker/entrypoint.sh and the E2E job in
+ * Used by docker/entrypoint.sh and by the test matrix and E2E jobs in
  * .github/workflows/code-quality.yml.
  *
  * Usage:

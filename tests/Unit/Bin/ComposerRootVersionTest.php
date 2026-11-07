@@ -26,7 +26,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * End-to-end CLI test for bin/composer-root-version.php, the value that
- * docker/entrypoint.sh and the E2E CI job pass as COMPOSER_ROOT_VERSION.
+ * docker/entrypoint.sh and the test matrix and E2E CI jobs pass as
+ * COMPOSER_ROOT_VERSION.
  *
  * Refs: o3-shop/o3-shop#282
  */
@@ -85,6 +86,16 @@ final class ComposerRootVersionTest extends TestCase
         $this->assertSame('', $result['stdout']);
     }
 
+    public function testFailsWhenTheBranchAliasIsNotAMap(): void
+    {
+        $path = $this->tmpFile('{"extra":{"branch-alias":"dev-b-1.7"}}');
+        $result = $this->runScript([$path]);
+
+        $this->assertSame(1, $result['exit']);
+        $this->assertSame('', $result['stdout']);
+        $this->assertStringContainsString('[ERROR]', $result['stderr']);
+    }
+
     public function testIgnoresAliasesThatAreNotStrings(): void
     {
         $path = $this->tmpFile('{"extra":{"branch-alias":{"dev-b-1.7":"1.7-dev","dev-broken":null,"dev-odd":["9.9-dev"]}}}');
@@ -100,6 +111,7 @@ final class ComposerRootVersionTest extends TestCase
 
         $this->assertSame(2, $result['exit']);
         $this->assertSame('', $result['stdout']);
+        $this->assertStringContainsString('[ERROR] Cannot read', $result['stderr']);
     }
 
     public function testFailsWhenComposerJsonIsMalformed(): void
@@ -109,6 +121,7 @@ final class ComposerRootVersionTest extends TestCase
 
         $this->assertSame(2, $result['exit']);
         $this->assertSame('', $result['stdout']);
+        $this->assertStringContainsString('is not valid JSON', $result['stderr']);
     }
 
     public function testDefaultsToTheRepositoryComposerJson(): void
