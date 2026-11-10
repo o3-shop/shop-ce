@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
+use oxBaseHelper;
 use oxDb;
 use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\Registry;
@@ -29,6 +30,8 @@ use OxidEsales\EshopCommunity\Application\Model\Search;
 use OxidEsales\EshopCommunity\Core\TableViewNameGenerator;
 use OxidEsales\TestingLibrary\UnitTestCase;
 use oxTestModules;
+
+require_once TEST_LIBRARY_HELPERS_PATH . 'oxBaseHelper.php';
 
 class SearchTest extends UnitTestCase
 {
@@ -982,6 +985,62 @@ class SearchTest extends UnitTestCase
         foreach ($expectedKeys as $sKey) {
             $this->assertArrayHasKey($sKey, $aSuggestions[0]);
         }
+    }
+
+    public function testGetSearchSuggestionsKeepsMainPictureOnRepeatedRequests()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle']);
+        $this->_insertSearchableArticle('_testSuggMainPic', 'SuggMainPic');
+        $this->addToDatabase(
+            "UPDATE oxarticles SET oxpic1 = 'sugg-main-pic.jpg', oxthumb = '' WHERE oxid = '_testSuggMainPic'",
+            'oxarticles'
+        );
+
+        $sMasterFile = $this->getConfig()->getPictureDir(false) . 'master/product/1/sugg-main-pic.jpg';
+        @mkdir(dirname($sMasterFile), 0777, true);
+        @touch($sMasterFile);
+
+        // A real request has a frontend controller, which is part of the field-name cache key.
+        $oActiveView = oxNew('oxStart');
+        $oActiveView->setClassKey('searchsuggest');
+        $this->getConfig()->setActiveView($oActiveView);
+
+        $this->cleanTmpDir();
+        oxBaseHelper::cleanup();
+
+        try {
+            $aFirstRequest = $this->_oSearchHandler->getSearchSuggestions('SuggMainPic');
+
+            // A new web request starts with a fresh static cache but reuses the field-name cache in tmp/.
+            oxBaseHelper::cleanup();
+            $aSecondRequest = $this->_oSearchHandler->getSearchSuggestions('SuggMainPic');
+        } finally {
+            @unlink($sMasterFile);
+        }
+
+        $this->assertCount(1, $aFirstRequest);
+        $this->assertStringContainsString('sugg-main-pic.jpg', $aFirstRequest[0]['icon']);
+        $this->assertCount(1, $aSecondRequest);
+        $this->assertStringContainsString('sugg-main-pic.jpg', $aSecondRequest[0]['icon']);
+        $this->assertSame($aFirstRequest[0]['icon'], $aSecondRequest[0]['icon']);
+    }
+
+    public function testGetSearchSuggestionsUsesTheSearchLanguageForTheArticleFields()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle']);
+        $this->_insertSearchableArticle('_testSuggLanguage', 'SuggLanguage');
+        $this->addToDatabase(
+            "UPDATE oxarticles SET oxtitle_1 = 'SuggLanguage' WHERE oxid = '_testSuggLanguage'",
+            'oxarticles'
+        );
+
+        $oSearch = oxNew('oxSearch');
+        $oSearch->setLanguage(1);
+
+        $aSuggestions = $oSearch->getSearchSuggestions('SuggLanguage');
+
+        $this->assertCount(1, $aSuggestions);
+        $this->assertSame('_testSuggLanguage', $aSuggestions[0]['id']);
     }
 
     public function testGetSearchSuggestionsReturnsPlaintextQuotesFromRawStorage()

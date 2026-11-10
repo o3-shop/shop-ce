@@ -476,6 +476,8 @@ class Search extends Base
         }
 
         $oArticle = oxNew(Article::class);
+        // Keep the article's field list on the same language view as the query below.
+        $oArticle->setLanguage($this->_iLanguage);
         $sActiveSnippet = $oArticle->getSqlActiveSnippet();
 
         $sSearchClause = $this->_getWhere($sSearchParam);
@@ -488,11 +490,7 @@ class Search extends Base
             $sDescJoin = " LEFT JOIN {$sDescView} ON {$sArticleTable}.oxid={$sDescView}.oxid";
         }
 
-        $sSelect = "SELECT {$sArticleTable}.oxid,
-                           {$sArticleTable}.oxtitle,
-                           {$sArticleTable}.oxvarselect,
-                           {$sArticleTable}.oxprice,
-                           {$sArticleTable}.oxthumb
+        $sSelect = "SELECT {$oArticle->getSelectFields()}
                     FROM {$sArticleTable} {$sDescJoin}
                     WHERE {$sActiveSnippet}
                       AND {$sArticleTable}.oxparentid = ''
