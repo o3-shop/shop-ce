@@ -195,6 +195,43 @@ class RevocationTemplateValidatorTest extends TestCase
         );
     }
 
+    public function testTwigThemeValidatesCleanWithTwigTemplates(): void
+    {
+        $themeId = 'o3-theme';
+        $langIds = [0];
+
+        $this->seedFullThemeTree($themeId, $langIds, '.html.twig');
+        $this->seedThemePhp($themeId, null, 'twig');
+        $language = $this->buildLanguageStub($langIds, true);
+
+        $missing = (new RevocationTemplateValidator($this->shopDir, $language))
+            ->validate(1, $themeId, $langIds);
+
+        $this->assertSame([], $missing, 'A Twig theme ships .html.twig templates, not .tpl.');
+    }
+
+    public function testTwigThemeReportsTwigPathWhenOnlyTplTemplatesExist(): void
+    {
+        $parentId = 'o3-theme';
+        $childId = 'twigchild';
+        $langIds = [0];
+
+        // The child inherits the engine from its parent.
+        $this->seedFullThemeTree($parentId, $langIds);
+        $this->seedThemePhp($parentId, null, 'twig');
+        $this->seedThemePhp($childId, $parentId);
+        $language = $this->buildLanguageStub($langIds, true);
+
+        $missing = (new RevocationTemplateValidator($this->shopDir, $language))
+            ->validate(1, $childId, $langIds);
+
+        $this->assertCount(8, $missing, '2 page + 6 email templates are missing as .html.twig.');
+        $this->assertStringEndsWith(
+            '/Application/views/twigchild/tpl/page/revocation/revocation.html.twig',
+            $missing[0]->getExpectedPath()
+        );
+    }
+
     public function testReportsAllMissingAssetsTogether(): void
     {
         $themeId = 'wave';
@@ -222,26 +259,26 @@ class RevocationTemplateValidatorTest extends TestCase
      *                        the test signature aligned with the
      *                        validator API
      */
-    private function seedFullThemeTree(string $themeId, array $langIds): void
+    private function seedFullThemeTree(string $themeId, array $langIds, string $suffix = '.tpl'): void
     {
         $themeRoot = $this->shopDir . '/Application/views/' . $themeId . '/';
 
         $pageDir = $themeRoot . 'tpl/page/revocation/';
         mkdir($pageDir, 0777, true);
-        touch($pageDir . 'revocation.tpl');
-        touch($pageDir . 'revocationreceipt.tpl');
+        touch($pageDir . 'revocation' . $suffix);
+        touch($pageDir . 'revocationreceipt' . $suffix);
 
         $emailHtml = $themeRoot . 'tpl/email/html/';
         $emailPlain = $themeRoot . 'tpl/email/plain/';
         mkdir($emailHtml, 0777, true);
         mkdir($emailPlain, 0777, true);
         foreach ([
-            $emailHtml . 'revocation_customer_confirmation.tpl',
-            $emailPlain . 'revocation_customer_confirmation.tpl',
-            $emailHtml . 'revocation_customer_confirmation_subj.tpl',
-            $emailHtml . 'revocation_operator_notification.tpl',
-            $emailPlain . 'revocation_operator_notification.tpl',
-            $emailHtml . 'revocation_operator_notification_subj.tpl',
+            $emailHtml . 'revocation_customer_confirmation' . $suffix,
+            $emailPlain . 'revocation_customer_confirmation' . $suffix,
+            $emailHtml . 'revocation_customer_confirmation_subj' . $suffix,
+            $emailHtml . 'revocation_operator_notification' . $suffix,
+            $emailPlain . 'revocation_operator_notification' . $suffix,
+            $emailHtml . 'revocation_operator_notification_subj' . $suffix,
         ] as $file) {
             touch($file);
         }
@@ -253,14 +290,15 @@ class RevocationTemplateValidatorTest extends TestCase
      * `$aTheme` array. When `$parentId` is given, the theme declares it
      * as its `parentTheme` so the validator can walk the inheritance chain.
      */
-    private function seedThemePhp(string $themeId, ?string $parentId): void
+    private function seedThemePhp(string $themeId, ?string $parentId, ?string $engine = null): void
     {
         $themeRoot = $this->shopDir . '/Application/views/' . $themeId . '/';
         if (!is_dir($themeRoot)) {
             mkdir($themeRoot, 0777, true);
         }
         $parentLine = $parentId !== null ? "    'parentTheme' => '$parentId',\n" : '';
-        $php = "<?php\n\$aTheme = [\n    'id' => '$themeId',\n$parentLine];\n";
+        $engineLine = $engine !== null ? "    'templateEngine' => '$engine',\n" : '';
+        $php = "<?php\n\$aTheme = [\n    'id' => '$themeId',\n$parentLine$engineLine];\n";
         file_put_contents($themeRoot . 'theme.php', $php);
     }
 

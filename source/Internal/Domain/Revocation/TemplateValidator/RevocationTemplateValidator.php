@@ -24,6 +24,7 @@ namespace OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator
 
 use OxidEsales\Eshop\Core\Language;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\TemplateEngineName;
 
 /**
  * Validates that every asset the §356a revocation feature needs is in
@@ -177,9 +178,13 @@ class RevocationTemplateValidator
         // that is genuinely absent from the whole chain.
         $themeRoots = $this->resolveThemeRoots($themeId);
         $childRoot = $themeRoots[0];
+        // A Twig theme ships `.html.twig` in place of every `.tpl`.
+        $toThemePath = $this->isTwigTheme($themeId)
+            ? fn (string $relpath): string => substr($relpath, 0, -strlen('.tpl')) . '.html.twig'
+            : fn (string $relpath): string => $relpath;
 
         // Page templates — not language-scoped.
-        foreach (self::PAGE_TEMPLATE_RELPATHS as $relpath) {
+        foreach (array_map($toThemePath, self::PAGE_TEMPLATE_RELPATHS) as $relpath) {
             if (!$this->templateExistsInChain($themeRoots, $relpath)) {
                 $absolute = $childRoot . $relpath;
                 $missing[] = new MissingAsset(
@@ -193,7 +198,7 @@ class RevocationTemplateValidator
 
         // Email templates — one set per theme; language-specific text comes
         // from `{oxmultilang}` calls inside the template (OXID convention).
-        foreach (array_merge(self::EMAIL_BODY_RELPATHS, self::EMAIL_SUBJECT_RELPATHS) as $relpath) {
+        foreach (array_map($toThemePath, array_merge(self::EMAIL_BODY_RELPATHS, self::EMAIL_SUBJECT_RELPATHS)) as $relpath) {
             if (!$this->templateExistsInChain($themeRoots, $relpath)) {
                 $absolute = $childRoot . $relpath;
                 $missing[] = new MissingAsset(
@@ -262,16 +267,43 @@ class RevocationTemplateValidator
      */
     private function getParentThemeId(string $themeId): ?string
     {
+        $parent = $this->readThemeInfo($themeId)['parentTheme'] ?? null;
+        return is_string($parent) && $parent !== '' ? $parent : null;
+    }
+
+    /**
+     * Whether the theme renders with Twig: the first `templateEngine` declared
+     * up the `parentTheme` chain, default Smarty — the same rule as
+     * {@see \OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\ThemeTemplateEngineProvider::getEngineName()}.
+     */
+    private function isTwigTheme(string $themeId): bool
+    {
+        $seen = [];
+        while ($themeId !== '' && !isset($seen[$themeId])) {
+            $seen[$themeId] = true;
+            $engine = $this->readThemeInfo($themeId)['templateEngine'] ?? null;
+            if ($engine !== null) {
+                return $engine === TemplateEngineName::TWIG;
+            }
+            $themeId = (string) $this->getParentThemeId($themeId);
+        }
+        return false;
+    }
+
+    /**
+     * The `$aTheme` array of a theme's `theme.php`, or [] when it has none.
+     */
+    private function readThemeInfo(string $themeId): array
+    {
         $themeFile = $this->resolveThemeRoot($themeId) . 'theme.php';
         if (!is_file($themeFile) || !is_readable($themeFile)) {
-            return null;
+            return [];
         }
 
         $aTheme = [];
         include $themeFile;
 
-        $parent = $aTheme['parentTheme'] ?? null;
-        return is_string($parent) && $parent !== '' ? $parent : null;
+        return is_array($aTheme) ? $aTheme : [];
     }
 
     /**
