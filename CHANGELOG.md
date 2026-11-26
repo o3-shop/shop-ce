@@ -12,6 +12,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   `twig/twig` dependency. The Twig cache lives in `<sCompileDir>/twig/` and is emptied by
   `TemplateCacheService::invalidateTemplateCache()` (and so by `oe:cache:clear`). The engine is
   not yet selectable for rendering; Smarty stays the template engine.
+- Twig support in O3-Shop 2.0, see `docs/twig.md`: a theme selects its engine with `'templateEngine' => 'twig'|'smarty'`
+  in `theme.php` (default `smarty`, inherited from the parent theme); admin and CMS content
+  (`parseThroughSmarty`) stay Smarty; e-mails use the storefront engine; modules ship Twig page
+  templates, own `@<moduleId>/` templates and extensions of theme templates (template chain ported
+  from OXID twig-component v2.0.1, GPL-3.0); admin warnings for modules without Twig templates and
+  for a Smarty child theme on a Twig parent.
+  **Upgrade note:** To keep a Smarty storefront, pin `o3-shop/o3-theme` to `^1` in your project's
+  `composer.json` *before* updating to O3-Shop 2.0; otherwise O3-Theme is updated to its Twig version.
 - console command `oe:module:refresh-settings` to re-apply the installed module configuration
   (templates, blocks, controllers, class extensions, events, services) to the shop without
   changing the module activation state. Module settings configured in the admin are kept.
