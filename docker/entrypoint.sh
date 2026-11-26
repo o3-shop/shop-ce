@@ -42,10 +42,11 @@ setup_environment() {
 # source/out/<theme> at its in-tree out/<theme> so Apache serves assets
 # directly out of the working tree.
 #
-# Args: <theme-name> <git-url>
+# Args: <theme-name> <git-url> [<branch>, default main]
 install_theme_from_git() {
     local theme="$1"
     local repo_url="$2"
+    local branch="${3:-main}"
     local view_dir="source/Application/views/${theme}"
     local out_dir="source/out/${theme}"
 
@@ -80,9 +81,9 @@ EOF
         fi
         log "${theme}: working tree already present, skipping clone"
     else
-        log "Cloning ${theme} from ${repo_url}..."
-        git clone --branch main "$repo_url" "$view_dir" \
-            || handle_error "Failed to clone ${theme} from ${repo_url}"
+        log "Cloning ${theme} (branch '${branch}') from ${repo_url}..."
+        git clone --branch "$branch" "$repo_url" "$view_dir" \
+            || handle_error "Failed to clone ${theme} branch '${branch}' from ${repo_url}"
     fi
 
     if [ -e "$out_dir" ] && [ ! -L "$out_dir" ]; then
@@ -122,7 +123,8 @@ install_theme() {
 }
 
 install_o3_theme() {
-    install_theme_from_git o3-theme https://github.com/o3-shop/o3-Theme.git
+    # O3-Theme 2.x (Twig) lives on b-2.0; main stays the Smarty 1.x line.
+    install_theme_from_git o3-theme https://github.com/o3-shop/o3-Theme.git b-2.0
 }
 
 # Function to install dependencies
