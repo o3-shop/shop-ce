@@ -2,6 +2,7 @@
     "name": "o3-shop/shop-ce",
     "description": "This package contains O3-Shop CE source code.",
     "type": "oxideshop",
+    "version": "dev-b-1.7",
     "keywords": ["o3-shop", "modules", "eShop"],
     "homepage": "https://www.o3-shop.com/",
     "license": "GPL-3.0-only",
@@ -126,6 +127,28 @@
         "allow-plugins": {
             "o3-shop/shop-composer-plugin": true,
             "o3-shop/shop-unified-namespace-generator": true
+        },
+        "policy": {
+            "advisories": {
+                "ignore": {
+                    "o3-shop/smarty": {
+                        "reason": "Smarty 2.6 is the template engine of the whole shop and cannot be swapped out here.",
+                        "on-audit": false
+                    },
+                    "smarty/smarty": {
+                        "reason": "Required by o3-shop/shop-unified-namespace-generator; same Smarty 2.6 line as o3-shop/smarty.",
+                        "on-audit": false
+                    },
+                    "symfony/dom-crawler": {
+                        "reason": "Dev only: pulled in by o3-shop/testing-library via o3-shop/mink-selenium-driver.",
+                        "on-audit": false
+                    },
+                    "symfony/polyfill-intl-idn": {
+                        "reason": "Dev only: pinned to 1.17.1 by o3-shop/testing-library.",
+                        "on-audit": false
+                    }
+                }
+            }
         }
     },
     "replace": {

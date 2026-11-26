@@ -205,3 +205,19 @@ type: feedback
   ("World-writable config file ... is ignored") and fell back to the socket ->
   `./docker.sh test` died in the bootstrap's test-DB install. `run-tests.sh` now sets
   `umask 022` first; keep it.
+
+## Dependabot (composer) on b-2.0 needs `version` + advisory ignores in composer.json (2026-11-26)
+- Dependabot resolves composer.json WITHOUT git info, so the root would be `1.0.0+no-version-set`
+  and o3-shop/shop-composer-plugin (`o3-shop/shop-ce ^1.2.0 || dev-*`) refuses it. `dev-*` is NOT a
+  wildcard in Composer, it's a literal branch name: the shop only ever satisfies the plugin via a
+  1.x branch alias. Hence `"version": "dev-b-1.7"` on b-2.0 (= what bin/composer-root-version.php
+  already gives CI). A `dev-b-2.0` -> `2.0-dev` alias would break CI AND Dependabot.
+- RELEASE TRAP: Composer/Packagist skip a TAG whose name doesn't match a hardcoded `version`
+  ("tag does not match version in composer.json"). Before tagging 2.0.x, remove/adjust the field,
+  and shop-composer-plugin needs a release accepting `^2.0` or a real 2.0 shop can't install it.
+- Composer >= 2.9 blocks packages with security advisories. `config.policy.advisories.ignore`
+  must list the advisory's package: o3-shop/smarty AND smarty/smarty (namespace generator), plus
+  the dev-only symfony/dom-crawler and symfony/polyfill-intl-idn. `on-audit: false` keeps
+  `composer audit` reporting them. Composer 2.2 (CI/Docker) ignores the `policy` key silently.
+- Reproduce Dependabot locally: copy composer.json+lock to a dir without .git and run the
+  latest composer.phar `update --dry-run --no-scripts --no-plugins`.
