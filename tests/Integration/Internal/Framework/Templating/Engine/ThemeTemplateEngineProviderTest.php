@@ -68,6 +68,32 @@ final class ThemeTemplateEngineProviderTest extends TestCase
         $this->assertSame('smarty', $this->provider($logger)->getEngineName('does-not-exist'));
     }
 
+    public function testUnknownThemeIsLoggedOncePerThemeId(): void
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->exactly(2))->method('warning');
+        $provider = $this->provider($logger);
+
+        $provider->getEngineName('does-not-exist');
+        $provider->getEngineName('does-not-exist');
+        $provider->getEngineName('does-not-exist-either');
+    }
+
+    public function testThemeInfoIsReadAndInvalidEngineLoggedOncePerThemeId(): void
+    {
+        $GLOBALS['invalidThemeInfoLoads'] = 0;
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('warning')->with($this->stringContains("'invalidtheme'"));
+        $provider = $this->provider($logger);
+
+        $this->assertSame('smarty', $provider->getEngineName('invalidtheme'));
+        $this->assertSame('smarty', $provider->getEngineName('invalidtheme'));
+        $this->assertSame('smarty', $provider->getOwnEngineName('invalidtheme'));
+        $this->assertNull($provider->getParentThemeId('invalidtheme'));
+
+        $this->assertSame(1, $GLOBALS['invalidThemeInfoLoads']);
+    }
+
     private function provider(?LoggerInterface $logger = null): ThemeTemplateEngineProvider
     {
         return new ThemeTemplateEngineProvider(

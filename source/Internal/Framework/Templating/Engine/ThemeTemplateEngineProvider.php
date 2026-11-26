@@ -34,6 +34,12 @@ class ThemeTemplateEngineProvider implements ThemeTemplateEngineProviderInterfac
     /** @var string|null */
     private $viewsDir;
 
+    /** @var array<string, array|null> theme info by theme id, read once per process */
+    private $themeInfos = [];
+
+    /** @var array<string, true> warnings already logged */
+    private $loggedWarnings = [];
+
     public function __construct(LoggerInterface $logger, ?string $viewsDir = null)
     {
         $this->logger = $logger;
@@ -49,7 +55,7 @@ class ThemeTemplateEngineProvider implements ThemeTemplateEngineProviderInterfac
             $seen[$themeId] = true;
             $info = $this->loadThemeInfo($themeId);
             if ($info === null) {
-                $this->logger->warning(
+                $this->warnOnce(
                     __METHOD__ . " - Theme '$themeId' could not be loaded. Falling back to template engine '"
                     . TemplateEngineName::SMARTY . "'."
                 );
@@ -90,7 +96,7 @@ class ThemeTemplateEngineProvider implements ThemeTemplateEngineProviderInterfac
         if ($engine === TemplateEngineName::TWIG || $engine === TemplateEngineName::SMARTY) {
             return $engine;
         }
-        $this->logger->warning(
+        $this->warnOnce(
             __METHOD__ . " - Theme '$themeId' declares an invalid template engine. Treating it as '"
             . TemplateEngineName::SMARTY . "'."
         );
@@ -100,6 +106,15 @@ class ThemeTemplateEngineProvider implements ThemeTemplateEngineProviderInterfac
 
     private function loadThemeInfo(string $themeId): ?array
     {
+        if (!array_key_exists($themeId, $this->themeInfos)) {
+            $this->themeInfos[$themeId] = $this->readThemeInfo($themeId);
+        }
+
+        return $this->themeInfos[$themeId];
+    }
+
+    private function readThemeInfo(string $themeId): ?array
+    {
         $file = ($this->viewsDir ?? Registry::getConfig()->getViewsDir()) . $themeId . '/theme.php';
         if (!is_readable($file)) {
             return null;
@@ -108,5 +123,16 @@ class ThemeTemplateEngineProvider implements ThemeTemplateEngineProviderInterfac
         include $file;
 
         return $aTheme;
+    }
+
+    /**
+     * The engine is resolved on every render call, so a broken theme is reported once per process, not per call.
+     */
+    private function warnOnce(string $message): void
+    {
+        if (!isset($this->loggedWarnings[$message])) {
+            $this->loggedWarnings[$message] = true;
+            $this->logger->warning($message);
+        }
     }
 }
