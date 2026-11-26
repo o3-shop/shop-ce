@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2dc36af127895f9a56eddaf475087a21",
+    "content-hash": "0dcb8228309ee875ac1641092c82e0e5",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -1630,16 +1630,16 @@
         },
         {
             "name": "o3-shop/shop-doctrine-migration-wrapper",
-            "version": "v1.0.3",
+            "version": "v1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/o3-shop/shop-doctrine-migration-wrapper.git",
-                "reference": "0f4230c29d569de5580aafdd2e22328fee56bc7a"
+                "reference": "ef661b749b0bd0025f136e5db61ad9dca6cf6f2a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/o3-shop/shop-doctrine-migration-wrapper/zipball/0f4230c29d569de5580aafdd2e22328fee56bc7a",
-                "reference": "0f4230c29d569de5580aafdd2e22328fee56bc7a",
+                "url": "https://api.github.com/repos/o3-shop/shop-doctrine-migration-wrapper/zipball/ef661b749b0bd0025f136e5db61ad9dca6cf6f2a",
+                "reference": "ef661b749b0bd0025f136e5db61ad9dca6cf6f2a",
                 "shasum": ""
             },
             "require": {
@@ -1677,9 +1677,9 @@
             "description": "O3-Shop database migrations using doctrine",
             "support": {
                 "issues": "https://github.com/o3-shop/shop-doctrine-migration-wrapper/issues",
-                "source": "https://github.com/o3-shop/shop-doctrine-migration-wrapper/tree/v1.0.3"
+                "source": "https://github.com/o3-shop/shop-doctrine-migration-wrapper/tree/v1.0.4"
             },
-            "time": "2026-05-09T15:44:24+00:00"
+            "time": "2026-06-25T07:59:05+00:00"
         },
         {
             "name": "o3-shop/shop-facts",
