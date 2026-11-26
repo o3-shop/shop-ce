@@ -318,6 +318,7 @@ class ShopControlTest extends \OxidTestCase
     public function testRenderTemplateNotFound()
     {
         ContainerFactory::resetContainer();
+        $this->getConfig()->setConfigParam('sTheme', 'wave'); // mocked Smarty needs a Smarty theme (O3-Theme 2.x is Twig)
         $oView = $this->getMock(\OxidEsales\Eshop\Core\Controller\BaseController::class, ['render']);
         $oView->expects($this->once())->method('render')->will($this->returnValue('wrongTpl'));
 
@@ -355,7 +356,7 @@ class ShopControlTest extends \OxidTestCase
     public function testProcess()
     {
         ContainerFactory::resetContainer();
-        $this->getConfig()->setConfigParam('sTheme', 'o3-theme');
+        $this->getConfig()->setConfigParam('sTheme', 'wave'); // mocked Smarty needs a Smarty theme (O3-Theme 2.x is Twig)
 
         $controllerClassName = 'content';
 
@@ -395,7 +396,7 @@ class ShopControlTest extends \OxidTestCase
     public function testProcessJson()
     {
         ContainerFactory::resetContainer();
-        $this->getConfig()->setConfigParam('sTheme', 'o3-theme');
+        $this->getConfig()->setConfigParam('sTheme', 'wave'); // mocked Smarty needs a Smarty theme (O3-Theme 2.x is Twig)
 
         $controllerClassName = 'content';
 
@@ -450,7 +451,7 @@ class ShopControlTest extends \OxidTestCase
     public function testProcessJsonWithErrors()
     {
         ContainerFactory::resetContainer();
-        $this->getConfig()->setConfigParam('sTheme', 'o3-theme');
+        $this->getConfig()->setConfigParam('sTheme', 'wave'); // mocked Smarty needs a Smarty theme (O3-Theme 2.x is Twig)
 
         $controllerClassName = 'content';
 
@@ -686,6 +687,9 @@ class ShopControlTest extends \OxidTestCase
         parent::tearDown();
 
         modDB::getInstance()->cleanup();
+        // Tests here build the container under the wave theme; its theme-bound Twig services
+        // (template directories) must not leak into later tests.
+        ContainerFactory::resetContainer();
     }
 
     /**

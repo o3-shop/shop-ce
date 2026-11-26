@@ -29,6 +29,10 @@ use OxidEsales\Eshop\Core\Theme;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\MissingAssetHintTranslator;
 use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\RevocationTemplateValidator;
+use OxidEsales\EshopCommunity\Internal\Framework\Templating\Compatibility\ModuleTwigCompatibilityCheckerInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Templating\Compatibility\ThemeEngineMismatchCheckerInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\TemplateEngineName;
+use OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\ThemeTemplateEngineProviderInterface;
 
 /**
  * Admin article main deliveryset manager.
@@ -55,6 +59,7 @@ class ThemeMain extends AdminDetailsController
 
         if ($oTheme->load($soxId)) {
             $this->_aViewData['oTheme'] = $oTheme;
+            $this->addTwigCompatibilityWarnings($soxId);
         } else {
             Registry::getUtilsView()->addErrorToDisplay(oxNew(StandardException::class, 'EXCEPTION_THEME_NOT_LOADED'));
         }
@@ -112,6 +117,7 @@ class ThemeMain extends AdminDetailsController
         try {
             $oTheme->activate();
             $this->resetContentCache();
+            $this->logTwigCompatibilityWarnings($sTheme);
         } catch (StandardException $oEx) {
             Registry::getUtilsView()->addErrorToDisplay($oEx);
             $oEx->debugOut();
@@ -183,5 +189,88 @@ class ThemeMain extends AdminDetailsController
                 ->get(RevocationTemplateValidator::class);
         }
         return $this->revocationTemplateValidator;
+    }
+
+    /** English log text of each Twig compatibility warning (logs are English, whatever the admin language). */
+    private const TWIG_WARNING_LOG_FORMATS = [
+        'TWIG_MODULES_WITHOUT_TWIG_TEMPLATES' =>
+            "Active modules without Twig templates will not render in the storefront: '%s'.",
+        'THEME_ENGINE_MISMATCH' =>
+            "Theme '%1\$s' uses template engine '%3\$s', but its parent theme '%2\$s' uses '%4\$s'. The theme will not work.",
+    ];
+
+    /** @var array{0: ThemeTemplateEngineProviderInterface, 1: ModuleTwigCompatibilityCheckerInterface, 2: ThemeEngineMismatchCheckerInterface}|null */
+    protected ?array $twigCompatibilityServices = null;
+
+    /**
+     * Test seam — inject the services of the Twig compatibility warnings without driving the DI container.
+     */
+    public function setTwigCompatibilityServices(
+        ThemeTemplateEngineProviderInterface $engineProvider,
+        ModuleTwigCompatibilityCheckerInterface $moduleChecker,
+        ThemeEngineMismatchCheckerInterface $mismatchChecker
+    ): void {
+        $this->twigCompatibilityServices = [$engineProvider, $moduleChecker, $mismatchChecker];
+    }
+
+    /**
+     * Warnings about a theme engine mismatch of the given theme and, while a Twig theme is active (or is
+     * just being activated: $activatedThemeId), about active modules without Twig templates.
+     *
+     * @return array<int, array{0: string, 1: string[]}> language key and sprintf arguments of each warning
+     */
+    protected function getTwigCompatibilityWarnings(string $themeId, ?string $activatedThemeId = null): array
+    {
+        if ($this->twigCompatibilityServices === null) {
+            $container = ContainerFactory::getInstance()->getContainer();
+            $this->twigCompatibilityServices = [
+                $container->get(ThemeTemplateEngineProviderInterface::class),
+                $container->get(ModuleTwigCompatibilityCheckerInterface::class),
+                $container->get(ThemeEngineMismatchCheckerInterface::class),
+            ];
+        }
+        [$engineProvider, $moduleChecker, $mismatchChecker] = $this->twigCompatibilityServices;
+        $warnings = [];
+
+        if ($engineProvider->getEngineName($activatedThemeId) === TemplateEngineName::TWIG) {
+            $moduleIds = $moduleChecker->getModulesWithoutTwigTemplates((int) Registry::getConfig()->getShopId());
+            if ($moduleIds !== []) {
+                $warnings[] = ['TWIG_MODULES_WITHOUT_TWIG_TEMPLATES', [implode(', ', $moduleIds)]];
+            }
+        }
+        $mismatch = $mismatchChecker->getMismatch($themeId);
+        if ($mismatch !== null) {
+            $warnings[] = ['THEME_ENGINE_MISMATCH', array_values($mismatch)];
+        }
+
+        return $warnings;
+    }
+
+    /**
+     * Displays the Twig compatibility warnings (display only, never logs: it runs on every page view).
+     */
+    protected function addTwigCompatibilityWarnings(string $themeId): void
+    {
+        foreach ($this->getTwigCompatibilityWarnings($themeId) as [$key, $args]) {
+            $exception = oxNew(ExceptionToDisplay::class);
+            $exception->setMessage($key);
+            $exception->setMessageArgs(...array_map('htmlspecialchars', $args));
+            Registry::getUtilsView()->addErrorToDisplay($exception);
+        }
+    }
+
+    /**
+     * Logs once per activation what the Twig compatibility check found. The warnings themselves are
+     * displayed by the render() that follows the activation in the same request.
+     */
+    protected function logTwigCompatibilityWarnings(string $themeId): void
+    {
+        $messages = [];
+        foreach ($this->getTwigCompatibilityWarnings($themeId, $themeId) as [$key, $args]) {
+            $messages[] = vsprintf(self::TWIG_WARNING_LOG_FORMATS[$key], $args);
+        }
+        if ($messages !== []) {
+            Registry::getLogger()->warning(__METHOD__ . " - Activated theme '$themeId': " . implode(' ', $messages));
+        }
     }
 }

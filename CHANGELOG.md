@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [unreleased]
 
 ### Added
+- Twig 3 engine core in `source/Internal/Framework/Twig/` (service `oxid_esales.templating.twig_engine`).
+  Adopted OXID twig-component v1.1.0 (GPL-3.0) into the core, ported to Twig 3; adds the
+  `twig/twig` dependency. The Twig cache lives in `<sCompileDir>/twig/` and is emptied by
+  `TemplateCacheService::invalidateTemplateCache()` (and so by `oe:cache:clear`).
+- Twig support in O3-Shop 2.0, see `docs/twig.md`: a theme selects its engine with `'templateEngine' => 'twig'|'smarty'`
+  in `theme.php` (default `smarty`, inherited from the parent theme); admin and CMS content
+  (`parseThroughSmarty`) stay Smarty; e-mails use the storefront engine; modules ship Twig page
+  templates, own `@<moduleId>/` templates and extensions of theme templates (template chain ported
+  from OXID twig-component v2.0.1, GPL-3.0); admin warnings for modules without Twig templates and
+  for a Smarty child theme on a Twig parent. CMS content in Twig templates is parsed by Smarty as in
+  1.x: `{% ifcontent %}` provides the content with its stored fields parsed by Smarty, and the new Twig function
+  `include_content(ident, field = 'oxcontent', oxid = null)` replaces Smarty's `[{oxcontent}]`.
+  **Upgrade note:** To keep a Smarty storefront, stay on O3-Theme 1.x *before* updating to O3-Shop 2.0;
+  otherwise O3-Theme is updated to its Twig version. Open item: every released O3-Theme 1.x tag requires
+  `o3-shop/shop-ce: ^1.2`, so pinning `o3-shop/o3-theme` to `^1` does not resolve next to O3-Shop 2.0 yet;
+  that needs an O3-Theme 1.x release whose `composer.json` also allows shop-ce 2.0 (not released yet).
+  Until then keep the theme checkout/package on the 1.x line manually. Module authors: see
+  "O3-Theme 2.x for module authors" in `docs/twig.md`.
 - console command `oe:module:refresh-settings` to re-apply the installed module configuration
   (templates, blocks, controllers, class extensions, events, services) to the shop without
   changing the module activation state. Module settings configured in the admin are kept.
@@ -14,6 +32,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   project configuration first.
 
 ### Changed
+- the v2 dev setup (`docker/entrypoint.sh`) and CI install O3-Theme 2.x (Twig, branch `b-2.0` of
+  `o3-shop/o3-Theme`); `main` stays the Smarty 1.x line. An existing `source/Application/views/o3-theme`
+  checkout is kept as is: switch it with `git -C source/Application/views/o3-theme switch b-2.0`.
 - `oe:module:install-configuration` now refreshes the stored settings of the shops where the
   module is already active and exits non-zero when a refresh failed. It takes the same run lock
   and pre-write backup as `oe:module:refresh-settings --from-metadata`, restores the backup when
@@ -21,6 +42,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   scripts need to account for the new exit code.
 
 ### Fixed
+- the revocation asset check (admin revocation settings, theme and language activation,
+  `o3:check-templates`) looks for `.html.twig` templates under a Twig theme instead of reporting
+  every revocation template as missing and blocking the save.
 - installing a module configuration now refreshes the stored module settings of the shops
   where the module is already active. Previously the shop kept serving the settings derived
   from the previous configuration until the module was deactivated and activated again -

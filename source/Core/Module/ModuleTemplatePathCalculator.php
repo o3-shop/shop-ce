@@ -77,19 +77,37 @@ class ModuleTemplatePathCalculator
             (array)$this->theme->getActiveThemesList()
         );
         foreach ($moduleTemplates as $moduleId => $templatesConfiguration) {
-            if (!$this->moduleIsActive($moduleId) || !$this->moduleExtendsTemplate($templatesConfiguration, $templateName)) {
+            if (!$this->moduleIsActive($moduleId)) {
                 continue;
             }
-            $moduleTemplatePath = $this->fileSystem->combinePaths(
-                $this->getModulesPath(),
-                $this->geModuleTemplateExtension($templatesConfiguration, $templateName)
-            );
+            $mappedName = $templateName;
+            if (!$this->moduleExtendsTemplate($templatesConfiguration, $mappedName)) {
+                // A Twig name falls back to the mapping of its .tpl name (sibling file).
+                $mappedName = $this->twigNameToTplName($templateName);
+                if ($mappedName === null || !$this->moduleExtendsTemplate($templatesConfiguration, $mappedName)) {
+                    continue;
+                }
+            }
+            $mappedPath = $this->geModuleTemplateExtension($templatesConfiguration, $mappedName);
+            if ($mappedName !== $templateName && substr($mappedPath, -4) === '.tpl') {
+                $mappedPath = substr($mappedPath, 0, -strlen('.tpl')) . '.html.twig';
+            }
+            $moduleTemplatePath = $this->fileSystem->combinePaths($this->getModulesPath(), $mappedPath);
             if (!$this->fileSystem->isReadable($moduleTemplatePath)) {
                 throw oxNew('oxException', sprintf('Cannot find template file "%s".', $moduleTemplatePath));
             }
             return $moduleTemplatePath;
         }
         throw oxNew('oxException', sprintf('Cannot find template "%s" in modules configuration.', $templateName));
+    }
+
+    private function twigNameToTplName(string $templateName): ?string
+    {
+        $suffix = '.html.twig';
+        if (substr($templateName, -strlen($suffix)) !== $suffix) {
+            return null;
+        }
+        return substr($templateName, 0, -strlen($suffix)) . '.tpl';
     }
 
     private function moduleIsActive(string $moduleId): bool

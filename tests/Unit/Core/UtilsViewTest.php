@@ -203,6 +203,8 @@ class UtilsViewTest extends \OxidTestCase
     public function testGetTemplateOutput()
     {
         $this->getConfig()->setConfigParam('iDebug', 0);
+        // A Smarty test template: needs a Smarty theme (O3-Theme 2.x is Twig).
+        $this->getConfig()->setConfigParam('sTheme', 'wave');
         $sTpl = __DIR__ . '/../testData//misc/testTempOut.tpl';
 
         $oView = oxNew('oxview');

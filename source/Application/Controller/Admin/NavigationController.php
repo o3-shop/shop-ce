@@ -31,6 +31,10 @@ use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\EshopCommunity\Core\AdminNaviRights;
 use OxidEsales\EshopCommunity\Core\AdminViewSetting;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Framework\Templating\Compatibility\ModuleTwigCompatibilityCheckerInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Templating\Compatibility\ThemeEngineMismatchCheckerInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\TemplateEngineName;
+use OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\ThemeTemplateEngineProviderInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\UpdateCheck\UpdateCheckServiceInterface;
 
 /**
@@ -208,7 +212,45 @@ class NavigationController extends AdminController
             $messages['warning'] .= ((!empty($messages['warning'])) ? '<br>' : '') . Registry::getLang()->translateString('SETUP_CONFIGPERMISSIONS_WARNING');
         }
 
+        foreach ($this->getTwigCompatibilityWarnings() as $warning) {
+            $messages['warning'] = (!empty($messages['warning']) ? $messages['warning'] . '<br>' : '') . $warning;
+        }
+
         return $messages;
+    }
+
+    /**
+     * Warnings about active modules without Twig templates (while a Twig theme is active) and about an
+     * engine mismatch between the active theme and its parent.
+     *
+     * @return string[] HTML-safe messages
+     */
+    protected function getTwigCompatibilityWarnings(): array
+    {
+        $container = ContainerFactory::getInstance()->getContainer();
+        $lang = Registry::getLang();
+        $warnings = [];
+
+        if ($container->get(ThemeTemplateEngineProviderInterface::class)->getEngineName() === TemplateEngineName::TWIG) {
+            $shopId = (int) Registry::getConfig()->getShopId();
+            $moduleIds = $container->get(ModuleTwigCompatibilityCheckerInterface::class)->getModulesWithoutTwigTemplates($shopId);
+            if ($moduleIds !== []) {
+                $warnings[] = sprintf(
+                    $lang->translateString('TWIG_MODULES_WITHOUT_TWIG_TEMPLATES'),
+                    htmlspecialchars(implode(', ', $moduleIds))
+                );
+            }
+        }
+        $themeId = (string) oxNew(\OxidEsales\Eshop\Core\Theme::class)->getActiveThemeId();
+        $mismatch = $container->get(ThemeEngineMismatchCheckerInterface::class)->getMismatch($themeId);
+        if ($mismatch !== null) {
+            $warnings[] = sprintf(
+                $lang->translateString('THEME_ENGINE_MISMATCH'),
+                ...array_map('htmlspecialchars', array_values($mismatch))
+            );
+        }
+
+        return $warnings;
     }
 
     /**

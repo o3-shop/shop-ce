@@ -21,6 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic;
 
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Registry;
+
 class IfContentLogic
 {
     /**
@@ -54,5 +57,66 @@ class IfContentLogic
         }
 
         return $oContent;
+    }
+
+    /**
+     * Active content with its stored oxcontent and oxtitle parsed through Smarty (cache id, active view and
+     * conditions as in Smarty's oxifcontent block), for {% ifcontent %}. Only stored CMS fields are parsed,
+     * never template output, so user data printed by the template cannot reach Smarty.
+     *
+     * @return mixed a parsed copy of the content, or false
+     */
+    public function getParsedContent(string $ident = null, string $oxid = null)
+    {
+        $content = $this->getContent($ident, $oxid);
+        if (!$content) {
+            return false;
+        }
+
+        // A copy: getContent() caches the stored content per request.
+        $content = clone $content;
+        foreach (['oxcontent', 'oxtitle'] as $field) {
+            $value = (string) $content->getFieldData($field);
+            if (strpos($value, '[{') !== false) {
+                $parsed = Registry::getUtilsView()->parseThroughSmarty(
+                    $value,
+                    $ident . md5($value),
+                    Registry::getConfig()->getActiveView()
+                );
+                $content->{"oxcontents__{$field}"} = new Field((string) $parsed, Field::T_RAW);
+            }
+        }
+
+        return $content;
+    }
+
+    /**
+     * Loads active CMS content by ident (or oxid) and renders the given field through Smarty with the template
+     * variables, as Smarty's oxcontent function does.
+     */
+    public function includeContent(array $context, ?string $ident, string $field = 'oxcontent', ?string $oxid = null): string
+    {
+        $text = Registry::getConfig()->getActiveShop()->isProductiveMode()
+            ? ''
+            : sprintf('<b>content not found ! check ident(%s) !</b>', $ident ?? 'undefined');
+
+        $content = ($ident || $oxid) ? $this->getContent($ident, $oxid) : false;
+        if (!$content) {
+            return $text;
+        }
+
+        $value = (string) $content->getFieldData($field);
+        $cacheId = $ident . $oxid . $field . Registry::getLang()->getBaseLanguage() . Registry::getConfig()->getShopId();
+        try {
+            // Returns the value unparsed when deactivateSmartyForCmsContent is set (or in the demo shop).
+            return Registry::getUtilsView()->getRenderedContent($value, $context, $cacheId);
+        } catch (\Throwable $error) {
+            Registry::getLogger()->error(
+                __METHOD__ . " - Rendering CMS content ident '$ident', oxid '$oxid', field '$field' through Smarty failed: '{$error->getMessage()}'.",
+                [$error]
+            );
+
+            return '';
+        }
     }
 }

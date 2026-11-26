@@ -1973,4 +1973,6 @@ $aLang = [
     'O3_GUARANTEE_ADMIN_CONDITIONS_LABEL' => 'Guarantee conditions (sec. 479 German Civil Code)',
     'O3_GUARANTEE_ADMIN_WARN_NOT_ELIGIBLE' => 'Note: The EU guarantee label is only shown for a guarantee duration of more than 2 years (Art. 6(1)(la) Consumer Rights Directive). Saving is still possible.',
     'O3_GUARANTEE_ADMIN_WARN_NO_GUARANTOR' => 'Warning: No guarantor can be determined (field empty, no manufacturer linked). The label cannot be shown without a guarantor.',
+    'TWIG_MODULES_WITHOUT_TWIG_TEMPLATES' => 'Twig theme is active, but these modules have no Twig templates and will not render in the storefront: %s',
+    'THEME_ENGINE_MISMATCH' => "Theme '%1\$s' uses a different template engine (%3\$s) than its parent theme '%2\$s' (%4\$s) and will not work.",
 ];

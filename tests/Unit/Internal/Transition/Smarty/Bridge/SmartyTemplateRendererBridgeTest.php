@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Transition\Smarty\Bridge;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Smarty\Bridge\SmartyTemplateRendererBridge;
+use OxidEsales\EshopCommunity\Internal\Framework\Smarty\Legacy\LegacySmartyEngineInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInterface;
 
 class SmartyTemplateRendererBridgeTest extends \PHPUnit\Framework\TestCase
@@ -34,8 +35,23 @@ class SmartyTemplateRendererBridgeTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $bridge = new SmartyTemplateRendererBridge($renderer);
+        $bridge = new SmartyTemplateRendererBridge($renderer, $this->createMock(LegacySmartyEngineInterface::class));
 
         $this->assertSame($renderer, $bridge->getTemplateRenderer());
+    }
+
+    public function testSetEngineGoesToTheSmartyEngineOnly()
+    {
+        $smarty = new \Smarty();
+        $renderer = $this->createMock(TemplateRendererInterface::class);
+        $renderer->expects($this->never())->method('getTemplateEngine');
+        $smartyEngine = $this->createMock(LegacySmartyEngineInterface::class);
+        $smartyEngine->expects($this->once())->method('setSmarty')->with($smarty);
+        $smartyEngine->method('getSmarty')->willReturn($smarty);
+
+        $bridge = new SmartyTemplateRendererBridge($renderer, $smartyEngine);
+        $bridge->setEngine($smarty);
+
+        $this->assertSame($smarty, $bridge->getEngine());
     }
 }

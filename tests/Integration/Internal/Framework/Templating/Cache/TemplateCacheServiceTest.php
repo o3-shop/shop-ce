@@ -28,6 +28,7 @@ final class TemplateCacheServiceTest extends TestCase
 
     protected function tearDown(): void
     {
+        $this->filesystem->remove(__DIR__ . '/Fixtures/tmp/twig');
         $this->filesystem->dumpFile(
             Path::join($this->templateCacheDirectory, 'sample.tpl.php'),
             ''
@@ -53,6 +54,22 @@ final class TemplateCacheServiceTest extends TestCase
             0,
             glob("{$this->templateCacheDirectory}/*.php")
         );
+    }
+
+    public function testInvalidateTemplateCacheAlsoClearsTwigCache(): void
+    {
+        $twigCacheDirectory = __DIR__ . '/Fixtures/tmp/twig';
+        $this->filesystem->dumpFile(Path::join($twigCacheDirectory, 'ab', 'compiled.php'), '');
+        $this->filesystem->dumpFile(Path::join($twigCacheDirectory, 'top.php'), '');
+
+        $basicContext = $this->getMockBuilder(BasicContext::class)
+            ->setMethods(['getCacheDirectory'])
+            ->getMock();
+        $basicContext->method('getCacheDirectory')->willReturn(__DIR__ . '/Fixtures/tmp');
+
+        (new TemplateCacheService($basicContext, $this->filesystem))->invalidateTemplateCache();
+
+        self::assertSame([], glob("{$twigCacheDirectory}/*"));
     }
 
     private function putFilesInTemplateCache(): void

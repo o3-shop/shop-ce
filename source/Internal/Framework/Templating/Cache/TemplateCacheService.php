@@ -35,6 +35,9 @@ use Webmozart\PathUtil\Path;
  */
 class TemplateCacheService implements TemplateCacheServiceInterface
 {
+    /** Cache directory names below the compile directory, one per template engine. */
+    private const TEMPLATE_ENGINE_CACHE_DIRECTORIES = ['smarty', 'twig'];
+
     /** @var Filesystem */
     private $filesystem;
 
@@ -55,24 +58,21 @@ class TemplateCacheService implements TemplateCacheServiceInterface
 
     public function invalidateTemplateCache(): void
     {
-        $templateCacheDirectory = $this->getTemplateCacheDirectory();
+        foreach (self::TEMPLATE_ENGINE_CACHE_DIRECTORIES as $directoryName) {
+            $this->emptyDirectory(Path::join($this->basicContext->getCacheDirectory(), $directoryName));
+        }
+    }
 
-        if ($this->filesystem->exists($templateCacheDirectory)) {
+    private function emptyDirectory(string $directory): void
+    {
+        if ($this->filesystem->exists($directory)) {
             $recursiveIterator = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($templateCacheDirectory, RecursiveDirectoryIterator::SKIP_DOTS),
+                new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS),
                 RecursiveIteratorIterator::SELF_FIRST,
                 RecursiveIteratorIterator::CATCH_GET_CHILD
             );
 
             $this->filesystem->remove($recursiveIterator);
         }
-    }
-
-    private function getTemplateCacheDirectory(): string
-    {
-        return Path::join(
-            $this->basicContext->getCacheDirectory(),
-            'smarty'
-        );
     }
 }

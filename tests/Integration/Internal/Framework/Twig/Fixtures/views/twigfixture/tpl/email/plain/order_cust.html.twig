@@ -1,0 +1,4 @@
+TWIG-FIXTURE-ORDER-CUST-PLAIN
+{{ translate({ ident: "ORDER_NUMBER" }) }} {{ order.oxorder__oxordernr.value }}
+{{ translate({ ident: "TOTAL" }) }} {{ format_price(order.getTotalOrderSum(), { currency: oEmailView.getCurrency() }) }}
+{{ oEmailView.getShop().oxshops__oxname.value }}

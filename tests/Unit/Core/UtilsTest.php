@@ -987,7 +987,8 @@ class UtilsTest extends \OxidTestCase
     public function testResetTemplateCache()
     {
         $config = $this->getConfig();
-        $config->setConfigParam('sTheme', 'o3-theme');
+        // Smarty template cache: needs a Smarty theme (O3-Theme 2.x is Twig).
+        $config->setConfigParam('sTheme', 'wave');
 
         $utils = oxRegistry::getUtils();
         $smarty = \OxidEsales\Eshop\Core\Registry::getUtilsView()->getSmarty(true);

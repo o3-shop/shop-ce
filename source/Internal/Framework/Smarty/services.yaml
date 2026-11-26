@@ -30,9 +30,26 @@ services:
     class: OxidEsales\EshopCommunity\Internal\Framework\Smarty\Bridge\SmartyEngineBridge
   smarty.smarty_engine_factory:
     class: OxidEsales\EshopCommunity\Internal\Framework\Smarty\Legacy\LegacySmartyEngineFactory
-  OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateEngineInterface:
+  oxid_esales.templating.smarty_engine:
     class: OxidEsales\EshopCommunity\Internal\Framework\Smarty\Legacy\LegacySmartyEngine
     factory: ['@smarty.smarty_engine_factory', 'getTemplateEngine']
+  OxidEsales\EshopCommunity\Internal\Framework\Smarty\Legacy\LegacySmartyEngineInterface:
+    alias: oxid_esales.templating.smarty_engine
+    public: true
+  # The engine is chosen per render call (admin mode -> Smarty, storefront -> active theme's engine).
+  OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateEngineInterface:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\DelegatingTemplateEngine
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\TemplateEngineResolverInterface'
+  OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\TemplateEngineResolverInterface:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\TemplateEngineResolver
+    public: true
+    arguments:
+      - !service_locator
+        smarty: '@oxid_esales.templating.smarty_engine'
+        twig: '@oxid_esales.templating.twig_engine'
+      - '@OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\ThemeTemplateEngineProviderInterface'
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface'
   OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface:
     class: OxidEsales\EshopCommunity\Internal\Framework\Smarty\Bridge\SmartyTemplateRendererBridge
     public: true

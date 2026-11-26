@@ -25,6 +25,9 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\DIContainer;
 
 use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Dao\ProjectYamlDao;
 use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Service\ProjectYamlImportService;
+use OxidEsales\EshopCommunity\Internal\Framework\Twig\DependencyInjection\Compiler\TwigEnvironmentPass;
+use OxidEsales\EshopCommunity\Internal\Framework\Twig\DependencyInjection\Compiler\TwigEscaperPass;
+use OxidEsales\EshopCommunity\Internal\Framework\Twig\DependencyInjection\Compiler\TwigLoaderPass;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContext;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
@@ -63,6 +66,9 @@ class ContainerBuilder
         $symfonyContainer = new SymfonyContainerBuilder();
         $symfonyContainer->addCompilerPass(new RegisterListenersPass(EventDispatcherInterface::class));
         $symfonyContainer->addCompilerPass(new AddConsoleCommandPass());
+        $symfonyContainer->addCompilerPass(new TwigLoaderPass());
+        $symfonyContainer->addCompilerPass(new TwigEnvironmentPass());
+        $symfonyContainer->addCompilerPass(new TwigEscaperPass());
         $this->loadEditionServices($symfonyContainer);
         $this->loadProjectServices($symfonyContainer);
 

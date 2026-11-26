@@ -26,6 +26,7 @@ namespace OxidEsales\EshopCommunity\Tests\Integration\Core\Smarty\Plugin;
 use OxidEsales\Eshop\Application\Model\Content;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\UtilsView;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInterface;
 use OxidEsales\TestingLibrary\UnitTestCase;
@@ -43,6 +44,10 @@ final class BlockOxIfContentTest extends UnitTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // A Smarty plugin test needs a Smarty storefront theme (O3-Theme 2.x is Twig).
+        Registry::getConfig()->setConfigParam('sTheme', 'wave');
+        Registry::getConfig()->setConfigParam('sCustomTheme', '');
+        Registry::set(UtilsView::class, null);
         $this->prepareTestData();
     }
 

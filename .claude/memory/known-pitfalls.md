@@ -154,7 +154,7 @@ type: feedback
 - Related: the whole `ORDER BY` also travels into `getSearchArticleCount()` (it slices the select from `' from '` onwards) and into `getSearchSuggestions()`, so every relevance term must be legal in an aggregate query too.
 
 ## E2E CI installs the satellites UNPINNED — an o3-theme / demodata change turns b-1.7 red with no shop-ce commit
-- `.github/workflows/code-quality.yml` installs `o3-shop/o3-theme:dev-main` (line ~369) and clones `shop-demodata-ce --branch main` (line ~389). Both track a moving target, so a merge in either repo lands in shop-ce CI on the next push and the blame falls on whatever PR happened to merge that day.
+- `.github/workflows/code-quality.yml` installs `o3-shop/o3-theme:dev-main` (line ~369; on the b-2.0 line a `git clone --branch b-2.0` of o3-Theme instead, see below) and clones `shop-demodata-ce --branch main` (line ~389). Both track a moving target, so a merge in either repo lands in shop-ce CI on the next push and the blame falls on whatever PR happened to merge that day.
 - Real incident (2026-09-03, run 33721506403): demodata `40ef584c` started seeding `('theme:o3-theme','blShowSubcatTiles','bool','1')`. o3-theme 1.5's `tpl/page/list/list.tpl` renders the PLP sub-categories as product-box **tiles instead of** the `nav.alist__orga-subcats` pill strip when that flag is on, so three #141 specs failed on a locator that no longer existed. `Search.php` was the only shop-ce change in that push and was entirely innocent.
 - **How to apply:** before debugging a red E2E on `b-1.7`, diff the satellites (`gh api repos/o3-shop/{o3-theme,shop-demodata-ce}/commits`) against the date of the last green run — the last green Code Quality run on the branch, not the last green PR run, which used an older base. Storefront specs must read markup that a theme *setting* can switch through a mode-agnostic POM accessor (see `StorefrontCategoryPage.subcatMode()/subcatTitles()`), not through one hardcoded selector.
 - To reproduce a theme-setting mode locally: `saveShopConfVar('bool','blShowSubcatTiles',true,null,'theme:o3-theme')` inside the shop container, then `rm -f source/tmp/oxc_*`. Never write theme settings into `oxconfig` with SQL.
@@ -221,3 +221,9 @@ type: feedback
   `composer audit` reporting them. Composer 2.2 (CI/Docker) ignores the `policy` key silently.
 - Reproduce Dependabot locally: copy composer.json+lock to a dir without .git and run the
   latest composer.phar `update --dry-run --no-scripts --no-plugins`.
+
+## b-2.0: the dev setup and CI run the Twig o3-theme (b-2.0) — Smarty tests must pin `wave`
+- `docker/entrypoint.sh` and both CI jobs clone o3-Theme `b-2.0` (Twig). `composer require o3-shop/o3-theme:dev-b-2.0` cannot resolve while the root version is `dev-b-1.7` (the theme requires shop-ce `^2.0`), hence the clone. An existing checkout is not switched by `./docker.sh start`.
+- A test that mocks Smarty, renders a `.tpl` fixture or reads `Config::getTemplatePath()` needs a Smarty theme: `setConfigParam('sTheme', 'wave')`. A test that builds the container under another theme (after `ContainerFactory::resetContainer()`) must reset it again afterwards: the Twig template directories are bound at container build, and the next test fails with `Unable to find template "email/html/….tpl"` (ShopControlTest polluted EmailTest; only visible in the full Unit run, `./docker.sh test --all-failures`; passing several paths to `./docker.sh test --fast` runs only the first).
+- Feature checks that look for `.tpl` files in the theme are wrong under Twig (revocation asset validator, fixed): key them on the theme's engine.
+- Local Playwright: `SHOP_CONTAINER=o3shop-shop-ce-shop-1` (default `o3shop-app` does not exist; the revocation and menu specs then fail on `docker exec`).

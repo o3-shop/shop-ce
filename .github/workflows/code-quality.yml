@@ -140,7 +140,12 @@ jobs:
           composer install --prefer-dist --no-progress
           echo "::endgroup::"
           echo "::group::Install O3-Theme"
-          composer require o3-shop/o3-theme:dev-main --prefer-dist --no-progress
+          # O3-Theme 2.x (Twig) for the b-2.0 line, cloned like docker/entrypoint.sh
+          # does: main is the Smarty 1.x line, and composer cannot install 2.x here
+          # while this line's root version is still dev-b-1.7 (2.x needs shop-ce ^2.0).
+          git clone --branch b-2.0 --depth 1 https://github.com/o3-shop/o3-Theme.git source/Application/views/o3-theme
+          mkdir -p source/out
+          ln -sfn ../Application/views/o3-theme/out/o3-theme source/out/o3-theme
           echo "::endgroup::"
           echo "::group::Apt Intall"
           sudo apt-get update
@@ -360,7 +365,9 @@ jobs:
           echo "COMPOSER_ROOT_VERSION=${root_version}" >> "$GITHUB_ENV"
           export COMPOSER_ROOT_VERSION="${root_version}"
           composer install --prefer-dist --no-progress --optimize-autoloader
-          composer require o3-shop/o3-theme:dev-main --prefer-dist --no-progress
+          # O3-Theme 2.x (Twig) for the b-2.0 line, cloned like docker/entrypoint.sh
+          # (see the unit job); its out/ symlink is set in the wave step below.
+          git clone --branch b-2.0 --depth 1 https://github.com/o3-shop/o3-Theme.git source/Application/views/o3-theme
 
       - name: 🧩 Clone satellites (testing-library, demodata) + symlinks
         env:

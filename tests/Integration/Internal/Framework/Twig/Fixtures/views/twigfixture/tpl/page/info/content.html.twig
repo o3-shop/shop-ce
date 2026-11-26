@@ -1,0 +1,8 @@
+{% extends "layout/base.html.twig" %}
+
+{% block content %}
+PARSED[{{ oView.getParsedContent()|raw }}]
+INCLUDE[{{ include_content('c2_vars') }}]
+IFCONTENT[{% ifcontent ident "c2_vars" set oCont %}{{ oCont.oxcontents__oxcontent.value|raw }}{% endifcontent %}]
+{{ include_widget({ cl: "oxwMiniBasket", nocookie: 1 }) }}
+{% endblock %}

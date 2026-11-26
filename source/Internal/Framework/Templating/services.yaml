@@ -60,3 +60,14 @@ services:
       - '@oxid_esales.symfony.file_system'
     public: true
 
+  OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\ThemeTemplateEngineProviderInterface:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\ThemeTemplateEngineProvider
+    public: true
+
+  OxidEsales\EshopCommunity\Internal\Framework\Templating\Compatibility\ModuleTwigCompatibilityCheckerInterface:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Templating\Compatibility\ModuleTwigCompatibilityChecker
+    public: true
+
+  OxidEsales\EshopCommunity\Internal\Framework\Templating\Compatibility\ThemeEngineMismatchCheckerInterface:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Templating\Compatibility\ThemeEngineMismatchChecker
+    public: true

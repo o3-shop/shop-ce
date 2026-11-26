@@ -1,0 +1,8 @@
+<html>
+<body>
+<p>TWIG-FIXTURE-ORDER-CUST-HTML</p>
+<p>{{ translate({ ident: "ORDER_NUMBER" }) }} {{ order.oxorder__oxordernr.value }}</p>
+<p>{{ translate({ ident: "TOTAL" }) }} {{ format_price(order.getTotalOrderSum(), { currency: oEmailView.getCurrency() }) }}</p>
+<p>{{ oEmailView.getShop().oxshops__oxname.value }}</p>
+</body>
+</html>

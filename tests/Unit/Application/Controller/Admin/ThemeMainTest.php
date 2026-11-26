@@ -210,4 +210,157 @@ class ThemeMainTest extends OxidTestCase
         $r->setAccessible(true);
         $this->assertFalse($r->invoke($controller, 'azure'));
     }
+
+    /**
+     * @return \OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\ThemeTemplateEngineProviderInterface
+     */
+    private function engineProvider(string $engine)
+    {
+        $provider = $this->createMock(\OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\ThemeTemplateEngineProviderInterface::class);
+        $provider->method('getEngineName')->willReturn($engine);
+
+        return $provider;
+    }
+
+    private function controllerWithCheckers(string $engine, array $moduleIds, ?array $mismatch): ThemeMain
+    {
+        $moduleChecker = $this->createMock(\OxidEsales\EshopCommunity\Internal\Framework\Templating\Compatibility\ModuleTwigCompatibilityCheckerInterface::class);
+        $moduleChecker->method('getModulesWithoutTwigTemplates')->willReturn($moduleIds);
+        $mismatchChecker = $this->createMock(\OxidEsales\EshopCommunity\Internal\Framework\Templating\Compatibility\ThemeEngineMismatchCheckerInterface::class);
+        $mismatchChecker->method('getMismatch')->willReturn($mismatch);
+
+        $controller = oxNew(ThemeMain::class);
+        $controller->setTwigCompatibilityServices($this->engineProvider($engine), $moduleChecker, $mismatchChecker);
+
+        return $controller;
+    }
+
+    private function expectDisplayedMessages(array $needles): void
+    {
+        $messages = [];
+        $utilsView = $this->createMock(\OxidEsales\Eshop\Core\UtilsView::class);
+        $utilsView->method('addErrorToDisplay')->willReturnCallback(
+            function ($exception) use (&$messages) {
+                $messages[] = $exception->getOxMessage();
+            }
+        );
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\UtilsView::class, $utilsView);
+        $this->messages = &$messages;
+    }
+
+    public function testRenderWarnsAboutModulesWithoutTwigTemplatesOnTwigTheme()
+    {
+        $this->getConfig()->setConfigParam('sTheme', 'o3-theme');
+        $this->expectDisplayedMessages([]);
+        $controller = $this->controllerWithCheckers('twig', ['smartyonly', 'other'], null);
+
+        $this->assertSame('theme_main.tpl', $controller->render());
+        $this->assertCount(1, $this->messages);
+        $this->assertStringContainsString('smartyonly, other', $this->messages[0]);
+    }
+
+    public function testRenderDoesNotWarnOnSmartyTheme()
+    {
+        $this->getConfig()->setConfigParam('sTheme', 'o3-theme');
+        $this->expectDisplayedMessages([]);
+        $controller = $this->controllerWithCheckers('smarty', ['smartyonly'], null);
+
+        $controller->render();
+        $this->assertSame([], $this->messages);
+    }
+
+    public function testRenderWarnsAboutEngineMismatch()
+    {
+        $this->getConfig()->setConfigParam('sTheme', 'o3-theme');
+        $this->expectDisplayedMessages([]);
+        $controller = $this->controllerWithCheckers(
+            'smarty',
+            [],
+            ['child' => 'mychild', 'parent' => 'o3-theme', 'childEngine' => 'smarty', 'parentEngine' => 'twig']
+        );
+
+        $controller->render();
+        $this->assertCount(1, $this->messages);
+        $this->assertStringContainsString('mychild', $this->messages[0]);
+        $this->assertStringContainsString('o3-theme', $this->messages[0]);
+    }
+
+    private function expectWarningLogs(int $count, string $needle = ''): void
+    {
+        $logger = $this->createMock(\Psr\Log\LoggerInterface::class);
+        $logger->expects($this->exactly($count))->method('warning')->with($this->stringContains($needle));
+        \OxidEsales\Eshop\Core\Registry::set('logger', $logger);
+    }
+
+    private function stubThemeActivation(): void
+    {
+        $this->setRequestParameter('oxid', 'o3-theme');
+        oxTestModules::addFunction('oxTheme', 'load($name)', '{return true;}');
+        oxTestModules::addFunction('oxTheme', 'activate', '{$GLOBALS["themeActivated"] = true; return true;}');
+        $GLOBALS['themeActivated'] = false;
+    }
+
+    public function testSetThenRenderDisplaysEachWarningOnceAndLogsOnce()
+    {
+        $this->expectDisplayedMessages([]);
+        $this->expectWarningLogs(1, 'smartyonly');
+        $controller = $this->controllerWithCheckers(
+            'twig',
+            ['smartyonly'],
+            ['child' => 'mychild', 'parent' => 'o3-theme', 'childEngine' => 'smarty', 'parentEngine' => 'twig']
+        );
+        $this->stubThemeActivation();
+
+        $controller->setTheme();
+        $controller->render();
+
+        $this->assertTrue($GLOBALS['themeActivated']);
+        $this->assertCount(2, $this->messages);
+        $this->assertStringContainsString('smartyonly', $this->messages[0]);
+        $this->assertStringContainsString('mychild', $this->messages[1]);
+    }
+
+    public function testActivationLogsEnglishTextWhateverTheAdminLanguage()
+    {
+        \OxidEsales\Eshop\Core\Registry::getLang()->setTplLanguage(0);
+        $this->expectDisplayedMessages([]);
+        $this->expectWarningLogs(
+            1,
+            "Activated theme 'o3-theme': Active modules without Twig templates will not render in the storefront: "
+            . "'smartyonly'. Theme 'mychild' uses template engine 'smarty', but its parent theme 'o3-theme' uses "
+            . "'twig'. The theme will not work."
+        );
+        $controller = $this->controllerWithCheckers(
+            'twig',
+            ['smartyonly'],
+            ['child' => 'mychild', 'parent' => 'o3-theme', 'childEngine' => 'smarty', 'parentEngine' => 'twig']
+        );
+        $this->stubThemeActivation();
+
+        $controller->setTheme();
+    }
+
+    public function testRenderAloneDisplaysButDoesNotLog()
+    {
+        $this->getConfig()->setConfigParam('sTheme', 'o3-theme');
+        $this->expectDisplayedMessages([]);
+        $this->expectWarningLogs(0);
+        $controller = $this->controllerWithCheckers('twig', ['smartyonly'], null);
+
+        $controller->render();
+        $this->assertCount(1, $this->messages);
+    }
+
+    public function testDisplayedIdsAreEscaped()
+    {
+        $this->getConfig()->setConfigParam('sTheme', 'o3-theme');
+        $this->expectDisplayedMessages([]);
+        $controller = $this->controllerWithCheckers('twig', ['<b>x</b>'], null);
+
+        $controller->render();
+        $this->assertStringContainsString('&lt;b&gt;x&lt;/b&gt;', $this->messages[0]);
+    }
+
+    /** @var string[] */
+    private $messages = [];
 }

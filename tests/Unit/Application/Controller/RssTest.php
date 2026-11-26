@@ -64,6 +64,9 @@ class RssTest extends \OxidTestCase
 
     public function testRender()
     {
+        // The Smarty render path (mocked Smarty below) needs a Smarty storefront theme;
+        // o3-theme 2.x is Twig.
+        $this->getConfig()->setConfigParam('sTheme', 'wave');
         ContainerFactory::resetContainer();
         $oSmarty = $this->getMock('Smarty', ['assign', 'fetch']);
         $oSmarty->expects($this->any())->method('assign');
@@ -86,6 +89,9 @@ class RssTest extends \OxidTestCase
         oxTestModules::addModuleObject('oxLang', $oLang);
 
         $this->assertSame(null, $oRss->render());
+
+        // The container was built under the wave theme; keep its theme-bound services out of later tests.
+        ContainerFactory::resetContainer();
     }
 
     public function testTopShopDisabled()
