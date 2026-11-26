@@ -142,4 +142,92 @@ class ModuleTemplatePathCalculatorCoverageTest extends \OxidTestCase
 
         $this->assertSame($expected, $calculator->calculateModuleTemplatePath('shared.tpl'));
     }
+
+    /** FileSystem mock joining paths and treating only $readable files as existing. */
+    private function makeSiblingFileSystem(array $readable): FileSystem
+    {
+        $fs = $this->getMock(FileSystem::class, ['combinePaths', 'isReadable']);
+        $fs->expects($this->any())->method('combinePaths')
+            ->will($this->returnCallback(function ($a, $b) {
+                return $a . '/' . $b;
+            }));
+        $fs->expects($this->any())->method('isReadable')
+            ->will($this->returnCallback(function ($path) use ($readable) {
+                return in_array($path, $readable, true);
+            }));
+        return $fs;
+    }
+
+    private function twigCalculator(array $templates, array $themes, array $readable): ModuleTemplatePathCalculator
+    {
+        $this->getConfig()->setConfigParam('aModuleTemplates', ['mymodule' => $templates]);
+        $this->getConfig()->setConfigParam('aModulePaths', ['mymodule' => 'mymodule/']);
+        $calculator = new ModuleTemplatePathCalculator(
+            null,
+            $this->makeTheme($themes),
+            $this->makeSiblingFileSystem($readable)
+        );
+        $calculator->setModulesPath('/m');
+        return $calculator;
+    }
+
+    public function testTwigNameFallsBackToTplMappingSibling(): void
+    {
+        $calculator = $this->twigCalculator(
+            ['mymodule_page.tpl' => 'my/views/tpl/page.tpl'],
+            [],
+            ['/m/my/views/tpl/page.html.twig']
+        );
+
+        $this->assertSame('/m/my/views/tpl/page.html.twig', $calculator->calculateModuleTemplatePath('mymodule_page.html.twig'));
+    }
+
+    public function testTwigNameWithNestedPath(): void
+    {
+        $calculator = $this->twigCalculator(
+            ['page/mymodule/page.tpl' => 'my/views/page.tpl'],
+            [],
+            ['/m/my/views/page.html.twig']
+        );
+
+        $this->assertSame('/m/my/views/page.html.twig', $calculator->calculateModuleTemplatePath('page/mymodule/page.html.twig'));
+    }
+
+    public function testTwigSiblingMissingThrows(): void
+    {
+        $calculator = $this->twigCalculator(
+            ['mymodule_page.tpl' => 'my/views/tpl/page.tpl'],
+            [],
+            ['/m/my/views/tpl/page.tpl']
+        );
+
+        $this->expectException(\Throwable::class);
+        $this->expectExceptionMessageMatches('/Cannot find template/');
+        $calculator->calculateModuleTemplatePath('mymodule_page.html.twig');
+    }
+
+    public function testThemeSpecificMappingSibling(): void
+    {
+        $calculator = $this->twigCalculator(
+            [
+                'page.tpl' => 'my/views/page.tpl',
+                'wave'     => ['page.tpl' => 'my/views/wave/page.tpl'],
+            ],
+            ['wave'],
+            ['/m/my/views/wave/page.html.twig', '/m/my/views/page.html.twig']
+        );
+
+        $this->assertSame('/m/my/views/wave/page.html.twig', $calculator->calculateModuleTemplatePath('page.html.twig'));
+    }
+
+    public function testExplicitTwigKeyWinsOverTplFallback(): void
+    {
+        $calculator = $this->twigCalculator(
+            ['page.html.twig' => 'my/explicit.html.twig', 'page.tpl' => 'my/views/page.tpl'],
+            [],
+            ['/m/my/explicit.html.twig']
+        );
+
+        $this->assertSame('/m/my/explicit.html.twig', $calculator->calculateModuleTemplatePath('page.html.twig'));
+    }
 }
