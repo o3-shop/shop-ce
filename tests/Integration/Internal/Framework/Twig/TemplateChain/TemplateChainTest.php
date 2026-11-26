@@ -161,6 +161,24 @@ final class TemplateChainTest extends TestCase
         $this->assertSame('[<modulea-twigtheme>theme</modulea-twigtheme>]', $this->render('page/start.tpl'));
     }
 
+    public function testThemePageExtendsLayoutThroughItsChain(): void
+    {
+        $this->activate('modulea');
+
+        $this->assertSame(
+            '<layout><modulea-layout>head</modulea-layout>details</layout>',
+            $this->render('page/details.html.twig')
+        );
+    }
+
+    public function testThemePageIncludesPartialThroughItsChain(): void
+    {
+        $this->activate('modulea');
+
+        $box = '<modulea-box>box</modulea-box>';
+        $this->assertSame("$box|$box|$box", $this->render('page/list.html.twig'));
+    }
+
     public function testModuleOwnTemplateNamespace(): void
     {
         $this->activate('modulea');

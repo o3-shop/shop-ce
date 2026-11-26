@@ -19,6 +19,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  *
  * Modified for O3-Shop (2026): adopted from OXID twig-component v1.1.0, ported to Twig 3.
+ * Modified for O3-Shop (2026): template chain include ported from twig-component v2.0.1 to PHP 7.4
  */
 
 declare(strict_types=1);
@@ -27,12 +28,11 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Twig\TokenParser;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Twig\Node\IncludeDynamicNode;
 use Twig\Token;
-use Twig\TokenParser\IncludeTokenParser;
 
 /**
  * Class IncludeDynamicTokenParser
  */
-class IncludeDynamicTokenParser extends IncludeTokenParser
+class IncludeDynamicTokenParser extends IncludeChainTokenParser
 {
     /**
      * @param Token $token
@@ -41,7 +41,7 @@ class IncludeDynamicTokenParser extends IncludeTokenParser
      */
     public function parse(Token $token): IncludeDynamicNode
     {
-        $expr = $this->parser->getExpressionParser()->parseExpression();
+        $expr = $this->parseTemplateExpression();
 
         list($variables, $only, $ignoreMissing) = $this->parseArguments();
 

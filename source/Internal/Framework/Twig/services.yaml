@@ -114,6 +114,7 @@ services:
     class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\IncludeExtension
     arguments:
       - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\IncludeDynamicLogic'
+      - '@OxidEsales\EshopCommunity\Internal\Framework\Twig\Resolver\TemplateChain\TemplateChainResolver'
     tags: ['twig.extension']
 
   OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\SmartyCycleExtension:

@@ -19,16 +19,22 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  *
  * Modified for O3-Shop (2026): adopted from OXID twig-component v1.1.0, ported to Twig 3.
+ * Modified for O3-Shop (2026): template chain include ported from twig-component v2.0.1 to PHP 7.4
  */
 
 declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions;
 
+use OxidEsales\EshopCommunity\Internal\Framework\Twig\Resolver\TemplateChain\TemplateChainResolver;
+use OxidEsales\EshopCommunity\Internal\Framework\Twig\TokenParser\IncludeChainTokenParser;
 use OxidEsales\EshopCommunity\Internal\Framework\Twig\TokenParser\IncludeDynamicTokenParser;
 use OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\IncludeDynamicLogic;
+use Twig\Environment;
 use Twig\Extension\AbstractExtension;
+use Twig\Extension\CoreExtension;
 use Twig\TokenParser\TokenParserInterface;
+use Twig\TwigFunction;
 
 /**
  * Class IncludeExtension
@@ -41,21 +47,77 @@ class IncludeExtension extends AbstractExtension
     private $includeDynamicLogic;
 
     /**
-     * IncludeExtension constructor.
-     *
-     * @param IncludeDynamicLogic $includeDynamicLogic
+     * @var TemplateChainResolver|null
      */
-    public function __construct(IncludeDynamicLogic $includeDynamicLogic)
-    {
+    private $templateChainResolver;
+
+    public function __construct(
+        IncludeDynamicLogic $includeDynamicLogic,
+        ?TemplateChainResolver $templateChainResolver = null
+    ) {
         $this->includeDynamicLogic = $includeDynamicLogic;
+        $this->templateChainResolver = $templateChainResolver;
     }
 
     /**
+     * The "include" and "include_dynamic" tags and the "include()" function render the outermost
+     * template of the included template's chain (module extensions).
+     *
      * @return TokenParserInterface[]
      */
     public function getTokenParsers(): array
     {
-        return [new IncludeDynamicTokenParser()];
+        if ($this->templateChainResolver === null) {
+            return [new IncludeDynamicTokenParser()];
+        }
+
+        return [
+            new IncludeChainTokenParser($this->templateChainResolver),
+            new IncludeDynamicTokenParser($this->templateChainResolver),
+        ];
+    }
+
+    /**
+     * @return TwigFunction[]
+     */
+    public function getFunctions(): array
+    {
+        if ($this->templateChainResolver === null) {
+            return [];
+        }
+
+        return [
+            new TwigFunction(
+                'include',
+                [$this, 'include'],
+                ['needs_environment' => true, 'needs_context' => true, 'is_safe' => ['all']]
+            ),
+        ];
+    }
+
+    /**
+     * Twig's include() with the template names resolved through their chains.
+     *
+     * @see CoreExtension::include
+     *
+     * @param mixed $template a name, a template object or a list of them
+     * @param mixed $variables
+     */
+    public function include(
+        Environment $env,
+        $context,
+        $template,
+        $variables = [],
+        bool $withContext = true,
+        bool $ignoreMissing = false,
+        bool $sandboxed = false
+    ): string {
+        $resolve = function ($name) {
+            return is_string($name) ? $this->templateChainResolver->getLastChild($name) : $name;
+        };
+        $template = is_array($template) ? array_map($resolve, $template) : $resolve($template);
+
+        return CoreExtension::include($env, $context, $template, $variables, $withContext, $ignoreMissing, $sandboxed);
     }
 
     /**

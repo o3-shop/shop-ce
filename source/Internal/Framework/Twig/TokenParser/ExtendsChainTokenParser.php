@@ -33,8 +33,8 @@ use Twig\Token;
 use Twig\TokenParser\AbstractTokenParser;
 
 /**
- * Replaces Twig's "extends" tag: inside a template chain, a constant parent name is replaced by the
- * next template of the chain, so module extensions of one theme template extend each other.
+ * Replaces Twig's "extends" tag: a constant parent name is replaced by the next template of the
+ * current template's chain, or else by the outermost template of the parent's own chain.
  *
  * @see \Twig\TokenParser\ExtendsTokenParser::parse
  */
@@ -66,11 +66,14 @@ class ExtendsChainTokenParser extends AbstractTokenParser
         }
 
         $expression = $this->parser->getExpressionParser()->parseExpression();
-        if ($expression instanceof ConstantExpression) {
-            $parent = $this->templateChainResolver->getParent($stream->getSourceContext()->getName());
-            if ($parent !== null) {
-                $expression->setAttribute('value', $parent);
-            }
+        if ($expression instanceof ConstantExpression && is_string($expression->getAttribute('value'))) {
+            // A module extension extends the next template of its chain; any other template (e.g. a theme
+            // page extending its layout) extends the outermost template of the parent's chain.
+            $expression->setAttribute(
+                'value',
+                $this->templateChainResolver->getParent($stream->getSourceContext()->getName())
+                    ?? $this->templateChainResolver->getLastChild($expression->getAttribute('value'))
+            );
         }
 
         $this->parser->setParent($expression);

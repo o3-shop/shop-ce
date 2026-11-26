@@ -93,6 +93,8 @@ class FilesystemLoader extends TwigLoader
     /**
      * Module extensions compile with their template chain parent baked in, and the chain depends on the
      * active theme and modules. Keying the compiled template by them keeps shops and theme switches apart.
+     * Not covered: an extension file added to an already active module in place; that needs a template
+     * cache clear (as on deploy), since only a template's own file is checked for freshness.
      */
     public function getCacheKey(string $name): string
     {
