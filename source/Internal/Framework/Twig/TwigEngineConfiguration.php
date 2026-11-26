@@ -57,6 +57,21 @@ class TwigEngineConfiguration implements TwigEngineConfigurationInterface
         return [
             'debug' => $this->context->getIsDebug(),
             'cache' => $this->context->getCacheDir(),
+            'autoescape' => [self::class, 'getAutoescapeStrategy'],
         ];
+    }
+
+    /**
+     * Autoescape html everywhere except plain-text mail templates. Matches the path segment so that logical names
+     * ("email/plain/x.html.twig") and module chain names ("@module/email/plain/x.html.twig") are both covered.
+     * A static callable (not a closure) keeps the options array dumpable by the container.
+     *
+     * @param string $templateName
+     *
+     * @return string|false
+     */
+    public static function getAutoescapeStrategy(string $templateName)
+    {
+        return preg_match('#(^|/)email/plain/#', $templateName) === 1 ? false : 'html';
     }
 }

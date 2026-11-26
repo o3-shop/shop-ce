@@ -33,8 +33,11 @@ class TwigEngineConfigurationTest extends TestCase
     public function testGetParameters(): void
     {
         $engineConfiguration = $this->getEngineConfiguration();
-        $this->assertEquals(['debug' => true, 'cache' => 'dummy_cache_dir'], $engineConfiguration->getParameters());
-        $this->assertNotEquals(['debug' => 'foo', 'cache' => 'foo'], $engineConfiguration->getParameters());
+        $parameters = $engineConfiguration->getParameters();
+        $this->assertTrue($parameters['debug']);
+        $this->assertSame('dummy_cache_dir', $parameters['cache']);
+        $this->assertSame('html', \call_user_func($parameters['autoescape'], 'page/x.html.twig'));
+        $this->assertFalse(\call_user_func($parameters['autoescape'], 'email/plain/x.html.twig'));
     }
 
     private function getEngineConfiguration(): TwigEngineConfiguration
