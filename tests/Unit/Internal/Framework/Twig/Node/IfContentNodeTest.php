@@ -76,7 +76,9 @@ class IfContentNodeTest extends NodeTestCase
         $tests[] = [$node, <<<EOF
 // line 1
 \$context["foo"] = \$this->extensions['$ifContentExtensionClass']->getContent("oxsomething", null);
-yield "Lorem Ipsum";
+if (\$context["foo"]) {
+    yield "Lorem Ipsum";
+}
 unset(\$context["foo"]);
 EOF
         ];
@@ -85,7 +87,9 @@ EOF
         $tests[] = [$node, <<<EOF
 // line 1
 \$context["foo"] = \$this->extensions['$ifContentExtensionClass']->getContent(null, "oxsomething");
-yield "Lorem Ipsum";
+if (\$context["foo"]) {
+    yield "Lorem Ipsum";
+}
 unset(\$context["foo"]);
 EOF
         ];

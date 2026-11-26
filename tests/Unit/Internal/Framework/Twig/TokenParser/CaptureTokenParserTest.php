@@ -140,4 +140,26 @@ class CaptureTokenParserTest extends TestCase
         $this->expectExceptionMessage("Incorrect attribute name. Possible attribute names are: 'name', 'assign' and 'append'");
         $this->parser->parse($stream);
     }
+
+    /**
+     * @dataProvider invalidVariableNameProvider
+     */
+    public function testInvalidVariableNameIsRejectedAtParseTime(string $source): void
+    {
+        $stream = $this->environment->tokenize(new Source($source, 'index'));
+
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage('The capture variable name must be a constant string');
+        $this->parser->parse($stream);
+    }
+
+    public function invalidVariableNameProvider(): array
+    {
+        return [
+            'php injection' => ['{% capture name="x\'];system(\'id\');//" %}a{% endcapture %}'],
+            'leading digit' => ['{% capture assign="1x" %}a{% endcapture %}'],
+            'empty' => ['{% capture append="" %}a{% endcapture %}'],
+            'not a constant' => ['{% capture name=foo %}a{% endcapture %}'],
+        ];
+    }
 }

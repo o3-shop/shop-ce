@@ -74,7 +74,11 @@ class IfContentNode extends Node
         $compiler->raw(");\n");
 
         $compiler
+            ->write('if (')->subcompile($this->getNode('variable'))->raw(") {\n")
+            ->indent()
             ->subcompile($this->getNode('body'))
+            ->outdent()
+            ->write("}\n")
             ->write('unset(')->subcompile($this->getNode('variable'))->raw(");\n");
     }
 }

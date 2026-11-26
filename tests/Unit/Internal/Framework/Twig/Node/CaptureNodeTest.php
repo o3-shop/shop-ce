@@ -58,7 +58,7 @@ class CaptureNodeTest extends NodeTestCase
     yield "Lorem Ipsum";
     return; yield '';
 })());
-\$context['twig']['capture']['foo'] = \$captureContent;
+\$context['twig']['capture']["foo"] = \$captureContent;
 unset(\$captureContent);
 EOF
         ];
@@ -75,8 +75,8 @@ EOF
     yield "Lorem Ipsum";
     return; yield '';
 })());
-if ('foo' != '') {
-\$context['foo'] = \$captureContent;
+if ("foo" != '') {
+\$context["foo"] = \$captureContent;
 }
 unset(\$captureContent);
 EOF
@@ -94,14 +94,14 @@ EOF
     yield "Lorem Ipsum";
     return; yield '';
 })());
-if ('foo' != '' && isset(\$captureContent)) {
-if (!isset(\$context['foo'])) {
-\$context['foo'] = [];
+if ("foo" != '' && isset(\$captureContent)) {
+if (!isset(\$context["foo"])) {
+\$context["foo"] = [];
 }
-if (!is_array(\$context['foo'])) {
-\$context['foo'] = [\$context['foo']];
+if (!is_array(\$context["foo"])) {
+\$context["foo"] = [\$context["foo"]];
 }
-\$context['foo'][] = \$captureContent;
+\$context["foo"][] = \$captureContent;
 }
 unset(\$captureContent);
 EOF

@@ -130,12 +130,16 @@ class CaptureNode extends Node
     }
 
     /**
+     * The variable name is emitted with Compiler::repr(), never concatenated into the PHP code.
+     *
      * @param Compiler $compiler
      */
     private function compileCaptureName(Compiler $compiler): void
     {
         $compiler
-            ->write("\$context['twig']['capture']['" . $this->variableName . "'] = \$captureContent;\n");
+            ->write("\$context['twig']['capture'][")
+            ->repr($this->variableName)
+            ->raw("] = \$captureContent;\n");
     }
 
     /**
@@ -144,9 +148,9 @@ class CaptureNode extends Node
     private function compileCaptureAssign(Compiler $compiler): void
     {
         $compiler
-            ->write("if ('" . $this->variableName . "' != '') {\n")
-            ->write("\$context['" . $this->variableName . "'] = \$captureContent;\n")
-            ->write(("}\n"));
+            ->write('if (')->repr($this->variableName)->raw(" != '') {\n")
+            ->write('$context[')->repr($this->variableName)->raw("] = \$captureContent;\n")
+            ->write("}\n");
     }
 
     /**
@@ -155,15 +159,15 @@ class CaptureNode extends Node
     private function compileCaptureAppend(Compiler $compiler): void
     {
         $compiler
-            ->write("if ('" . $this->variableName . "' != '' && isset(\$captureContent)) {\n")
-            ->write("if (!isset(\$context['" . $this->variableName . "'])) {\n")
-            ->write("\$context['" . $this->variableName . "'] = [];\n")
-            ->write(("}\n"))
-            ->write("if (!is_array(\$context['" . $this->variableName . "'])) {\n")
-            ->write("\$context['" . $this->variableName . "'] = [\$context['" . $this->variableName . "']];\n")
-            ->write(("}\n"))
-            ->write("\$context['" . $this->variableName . "'][] = \$captureContent;\n")
-            ->write(("}\n"));
+            ->write('if (')->repr($this->variableName)->raw(" != '' && isset(\$captureContent)) {\n")
+            ->write('if (!isset($context[')->repr($this->variableName)->raw("])) {\n")
+            ->write('$context[')->repr($this->variableName)->raw("] = [];\n")
+            ->write("}\n")
+            ->write('if (!is_array($context[')->repr($this->variableName)->raw("])) {\n")
+            ->write('$context[')->repr($this->variableName)->raw('] = [$context[')->repr($this->variableName)->raw("]];\n")
+            ->write("}\n")
+            ->write('$context[')->repr($this->variableName)->raw("][] = \$captureContent;\n")
+            ->write("}\n");
     }
 
     /**

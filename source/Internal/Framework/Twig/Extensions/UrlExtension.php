@@ -66,7 +66,7 @@ class UrlExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('seo_url', [$this, 'getSeoUrl'], ['is_safe' => ['html']]),
+            new TwigFunction('seo_url', [$this, 'getSeoUrl']),
         ];
     }
 
@@ -78,7 +78,7 @@ class UrlExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('add_url_parameters', [$this, 'addUrlParameters'], ['is_safe' => ['html']]),
+            new TwigFilter('add_url_parameters', [$this, 'addUrlParameters']),
         ];
     }
 
@@ -98,7 +98,7 @@ class UrlExtension extends AbstractExtension
             $url = $this->addUrlParameters($url, $dynamicParameters);
         }
 
-        return $url;
+        return $this->toPlainUrl($url);
     }
 
     /**
@@ -111,6 +111,15 @@ class UrlExtension extends AbstractExtension
      */
     public function addUrlParameters(string $url, string $dynamicParameters): string
     {
-        return $this->addUrlParametersLogic->addUrlParameters($url, $dynamicParameters);
+        return $this->toPlainUrl($this->addUrlParametersLogic->addUrlParameters($url, $dynamicParameters));
+    }
+
+    /**
+     * The URL logic returns HTML-encoded ampersands. A URL is not markup, so it is returned plain and
+     * left to the autoescaper, which encodes it exactly once.
+     */
+    private function toPlainUrl(string $url): string
+    {
+        return str_replace('&amp;', '&', $url);
     }
 }

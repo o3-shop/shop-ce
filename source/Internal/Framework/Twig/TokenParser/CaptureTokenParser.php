@@ -27,6 +27,8 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Twig\TokenParser;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Twig\Node\CaptureNode;
 use Twig\Error\SyntaxError;
+use Twig\Node\Expression\ConstantExpression;
+use Twig\Node\Node;
 use Twig\Token;
 use Twig\TokenParser\AbstractTokenParser;
 use Twig\TokenStream;
@@ -53,12 +55,27 @@ class CaptureTokenParser extends AbstractTokenParser
 
         $attributeName = $this->getAttributeName($stream);
         $stream->expect(Token::OPERATOR_TYPE, '=');
-        $variableName = $parser->getExpressionParser()->parseExpression()->getAttribute('value');
+        $variableName = $this->getVariableName($parser->getExpressionParser()->parseExpression(), $token->getLine());
         $stream->expect(Token::BLOCK_END_TYPE);
         $body = $this->parser->subparse([$this, 'decideBlockEnd'], true);
         $stream->expect(Token::BLOCK_END_TYPE);
 
         return new CaptureNode($attributeName, $variableName, $body, $token->getLine(), $this->getTag());
+    }
+
+    /**
+     * The name ends up in compiled PHP, so only plain identifiers are accepted.
+     *
+     * @throws SyntaxError
+     */
+    private function getVariableName(Node $expression, int $line): string
+    {
+        $name = $expression instanceof ConstantExpression ? $expression->getAttribute('value') : null;
+        if (!is_string($name) || !preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $name)) {
+            throw new SyntaxError('The capture variable name must be a constant string of letters, digits and underscores.', $line, $this->parser->getStream()->getSourceContext());
+        }
+
+        return $name;
     }
 
     /**
