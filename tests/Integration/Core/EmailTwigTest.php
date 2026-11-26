@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Core;
 
+use OxidEsales\Eshop\Application\Model\ArticleList;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\Shop;
@@ -30,6 +31,7 @@ use OxidEsales\Eshop\Application\Model\UserPayment;
 use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\UtilsObject;
 use OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Twig\FixtureThemeTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -84,6 +86,62 @@ final class EmailTwigTest extends TestCase
         $this->assertStringContainsString('987654321', $email->getBody());
     }
 
+    public function testStockReminderRendersTwigTemplate(): void
+    {
+        $articleList = $this->getMockBuilder(ArticleList::class)
+            ->setMethods(['loadStockRemindProducts', 'count'])
+            ->getMock();
+        $articleList->method('count')->willReturn(1);
+        UtilsObject::setClassInstance(ArticleList::class, $articleList);
+
+        $email = $this->getMailMock();
+        $this->assertTrue($email->sendStockReminder([]));
+
+        $this->assertStringContainsString('TWIG-FIXTURE-OWNER-REMINDER', $email->getBody());
+    }
+
+    public function testShippedMailSentFromAdminRendersTwigAndRestoresAdminMode(): void
+    {
+        Registry::getConfig()->setAdminMode(true);
+
+        $email = $this->getMailMock();
+        $email->sendSendedNowMail($this->getOrderStub());
+
+        $this->assertStringContainsString('TWIG-FIXTURE-ORDERSHIPPED-HTML 987654321', $email->getBody());
+        $this->assertStringContainsString('TWIG-FIXTURE-ORDERSHIPPED-PLAIN', $email->getAltBody());
+        $this->assertTrue(Registry::getConfig()->isAdmin());
+    }
+
+    public function testAdminModeIsRestoredWhenRenderingFails(): void
+    {
+        Registry::getConfig()->setAdminMode(true);
+        $email = $this->getMailMock();
+        \Closure::bind(function (): void {
+            $this->_sSenedNowTemplate = 'email/html/does_not_exist.tpl';
+        }, $email, Email::class)();
+
+        try {
+            $email->sendSendedNowMail($this->getOrderStub());
+            $this->fail('Rendering a missing template throws.');
+        } catch (\Throwable $exception) {
+            $this->assertTrue(Registry::getConfig()->isAdmin(), 'Admin mode is restored after a failed render.');
+        }
+    }
+
+    private function getMailMock(): Email
+    {
+        $shop = oxNew(Shop::class);
+        $shop->load(Registry::getConfig()->getShopId());
+
+        $email = $this->getMockBuilder(Email::class)
+            ->setMethods(['_sendMail', '_getShop'])
+            ->getMock();
+        $email->method('_sendMail')->willReturn(true);
+        $email->method('_getShop')->willReturn($shop);
+
+        return $email;
+    }
+
     private function sendOrderMail(): Email
     {
         $shop = oxNew(Shop::class);
@@ -127,7 +185,10 @@ final class EmailTwigTest extends TestCase
         $order->oxorder__oxordernr = new Field('987654321', Field::T_RAW);
         $order->oxorder__oxremark = new Field('');
         $order->oxorder__oxdeltype = new Field('oxidstandard');
-        foreach (['fname', 'lname', 'addinfo', 'street', 'city', 'country', 'company'] as $field) {
+        $order->oxorder__oxlang = new Field(0);
+        $order->oxorder__oxuserid = new Field('_testUserId');
+        $order->oxorder__oxbillemail = new Field('username@useremail.nl');
+        foreach (['fname', 'lname', 'addinfo', 'street', 'streetnr', 'zip', 'city', 'country', 'company'] as $field) {
             $order->{'oxorder__oxbill' . $field} = new Field('');
         }
 

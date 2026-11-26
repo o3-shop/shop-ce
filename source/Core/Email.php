@@ -461,6 +461,24 @@ class Email extends PHPMailer
     }
 
     /**
+     * Runs a render of storefront mail templates in non-admin mode, so mails sent from the admin use the
+     * storefront theme's engine, templates and translations. The previous admin mode is always restored.
+     *
+     * @param callable $render
+     */
+    private function renderAsStorefront(callable $render): void
+    {
+        $config = $this->getConfig();
+        $wasAdmin = $config->isAdmin();
+        $config->setAdminMode(false);
+        try {
+            $render();
+        } finally {
+            $config->setAdminMode($wasAdmin);
+        }
+    }
+
+    /**
      * @return ContainerInterface
      * @internal
      *
@@ -646,11 +664,7 @@ class Email extends PHPMailer
         // Process view data array through oxOutput processor
         $this->_processViewArray();
 
-        // Mails sent from the admin render with the storefront theme's engine and templates.
-        $myConfig = $this->getConfig();
-        $wasAdmin = $myConfig->isAdmin();
-        $myConfig->setAdminMode(false);
-        try {
+        $this->renderAsStorefront(function () use ($renderer, $shop, $order, &$subject) {
             $this->setBody($renderer->renderTemplate($this->_sOrderUserTemplate, $this->getViewData()));
             $this->setAltBody($renderer->renderTemplate($this->_sOrderUserPlainTemplate, $this->getViewData()));
 
@@ -662,9 +676,7 @@ class Email extends PHPMailer
                     $subject = $shop->oxshops__oxordersubject->getRawValue() . ' (#' . $order->oxorder__oxordernr->value . ')';
                 }
             }
-        } finally {
-            $myConfig->setAdminMode($wasAdmin);
-        }
+        });
 
         $this->setSubject($subject);
 
@@ -722,18 +734,20 @@ class Email extends PHPMailer
         // Process view data array through oxoutput processor
         $this->_processViewArray();
 
-        $this->setBody($renderer->renderTemplate($this->_sOrderOwnerTemplate, $this->getViewData()));
-        $this->setAltBody($renderer->renderTemplate($this->_sOrderOwnerPlainTemplate, $this->getViewData()));
+        $this->renderAsStorefront(function () use ($renderer, $shop, $order, &$subject) {
+            $this->setBody($renderer->renderTemplate($this->_sOrderOwnerTemplate, $this->getViewData()));
+            $this->setAltBody($renderer->renderTemplate($this->_sOrderOwnerPlainTemplate, $this->getViewData()));
 
-        //Sets subject to email
-        // #586A
-        if ($subject === null) {
-            if ($renderer->exists($this->_sOrderOwnerSubjectTemplate)) {
-                $subject = $renderer->renderTemplate($this->_sOrderOwnerSubjectTemplate, $this->getViewData());
-            } else {
-                $subject = $shop->oxshops__oxordersubject->getRawValue() . ' (#' . $order->oxorder__oxordernr->value . ')';
+            //Sets subject to email
+            // #586A
+            if ($subject === null) {
+                if ($renderer->exists($this->_sOrderOwnerSubjectTemplate)) {
+                    $subject = $renderer->renderTemplate($this->_sOrderOwnerSubjectTemplate, $this->getViewData());
+                } else {
+                    $subject = $shop->oxshops__oxordersubject->getRawValue() . ' (#' . $order->oxorder__oxordernr->value . ')';
+                }
             }
-        }
+        });
 
         $this->setSubject($subject);
         $this->setRecipient($shop->oxshops__oxowneremail->value, $language->translateString('ORDERS'));
@@ -814,9 +828,7 @@ class Email extends PHPMailer
         // keys. Bracket the render in non-admin mode — same pattern as
         // sendDownloadLinksMail / sendSendedNowMail. The third arg `false`
         // on translateString forces frontend-domain lookup.
-        $myConfig = $this->getConfig();
-        $myConfig->setAdminMode(false);
-        try {
+        $this->renderAsStorefront(function () use ($renderer, $submission, &$subject) {
             $this->setBody($renderer->renderTemplate($this->_sRevocationCustomerTemplate, $this->getViewData()));
             $this->setAltBody($renderer->renderTemplate($this->_sRevocationCustomerPlainTemplate, $this->getViewData()));
 
@@ -829,9 +841,7 @@ class Email extends PHPMailer
                     false
                 ) . ' (#' . $submission->getId() . ')';
             }
-        } finally {
-            $myConfig->setAdminMode(true);
-        }
+        });
         $this->setSubject($subject);
 
         $this->setRecipient($submission->getEmail(), $submission->getName());
@@ -905,9 +915,7 @@ class Email extends PHPMailer
 
         // See sendRevocationEmailToCustomer() — when called from the admin
         // resend action the renderer/lang lookups must run in non-admin mode.
-        $myConfig = $this->getConfig();
-        $myConfig->setAdminMode(false);
-        try {
+        $this->renderAsStorefront(function () use ($renderer, $submission, &$subject) {
             $this->setBody($renderer->renderTemplate($this->_sRevocationOperatorTemplate, $this->getViewData()));
             $this->setAltBody($renderer->renderTemplate($this->_sRevocationOperatorPlainTemplate, $this->getViewData()));
 
@@ -920,9 +928,7 @@ class Email extends PHPMailer
                     false
                 ) . ' (#' . $submission->getId() . ')';
             }
-        } finally {
-            $myConfig->setAdminMode(true);
-        }
+        });
         $this->setSubject($subject);
 
         $this->setRecipient($recipient, Registry::getLang()->translateString('ORDERS'));
@@ -977,8 +983,10 @@ class Email extends PHPMailer
         // Process view data array through oxOutput processor
         $this->_processViewArray();
 
-        $this->setBody($renderer->renderTemplate($this->_sRegisterTemplate, $this->getViewData()));
-        $this->setAltBody($renderer->renderTemplate($this->_sRegisterTemplatePlain, $this->getViewData()));
+        $this->renderAsStorefront(function () use ($renderer) {
+            $this->setBody($renderer->renderTemplate($this->_sRegisterTemplate, $this->getViewData()));
+            $this->setAltBody($renderer->renderTemplate($this->_sRegisterTemplatePlain, $this->getViewData()));
+        });
 
         $this->setSubject(($subject !== null) ? $subject : $shop->oxshops__oxregistersubject->getRawValue());
 
@@ -1014,8 +1022,10 @@ class Email extends PHPMailer
             $this->_processViewArray();
 
             $this->_setMailParams($shop);
-            $this->setBody($renderer->renderTemplate($this->_sForgotPwdTemplate, $this->getViewData()));
-            $this->setAltBody($renderer->renderTemplate($this->_sForgotPwdTemplatePlain, $this->getViewData()));
+            $this->renderAsStorefront(function () use ($renderer) {
+                $this->setBody($renderer->renderTemplate($this->_sForgotPwdTemplate, $this->getViewData()));
+                $this->setAltBody($renderer->renderTemplate($this->_sForgotPwdTemplatePlain, $this->getViewData()));
+            });
             $this->setSubject(($subject !== null) ? $subject : $shop->oxshops__oxforgotpwdsubject->getRawValue());
 
             $fullName = $user->oxuser__oxfname->getRawValue() . ' ' . $user->oxuser__oxlname->getRawValue();
@@ -1091,8 +1101,10 @@ class Email extends PHPMailer
         // Process view data array through oxOutput processor
         $this->_processViewArray();
 
-        $this->setBody($renderer->renderTemplate($this->_sNewsletterOptInTemplate, $this->getViewData()));
-        $this->setAltBody($renderer->renderTemplate($this->_sNewsletterOptInTemplatePlain, $this->getViewData()));
+        $this->renderAsStorefront(function () use ($renderer) {
+            $this->setBody($renderer->renderTemplate($this->_sNewsletterOptInTemplate, $this->getViewData()));
+            $this->setAltBody($renderer->renderTemplate($this->_sNewsletterOptInTemplatePlain, $this->getViewData()));
+        });
         $this->setSubject(($subject !== null) ? $subject : \OxidEsales\Eshop\Core\Registry::getLang()->translateString('NEWSLETTER') . ' ' . $shop->oxshops__oxname->getRawValue());
 
         $fullName = $user->oxuser__oxfname->getRawValue() . ' ' . $user->oxuser__oxlname->getRawValue();
@@ -1210,8 +1222,10 @@ class Email extends PHPMailer
         // Process view data array through oxOutput processor
         $this->_processViewArray();
 
-        $this->setBody($renderer->renderTemplate($this->_sSuggestTemplate, $this->getViewData()));
-        $this->setAltBody($renderer->renderTemplate($this->_sSuggestTemplatePlain, $this->getViewData()));
+        $this->renderAsStorefront(function () use ($renderer) {
+            $this->setBody($renderer->renderTemplate($this->_sSuggestTemplate, $this->getViewData()));
+            $this->setAltBody($renderer->renderTemplate($this->_sSuggestTemplatePlain, $this->getViewData()));
+        });
         $this->setSubject($user->send_subject);
 
         $this->setRecipient($user->rec_email, $user->rec_name);
@@ -1266,9 +1280,10 @@ class Email extends PHPMailer
                     // Process view data array through oxoutput processor
                     $this->_processViewArray();
 
-                    $this->setBody($renderer->renderTemplate($this->_sInviteTemplate, $this->getViewData()));
-
-                    $this->setAltBody($renderer->renderTemplate($this->_sInviteTemplatePlain, $this->getViewData()));
+                    $this->renderAsStorefront(function () use ($renderer) {
+                        $this->setBody($renderer->renderTemplate($this->_sInviteTemplate, $this->getViewData()));
+                        $this->setAltBody($renderer->renderTemplate($this->_sInviteTemplatePlain, $this->getViewData()));
+                    });
                     $this->setSubject($user->send_subject);
 
                     $this->setRecipient($email);
@@ -1328,11 +1343,10 @@ class Email extends PHPMailer
         $lang->setTplLanguage($orderLang);
         $lang->setBaseLanguage($orderLang);
 
-        // force non admin to get correct paths (tpl, img)
-        $myConfig->setAdminMode(false);
-        $this->setBody($renderer->renderTemplate($this->_sSenedNowTemplate, $this->getViewData()));
-        $this->setAltBody($renderer->renderTemplate($this->_sSenedNowTemplatePlain, $this->getViewData()));
-        $myConfig->setAdminMode(true);
+        $this->renderAsStorefront(function () use ($renderer) {
+            $this->setBody($renderer->renderTemplate($this->_sSenedNowTemplate, $this->getViewData()));
+            $this->setAltBody($renderer->renderTemplate($this->_sSenedNowTemplatePlain, $this->getViewData()));
+        });
         $lang->setTplLanguage($oldTplLang);
         $lang->setBaseLanguage($oldBaseLang);
 
@@ -1386,11 +1400,10 @@ class Email extends PHPMailer
         $lang->setTplLanguage($orderLang);
         $lang->setBaseLanguage($orderLang);
 
-        // force non admin to get correct paths (tpl, img)
-        $myConfig->setAdminMode(false);
-        $this->setBody($renderer->renderTemplate($this->_sSendDownloadsTemplate, $this->getViewData()));
-        $this->setAltBody($renderer->renderTemplate($this->_sSendDownloadsTemplatePlain, $this->getViewData()));
-        $myConfig->setAdminMode(true);
+        $this->renderAsStorefront(function () use ($renderer) {
+            $this->setBody($renderer->renderTemplate($this->_sSendDownloadsTemplate, $this->getViewData()));
+            $this->setAltBody($renderer->renderTemplate($this->_sSendDownloadsTemplatePlain, $this->getViewData()));
+        });
         $lang->setTplLanguage($oldTplLang);
         $lang->setBaseLanguage($oldBaseLang);
 
@@ -1528,7 +1541,9 @@ class Email extends PHPMailer
 
             $this->setRecipient($shop->oxshops__oxowneremail->value, $shop->oxshops__oxname->getRawValue());
             $this->setFrom($shop->oxshops__oxowneremail->value, $shop->oxshops__oxname->getRawValue());
-            $this->setBody($renderer->renderTemplate($this->getConfig()->getTemplatePath($this->_sReminderMailTemplate, false), $this->getViewData()));
+            $this->renderAsStorefront(function () use ($renderer) {
+                $this->setBody($renderer->renderTemplate($this->_sReminderMailTemplate, $this->getViewData()));
+            });
             $this->setAltBody('');
             $this->setSubject(($subject !== null) ? $subject : $lang->translateString('STOCK_LOW'));
 
@@ -1561,8 +1576,10 @@ class Email extends PHPMailer
         // Process view data array through oxoutput processor
         $this->_processViewArray();
 
-        $this->setBody($renderer->renderTemplate($this->_sWishListTemplate, $this->getViewData()));
-        $this->setAltBody($renderer->renderTemplate($this->_sWishListTemplatePlain, $this->getViewData()));
+        $this->renderAsStorefront(function () use ($renderer) {
+            $this->setBody($renderer->renderTemplate($this->_sWishListTemplate, $this->getViewData()));
+            $this->setAltBody($renderer->renderTemplate($this->_sWishListTemplatePlain, $this->getViewData()));
+        });
         $this->setSubject($params->send_subject);
 
         $this->setRecipient($params->rec_email, $params->rec_name);
@@ -1607,7 +1624,9 @@ class Email extends PHPMailer
 
         $this->setRecipient($shop->oxshops__oxorderemail->value, $shop->oxshops__oxname->getRawValue());
         $this->setSubject(($subject !== null) ? $subject : $lang->translateString('PRICE_ALERT_FOR_PRODUCT', $alarmLang) . ' ' . $article->oxarticles__oxtitle->getRawValue());
-        $this->setBody($renderer->renderTemplate($this->_sOwnerPricealarmTemplate, $this->getViewData()));
+        $this->renderAsStorefront(function () use ($renderer) {
+            $this->setBody($renderer->renderTemplate($this->_sOwnerPricealarmTemplate, $this->getViewData()));
+        });
         $this->setFrom($params['email'], '');
         $this->setReplyTo($params['email'], '');
 
