@@ -28,6 +28,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   project configuration first.
 
 ### Changed
+- the v2 dev setup (`docker/entrypoint.sh`) and CI install O3-Theme 2.x (Twig, branch `b-2.0` of
+  `o3-shop/o3-Theme`); `main` stays the Smarty 1.x line. An existing `source/Application/views/o3-theme`
+  checkout is kept as is: switch it with `git -C source/Application/views/o3-theme switch b-2.0`.
 - `oe:module:install-configuration` now refreshes the stored settings of the shops where the
   module is already active and exits non-zero when a refresh failed. It takes the same run lock
   and pre-write backup as `oe:module:refresh-settings --from-metadata`, restores the backup when
@@ -35,6 +38,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   scripts need to account for the new exit code.
 
 ### Fixed
+- the revocation asset check (admin revocation settings, theme and language activation,
+  `o3:check-templates`) looks for `.html.twig` templates under a Twig theme instead of reporting
+  every revocation template as missing and blocking the save.
 - installing a module configuration now refreshes the stored module settings of the shops
   where the module is already active. Previously the shop kept serving the settings derived
   from the previous configuration until the module was deactivated and activated again -

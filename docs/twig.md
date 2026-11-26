@@ -36,6 +36,8 @@ Twig templates use the extension `.html.twig`. Controllers keep naming `.tpl` te
 
 Changed templates are recompiled when "check templates" (`blCheckTemplates`) is on, as for Smarty; never in productive mode.
 
+Plain-text mails (`email/plain/**`): Twig drops the newline after every `{% … %}` and `{# … #}` tag, Smarty only after control tags (`[{block}]` lines kept theirs). A block override in a plain mail therefore needs an empty line after its `{% block … %}` and `{% endblock %}` lines to keep the 1.x text layout.
+
 ## CMS content
 
 CMS content keeps its Smarty syntax and is parsed by Smarty, also under a Twig theme. Twig syntax in CMS content is not executed.
