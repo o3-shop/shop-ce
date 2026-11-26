@@ -62,6 +62,71 @@ class ContentAndIncludeRenderTest extends TestCase
         $this->assertSame('[]', $this->render('[{% ifcontent ident "missing" %}body{% endifcontent %}]', ['ifContent' => $logic]));
     }
 
+    public function testIfContentPassesABodyWithSmartyTagsToTheLogicAndOutputsItUnescaped(): void
+    {
+        $logic = $this->createMock(IfContentLogic::class);
+        $logic->method('getContent')->willReturn((object) ['text' => '<b>A[{ "B" }]C</b>']);
+        $logic->expects($this->once())->method('renderContent')->with('<b>A[{ "B" }]C</b>', 'oxagb')->willReturn('<b>ABC</b>');
+
+        $this->assertSame(
+            '[<b>ABC</b>]',
+            $this->render('[{% ifcontent ident "oxagb" %}{{ oCont.text|raw }}{% endifcontent %}]', ['ifContent' => $logic], [], [], 'html')
+        );
+    }
+
+    public function testIfContentLoadedByOxidPassesNoIdentToTheLogic(): void
+    {
+        $logic = $this->createMock(IfContentLogic::class);
+        $logic->method('getContent')->willReturn((object) ['text' => '[{ "B" }]']);
+        $logic->expects($this->once())->method('renderContent')->with('[{ "B" }]', null)->willReturn('B');
+
+        $this->assertSame('B', $this->render('{% ifcontent oxid "abc" %}{{ oCont.text }}{% endifcontent %}', ['ifContent' => $logic]));
+    }
+
+    public function testIfContentDoesNotCallSmartyForABodyWithoutSmartyTags(): void
+    {
+        $logic = $this->createMock(IfContentLogic::class);
+        $logic->method('getContent')->willReturn((object) ['text' => '{{ 7*7 }}']);
+        $logic->expects($this->never())->method('renderContent');
+
+        $this->assertSame('{{ 7*7 }}', $this->render('{% ifcontent ident "x" %}{{ oCont.text }}{% endifcontent %}', ['ifContent' => $logic]));
+    }
+
+    public function testIfContentInsideSetCaptureAssignsTheParsedBody(): void
+    {
+        $logic = $this->createMock(IfContentLogic::class);
+        $logic->method('getContent')->willReturn((object) ['text' => '[{ "B" }]']);
+        $logic->method('renderContent')->willReturn('<i>B</i>');
+
+        $this->assertSame(
+            '|<i>B</i>|',
+            $this->render('{% set x %}{% ifcontent ident "x" %}{{ oCont.text }}{% endifcontent %}{% endset %}|{{ x }}|', ['ifContent' => $logic], [], [], 'html')
+        );
+    }
+
+    public function testIncludeContentReturnsTheLogicOutputUnescapedAndPassesTheContext(): void
+    {
+        $logic = $this->createMock(IfContentLogic::class);
+        $logic->expects($this->once())->method('includeContent')
+            ->with($this->callback(static function (array $context): bool {
+                return ($context['shopName'] ?? null) === 'O3';
+            }), 'oxpricealarmemail', 'oxcontent', null)
+            ->willReturn('<b>x</b>');
+
+        $this->assertSame(
+            '<b>x</b>',
+            $this->render("{{ include_content('oxpricealarmemail') }}", ['ifContent' => $logic], [], ['shopName' => 'O3'], 'html')
+        );
+    }
+
+    public function testIncludeContentAcceptsFieldAndOxidAsNamedArguments(): void
+    {
+        $logic = $this->createMock(IfContentLogic::class);
+        $logic->expects($this->once())->method('includeContent')->with($this->anything(), null, 'oxtitle', 'abc')->willReturn('T');
+
+        $this->assertSame('T', $this->render("{{ include_content(field = 'oxtitle', oxid = 'abc') }}", ['ifContent' => $logic]));
+    }
+
     public function testIncludeDynamicWithVariablesIncludesTheTemplateWithPrefixedParameters(): void
     {
         $logic = $this->createMock(IncludeDynamicLogic::class);
@@ -97,9 +162,12 @@ class ContentAndIncludeRenderTest extends TestCase
         );
     }
 
-    private function render(string $template, array $logics, array $templates = [], array $context = []): string
+    /**
+     * @param string|false $autoescape
+     */
+    private function render(string $template, array $logics, array $templates = [], array $context = [], $autoescape = false): string
     {
-        $twig = new Environment(new ArrayLoader(['main' => $template] + $templates), ['autoescape' => false, 'cache' => false]);
+        $twig = new Environment(new ArrayLoader(['main' => $template] + $templates), ['autoescape' => $autoescape, 'cache' => false]);
         if (isset($logics['ifContent'])) {
             $twig->addExtension(new IfContentExtension($logics['ifContent']));
         }

@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic;
 
+use OxidEsales\Eshop\Core\Registry;
+
 class IfContentLogic
 {
     /**
@@ -54,5 +56,47 @@ class IfContentLogic
         }
 
         return $oContent;
+    }
+
+    /**
+     * Parses rendered CMS content through Smarty, as Smarty's oxifcontent block does with its body.
+     */
+    public function renderContent(string $content, ?string $ident = null): string
+    {
+        return (string) Registry::getUtilsView()->parseThroughSmarty(
+            $content,
+            $ident . md5($content),
+            Registry::getConfig()->getActiveView()
+        );
+    }
+
+    /**
+     * Loads active CMS content by ident (or oxid) and renders the given field through Smarty with the template
+     * variables, as Smarty's oxcontent function does.
+     */
+    public function includeContent(array $context, ?string $ident, string $field = 'oxcontent', ?string $oxid = null): string
+    {
+        $text = Registry::getConfig()->getActiveShop()->isProductiveMode()
+            ? ''
+            : sprintf('<b>content not found ! check ident(%s) !</b>', $ident ?? 'undefined');
+
+        $content = ($ident || $oxid) ? $this->getContent($ident, $oxid) : false;
+        if (!$content) {
+            return $text;
+        }
+
+        $value = (string) $content->getFieldData($field);
+        $cacheId = $ident . $oxid . $field . Registry::getLang()->getBaseLanguage() . Registry::getConfig()->getShopId();
+        try {
+            // Returns the value unparsed when deactivateSmartyForCmsContent is set (or in the demo shop).
+            return Registry::getUtilsView()->getRenderedContent($value, $context, $cacheId);
+        } catch (\Throwable $error) {
+            Registry::getLogger()->error(
+                __METHOD__ . " - Rendering CMS content ident '$ident', oxid '$oxid', field '$field' through Smarty failed: '{$error->getMessage()}'.",
+                [$error]
+            );
+
+            return '';
+        }
     }
 }

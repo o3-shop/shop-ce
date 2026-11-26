@@ -36,13 +36,21 @@ Twig templates use the extension `.html.twig`. Controllers keep naming `.tpl` te
 
 Changed templates are recompiled when "check templates" (`blCheckTemplates`) is on, as for Smarty; never in productive mode.
 
+## CMS content
+
+CMS content keeps its Smarty syntax and is parsed by Smarty, also under a Twig theme. Twig syntax in CMS content is not executed.
+
+- `{% ifcontent ident "oxagb" set oCont %}…{% endifcontent %}` loads active content (by `ident` or `oxid`) into `oCont` (default name) and renders the body only if it exists. As in 1.x, the rendered body is parsed by Smarty when it contains `[{`, and it is output unescaped. To keep it in a variable, capture it: `{% set text %}{% ifcontent … %}…{% endifcontent %}{% endset %}`.
+- `{{ include_content('oxemailfooter') }}` replaces Smarty's `[{oxcontent ident="oxemailfooter"}]`: `include_content(ident, field = 'oxcontent', oxid = null)` returns the field of the active content, parsed by Smarty with the template's variables, unescaped. Missing or inactive content returns `''` in productive mode and a "content not found" hint otherwise; with `deactivateSmartyForCmsContent` (or in the demo shop) the field is returned unparsed.
+- Inside an `ifcontent` body, output that contains `[{` is evaluated by Smarty, as in 1.x: never print user input there.
+
 ## Autoescaping
 
 - Storefront templates are autoescaped (`html` strategy).
 - Templates under `email/plain/` are not escaped.
 - Mark HTML explicitly with `|raw`: CMS content, long descriptions, HTML translations.
 - `seo_url` and `add_url_parameters` return plain URLs; do not add `|raw`.
-- `include_widget`, `include_dynamic`, `insert_new_basket_item`, `mailto`, `script` and `style` return safe markup already.
+- `include_widget`, `include_dynamic`, `insert_new_basket_item`, `include_content`, `ifcontent`, `mailto`, `script` and `style` return safe markup already.
 - `mailto` outputs its `text`, `address` and `extra` arguments raw: do not pass user data to it.
 - `translate` output is escaped.
 

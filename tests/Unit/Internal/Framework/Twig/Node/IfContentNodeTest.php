@@ -77,7 +77,11 @@ class IfContentNodeTest extends NodeTestCase
 // line 1
 \$context["foo"] = \$this->extensions['$ifContentExtensionClass']->getContent("oxsomething", null);
 if (\$context["foo"]) {
-    yield "Lorem Ipsum";
+    \$ifContentBody = \Twig\Extension\CoreExtension::captureOutput((function () use (&\$context, \$macros, \$blocks) {
+        yield "Lorem Ipsum";
+        return; yield '';
+    })());
+    yield \$this->extensions['$ifContentExtensionClass']->renderContent(\$ifContentBody, "oxsomething");
 }
 unset(\$context["foo"]);
 EOF
@@ -88,7 +92,11 @@ EOF
 // line 1
 \$context["foo"] = \$this->extensions['$ifContentExtensionClass']->getContent(null, "oxsomething");
 if (\$context["foo"]) {
-    yield "Lorem Ipsum";
+    \$ifContentBody = \Twig\Extension\CoreExtension::captureOutput((function () use (&\$context, \$macros, \$blocks) {
+        yield "Lorem Ipsum";
+        return; yield '';
+    })());
+    yield \$this->extensions['$ifContentExtensionClass']->renderContent(\$ifContentBody, null);
 }
 unset(\$context["foo"]);
 EOF

@@ -29,6 +29,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Twig\TokenParser\IfContentToken
 use OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\IfContentLogic;
 use Twig\Extension\AbstractExtension;
 use Twig\TokenParser\TokenParserInterface;
+use Twig\TwigFunction;
 
 /**
  * Class IfContentExtension
@@ -56,6 +57,34 @@ class IfContentExtension extends AbstractExtension
     public function getTokenParsers(): array
     {
         return [new IfContentTokenParser()];
+    }
+
+    /**
+     * @return TwigFunction[]
+     */
+    public function getFunctions(): array
+    {
+        return [
+            new TwigFunction('include_content', [$this, 'includeContent'], ['needs_context' => true, 'is_safe' => ['html']]),
+        ];
+    }
+
+    /**
+     * Twig counterpart of Smarty's [{oxcontent ident=… field=… oxid=…}].
+     */
+    public function includeContent(array $context, ?string $ident = null, string $field = 'oxcontent', ?string $oxid = null): string
+    {
+        return $this->ifContentLogic->includeContent($context, $ident, $field, $oxid);
+    }
+
+    /**
+     * The rendered ifcontent body, parsed through Smarty when it contains Smarty tags (as Smarty's oxifcontent).
+     *
+     * @param string|null $ident
+     */
+    public function renderContent(string $body, $ident = null): string
+    {
+        return strpos($body, '[{') === false ? $body : $this->ifContentLogic->renderContent($body, $ident === null ? null : (string) $ident);
     }
 
     /**

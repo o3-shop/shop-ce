@@ -16,7 +16,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   (`parseThroughSmarty`) stay Smarty; e-mails use the storefront engine; modules ship Twig page
   templates, own `@<moduleId>/` templates and extensions of theme templates (template chain ported
   from OXID twig-component v2.0.1, GPL-3.0); admin warnings for modules without Twig templates and
-  for a Smarty child theme on a Twig parent.
+  for a Smarty child theme on a Twig parent. CMS content in Twig templates is parsed by Smarty as in
+  1.x: `{% ifcontent %}` bodies go through Smarty, and the new Twig function
+  `include_content(ident, field = 'oxcontent', oxid = null)` replaces Smarty's `[{oxcontent}]`.
   **Upgrade note:** To keep a Smarty storefront, pin `o3-shop/o3-theme` to `^1` in your project's
   `composer.json` *before* updating to O3-Shop 2.0; otherwise O3-Theme is updated to its Twig version.
 - console command `oe:module:refresh-settings` to re-apply the installed module configuration

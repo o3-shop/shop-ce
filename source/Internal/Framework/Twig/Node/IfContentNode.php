@@ -27,6 +27,7 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Twig\Node;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\IfContentExtension;
 use Twig\Compiler;
+use Twig\Node\CaptureNode;
 use Twig\Node\Node;
 
 /**
@@ -73,10 +74,24 @@ class IfContentNode extends Node
 
         $compiler->raw(");\n");
 
+        // As Smarty's oxifcontent: the rendered body is CMS content and goes through Smarty (see renderContent()).
+        $body = new CaptureNode($this->getNode('body'), $this->getTemplateLine());
+        $body->setAttribute('raw', true);
+
         $compiler
             ->write('if (')->subcompile($this->getNode('variable'))->raw(") {\n")
             ->indent()
-            ->subcompile($this->getNode('body'))
+            ->write('$ifContentBody = ')->subcompile($body)->raw("\n")
+            ->write("yield \$this->extensions['" . IfContentExtension::class . "']->renderContent(\$ifContentBody, ");
+
+        if ($this->hasNode('ident')) {
+            $compiler->subcompile($this->getNode('ident'));
+        } else {
+            $compiler->raw('null');
+        }
+
+        $compiler
+            ->raw(");\n")
             ->outdent()
             ->write("}\n")
             ->write('unset(')->subcompile($this->getNode('variable'))->raw(");\n");
