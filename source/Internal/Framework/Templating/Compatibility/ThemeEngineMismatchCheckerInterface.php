@@ -26,7 +26,7 @@ interface ThemeEngineMismatchCheckerInterface
 {
     /**
      * Reports a child theme whose own template engine differs from its parent's. A child theme without
-     * own templates inherits the parent's engine and is fine. Logs a warning on a mismatch.
+     * own templates inherits the parent's engine and is fine.
      *
      * @return array{child: string, parent: string, childEngine: string, parentEngine: string}|null
      */

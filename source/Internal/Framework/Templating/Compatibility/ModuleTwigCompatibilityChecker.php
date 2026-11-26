@@ -29,7 +29,6 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopCo
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleConfigurationNotFoundException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Path\ModulePathResolverInterface;
-use Psr\Log\LoggerInterface;
 use Webmozart\PathUtil\Path;
 
 class ModuleTwigCompatibilityChecker implements ModuleTwigCompatibilityCheckerInterface
@@ -43,19 +42,14 @@ class ModuleTwigCompatibilityChecker implements ModuleTwigCompatibilityCheckerIn
     /** @var ModulePathResolverInterface */
     private $modulePathResolver;
 
-    /** @var LoggerInterface */
-    private $logger;
-
     public function __construct(
         ShopConfigurationDaoInterface $shopConfigurationDao,
         ShopConfigurationSettingDaoInterface $shopConfigurationSettingDao,
-        ModulePathResolverInterface $modulePathResolver,
-        LoggerInterface $logger
+        ModulePathResolverInterface $modulePathResolver
     ) {
         $this->shopConfigurationDao = $shopConfigurationDao;
         $this->shopConfigurationSettingDao = $shopConfigurationSettingDao;
         $this->modulePathResolver = $modulePathResolver;
-        $this->logger = $logger;
     }
 
     public function getModulesWithoutTwigTemplates(int $shopId): array
@@ -75,12 +69,6 @@ class ModuleTwigCompatibilityChecker implements ModuleTwigCompatibilityCheckerIn
                 $moduleIds[] = $moduleId;
             }
         }
-        if ($moduleIds !== []) {
-            $this->logger->warning(
-                __METHOD__ . " - Module(s) '" . implode(', ', $moduleIds) . "' have storefront Smarty templates but no Twig templates."
-            );
-        }
-
         return $moduleIds;
     }
 

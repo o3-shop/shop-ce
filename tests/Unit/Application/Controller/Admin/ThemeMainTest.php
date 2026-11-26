@@ -285,19 +285,60 @@ class ThemeMainTest extends OxidTestCase
         $this->assertStringContainsString('o3-theme', $this->messages[0]);
     }
 
-    public function testSetThemeStillActivatesAndWarnsWhenActivatingTwigThemeWithSmartyOnlyModules()
+    private function expectWarningLogs(int $count, string $needle = ''): void
     {
-        $this->expectDisplayedMessages([]);
-        $controller = $this->controllerWithCheckers('twig', ['smartyonly'], null);
+        $logger = $this->createMock(\Psr\Log\LoggerInterface::class);
+        $logger->expects($this->exactly($count))->method('warning')->with($this->stringContains($needle));
+        \OxidEsales\Eshop\Core\Registry::set('logger', $logger);
+    }
+
+    private function stubThemeActivation(): void
+    {
         $this->setRequestParameter('oxid', 'o3-theme');
         oxTestModules::addFunction('oxTheme', 'load($name)', '{return true;}');
         oxTestModules::addFunction('oxTheme', 'activate', '{$GLOBALS["themeActivated"] = true; return true;}');
         $GLOBALS['themeActivated'] = false;
+    }
+
+    public function testSetThenRenderDisplaysEachWarningOnceAndLogsOnce()
+    {
+        $this->expectDisplayedMessages([]);
+        $this->expectWarningLogs(1, 'smartyonly');
+        $controller = $this->controllerWithCheckers(
+            'twig',
+            ['smartyonly'],
+            ['child' => 'mychild', 'parent' => 'o3-theme', 'childEngine' => 'smarty', 'parentEngine' => 'twig']
+        );
+        $this->stubThemeActivation();
 
         $controller->setTheme();
+        $controller->render();
+
         $this->assertTrue($GLOBALS['themeActivated']);
-        $this->assertCount(1, $this->messages);
+        $this->assertCount(2, $this->messages);
         $this->assertStringContainsString('smartyonly', $this->messages[0]);
+        $this->assertStringContainsString('mychild', $this->messages[1]);
+    }
+
+    public function testRenderAloneDisplaysButDoesNotLog()
+    {
+        $this->getConfig()->setConfigParam('sTheme', 'o3-theme');
+        $this->expectDisplayedMessages([]);
+        $this->expectWarningLogs(0);
+        $controller = $this->controllerWithCheckers('twig', ['smartyonly'], null);
+
+        $controller->render();
+        $this->assertCount(1, $this->messages);
+    }
+
+    public function testDisplayedIdsAreEscaped()
+    {
+        $this->getConfig()->setConfigParam('sTheme', 'o3-theme');
+        $this->expectDisplayedMessages([]);
+        $controller = $this->controllerWithCheckers('twig', ['<b>x</b>'], null);
+
+        $controller->render();
+        $this->assertStringContainsString('&lt;b&gt;x&lt;/b&gt;', $this->messages[0]);
     }
 
     /** @var string[] */

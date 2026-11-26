@@ -32,7 +32,6 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Path\ModulePathResolverInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\Compatibility\ModuleTwigCompatibilityChecker;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 
 class ModuleTwigCompatibilityCheckerTest extends TestCase
 {
@@ -50,16 +49,14 @@ class ModuleTwigCompatibilityCheckerTest extends TestCase
         exec('rm -rf ' . escapeshellarg($this->root));
     }
 
-    public function testModuleWithOnlyBlocksIsReportedAndLogged(): void
+    public function testModuleWithOnlyBlocksIsReported(): void
     {
         $this->file('smartyonly/views/blocks/b.tpl');
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('warning')->with($this->stringContains("'smartyonly'"));
 
         $module = $this->module('smartyonly');
         $module->addTemplateBlock(new TemplateBlock('page/x.tpl', 'blk', 'views/blocks/b.tpl'));
 
-        $this->assertSame(['smartyonly'], $this->checker([$module], ['smartyonly'], $logger)->getModulesWithoutTwigTemplates(1));
+        $this->assertSame(['smartyonly'], $this->checker([$module], ['smartyonly'])->getModulesWithoutTwigTemplates(1));
     }
 
     public function testModuleWithTwigSiblingsIsNotReported(): void
@@ -68,14 +65,12 @@ class ModuleTwigCompatibilityCheckerTest extends TestCase
         $this->file('both/views/blocks/b.html.twig');
         $this->file('both/views/t.tpl');
         $this->file('both/views/t.html.twig');
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->never())->method('warning');
 
         $module = $this->module('both');
         $module->addTemplateBlock(new TemplateBlock('page/x.tpl', 'blk', 'views/blocks/b.tpl'));
         $module->addTemplate(new Template('t.tpl', 'views/t.tpl'));
 
-        $this->assertSame([], $this->checker([$module], ['both'], $logger)->getModulesWithoutTwigTemplates(1));
+        $this->assertSame([], $this->checker([$module], ['both'])->getModulesWithoutTwigTemplates(1));
     }
 
     public function testModuleWithViewsTwigDirectoryIsNotReported(): void
@@ -120,7 +115,7 @@ class ModuleTwigCompatibilityCheckerTest extends TestCase
         return $module;
     }
 
-    private function checker(array $modules, array $activeIds, ?LoggerInterface $logger = null): ModuleTwigCompatibilityChecker
+    private function checker(array $modules, array $activeIds): ModuleTwigCompatibilityChecker
     {
         $shop = new ShopConfiguration();
         foreach ($modules as $module) {
@@ -139,6 +134,6 @@ class ModuleTwigCompatibilityCheckerTest extends TestCase
             }
         );
 
-        return new ModuleTwigCompatibilityChecker($shopDao, $settingDao, $resolver, $logger ?? $this->createMock(LoggerInterface::class));
+        return new ModuleTwigCompatibilityChecker($shopDao, $settingDao, $resolver);
     }
 }

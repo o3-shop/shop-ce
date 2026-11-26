@@ -117,7 +117,7 @@ class ThemeMain extends AdminDetailsController
         try {
             $oTheme->activate();
             $this->resetContentCache();
-            $this->addTwigCompatibilityWarnings($sTheme, $sTheme);
+            $this->logTwigCompatibilityWarnings($sTheme);
         } catch (StandardException $oEx) {
             Registry::getUtilsView()->addErrorToDisplay($oEx);
             $oEx->debugOut();
@@ -206,10 +206,12 @@ class ThemeMain extends AdminDetailsController
     }
 
     /**
-     * Warns (never blocks) about a theme engine mismatch of the given theme and, while a Twig theme is
-     * active (or is just being activated: $activatedThemeId), about active modules without Twig templates.
+     * Warnings about a theme engine mismatch of the given theme and, while a Twig theme is active (or is
+     * just being activated: $activatedThemeId), about active modules without Twig templates.
+     *
+     * @return array<int, array{0: string, 1: string[]}> language key and sprintf arguments of each warning
      */
-    protected function addTwigCompatibilityWarnings(string $themeId, ?string $activatedThemeId = null): void
+    protected function getTwigCompatibilityWarnings(string $themeId, ?string $activatedThemeId = null): array
     {
         if ($this->twigCompatibilityServices === null) {
             $container = ContainerFactory::getInstance()->getContainer();
@@ -220,32 +222,48 @@ class ThemeMain extends AdminDetailsController
             ];
         }
         [$engineProvider, $moduleChecker, $mismatchChecker] = $this->twigCompatibilityServices;
-        $lang = Registry::getLang();
+        $warnings = [];
 
         if ($engineProvider->getEngineName($activatedThemeId) === TemplateEngineName::TWIG) {
             $moduleIds = $moduleChecker->getModulesWithoutTwigTemplates((int) Registry::getConfig()->getShopId());
             if ($moduleIds !== []) {
-                $this->addWarningToDisplay(
-                    sprintf($lang->translateString('TWIG_MODULES_WITHOUT_TWIG_TEMPLATES'), implode(', ', $moduleIds))
-                );
+                $warnings[] = ['TWIG_MODULES_WITHOUT_TWIG_TEMPLATES', [implode(', ', $moduleIds)]];
             }
         }
         $mismatch = $mismatchChecker->getMismatch($themeId);
         if ($mismatch !== null) {
-            $this->addWarningToDisplay(sprintf(
-                $lang->translateString('THEME_ENGINE_MISMATCH'),
-                $mismatch['child'],
-                $mismatch['parent'],
-                $mismatch['childEngine'],
-                $mismatch['parentEngine']
-            ));
+            $warnings[] = ['THEME_ENGINE_MISMATCH', array_values($mismatch)];
+        }
+
+        return $warnings;
+    }
+
+    /**
+     * Displays the Twig compatibility warnings (display only, never logs: it runs on every page view).
+     */
+    protected function addTwigCompatibilityWarnings(string $themeId): void
+    {
+        foreach ($this->getTwigCompatibilityWarnings($themeId) as [$key, $args]) {
+            $exception = oxNew(ExceptionToDisplay::class);
+            $exception->setMessage($key);
+            $exception->setMessageArgs(...array_map('htmlspecialchars', $args));
+            Registry::getUtilsView()->addErrorToDisplay($exception);
         }
     }
 
-    private function addWarningToDisplay(string $message): void
+    /**
+     * Logs once per activation what the Twig compatibility check found. The warnings themselves are
+     * displayed by the render() that follows the activation in the same request.
+     */
+    protected function logTwigCompatibilityWarnings(string $themeId): void
     {
-        $exception = oxNew(ExceptionToDisplay::class);
-        $exception->setMessage($message);
-        Registry::getUtilsView()->addErrorToDisplay($exception);
+        $lang = Registry::getLang();
+        $messages = [];
+        foreach ($this->getTwigCompatibilityWarnings($themeId, $themeId) as [$key, $args]) {
+            $messages[] = vsprintf($lang->translateString($key), $args);
+        }
+        if ($messages !== []) {
+            Registry::getLogger()->warning(__METHOD__ . " - Activated theme '$themeId': " . implode(' ', $messages));
+        }
     }
 }

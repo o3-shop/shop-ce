@@ -25,26 +25,20 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Templating\Compatibility;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\TemplateEngineName;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\ThemeTemplateEngineProviderInterface;
-use Psr\Log\LoggerInterface;
 
 class ThemeEngineMismatchChecker implements ThemeEngineMismatchCheckerInterface
 {
     /** @var ThemeTemplateEngineProviderInterface */
     private $engineProvider;
 
-    /** @var LoggerInterface */
-    private $logger;
-
     /** @var string|null */
     private $viewsDir;
 
     public function __construct(
         ThemeTemplateEngineProviderInterface $engineProvider,
-        LoggerInterface $logger,
         ?string $viewsDir = null
     ) {
         $this->engineProvider = $engineProvider;
-        $this->logger = $logger;
         $this->viewsDir = $viewsDir;
     }
 
@@ -60,10 +54,6 @@ class ThemeEngineMismatchChecker implements ThemeEngineMismatchCheckerInterface
         if ($childEngine === null || $childEngine === $parentEngine) {
             return null;
         }
-        $this->logger->warning(
-            __METHOD__ . " - Child theme '$themeId' uses template engine '$childEngine' but its parent theme '$parentId' uses '$parentEngine'."
-        );
-
         return ['child' => $themeId, 'parent' => $parentId, 'childEngine' => $childEngine, 'parentEngine' => $parentEngine];
     }
 

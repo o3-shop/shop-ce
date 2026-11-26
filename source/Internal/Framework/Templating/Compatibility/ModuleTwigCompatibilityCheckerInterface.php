@@ -27,7 +27,7 @@ interface ModuleTwigCompatibilityCheckerInterface
     /**
      * Ids of the active modules of the shop that produce storefront Smarty output (template blocks or
      * ".tpl" templates) without a Twig counterpart (".html.twig" sibling or a "views/twig" directory).
-     * Logs a warning when the list is not empty.
+     *
      *
      * @return string[]
      */

@@ -43,15 +43,13 @@ class ThemeEngineMismatchCheckerTest extends TestCase
         exec('rm -rf ' . escapeshellarg($this->views));
     }
 
-    public function testSmartyChildOfTwigParentIsReportedAndLogged(): void
+    public function testSmartyChildOfTwigParentIsReported(): void
     {
         $this->theme('child', "'parentTheme' => 'parent', 'templateEngine' => 'smarty'");
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('warning')->with($this->stringContains("'child'"));
 
         $this->assertSame(
             ['child' => 'child', 'parent' => 'parent', 'childEngine' => 'smarty', 'parentEngine' => 'twig'],
-            $this->checker($logger)->getMismatch('child')
+            $this->checker()->getMismatch('child')
         );
     }
 
@@ -67,10 +65,8 @@ class ThemeEngineMismatchCheckerTest extends TestCase
     public function testChildWithoutOwnTemplatesIsFine(): void
     {
         $this->theme('child', "'parentTheme' => 'parent'");
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->never())->method('warning');
 
-        $this->assertNull($this->checker($logger)->getMismatch('child'));
+        $this->assertNull($this->checker()->getMismatch('child'));
     }
 
     public function testThemeWithoutParentAndMatchingEnginesAreFine(): void
@@ -87,10 +83,10 @@ class ThemeEngineMismatchCheckerTest extends TestCase
         file_put_contents($this->views . $id . '/theme.php', "<?php\n\$aTheme = ['id' => '$id', $entries];\n");
     }
 
-    private function checker(?LoggerInterface $logger = null): ThemeEngineMismatchChecker
+    private function checker(): ThemeEngineMismatchChecker
     {
-        $logger = $logger ?? $this->createMock(LoggerInterface::class);
+        $logger = $this->createMock(LoggerInterface::class);
 
-        return new ThemeEngineMismatchChecker(new ThemeTemplateEngineProvider($logger, $this->views), $logger, $this->views);
+        return new ThemeEngineMismatchChecker(new ThemeTemplateEngineProvider($logger, $this->views), $this->views);
     }
 }
