@@ -31,7 +31,8 @@ use Webmozart\PathUtil\Path;
 
 /**
  * Builds the inheritance chain of a theme template: the module extensions
- * "@<moduleId>/extensions/themes/<themeId|default>/<template>" of the active modules in activation order,
+ * "@<moduleId>/extensions/themes/<themeId|default>/<template>" of the active modules in activation order
+ * (per module the first match of: active child theme, its parent theme, "default"),
  * followed by the theme template itself. The first entry is rendered; each entry extends the next one.
  */
 class TemplateChainResolver
@@ -85,8 +86,9 @@ class TemplateChainResolver
         }
 
         $chain = [];
+        $themeIds = array_merge($this->twigContext->getActiveThemeIds(), [self::DEFAULT_THEME_ID]);
         foreach ($this->modulesTemplateDirectoryResolver->getTemplateDirectories() as $moduleId => $directory) {
-            foreach ([$this->twigContext->getActiveThemeId(), self::DEFAULT_THEME_ID] as $themeId) {
+            foreach ($themeIds as $themeId) {
                 $relativePath = "extensions/themes/$themeId/$themeTemplate";
                 if (is_file(Path::join($directory, $relativePath))) {
                     $chain[] = "@$moduleId/$relativePath";

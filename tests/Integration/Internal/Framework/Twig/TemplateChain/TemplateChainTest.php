@@ -154,6 +154,16 @@ final class TemplateChainTest extends TestCase
         );
     }
 
+    public function testChildThemeUsesParentThemeExtension(): void
+    {
+        $this->activate('modulea');
+
+        $this->assertSame(
+            '[<modulea-twigtheme>theme</modulea-twigtheme>]',
+            trim($this->createTwigEngine('childtheme')->render(self::TEMPLATE))
+        );
+    }
+
     public function testLegacyTplNameIsChainedThroughItsTwigSibling(): void
     {
         $this->activate('modulea');
@@ -198,13 +208,13 @@ final class TemplateChainTest extends TestCase
 
     /**
      * A freshly compiled container, so the engine sees the current module state; the theme
-     * templates come from the fixture directory and the active theme is "twigtheme".
+     * templates come from the fixture directory and the active theme is "twigtheme" (or a child theme of it).
      */
-    private function createTwigEngine(): TemplateEngineInterface
+    private function createTwigEngine(string $customTheme = ''): TemplateEngineInterface
     {
         // Set here: module activation reloads the shop config.
         Registry::getConfig()->setConfigParam('sTheme', 'twigtheme');
-        Registry::getConfig()->setConfigParam('sCustomTheme', '');
+        Registry::getConfig()->setConfigParam('sCustomTheme', $customTheme);
 
         $builder = (new ContainerBuilderFactory())->create()->getContainer();
         $builder->getDefinition('twig.loader.filesystem')->replaceArgument(0, [__DIR__ . '/Fixtures/theme']);

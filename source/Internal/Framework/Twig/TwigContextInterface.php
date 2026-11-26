@@ -51,4 +51,11 @@ interface TwigContextInterface
      * The active storefront theme id (custom theme first).
      */
     public function getActiveThemeId(): string;
+
+    /**
+     * The active storefront theme ids, most specific first: the custom (child) theme, then its parent theme.
+     *
+     * @return string[]
+     */
+    public function getActiveThemeIds(): array;
 }

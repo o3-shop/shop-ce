@@ -93,4 +93,12 @@ class TwigContext implements TwigContextInterface
     {
         return (string) ($this->config->getConfigParam('sCustomTheme') ?: $this->config->getConfigParam('sTheme'));
     }
+
+    public function getActiveThemeIds(): array
+    {
+        return array_values(array_unique(array_filter([
+            (string) $this->config->getConfigParam('sCustomTheme'),
+            (string) $this->config->getConfigParam('sTheme'),
+        ])));
+    }
 }
