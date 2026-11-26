@@ -249,7 +249,8 @@ class NavigationTest extends \OxidTestCase
 
     public function testNoTwigCompatibilityWarningsOnSmartyTheme()
     {
-        $this->getConfig()->setConfigParam('sTheme', 'o3-theme');
+        // wave is a Smarty theme (O3-Theme 2.x is Twig).
+        $this->getConfig()->setConfigParam('sTheme', 'wave');
         $view = oxNew(NavigationController::class);
 
         $method = new \ReflectionMethod(NavigationController::class, 'getTwigCompatibilityWarnings');
