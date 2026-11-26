@@ -39,6 +39,8 @@ services:
     calls:
       - [addGlobal, ['twig', {capture: {}}]]
       - [addGlobal, ['oView', {}]]
+      # Set by insert_new_basket_item while rendering; Twig only accepts new globals before it is initialised.
+      - [addGlobal, ['_newitem', null]]
 
   # Loaders. TwigLoaderPass aliases "twig.loader" to the tagged loader, or chains several tagged loaders.
 

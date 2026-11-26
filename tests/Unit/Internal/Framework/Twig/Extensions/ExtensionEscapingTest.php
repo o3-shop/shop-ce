@@ -27,11 +27,13 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Twig\Extension
 
 use OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\TranslateExtension as TranslateFilterExtension;
 use OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\IncludeWidgetExtension;
+use OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\InsertNewBasketItemExtension;
 use OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\MailtoExtension;
 use OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\ScriptExtension;
 use OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\StyleExtension;
 use OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\TranslateExtension;
 use OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\IncludeWidgetLogic;
+use OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\InsertNewBasketItemLogicTwig;
 use OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\ScriptLogic;
 use OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\StyleLogic;
 use OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\TranslateFilterLogic;
@@ -50,10 +52,11 @@ class ExtensionEscapingTest extends TestCase
             (new IncludeWidgetExtension($this->createMock(IncludeWidgetLogic::class)))->getFunctions(),
             (new ScriptExtension($this->createMock(ScriptLogic::class)))->getFunctions(),
             (new StyleExtension($this->createMock(StyleLogic::class)))->getFunctions(),
-            (new MailtoExtension())->getFunctions()
+            (new MailtoExtension())->getFunctions(),
+            (new InsertNewBasketItemExtension($this->createMock(InsertNewBasketItemLogicTwig::class)))->getFunctions()
         );
 
-        $this->assertCount(4, $functions);
+        $this->assertCount(5, $functions);
         foreach ($functions as $function) {
             $this->assertSame(['html'], $function->getSafe(new Node()), $function->getName());
         }
