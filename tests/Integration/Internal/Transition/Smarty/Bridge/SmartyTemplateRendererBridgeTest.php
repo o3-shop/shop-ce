@@ -23,18 +23,28 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Transition\Smarty\Bridge;
 
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidEsales\EshopCommunity\Internal\Framework\Smarty\Bridge\SmartyTemplateRendererBridge;
-use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\DelegatingTemplateEngine;
+use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
 
 class SmartyTemplateRendererBridgeTest extends \PHPUnit\Framework\TestCase
 {
     public function testSetGetEngine()
     {
         $smarty = new \Smarty();
-        $renderer = ContainerFactory::getInstance()->getContainer()->get(TemplateRendererInterface::class);
-        $bridge = new SmartyTemplateRendererBridge($renderer);
+        $bridge = ContainerFactory::getInstance()->getContainer()->get(TemplateRendererBridgeInterface::class);
         $bridge->setEngine($smarty);
 
-        $this->assertEquals($smarty, $bridge->getEngine());
+        $this->assertSame($smarty, $bridge->getEngine());
+    }
+
+    public function testRendererUsesThePerCallEngineWithSmartyForTheSmartyTheme()
+    {
+        $engine = ContainerFactory::getInstance()->getContainer()
+            ->get(TemplateRendererBridgeInterface::class)
+            ->getTemplateRenderer()
+            ->getTemplateEngine();
+
+        $this->assertInstanceOf(DelegatingTemplateEngine::class, $engine);
+        $this->assertSame('tpl', $engine->getDefaultFileExtension());
     }
 }

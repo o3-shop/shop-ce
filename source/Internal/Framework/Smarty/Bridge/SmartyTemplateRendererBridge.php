@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Smarty\Bridge;
 
+use OxidEsales\EshopCommunity\Internal\Framework\Smarty\Legacy\LegacySmartyEngineInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInterface;
 
@@ -34,13 +35,20 @@ class SmartyTemplateRendererBridge implements TemplateRendererBridgeInterface
     private $renderer;
 
     /**
-     * SmartyTemplateRendererBridge constructor.
-     *
-     * @param TemplateRendererInterface $renderer
+     * @var LegacySmartyEngineInterface
      */
-    public function __construct(TemplateRendererInterface $renderer)
+    private $smartyEngine;
+
+    /**
+     * The renderer's engine is chosen per call, so the Smarty instance is set on the Smarty engine directly.
+     *
+     * @param TemplateRendererInterface   $renderer
+     * @param LegacySmartyEngineInterface $smartyEngine
+     */
+    public function __construct(TemplateRendererInterface $renderer, LegacySmartyEngineInterface $smartyEngine)
     {
         $this->renderer = $renderer;
+        $this->smartyEngine = $smartyEngine;
     }
 
     /**
@@ -56,7 +64,7 @@ class SmartyTemplateRendererBridge implements TemplateRendererBridgeInterface
      */
     public function setEngine($engine)
     {
-        $this->renderer->getTemplateEngine()->setSmarty($engine);
+        $this->smartyEngine->setSmarty($engine);
     }
 
     /**
@@ -64,6 +72,6 @@ class SmartyTemplateRendererBridge implements TemplateRendererBridgeInterface
      */
     public function getEngine()
     {
-        return $this->renderer->getTemplateEngine()->getSmarty();
+        return $this->smartyEngine->getSmarty();
     }
 }
