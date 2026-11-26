@@ -1,0 +1,11 @@
+{% extends "layout/base.html.twig" %}
+
+{% block content %}
+TWIG-FIXTURE-START-BEGIN
+view:{{ oView.getClassKey() }};
+translated:{{ translate({ ident: "HOME" }) }};
+price:{{ format_price(1234.5) }};
+escaped:{{ "<b>"|lower }};
+{{ include_widget({ cl: "oxwMiniBasket", nocookie: 1 }) }}
+TWIG-FIXTURE-START-END
+{% endblock %}
