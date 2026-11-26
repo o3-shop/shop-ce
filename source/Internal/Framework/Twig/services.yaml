@@ -80,6 +80,196 @@ services:
   OxidEsales\EshopCommunity\Internal\Framework\Twig\Escaper\UrlPathInfoEscaper:
     tags: ['twig.escaper']
 
+  # Token parsers
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\TokenParser\HasRightsTokenParser:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\TokenParser\HasRightsTokenParser
+    arguments:
+      - 'OxidEsales\EshopCommunity\Internal\Framework\Twig\Node\HasRightsNode'
+
+  # Extensions
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\MathExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\MathExtension
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\IncludeExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\IncludeExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\IncludeDynamicLogic'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\SmartyCycleExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\SmartyCycleExtension
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\MailtoExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\MailtoExtension
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\UrlExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\UrlExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\SeoUrlLogic'
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\AddUrlParametersLogic'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\AssignAdvancedExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\AssignAdvancedExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\AssignAdvancedLogic'
+    tags: ['twig.extension']
+
+  Twig\Extension\StringLoaderExtension:
+    class: Twig\Extension\StringLoaderExtension
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\HasRightsExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\HasRightsExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Framework\Twig\TokenParser\HasRightsTokenParser'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\IfContentExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\IfContentExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\IfContentLogic'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\FormatPriceExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\FormatPriceExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\FormatPriceLogic'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\CatExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\CatExtension
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\EncloseExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\EncloseExtension
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\ScriptExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\ScriptExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\ScriptLogic'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\FormatDateExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\FormatDateExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\FormatDateLogic'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\DateFormatExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\DateFormatExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\DateFormatHelper'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\TranslateExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\TranslateExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\TranslateFilterLogic'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\TranslateExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\TranslateExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\TranslateFunctionLogic'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\FormatTimeExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\FormatTimeExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\FormatTimeLogic'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\FileSizeExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\FileSizeExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\FileSizeLogic'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\StyleExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\StyleExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\StyleLogic'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\TruncateExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\TruncateExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\TruncateLogic'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\TranslateSalutationExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\TranslateSalutationExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\TranslateSalutationLogic'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\FormatCurrencyExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\FormatCurrencyExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\FormatCurrencyLogic'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\WordwrapExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\WordwrapExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\WordwrapLogic'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\IncludeWidgetExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\IncludeWidgetExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\IncludeWidgetLogic'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\SmartWordwrapExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\SmartWordwrapExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\SmartWordwrapLogic'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\InputHelpExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\InputHelpExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\InputHelpLogic'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\PhpFunctionsExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\PhpFunctionsExtension
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\PhpFunctionsExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\PhpFunctionsExtension
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\RegexReplaceExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\Filters\RegexReplaceExtension
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\CaptureExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\CaptureExtension
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\InsertNewBasketItemExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\InsertNewBasketItemExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic\InsertNewBasketItemLogicTwig'
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\InsertTrackerExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\InsertTrackerExtension
+    tags: ['twig.extension']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\GetRequestVariablesExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\GetRequestVariablesExtension
+    tags: ['twig.extension']
+
   # Engine (extensions are added by TwigEnvironmentPass, escapers by TwigEscaperPass). Deliberately not bound to TemplateEngineInterface: the engine is selected elsewhere.
 
   oxid_esales.templating.twig_engine:
