@@ -33,3 +33,9 @@ type: reference
 - Smarty plain mails saw variables the HTML mail assigned just before (shared Smarty object, also across mails in one PHP process: `$style` leaked into later mails). Twig plain templates must set `shop`/`user`/… themselves; compare mails one PHP process per mail.
 - Twig cannot reach magic `__get` properties (`Order::oDelSet`) nor unset dynamic ones (`BasketItem::aDiscounts`): `Base::__call` throws `SystemComponentException` (not BadMethodCallException, so Twig does not swallow it).
 - `Email::setAltBody()`/`setSubject()` decode one level of entities, so plain mails/subjects print core-escaped `.value` as is.
+
+## Theme port pitfalls (Task 8, escaping audit)
+- Several values are stored request-escaped by the core, so they need `|raw` (escaping again double-encodes): basket/order persparams (`BasketComponent` reads `persparam`/`aproducts` escaped, keys too), recommlist article notes (`addToRecomm`, `recomm_txt`), voucher numbers, `SelectList::getLabel()`/`VariantSelectList::getLabel()`/`Selection::getName()` (htmlspecialchars). SQL-inserted test fixtures hide this; inject hostile values through the storefront forms and compare with `main`.
+- Converted templates keep 1.x dead code as one big `{# … #}` (from `[{* … *}]`, e.g. `basketcontents_list.html.twig` lines 62–136). An edit there is dead, and a `{# … #}` comment added inside closes the outer comment early (Twig "Unexpected endblock"). Check `{#` before editing; compile-check with the Twig env (`compileSource`) after edits, the lint does not parse.
+- JS strings in templates: `|e('js')` on decoded text (`getRawValue()`, or `.value` of T_RAW fields), never HTML-escaped `.value|raw`.
+- Translations with arguments: never `translate({…args…})|raw`; escape the lang text and insert the escaped argument (`translate({ident:"X"})|e|replace({'%s': arg})|raw`) or pass a decoded value and let autoescape work. `build/lint-twig.php` reports both (`transraw`, `rawtext`).
