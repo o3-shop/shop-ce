@@ -25,6 +25,7 @@ namespace OxidEsales\EshopCommunity\Tests\Integration\Core;
 use OxidEsales\Eshop\Application\Model\ArticleList;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Application\Model\PriceAlarm;
 use OxidEsales\Eshop\Application\Model\Shop;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Application\Model\UserPayment;
@@ -126,6 +127,33 @@ final class EmailTwigTest extends TestCase
         } catch (\Throwable $exception) {
             $this->assertTrue(Registry::getConfig()->isAdmin(), 'Admin mode is restored after a failed render.');
         }
+    }
+
+    /**
+     * The customer price-alarm mail template exists only in views/admin, so it stays Smarty and admin mode.
+     */
+    public function testCustomerPriceAlarmFromAdminRendersAdminSmartyTemplate(): void
+    {
+        Registry::getConfig()->setAdminMode(true);
+        $article = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+        $article->oxarticles__oxid = new Field('_testArticleId');
+        $currency = new \stdClass();
+        $currency->sign = 'EUR';
+        $alarm = $this->getMockBuilder(PriceAlarm::class)
+            ->setMethods(['getArticle', 'getFProposedPrice', 'getPriceAlarmCurrency', 'getFPrice', 'getTitle'])
+            ->getMock();
+        $alarm->method('getArticle')->willReturn($article);
+        $alarm->method('getFProposedPrice')->willReturn('1,00');
+        $alarm->method('getPriceAlarmCurrency')->willReturn($currency);
+        $alarm->method('getFPrice')->willReturn('2,00');
+        $alarm->method('getTitle')->willReturn('PRICEALARM-TITLE');
+        $alarm->oxpricealarm__oxshopid = new Field(Registry::getConfig()->getShopId());
+
+        $body = $this->getMailMock()->sendPricealarmToCustomer('customer@example.com', $alarm, null, true);
+
+        $this->assertStringContainsString('PRICEALARM-TITLE', $body);
+        $this->assertStringContainsString('_testArticleId', $body);
+        $this->assertTrue(Registry::getConfig()->isAdmin());
     }
 
     private function getMailMock(): Email
