@@ -23,13 +23,11 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Templating\Engine;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\DelegatingTemplateEngine;
-use OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\TemplateEngineName;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\TemplateEngineResolverInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\Resolver\LegacyTemplateNameResolver;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\Resolver\TemplateNameResolver;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateEngineInterface;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 
 final class DelegatingTemplateEngineTest extends TestCase
 {
@@ -90,12 +88,37 @@ final class DelegatingTemplateEngineTest extends TestCase
         $this->assertSame(['g' => 1], $engine->getGlobals());
     }
 
-    public function testAddGlobalReachesBothEngines(): void
+    public function testAddGlobalOnSmartyDoesNotBuildTwig(): void
     {
         $this->smarty->expects($this->once())->method('addGlobal')->with('oView', 'view');
-        $this->twig->expects($this->once())->method('addGlobal')->with('oView', 'view');
+        $this->twig->expects($this->never())->method('addGlobal');
 
         $this->engine()->addGlobal('oView', 'view');
+    }
+
+    public function testRememberedGlobalsAreReplayedOnTheOtherEngineOnce(): void
+    {
+        $engine = $this->engine();
+        $engine->addGlobal('oView', 'view');
+
+        $this->active = $this->twig;
+        $this->twig->expects($this->once())->method('addGlobal')->with('oView', 'view');
+        $engine->render('a.html.twig');
+        $engine->render('b.html.twig');
+    }
+
+    public function testNewGlobalReachesAnEngineAlreadyInSync(): void
+    {
+        $engine = $this->engine();
+        $this->active = $this->twig;
+        $engine->render('a.html.twig');
+
+        $this->active = $this->smarty;
+        $engine->addGlobal('oView', 'second');
+
+        $this->active = $this->twig;
+        $this->twig->expects($this->once())->method('addGlobal')->with('oView', 'second');
+        $engine->render('a.html.twig');
     }
 
     private function engine(): DelegatingTemplateEngine
@@ -105,16 +128,6 @@ final class DelegatingTemplateEngineTest extends TestCase
             return $this->active;
         });
 
-        return new DelegatingTemplateEngine(
-            $resolver,
-            new ServiceLocator([
-                TemplateEngineName::SMARTY => function () {
-                    return $this->smarty;
-                },
-                TemplateEngineName::TWIG => function () {
-                    return $this->twig;
-                },
-            ])
-        );
+        return new DelegatingTemplateEngine($resolver);
     }
 }

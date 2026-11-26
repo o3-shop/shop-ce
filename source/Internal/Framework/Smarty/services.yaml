@@ -41,9 +41,6 @@ services:
     class: OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\DelegatingTemplateEngine
     arguments:
       - '@OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\TemplateEngineResolverInterface'
-      - !service_locator
-        smarty: '@oxid_esales.templating.smarty_engine'
-        twig: '@oxid_esales.templating.twig_engine'
   OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\TemplateEngineResolverInterface:
     class: OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\TemplateEngineResolver
     public: true
