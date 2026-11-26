@@ -18,7 +18,7 @@ updates:
     directory: "/"
     target-branch: "b-2.0"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     open-pull-requests-limit: 10
     # Symfony (and Doctrine) components must move in lockstep: a single
     # component bump cannot resolve against the rest of the stack. Grouping
