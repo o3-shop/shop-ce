@@ -19,6 +19,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  *
  * Modified for O3-Shop (2026): adopted from OXID twig-component v1.1.0, ported to Twig 3.
+ * Modified for O3-Shop (2026): module namespaces ported from twig-component v2.0.1 to PHP 7.4
  */
 
 declare(strict_types=1);
@@ -29,6 +30,8 @@ use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\Exception\TemplateFileNotFoundException;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\Loader\TemplateLoaderInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Twig\Resolver\ModulesTemplateDirectoryResolver;
+use OxidEsales\EshopCommunity\Internal\Framework\Twig\TwigContextInterface;
 use Twig\Error\LoaderError;
 use Twig\Loader\FilesystemLoader as TwigLoader;
 
@@ -53,6 +56,16 @@ class FilesystemLoader extends TwigLoader
     private $adminLoader;
 
     /**
+     * @var ModulesTemplateDirectoryResolver|null
+     */
+    private $modulesTemplateDirectoryResolver;
+
+    /**
+     * @var TwigContextInterface|null
+     */
+    private $twigContext;
+
+    /**
      * FilesystemLoader constructor.
      *
      * @param array                   $paths
@@ -64,13 +77,32 @@ class FilesystemLoader extends TwigLoader
         $paths = [],
         ?string $rootPath = null,
         ?TemplateLoaderInterface $loader = null,
-        ?TemplateLoaderInterface $adminLoader = null
+        ?TemplateLoaderInterface $adminLoader = null,
+        ?ModulesTemplateDirectoryResolver $modulesTemplateDirectoryResolver = null,
+        ?TwigContextInterface $twigContext = null
     ) {
         parent::__construct($paths, $rootPath);
 
         $this->config = Registry::getConfig();
         $this->loader = $loader;
         $this->adminLoader = $adminLoader;
+        $this->modulesTemplateDirectoryResolver = $modulesTemplateDirectoryResolver;
+        $this->twigContext = $twigContext;
+    }
+
+    /**
+     * Module extensions compile with their template chain parent baked in, and the chain depends on the
+     * active theme and modules. Keying the compiled template by them keeps shops and theme switches apart.
+     */
+    public function getCacheKey(string $name): string
+    {
+        $key = parent::getCacheKey($name);
+        if ($this->modulesTemplateDirectoryResolver !== null && $this->twigContext !== null) {
+            $key .= '|' . $this->twigContext->getActiveThemeId()
+                . '|' . implode(',', array_keys($this->modulesTemplateDirectoryResolver->getTemplateDirectories()));
+        }
+
+        return $key;
     }
 
     /**
@@ -84,6 +116,8 @@ class FilesystemLoader extends TwigLoader
      */
     public function findTemplate(string $name, bool $throw = true)
     {
+        $this->addModuleNamespaces();
+
         if ($this->config->isAdmin()) {
             $template = $this->findByInternalLoader($this->adminLoader, $name);
         } else {
@@ -99,6 +133,22 @@ class FilesystemLoader extends TwigLoader
         }
 
         return $template;
+    }
+
+    /**
+     * Active modules' "views/twig" directories become the "@<moduleId>" namespaces. Resolved per call,
+     * since the active modules depend on the current shop.
+     */
+    private function addModuleNamespaces(): void
+    {
+        if ($this->modulesTemplateDirectoryResolver === null) {
+            return;
+        }
+        foreach ($this->modulesTemplateDirectoryResolver->getTemplateDirectories() as $moduleId => $directory) {
+            if (!in_array($directory, $this->getPaths($moduleId), true)) {
+                $this->addPath($directory, $moduleId);
+            }
+        }
     }
 
     private function findByInternalLoader(?TemplateLoaderInterface $loader, string $name): string

@@ -46,4 +46,9 @@ interface TwigContextInterface
      * @return string
      */
     public function getCacheDir(): string;
+
+    /**
+     * The active storefront theme id (custom theme first).
+     */
+    public function getActiveThemeId(): string;
 }

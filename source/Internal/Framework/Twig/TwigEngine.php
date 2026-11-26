@@ -27,6 +27,7 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Twig;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateEngineInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Twig\Escaper\EscaperInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Twig\Resolver\TemplateChain\TemplateChainResolver;
 use Twig\Environment;
 use Twig\Extension\DebugExtension;
 use Twig\Extension\EscaperExtension;
@@ -42,15 +43,25 @@ class TwigEngine implements TemplateEngineInterface
     private $engine;
 
     /**
+     * @var TemplateChainResolver|null
+     */
+    private $templateChainResolver;
+
+    /**
      * TwigEngine constructor.
      *
      * @param Environment $engine
      * @param iterable    $twigExtensions
      * @param iterable    $twigEscaper
      */
-    public function __construct(Environment $engine, iterable $twigExtensions = [], iterable $twigEscaper = [])
-    {
+    public function __construct(
+        Environment $engine,
+        iterable $twigExtensions = [],
+        iterable $twigEscaper = [],
+        ?TemplateChainResolver $templateChainResolver = null
+    ) {
         $this->engine = $engine;
+        $this->templateChainResolver = $templateChainResolver;
 
         foreach ($twigExtensions as $extension) {
             $this->engine->addExtension($extension);
@@ -84,6 +95,10 @@ class TwigEngine implements TemplateEngineInterface
      */
     public function render(string $name, array $context = []): string
     {
+        if ($this->templateChainResolver !== null) {
+            $name = $this->templateChainResolver->getLastChild($name);
+        }
+
         return $this->engine->render($name, $context);
     }
 

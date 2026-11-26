@@ -49,7 +49,24 @@ services:
       - null
       - '@oxid_esales.templating.template.loader'
       - '@oxid_esales.templating.admin.template.loader'
+      - '@OxidEsales\EshopCommunity\Internal\Framework\Twig\Resolver\ModulesTemplateDirectoryResolver'
+      - '@OxidEsales\EshopCommunity\Internal\Framework\Twig\TwigContextInterface'
     tags: ['twig.loader']
+
+  # Template chain: active modules extend theme templates (ported from twig-component 2.x)
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Resolver\ModulesTemplateDirectoryResolver:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Resolver\ModulesTemplateDirectoryResolver
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Framework\Config\Dao\ShopConfigurationSettingDaoInterface'
+      - '@OxidEsales\EshopCommunity\Internal\Framework\Module\Path\ModulePathResolverInterface'
+      - '@OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface'
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Resolver\TemplateChain\TemplateChainResolver:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Resolver\TemplateChain\TemplateChainResolver
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Framework\Twig\Resolver\ModulesTemplateDirectoryResolver'
+      - '@OxidEsales\EshopCommunity\Internal\Framework\Twig\TwigContextInterface'
 
   twig.loader.chain:
     class: Twig\Loader\ChainLoader
@@ -270,10 +287,19 @@ services:
     class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\GetRequestVariablesExtension
     tags: ['twig.extension']
 
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\ExtendsExtension:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions\ExtendsExtension
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Framework\Twig\Resolver\TemplateChain\TemplateChainResolver'
+    tags: ['twig.extension']
+
   # Engine (extensions are added by TwigEnvironmentPass, escapers by TwigEscaperPass). Deliberately not bound to TemplateEngineInterface: the engine is selected elsewhere.
 
   oxid_esales.templating.twig_engine:
     class: OxidEsales\EshopCommunity\Internal\Framework\Twig\TwigEngine
     arguments:
       - '@twig'
+      - []
+      - []
+      - '@OxidEsales\EshopCommunity\Internal\Framework\Twig\Resolver\TemplateChain\TemplateChainResolver'
     public: true
