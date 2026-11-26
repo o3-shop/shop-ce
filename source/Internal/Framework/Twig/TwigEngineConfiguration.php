@@ -57,6 +57,7 @@ class TwigEngineConfiguration implements TwigEngineConfigurationInterface
         return [
             'debug' => $this->context->getIsDebug(),
             'cache' => $this->context->getCacheDir(),
+            'auto_reload' => $this->context->getTemplateCompileCheckMode(),
             'autoescape' => [self::class, 'getAutoescapeStrategy'],
         ];
     }

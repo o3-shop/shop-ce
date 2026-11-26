@@ -40,12 +40,31 @@ class TwigEngineConfigurationTest extends TestCase
         $this->assertFalse(\call_user_func($parameters['autoescape'], 'email/plain/x.html.twig'));
     }
 
-    private function getEngineConfiguration(): TwigEngineConfiguration
+    /**
+     * @dataProvider autoReloadProvider
+     */
+    public function testAutoReloadFollowsTemplateCompileCheckNotDebug(bool $debug, bool $compileCheck): void
+    {
+        $parameters = $this->getEngineConfiguration($debug, $compileCheck)->getParameters();
+
+        $this->assertSame($compileCheck, $parameters['auto_reload']);
+    }
+
+    public function autoReloadProvider(): array
+    {
+        return [
+            'debug without template check' => [true, false],
+            'template check without debug' => [false, true],
+        ];
+    }
+
+    private function getEngineConfiguration(bool $debug = true, bool $compileCheck = false): TwigEngineConfiguration
     {
         /** @var TwigContextInterface|MockObject $context */
         $context = $this->getMockBuilder('OxidEsales\EshopCommunity\Internal\Framework\Twig\TwigContextInterface')->getMock();
-        $context->method('getIsDebug')->willReturn(true);
+        $context->method('getIsDebug')->willReturn($debug);
         $context->method('getCacheDir')->willReturn('dummy_cache_dir');
+        $context->method('getTemplateCompileCheckMode')->willReturn($compileCheck);
         return new TwigEngineConfiguration($context);
     }
 }

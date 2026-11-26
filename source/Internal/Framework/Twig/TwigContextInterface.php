@@ -48,6 +48,11 @@ interface TwigContextInterface
     public function getCacheDir(): string;
 
     /**
+     * Whether changed templates are recompiled ("blCheckTemplates", always off in productive mode), as for Smarty.
+     */
+    public function getTemplateCompileCheckMode(): bool;
+
+    /**
      * The active storefront theme id (custom theme first).
      */
     public function getActiveThemeId(): string;

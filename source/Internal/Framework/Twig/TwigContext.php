@@ -89,6 +89,11 @@ class TwigContext implements TwigContextInterface
         return $this->config->getConfigParam('sCompileDir') . '/twig';
     }
 
+    public function getTemplateCompileCheckMode(): bool
+    {
+        return !$this->config->isProductiveMode() && (bool) $this->config->getConfigParam('blCheckTemplates');
+    }
+
     public function getActiveThemeId(): string
     {
         return (string) ($this->config->getConfigParam('sCustomTheme') ?: $this->config->getConfigParam('sTheme'));
