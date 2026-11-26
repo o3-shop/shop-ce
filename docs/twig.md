@@ -4,7 +4,7 @@ O3-Shop 2.0 ships Twig 3 next to Smarty. The active storefront theme decides whi
 
 ## Upgrade note (read before updating)
 
-To keep a Smarty storefront, pin `o3-shop/o3-theme` to `^1` in your project's `composer.json` *before* updating to O3-Shop 2.0; otherwise O3-Theme is updated to its Twig version.
+To keep a Smarty storefront, stay on O3-Theme 1.x *before* updating to O3-Shop 2.0; otherwise O3-Theme is updated to its Twig version (2.x). **Open item:** every released O3-Theme 1.x tag requires `o3-shop/shop-ce: ^1.2`, so pinning `o3-shop/o3-theme` to `^1` does not resolve next to O3-Shop 2.0 yet. That needs an O3-Theme 1.x release whose `composer.json` also allows shop-ce 2.0 (not released yet); until then keep the theme checkout/package on the 1.x line manually.
 
 The core never switches the active theme or engine on its own. A child theme written in Smarty on a Twig parent theme cannot work; the admin shows a warning naming both themes.
 
@@ -66,6 +66,15 @@ CMS content keeps its Smarty syntax and is parsed by Smarty, also under a Twig t
 - Smarty `blocks` apply to Smarty themes only.
 - Not supported yet: a sorting configuration (order is activation order; tracked as a follow-up), `embed`, and dynamic (non-constant) names in `extends`/`include`.
 - An extension file added to an already active module needs a template cache clear (`oe:cache:clear`).
+
+## O3-Theme 2.x for module authors
+
+O3-Theme 2.x (Twig) keeps the 1.x block names, with these contract changes (details: the theme's `CHANGELOG.md`, section 2.0.0):
+
+- **New block `content`.** Pages `{% extends "layout/page.html.twig" %}` and fill `content` (inside `content_main`) instead of `[{capture append="oxidBlock_content"}]`. It is the only block without a 1.x counterpart. To change a page's main area, extend `content` (or the page's own blocks); variables the layout reads (`blHideBreadcrumb`) are set at the page's top level.
+- **Detail tabs (`page/details/inc/tabs.html.twig`).** Each `details_tabs_*` block prints its nav link when `tabPart == 'nav'` and its pane when `tabPart == 'content'`; the template renders every tab block twice (nav first, then content if the nav part printed anything). One block yields at most one tab, and all output and side effects of a tab block (includes, widgets, `script()`) must be gated by `tabPart`. Add a tab by overriding one of the empty tab blocks the same way.
+- **Popup pages keep the 1.x shape.** `page/account/forgotpwd`, `page/account/register`, `page/account/register_success`, `page/info/content_plain` and `page/privatesales/login` render in `layout/popup`, which has no `content` block: they still `capture append="oxidBlock_content"` and include the layout, as do `page/details/details` and `page/privatesales/invite`. Extend their own blocks, not `content`.
+- Blocks that 1.x defined twice with different bodies are defined once and rendered again with `{{ block('…') }}`; an override applies to every place, as in 1.x (list in the theme CHANGELOG).
 
 ## Admin warnings
 

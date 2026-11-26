@@ -19,8 +19,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   for a Smarty child theme on a Twig parent. CMS content in Twig templates is parsed by Smarty as in
   1.x: `{% ifcontent %}` provides the content with its stored fields parsed by Smarty, and the new Twig function
   `include_content(ident, field = 'oxcontent', oxid = null)` replaces Smarty's `[{oxcontent}]`.
-  **Upgrade note:** To keep a Smarty storefront, pin `o3-shop/o3-theme` to `^1` in your project's
-  `composer.json` *before* updating to O3-Shop 2.0; otherwise O3-Theme is updated to its Twig version.
+  **Upgrade note:** To keep a Smarty storefront, stay on O3-Theme 1.x *before* updating to O3-Shop 2.0;
+  otherwise O3-Theme is updated to its Twig version. Open item: every released O3-Theme 1.x tag requires
+  `o3-shop/shop-ce: ^1.2`, so pinning `o3-shop/o3-theme` to `^1` does not resolve next to O3-Shop 2.0 yet;
+  that needs an O3-Theme 1.x release whose `composer.json` also allows shop-ce 2.0 (not released yet).
+  Until then keep the theme checkout/package on the 1.x line manually. Module authors: see
+  "O3-Theme 2.x for module authors" in `docs/twig.md`.
 - console command `oe:module:refresh-settings` to re-apply the installed module configuration
   (templates, blocks, controllers, class extensions, events, services) to the shop without
   changing the module activation state. Module settings configured in the admin are kept.
