@@ -82,6 +82,23 @@ RUN composer global require friendsofphp/php-cs-fixer \
 RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/source|g' /etc/apache2/sites-available/000-default.conf \
     && sed -i '/<VirtualHost \*:80>/a <Directory /var/www/html/source>\n    Options Indexes FollowSymLinks\n    AllowOverride All\n    Require all granted\n</Directory>' /etc/apache2/sites-available/000-default.conf
 
+# Enable Apache mod_ssl and serve HTTPS on 443 (published per-worktree) with a
+# self-signed certificate, so the setup mod_rewrite self-probe can exercise the
+# SSL code path locally. Pair with O3SHOP_CONF_ALLOWSELFSIGNEDCERTIFICATES=1.
+# Mirror the DocumentRoot/Directory tweaks applied to the HTTP vhost above.
+RUN a2enmod ssl \
+    && mkdir -p /etc/apache2/ssl \
+    && openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+        -keyout /etc/apache2/ssl/o3shop.key \
+        -out /etc/apache2/ssl/o3shop.crt \
+        -subj "/CN=localhost" \
+        -addext "subjectAltName=DNS:localhost" \
+    && sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/source|g' /etc/apache2/sites-available/default-ssl.conf \
+    && sed -i 's|/etc/ssl/certs/ssl-cert-snakeoil.pem|/etc/apache2/ssl/o3shop.crt|' /etc/apache2/sites-available/default-ssl.conf \
+    && sed -i 's|/etc/ssl/private/ssl-cert-snakeoil.key|/etc/apache2/ssl/o3shop.key|' /etc/apache2/sites-available/default-ssl.conf \
+    && sed -i '/<VirtualHost _default_:443>/a <Directory /var/www/html/source>\n    Options Indexes FollowSymLinks\n    AllowOverride All\n    Require all granted\n</Directory>' /etc/apache2/sites-available/default-ssl.conf \
+    && a2ensite default-ssl
+
 RUN echo "[client]" > /root/.my.cnf \
     && echo "skip-ssl = true" >> /root/.my.cnf
 

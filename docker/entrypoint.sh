@@ -138,7 +138,8 @@ start_apache() {
     
     # Enable Apache modules
     a2enmod rewrite || handle_error "Failed to enable Apache rewrite module"
-    
+    a2enmod ssl || handle_error "Failed to enable Apache ssl module"
+
     log "${GREEN}Starting Apache...${NC}"
     rm /tmp/o3setup-running
 

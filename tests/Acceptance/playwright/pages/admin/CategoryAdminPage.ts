@@ -34,15 +34,7 @@ export class CategoryAdminPage extends BaseAdminPage {
 
     private async stoken(): Promise<string> {
         if (this.cachedStoken) return this.cachedStoken;
-        const navFrame = this.page
-            .frameLocator('frame[name="navigation"]')
-            .frameLocator('frame[name="adminnav"]');
-        const href = await navFrame.locator('a[href*="stoken="]').first().getAttribute('href');
-        const m = href?.match(/stoken=([A-Za-z0-9]+)/);
-        if (!m) {
-            throw new Error('CategoryAdminPage: could not extract stoken from admin nav.');
-        }
-        this.cachedStoken = m[1] ?? '';
+        this.cachedStoken = await this.extractStoken();
         return this.cachedStoken;
     }
 

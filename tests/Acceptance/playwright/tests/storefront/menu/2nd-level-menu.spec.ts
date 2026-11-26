@@ -112,7 +112,11 @@ test.describe('storefront / 2nd-level menu (#141)', () => {
         expect(await plp.hasMegamenu('Einhörner')).toBe(true);
         const menu = await plp.openMegamenu('Einhörner');
 
-        // Visible panel: white bg + rounded radius drawn by ::before pseudo
+        // Visible panel: white bg + drop-shadow drawn by the ::before pseudo.
+        // o3-theme v1.4.0 (#27) deliberately flattened the corners
+        // (`.megamenu::before { border-radius: 0 }` in _svg-icons.scss) so the
+        // panel is a square white box that matches the page background — hence
+        // radius is expected to be 0, not the pre-1.4.0 12px.
         const panelStyles = await menu.evaluate((el) => {
             const cs = getComputedStyle(el, '::before');
             return {
@@ -122,7 +126,7 @@ test.describe('storefront / 2nd-level menu (#141)', () => {
             };
         });
         expect(panelStyles.bg).toBe('rgb(255, 255, 255)');
-        expect(panelStyles.radius).toBeGreaterThanOrEqual(8);
+        expect(panelStyles.radius, 'o3-theme v1.4.0 flattened the megamenu panel (#27)').toBe(0);
         expect(panelStyles.hasShadow).toBe(true);
 
         // Caret (::after pseudo) is anchored to the LEFT side for left-side items

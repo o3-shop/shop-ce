@@ -36,6 +36,44 @@ class SystemRequirementsTest extends \OxidTestCase
         $this->assertEquals(34359738368, $systemRequirements->UNITgetBytes('32G'));
     }
 
+    public function testBuildModRewriteStreamContextKeepsVerificationForSslWhenFlagOff()
+    {
+        \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)
+            ->setVar('blAllowSelfSignedCertificates', false);
+        $systemRequirements = new SystemRequirements();
+
+        $context = $systemRequirements->UNITbuildModRewriteStreamContext(['ssl' => true]);
+        $options = stream_context_get_options($context);
+
+        $this->assertArrayNotHasKey('ssl', $options);
+    }
+
+    public function testBuildModRewriteStreamContextRelaxesVerificationForSslWhenFlagOn()
+    {
+        \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)
+            ->setVar('blAllowSelfSignedCertificates', true);
+        $systemRequirements = new SystemRequirements();
+
+        $context = $systemRequirements->UNITbuildModRewriteStreamContext(['ssl' => true]);
+        $options = stream_context_get_options($context);
+
+        $this->assertFalse($options['ssl']['verify_peer']);
+        $this->assertFalse($options['ssl']['verify_peer_name']);
+        $this->assertTrue($options['ssl']['allow_self_signed']);
+    }
+
+    public function testBuildModRewriteStreamContextKeepsVerificationForNonSslWhenFlagOn()
+    {
+        \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)
+            ->setVar('blAllowSelfSignedCertificates', true);
+        $systemRequirements = new SystemRequirements();
+
+        $context = $systemRequirements->UNITbuildModRewriteStreamContext(['ssl' => false]);
+        $options = stream_context_get_options($context);
+
+        $this->assertArrayNotHasKey('ssl', $options);
+    }
+
     public function testGetRequiredModules()
     {
         $systemRequirements = new SystemRequirements();

@@ -20,18 +20,6 @@ export class AdminRevocationDetailPage extends BaseAdminPage {
     );
   }
 
-  private async extractStoken(): Promise<string> {
-    const navFrame = this.page
-      .frameLocator('frame[name="navigation"]')
-      .frameLocator('frame[name="adminnav"]');
-    const link = await navFrame.locator('a[href*="stoken="]').first().getAttribute('href');
-    const match = link?.match(/stoken=([A-Za-z0-9]+)/);
-    if (!match) {
-      throw new Error('AdminRevocationDetailPage: could not extract stoken from admin nav.');
-    }
-    return match[1] ?? '';
-  }
-
   get editForm(): Locator {
     return this.page.locator('form#myedit');
   }

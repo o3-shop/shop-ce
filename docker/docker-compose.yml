@@ -32,6 +32,7 @@ services:
       PHP_INI_SCAN_DIR: ":/var/www/html/docker/xdebug"
     ports:
       - "${O3SHOP_PORT_HTTP:-8080}:80"
+      - "${O3SHOP_PORT_HTTPS:-8443}:443"
     working_dir: /var/www/html
     healthcheck:
       test: [ "CMD", "test", "!", "-f", "/tmp/o3setup-running" ]

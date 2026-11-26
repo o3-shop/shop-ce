@@ -28,7 +28,7 @@ Workflow skills are bundled in `.claude/skills/` and trigger automatically. See 
 ./docker.sh rebuild # full rebuild from scratch (slow — only when needed)
 ```
 
-Shop: http://localhost:8080 | Admin: http://localhost:8080/admin/ (admin@example.com / admin123)
+Shop: http://localhost:8080 (or https://localhost:8443, self-signed) | Admin: http://localhost:8080/admin/ (admin@example.com / admin123)
 Adminer: http://localhost:8081 | Mailpit: http://localhost:8025
 
 ## Command Reference

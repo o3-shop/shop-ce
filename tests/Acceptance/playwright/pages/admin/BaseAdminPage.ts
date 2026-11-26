@@ -30,4 +30,22 @@ export abstract class BaseAdminPage {
     await this.page.waitForLoadState('domcontentloaded');
     await this.page.waitForSelector('frame[name="basefrm"]');
   }
+
+  /**
+   * Read the fresh `stoken` from the framed admin home's nav links. The
+   * adminPage fixture leaves the page on the framed admin home, where every
+   * nav link carries a `stoken=` query param; concrete pages need it for any
+   * subsequent top-level admin navigation in the same session.
+   */
+  protected async extractStoken(): Promise<string> {
+    const navFrame = this.page
+      .frameLocator('frame[name="navigation"]')
+      .frameLocator('frame[name="adminnav"]');
+    const link = await navFrame.locator('a[href*="stoken="]').first().getAttribute('href');
+    const match = link?.match(/stoken=([A-Za-z0-9]+)/);
+    if (!match) {
+      throw new Error(`${this.constructor.name}: could not extract stoken from admin nav.`);
+    }
+    return match[1] ?? '';
+  }
 }
