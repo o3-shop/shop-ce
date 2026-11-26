@@ -27,11 +27,14 @@ The engine is chosen on every render call:
 | Admin pages (admin mode) | Smarty, always |
 | Storefront pages and widgets | the theme's engine |
 | E-mails (also when sent from the admin) | the theme's engine |
-| CMS content parsed with `parseThroughSmarty` (content pages/snippets, long descriptions, newsletters) | Smarty |
+| Customer price-alarm mail sent from the admin (template in the admin theme) | Smarty |
+| CMS content parsed with `parseThroughSmarty` (content pages/snippets, long descriptions, newsletters), also under a Twig theme | Smarty |
 
 ## Twig templates
 
 Twig templates use the extension `.html.twig`. Controllers keep naming `.tpl` templates (for example `page/checkout/basket.tpl`); under a Twig theme the shop resolves `page/checkout/basket.html.twig`.
+
+Changed templates are recompiled when "check templates" (`blCheckTemplates`) is on, as for Smarty; never in productive mode.
 
 ## Autoescaping
 
@@ -39,7 +42,8 @@ Twig templates use the extension `.html.twig`. Controllers keep naming `.tpl` te
 - Templates under `email/plain/` are not escaped.
 - Mark HTML explicitly with `|raw`: CMS content, long descriptions, HTML translations.
 - `seo_url` and `add_url_parameters` return plain URLs; do not add `|raw`.
-- `include_widget`, `include_dynamic`, `mailto`, `script` and `style` return safe markup already.
+- `include_widget`, `include_dynamic`, `insert_new_basket_item`, `mailto`, `script` and `style` return safe markup already.
+- `mailto` outputs its `text`, `address` and `extra` arguments raw: do not pass user data to it.
 - `translate` output is escaped.
 
 ## Modules
@@ -48,9 +52,10 @@ Twig templates use the extension `.html.twig`. Controllers keep naming `.tpl` te
 - **Own templates:** put them in `views/twig/` and address them as `@<moduleId>/<path>.html.twig`.
 - **Extending theme templates:** add a file at
   `views/twig/extensions/themes/<themeId>/<template>` (or `views/twig/extensions/themes/default/<template>` for any theme) using `{% extends %}` and `{% block %}`.
+  Per module the first match wins: the active (child) theme, its parent theme, then `default`.
   Extensions of all active modules are chained in module activation order. Extended layouts and included partials (`{% include %}`, `include()`, `include_dynamic`) go through the chain as well.
 - Smarty `blocks` apply to Smarty themes only.
-- Not supported yet: a sorting configuration (order is activation order), `embed`, and dynamic (non-constant) names in `extends`/`include`.
+- Not supported yet: a sorting configuration (order is activation order; tracked as a follow-up), `embed`, and dynamic (non-constant) names in `extends`/`include`.
 - An extension file added to an already active module needs a template cache clear (`oe:cache:clear`).
 
 ## Admin warnings
