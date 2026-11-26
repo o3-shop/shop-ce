@@ -1,1 +1,2 @@
 <div class="minibasket">TWIG-FIXTURE-MINIBASKET {{ translate({ ident: "CART" }) }}</div>
+{% ifcontent ident "c2_widget" set oCont %}WIDGET[{{ oCont.oxcontents__oxcontent.value|raw }}]{% endifcontent %}
