@@ -210,4 +210,96 @@ class ThemeMainTest extends OxidTestCase
         $r->setAccessible(true);
         $this->assertFalse($r->invoke($controller, 'azure'));
     }
+
+    /**
+     * @return \OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\ThemeTemplateEngineProviderInterface
+     */
+    private function engineProvider(string $engine)
+    {
+        $provider = $this->createMock(\OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\ThemeTemplateEngineProviderInterface::class);
+        $provider->method('getEngineName')->willReturn($engine);
+
+        return $provider;
+    }
+
+    private function controllerWithCheckers(string $engine, array $moduleIds, ?array $mismatch): ThemeMain
+    {
+        $moduleChecker = $this->createMock(\OxidEsales\EshopCommunity\Internal\Framework\Templating\Compatibility\ModuleTwigCompatibilityCheckerInterface::class);
+        $moduleChecker->method('getModulesWithoutTwigTemplates')->willReturn($moduleIds);
+        $mismatchChecker = $this->createMock(\OxidEsales\EshopCommunity\Internal\Framework\Templating\Compatibility\ThemeEngineMismatchCheckerInterface::class);
+        $mismatchChecker->method('getMismatch')->willReturn($mismatch);
+
+        $controller = oxNew(ThemeMain::class);
+        $controller->setTwigCompatibilityServices($this->engineProvider($engine), $moduleChecker, $mismatchChecker);
+
+        return $controller;
+    }
+
+    private function expectDisplayedMessages(array $needles): void
+    {
+        $messages = [];
+        $utilsView = $this->createMock(\OxidEsales\Eshop\Core\UtilsView::class);
+        $utilsView->method('addErrorToDisplay')->willReturnCallback(
+            function ($exception) use (&$messages) {
+                $messages[] = $exception->getOxMessage();
+            }
+        );
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\UtilsView::class, $utilsView);
+        $this->messages = &$messages;
+    }
+
+    public function testRenderWarnsAboutModulesWithoutTwigTemplatesOnTwigTheme()
+    {
+        $this->getConfig()->setConfigParam('sTheme', 'o3-theme');
+        $this->expectDisplayedMessages([]);
+        $controller = $this->controllerWithCheckers('twig', ['smartyonly', 'other'], null);
+
+        $this->assertSame('theme_main.tpl', $controller->render());
+        $this->assertCount(1, $this->messages);
+        $this->assertStringContainsString('smartyonly, other', $this->messages[0]);
+    }
+
+    public function testRenderDoesNotWarnOnSmartyTheme()
+    {
+        $this->getConfig()->setConfigParam('sTheme', 'o3-theme');
+        $this->expectDisplayedMessages([]);
+        $controller = $this->controllerWithCheckers('smarty', ['smartyonly'], null);
+
+        $controller->render();
+        $this->assertSame([], $this->messages);
+    }
+
+    public function testRenderWarnsAboutEngineMismatch()
+    {
+        $this->getConfig()->setConfigParam('sTheme', 'o3-theme');
+        $this->expectDisplayedMessages([]);
+        $controller = $this->controllerWithCheckers(
+            'smarty',
+            [],
+            ['child' => 'mychild', 'parent' => 'o3-theme', 'childEngine' => 'smarty', 'parentEngine' => 'twig']
+        );
+
+        $controller->render();
+        $this->assertCount(1, $this->messages);
+        $this->assertStringContainsString('mychild', $this->messages[0]);
+        $this->assertStringContainsString('o3-theme', $this->messages[0]);
+    }
+
+    public function testSetThemeStillActivatesAndWarnsWhenActivatingTwigThemeWithSmartyOnlyModules()
+    {
+        $this->expectDisplayedMessages([]);
+        $controller = $this->controllerWithCheckers('twig', ['smartyonly'], null);
+        $this->setRequestParameter('oxid', 'o3-theme');
+        oxTestModules::addFunction('oxTheme', 'load($name)', '{return true;}');
+        oxTestModules::addFunction('oxTheme', 'activate', '{$GLOBALS["themeActivated"] = true; return true;}');
+        $GLOBALS['themeActivated'] = false;
+
+        $controller->setTheme();
+        $this->assertTrue($GLOBALS['themeActivated']);
+        $this->assertCount(1, $this->messages);
+        $this->assertStringContainsString('smartyonly', $this->messages[0]);
+    }
+
+    /** @var string[] */
+    private $messages = [];
 }

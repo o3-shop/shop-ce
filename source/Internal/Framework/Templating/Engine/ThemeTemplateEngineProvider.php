@@ -73,6 +73,14 @@ class ThemeTemplateEngineProvider implements ThemeTemplateEngineProviderInterfac
         return $info === null ? null : $this->ownEngineFrom($info, $themeId);
     }
 
+    public function getParentThemeId(string $themeId): ?string
+    {
+        $info = $this->loadThemeInfo($themeId);
+        $parent = $info === null ? '' : (string) ($info['parentTheme'] ?? '');
+
+        return $parent === '' ? null : $parent;
+    }
+
     private function ownEngineFrom(array $info, string $themeId): ?string
     {
         if (!isset($info['templateEngine'])) {

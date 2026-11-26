@@ -234,4 +234,27 @@ class NavigationTest extends \OxidTestCase
         $this->assertStringContainsString($currentVersion, $actual);
         $this->assertStringContainsString($latestVersion, $actual);
     }
+
+    public function testStartUpChecksIncludeTwigCompatibilityWarnings()
+    {
+        $view = $this->getMock(NavigationController::class, ['getTwigCompatibilityWarnings']);
+        $view->method('getTwigCompatibilityWarnings')->willReturn(['first twig warning', 'second twig warning']);
+
+        $method = new \ReflectionMethod(NavigationController::class, '_doStartUpChecks');
+        $method->setAccessible(true);
+        $messages = $method->invoke($view);
+
+        $this->assertStringContainsString('first twig warning<br>second twig warning', $messages['warning']);
+    }
+
+    public function testNoTwigCompatibilityWarningsOnSmartyTheme()
+    {
+        $this->getConfig()->setConfigParam('sTheme', 'o3-theme');
+        $view = oxNew(NavigationController::class);
+
+        $method = new \ReflectionMethod(NavigationController::class, 'getTwigCompatibilityWarnings');
+        $method->setAccessible(true);
+
+        $this->assertSame([], $method->invoke($view));
+    }
 }

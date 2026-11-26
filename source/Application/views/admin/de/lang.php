@@ -1974,4 +1974,6 @@ $aLang = [
     'O3_GUARANTEE_ADMIN_CONDITIONS_LABEL' => 'Garantiebedingungen (§ 479 BGB)',
     'O3_GUARANTEE_ADMIN_WARN_NOT_ELIGIBLE' => 'Hinweis: Das EU-Garantie-Label wird erst ab einer Garantiedauer von mehr als 2 Jahren angezeigt (Art. 6 Abs. 1 lit. la Verbraucherrechte-RL). Das Speichern ist trotzdem möglich.',
     'O3_GUARANTEE_ADMIN_WARN_NO_GUARANTOR' => 'Achtung: Es ist kein Garantiegeber ermittelbar (Feld leer, kein Hersteller verknüpft). Das Label kann ohne Garantiegeber nicht angezeigt werden.',
+    'TWIG_MODULES_WITHOUT_TWIG_TEMPLATES' => 'Ein Twig-Theme ist aktiv, aber diese Module haben keine Twig-Templates und werden im Shop nicht dargestellt: %s',
+    'THEME_ENGINE_MISMATCH' => "Das Theme '%1\$s' verwendet eine andere Template-Engine (%3\$s) als sein Eltern-Theme '%2\$s' (%4\$s) und funktioniert nicht.",
 ];

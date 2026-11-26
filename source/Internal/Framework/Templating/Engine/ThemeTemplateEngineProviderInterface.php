@@ -33,4 +33,9 @@ interface ThemeTemplateEngineProviderInterface
      * The theme's own 'templateEngine' value, or null if it declares none (or is unknown).
      */
     public function getOwnEngineName(string $themeId): ?string;
+
+    /**
+     * The id of the theme's parent theme, or null if it has none (or is unknown).
+     */
+    public function getParentThemeId(string $themeId): ?string;
 }
