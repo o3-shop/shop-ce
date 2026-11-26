@@ -32,6 +32,7 @@ use OxidEsales\Eshop\Core\Module\ModuleTemplateBlockRepository;
 use OxidEsales\Eshop\Core\Module\ModuleVariablesLocator;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopIdCalculator as EshopShopIdCalculator;
+use OxidEsales\EshopCommunity\Internal\Framework\Smarty\Legacy\LegacySmartyEngineInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Theme\Bridge\AdminThemeBridgeInterface;
@@ -246,9 +247,11 @@ class UtilsView extends \OxidEsales\Eshop\Core\Base
             return $description;
         }
         $activeLanguageId = Registry::getLang()->getTplLanguage();
-        $renderer = clone $this->getRenderer();
+        // CMS content is Smarty syntax, whatever engine the active theme uses.
+        $smartyEngine = $this->getContainer()->get(LegacySmartyEngineInterface::class);
+        $smartyEngine->setSmarty($this->getSmarty());
 
-        return $renderer->renderFragment(
+        return $smartyEngine->renderFragment(
             $description,
             "ox:{$oxid}{$activeLanguageId}",
             $context

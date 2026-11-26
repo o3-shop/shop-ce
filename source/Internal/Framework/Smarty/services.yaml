@@ -35,6 +35,7 @@ services:
     factory: ['@smarty.smarty_engine_factory', 'getTemplateEngine']
   OxidEsales\EshopCommunity\Internal\Framework\Smarty\Legacy\LegacySmartyEngineInterface:
     alias: oxid_esales.templating.smarty_engine
+    public: true
   # The engine is chosen per render call (admin mode -> Smarty, storefront -> active theme's engine).
   OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateEngineInterface:
     class: OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\DelegatingTemplateEngine
