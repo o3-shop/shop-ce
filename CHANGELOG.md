@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [unreleased]
 
 ### Added
+- Twig 3 engine core in `source/Internal/Framework/Twig/` (service `oxid_esales.templating.twig_engine`).
+  Adopted OXID twig-component v1.1.0 (GPL-3.0) into the core, ported to Twig 3; adds the
+  `twig/twig` dependency. The Twig cache lives in `<sCompileDir>/twig/` and is emptied by
+  `TemplateCacheService::invalidateTemplateCache()` (and so by `oe:cache:clear`). The engine is
+  not yet selectable for rendering; Smarty stays the template engine.
 - console command `oe:module:refresh-settings` to re-apply the installed module configuration
   (templates, blocks, controllers, class extensions, events, services) to the shop without
   changing the module activation state. Module settings configured in the admin are kept.

@@ -1,0 +1,90 @@
+services:
+  _defaults:
+    autowire: false
+    public: false
+
+  OxidEsales\Eshop\Core\Config:
+    class: OxidEsales\Eshop\Core\Config
+    factory: ['OxidEsales\Eshop\Core\Registry', getConfig]
+
+  OxidEsales\Eshop\Core\UtilsView:
+    class: OxidEsales\Eshop\Core\UtilsView
+    factory: ['OxidEsales\Eshop\Core\Registry', getUtilsView]
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\TwigContextInterface:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\TwigContext
+    arguments:
+      - '@OxidEsales\Eshop\Core\Config'
+      - '@OxidEsales\Eshop\Core\UtilsView'
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\TwigEngineConfigurationInterface:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\TwigEngineConfiguration
+    arguments:
+      - '@OxidEsales\EshopCommunity\Internal\Framework\Twig\TwigContextInterface'
+
+  # Plain arrays produced by factories, so no expression language is needed.
+  twig.options:
+    class: array
+    factory: ['@OxidEsales\EshopCommunity\Internal\Framework\Twig\TwigEngineConfigurationInterface', getParameters]
+
+  twig.template_directories:
+    class: array
+    factory: ['@OxidEsales\EshopCommunity\Internal\Framework\Twig\TwigContextInterface', getTemplateDirectories]
+
+  twig:
+    class: Twig\Environment
+    arguments:
+      - '@twig.loader'
+      - '@twig.options'
+    calls:
+      - [addGlobal, ['twig', {capture: {}}]]
+      - [addGlobal, ['oView', {}]]
+
+  # Loaders. TwigLoaderPass aliases "twig.loader" to the tagged loader, or chains several tagged loaders.
+
+  twig.loader.filesystem:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\Loader\FilesystemLoader
+    arguments:
+      - '@twig.template_directories'
+      - null
+      - '@oxid_esales.templating.template.loader'
+      - '@oxid_esales.templating.admin.template.loader'
+    tags: ['twig.loader']
+
+  twig.loader.chain:
+    class: Twig\Loader\ChainLoader
+
+  # Escapers
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Escaper\DecEntityEscaper:
+    tags: ['twig.escaper']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Escaper\HexEntityEscaper:
+    tags: ['twig.escaper']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Escaper\HexEscaper:
+    tags: ['twig.escaper']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Escaper\HtmlAllEscaper:
+    tags: ['twig.escaper']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Escaper\MailEscaper:
+    tags: ['twig.escaper']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Escaper\NonStdEscaper:
+    tags: ['twig.escaper']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Escaper\QuotesEscaper:
+    tags: ['twig.escaper']
+
+  OxidEsales\EshopCommunity\Internal\Framework\Twig\Escaper\UrlPathInfoEscaper:
+    tags: ['twig.escaper']
+
+  # Engine (escapers are added by TwigEscaperPass). Deliberately not bound to TemplateEngineInterface: the engine is selected elsewhere.
+
+  oxid_esales.templating.twig_engine:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Twig\TwigEngine
+    arguments:
+      - '@twig'
+      - !tagged twig.extension
+    public: true

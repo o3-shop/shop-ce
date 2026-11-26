@@ -48,7 +48,8 @@
         "o3-shop/shop-unified-namespace-generator": "^v1.0.0",
         "o3-shop/shop-facts": "^v1.0.0",
         "composer/composer": "~2.2.0",
-        "symfony/process": "^5.4"
+        "symfony/process": "^5.4",
+        "twig/twig": "~3.11.0 || ~3.10.0"
     },
     "require-dev": {
         "o3-shop/testing-library": "^v1.2.0",
