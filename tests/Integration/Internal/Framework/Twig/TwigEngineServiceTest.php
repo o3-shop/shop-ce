@@ -29,6 +29,7 @@ use OxidEsales\EshopCommunity\Internal\Container\ContainerBuilderFactory;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateEngineInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Twig\TwigEngine;
+use OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Twig\Fixtures\FixtureExtension;
 use PHPUnit\Framework\TestCase;
 
 class TwigEngineServiceTest extends TestCase
@@ -49,6 +50,17 @@ class TwigEngineServiceTest extends TestCase
             TwigEngine::class,
             $uncompiledContainer->getDefinition(TemplateEngineInterface::class)->getClass()
         );
+    }
+
+    public function testTaggedExtensionIsRegisteredOnceOnTheEngine(): void
+    {
+        $container = (new ContainerBuilderFactory())->create()->getContainer();
+        $container->register(FixtureExtension::class)->addTag('twig.extension');
+        $container->compile();
+
+        $engine = $container->get('oxid_esales.templating.twig_engine');
+
+        $this->assertSame('fixture', $engine->renderFragment('{{ fixture_function() }}', 'ox:fixture'));
     }
 
     public function testEscapersAreRegisteredOnTheEngine(): void
