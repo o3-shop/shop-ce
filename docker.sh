@@ -279,8 +279,15 @@ run_npm_audits() {
   # not to fix.
   local audit_themes=("o3-theme")
 
+  # Audit only the theme's production dependencies (--omit=dev: bootstrap,
+  # @popperjs/core, splide), which are bundled into out/. The build tooling
+  # (gulp, del, …) is skipped: its known advisory (GHSA-vfj7-8cjw-p6xm in
+  # braces, no patched version) would otherwise block every test run — see
+  # o3-shop/o3-shop#243. Not covered: hand-vendored copies in out/…/js —
+  # PhotoSwipe 4.1.1 (a devDependency, o3-shop#245) and jQuery 2.2.4 (not in
+  # package.json, loaded only with the theme option activateJquery, o3-shop#246).
   echo "---------------------------"
-  echo "Running npm audit:"
+  echo "Running npm audit (runtime dependencies):"
   echo "---------------------------"
 
   for theme in "${audit_themes[@]}"; do
@@ -290,7 +297,7 @@ run_npm_audits() {
           continue
       fi
       echo -e "${GREEN}✓ Auditing ${theme_path}...${NC}"
-      if ! $DOCKER_COMPOSE exec -w "/var/www/html/${theme_path}" shop npm audit; then
+      if ! $DOCKER_COMPOSE exec -w "/var/www/html/${theme_path}" shop npm audit --omit=dev; then
           echo -e "${RED}"
           echo "================================================================================"
           echo " ✗ npm audit reported vulnerabilities in ${theme}."
@@ -303,9 +310,9 @@ run_npm_audits() {
           echo "  2. Apply the auto-fix (preferred — patch/minor bumps only):"
           echo ""
           echo "       $DOCKER_COMPOSE exec -w /var/www/html/${theme_path} \\"
-          echo "                   shop npm audit fix"
+          echo "                   shop npm audit fix --omit=dev"
           echo ""
-          echo "     If only 'npm audit fix --force' resolves it, review the breaking"
+          echo "     If only 'npm audit fix --omit=dev --force' resolves it, review the breaking"
           echo "     changes carefully before accepting (it may bump a major version)."
           echo ""
           echo "  3. Rebuild the theme bundle so the fix lands in the runtime CSS/JS:"
@@ -324,7 +331,7 @@ run_npm_audits() {
           echo ""
           exit 1
       fi
-      echo -e "${GREEN}✓ npm audit clean for ${theme}.${NC}"
+      echo -e "${GREEN}✓ npm audit clean for ${theme} (runtime dependencies).${NC}"
   done
 
   cd "$MY_DIR"
@@ -398,12 +405,18 @@ if [ ! -f "$MY_DIR/.env" ]; then
     echo "Created .env file from example"
 fi
 
-# For worktrees: patch project .env with the computed DBNAME and SHOPURL so the
-# shop installer uses the right database and generates correct URLs.
+# For worktrees: patch project .env with the computed DBNAME and SHOP URLs so
+# the shop installer uses the right database and generates correct URLs.
+# SSLSHOPURL is stripped and re-written with an explicit value too: .env.example
+# defines it as "${O3SHOP_CONF_SHOPURL}", and since we re-append SHOPURL at the
+# end, that interpolation would become a forward reference Dotenv cannot resolve
+# (leaving the literal "${O3SHOP_CONF_SHOPURL}" in every SSL link). Writing it
+# explicitly avoids the ordering trap entirely.
 if $IS_WORKTREE; then
-    grep -v "^O3SHOP_CONF_DBNAME=\|^O3SHOP_CONF_SHOPURL=" "$MY_DIR/.env" > "$MY_DIR/.env.tmp"
+    grep -v "^O3SHOP_CONF_DBNAME=\|^O3SHOP_CONF_SHOPURL=\|^O3SHOP_CONF_SSLSHOPURL=" "$MY_DIR/.env" > "$MY_DIR/.env.tmp"
     echo "O3SHOP_CONF_DBNAME=\"${O3SHOP_CONF_DBNAME}\"" >> "$MY_DIR/.env.tmp"
     echo "O3SHOP_CONF_SHOPURL=\"http://localhost:${O3SHOP_PORT_HTTP}\"" >> "$MY_DIR/.env.tmp"
+    echo "O3SHOP_CONF_SSLSHOPURL=\"http://localhost:${O3SHOP_PORT_HTTP}\"" >> "$MY_DIR/.env.tmp"
     mv "$MY_DIR/.env.tmp" "$MY_DIR/.env"
 fi
 

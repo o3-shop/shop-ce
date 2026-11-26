@@ -77,7 +77,7 @@ class EmailUtf8Test extends \OxidTestCase
         $oPrice->expects($this->any())->method('getPrice')->will($this->returnValue(256));
         $oPrice->expects($this->any())->method('getBruttoPrice')->will($this->returnValue(8));
 
-        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, ['getPrice', 'getUnitPrice', 'getRegularUnitPrice', 'getTitle']);
+        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, ['getPrice', 'getUnitPrice', 'getRegularUnitPrice', 'getTitle', 'getArticle']);
         $oBasketItem->expects($this->any())->method('getPrice')->will($this->returnValue($oPrice));
         $oBasketItem->expects($this->any())->method('getUnitPrice')->will($this->returnValue($oPrice));
         $oBasketItem->expects($this->any())->method('getRegularUnitPrice')->will($this->returnValue($oPrice));
@@ -88,6 +88,11 @@ class EmailUtf8Test extends \OxidTestCase
         $oArticle->setId('_testArticleId');
         $oArticle->setId('_testArticleId');
         $oArticle->oxarticles__oxtitle = new oxField();
+        // A theme's order-confirmation template may call $basketitem->getArticle()
+        // directly (e.g. the wave #219 durability-guarantee label). Without this stub
+        // the real BasketItem::getArticle() runs against a product-less mock and throws
+        // EXCEPTION_ARTICLE_NOPRODUCTID, erroring this test. Return the test article.
+        $oBasketItem->expects($this->any())->method('getArticle')->will($this->returnValue($oArticle));
 
         $aBasketContents[] = $oBasketItem;
         $aBasketArticles[] = $oArticle;

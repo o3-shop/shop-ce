@@ -121,14 +121,14 @@ class SystemRequirements
      *
      * @var string
      */
-    protected $_sReqInfoUrl = 'https://docs.o3-shop.com/en/latest/user/installation/NewInstallation/SystemRequirements.html';
+    protected $_sReqInfoUrl = 'https://docs.o3-shop.com/en/latest/User/Installation/SystemRequirements.html';
 
     /**
      * Installation preparation info url
      *
      * @var string
      */
-    protected $_sPreparationInfoUrl = 'https://docs.o3-shop.com/en/latest/user/installation/NewInstallation/PrepareInstallation.html';
+    protected $_sPreparationInfoUrl = 'https://docs.o3-shop.com/en/latest/User/Installation/NewInstallation.html';
 
     /**
      * Module or system configuration mapping with installation requirements info url anchor
@@ -153,6 +153,7 @@ class SystemRequirements
         'tokenizer'          => 'php',
         'mysql_connect'      => 'php',
         'gd_info'            => 'php',
+        'gd_freetype'        => 'php',
         'mb_string'          => 'php',
         'curl'               => 'php',
         'bc_math'            => 'php',
@@ -166,7 +167,7 @@ class SystemRequirements
      * @var array
      */
     protected $_aPreparationInfoMap = [
-        'server_permissions' => 'adjusting-file-and-directory-permissions',
+        'server_permissions' => 'adjust-file-and-directory-permissions',
     ];
 
     /**
@@ -241,6 +242,7 @@ class SystemRequirements
                 'tokenizer',
                 'mysql_connect',
                 'gd_info',
+                'gd_freetype',
                 'mb_string',
                 'curl',
                 'bc_math',
@@ -888,6 +890,19 @@ class SystemRequirements
         $iModStat = function_exists('imagecreatefrompng') ? $iModStat : 0;
 
         return $iModStat;
+    }
+
+    /**
+     * Checks if GD is built with FreeType support (imagettftext), required to
+     * render text into images, e.g. the EU guarantee label.
+     *
+     * @return integer
+     */
+    public function checkGdFreetype()
+    {
+        return function_exists('imagettftext')
+            ? static::MODULE_STATUS_OK
+            : static::MODULE_STATUS_BLOCKS_SETUP;
     }
 
     /**

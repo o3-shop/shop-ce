@@ -117,7 +117,37 @@ class ArticleExtend extends AdminDetailsController
         //load media files
         $this->_aViewData['aMediaUrls'] = $article->getMediaUrls();
 
+        $this->_aViewData['guaranteeWarnings'] = $this->collectGuaranteeAdvisories($article);
+
         return 'article_extend.tpl';
+    }
+
+    /**
+     * Non-blocking advisories for the EU durability-guarantee fields (#219).
+     * Saving is NEVER blocked - the label simply does not render while the
+     * data is incomplete/ineligible; these hints tell the operator why.
+     *
+     * Operates on the article render() has already loaded into
+     * $_aViewData['edit'] (no extra DB round-trip); the guarantee fields are
+     * single-language, so the base-language instance carries the right values.
+     *
+     * @param Article $article the article currently being edited
+     *
+     * @return string[] translation keys
+     */
+    protected function collectGuaranteeAdvisories(Article $article): array
+    {
+        $warnings = [];
+        $years = $article->getGuaranteeYears();
+
+        if ($years > 0 && !$article->isDurabilityGuaranteeEligible()) {
+            $warnings[] = 'O3_GUARANTEE_ADMIN_WARN_NOT_ELIGIBLE';
+        }
+        if ($article->isDurabilityGuaranteeEligible() && $article->getGuaranteeGuarantor() === '') {
+            $warnings[] = 'O3_GUARANTEE_ADMIN_WARN_NO_GUARANTOR';
+        }
+
+        return $warnings;
     }
 
     /**

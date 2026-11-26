@@ -18,9 +18,11 @@ import {
  *      so the test starts from a known-empty subtree.
  *   2. NAVIGATE the frontend and assert:
  *        - Pandas now exposes a megamenu with TestL2A + TestL2B
- *        - /Pandas/ inline strip lists TestL2A + TestL2B as chips
- *        - /Pandas/<TestL2A>/ inline strip lists TestL3 as a chip
+ *        - /Pandas/ sub-category listing shows TestL2A + TestL2B
+ *        - /Pandas/<TestL2A>/ sub-category listing shows TestL3
  *        - both views show the **same** depth (no level-3 in the megamenu)
+ *      The PLP listing is read mode-agnostically: o3-theme renders it as a
+ *      pill strip or as tiles depending on `blShowSubcatTiles`.
  *   3. CLEAN UP by cascading-deleting the TestL2A subtree (removes
  *      TestL2A + TestL3) and TestL2B. Cleanup runs in `afterAll` so a
  *      mid-test failure still triggers it.
@@ -146,21 +148,18 @@ test.describe.serial('storefront / 2nd-level menu E2E (#141)', () => {
         const menu = await plp.openMegamenu('Pandas');
         expect(await menu.locator('a[data-level="is-level-3"]').count()).toBe(0);
 
-        // PLP /Pandas/ → inline strip shows the same two level-2 chips.
+        // PLP /Pandas/ → the sub-category listing shows the same two level-2
+        // entries, whichever way the theme renders them (pills or tiles).
         await plp.goto('/Pandas/');
-        const pandasChips = await plp.inlineSubcatChips();
-        expect(pandasChips).toEqual(expect.arrayContaining([L2A, L2B]));
-        expect(pandasChips).not.toContain(L3); // direct children only
+        const pandasSubcats = await plp.subcatTitles();
+        expect(pandasSubcats).toEqual(expect.arrayContaining([L2A, L2B]));
+        expect(pandasSubcats).not.toContain(L3); // direct children only
 
-        // Drilling into TestL2A → its PLP shows TestL3 as the lone chip.
-        // We follow the chip to keep the test data-driven (no hard-coded URL).
-        await plp.inlineSubcatNav.locator('a.btn', { hasText: L2A }).click();
+        // Drilling into TestL2A → its PLP lists TestL3 alone. We follow the
+        // rendered link to keep the test data-driven (no hard-coded URL).
+        await plp.subcatLink(L2A).first().click();
         await storefrontPage.waitForLoadState('domcontentloaded');
-        const l2aChips = await plp.inlineSubcatChips();
-        expect(l2aChips).toEqual([L3]);
-
-        // Eyebrow label is rendered on the L2A PLP too.
-        expect(await plp.inlineSubcatLabel()).toBe('In dieser Kategorie');
+        expect(await plp.subcatTitles()).toEqual([L3]);
     });
 
     test('3) admin/db: cleanup removes the seeded categories', async ({ db }) => {

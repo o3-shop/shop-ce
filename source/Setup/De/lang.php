@@ -89,6 +89,7 @@ $aLang = [
 'MOD_MYSQL_CONNECT'                             => 'PDO_MySQL',
 'MOD_MYSQL_VERSION'                             => 'MySQL Version 5.5, 5.7, 8.0 oder MariaDB 10',
 'MOD_GD_INFO'                                   => 'GDlib v2 incl. JPEG Unterstützung',
+'MOD_GD_FREETYPE'                               => 'GDlib FreeType-Unterstützung (imagettftext)',
 'MOD_INI_SET'                                   => 'ini_set erlaubt',
 'MOD_REGISTER_GLOBALS'                          => 'register_globals muss ausgeschaltet sein',
 'MOD_MAGIC_QUOTES_GPC'                          => 'magic_quotes_gpc muss ausgeschaltet sein',
@@ -105,7 +106,7 @@ $aLang = [
 'MOD_MEMORY_LIMIT'                              => 'PHP Memory limit (min. 32MB, 60MB empfohlen)',
 
 'STEP_0_ERROR_TEXT'                             => 'Ihr System erfüllt nicht alle nötigen Systemvoraussetzungen',
-'STEP_0_ERROR_URL'                              => 'https://docs.o3-shop.com/eshop/de/latest/installation/neu-installation/server-und-systemvoraussetzungen.html',
+'STEP_0_ERROR_URL'                              => 'https://docs.o3-shop.com/en/latest/User/Installation/SystemRequirements.html',
 'STEP_0_TEXT'                                   => '<ul class="req">' .
                                                    '<li class="pass"> - Die Voraussetzung ist erfüllt.</li>' .
                                                    '<li class="pmin"> - Die Voraussetzung ist nicht oder nur teilweise erfüllt. Der O3-Shop funktioniert trotzdem und kann installiert werden.</li>' .

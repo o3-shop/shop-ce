@@ -265,6 +265,9 @@ final class RepoPathDiscovery
         }
         // Match the url under the [remote "origin"] section. The
         // value can be HTTPS or SSH; both strip to the same slug.
+        // The SSH host may be an ~/.ssh/config alias
+        // (`git@github-work:o3-shop/...`), so it is not pinned to
+        // github.com — the `o3-shop` owner check below identifies the repo.
         if (!preg_match(
             '/\[remote\s+"origin"\][^\[]*?\burl\s*=\s*(\S+)/s',
             $contents,
@@ -274,7 +277,7 @@ final class RepoPathDiscovery
         }
         $url = $m[1];
         if (!preg_match(
-            '#(?:https://github\.com/|git@github\.com:)([\w.-]+)/([\w.-]+?)(?:\.git)?/?$#',
+            '#(?:https://github\.com/|(?:ssh://)?git@[\w.-]+[:/])([\w.-]+)/([\w.-]+?)(?:\.git)?/?$#',
             $url,
             $m
         )) {

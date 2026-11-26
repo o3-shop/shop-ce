@@ -89,6 +89,76 @@ class LoggerServiceWrapperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * A failing log write (e.g. an unwritable log dir) must not change the
+     * outcome of the request that tried to log (o3-shop/o3-shop#259).
+     *
+     * @dataProvider dataProviderLevelMethods
+     */
+    public function testFailingLoggerDoesNotThrowAndFallsBackToErrorLog(string $methodName)
+    {
+        $loggerMock = $this->getLoggerMock();
+        $loggerMock->method($methodName)
+            ->willThrowException(new \UnexpectedValueException("Log dir missing.\nSecond line."));
+
+        $errorLog = $this->captureErrorLog(function () use ($loggerMock, $methodName) {
+            (new LoggerWrapper($loggerMock))->$methodName("Mail failed.\nDetails.", ['key' => 'value']);
+        });
+
+        $this->assertStringContainsString(LoggerWrapper::class . '::writeSafely - ', $errorLog);
+        $this->assertStringContainsString("Writing a '$methodName' log entry failed: 'Log dir missing. Second line.'.", $errorLog);
+        $this->assertStringContainsString("Original message: 'Mail failed. Details.'.", $errorLog);
+        $this->assertSame(1, substr_count(trim($errorLog), "\n") + 1, 'Fallback entry must be a single line.');
+    }
+
+    public function testFailingLoggerLogMethodDoesNotThrowAndFallsBackToErrorLog()
+    {
+        $loggerMock = $this->getLoggerMock();
+        $loggerMock->method('log')->willThrowException(new \RuntimeException('Disk full.'));
+
+        $errorLog = $this->captureErrorLog(function () use ($loggerMock) {
+            (new LoggerWrapper($loggerMock))->log('critical', 'Order failed.');
+        });
+
+        $this->assertStringContainsString("Writing a 'critical' log entry failed: 'Disk full.'.", $errorLog);
+        $this->assertStringContainsString("Original message: 'Order failed.'.", $errorLog);
+    }
+
+    /**
+     * @return array
+     */
+    public function dataProviderLevelMethods()
+    {
+        return [
+            ['emergency'],
+            ['alert'],
+            ['critical'],
+            ['error'],
+            ['warning'],
+            ['notice'],
+            ['info'],
+            ['debug'],
+        ];
+    }
+
+    /**
+     * Runs $callback with PHP's error_log() redirected to a temp file; returns what was written.
+     */
+    private function captureErrorLog(callable $callback): string
+    {
+        $file = tempnam(sys_get_temp_dir(), 'errorlog');
+        $previous = ini_set('error_log', $file);
+        try {
+            $callback();
+        } finally {
+            ini_set('error_log', (string) $previous);
+        }
+        $content = (string) file_get_contents($file);
+        unlink($file);
+
+        return $content;
+    }
+
+    /**
      * @return \PHPUnit\Framework\MockObject\MockObject|\Psr\Log\LoggerInterface
      */
     private function getLoggerMock()

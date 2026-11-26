@@ -632,6 +632,13 @@ class Utils extends \OxidEsales\Eshop\Core\Base
      */
     protected function _lockFile($sFilePath, $sIdent, $iLockMode = LOCK_EX) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        // Without a valid cache file path (e.g. the compile dir is not
+        // configured) there is nothing to lock. Skip gracefully instead of
+        // calling fopen('') which throws a ValueError on PHP 8.
+        if (!$sFilePath) {
+            return false;
+        }
+
         $rHandle = isset($this->_aLockedFileHandles[$iLockMode][$sIdent]) ? $this->_aLockedFileHandles[$iLockMode][$sIdent] : null;
         if ($rHandle === null) {
             $blLocked = false;
@@ -706,7 +713,8 @@ class Utils extends \OxidEsales\Eshop\Core\Base
      */
     public function oxResetFileCache()
     {
-        $aFiles = glob($this->getCacheFilePath(null, true) . '*');
+        $sCacheFilePath = $this->getCacheFilePath(null, true);
+        $aFiles = $sCacheFilePath ? glob($sCacheFilePath . '*') : false;
         if (is_array($aFiles)) {
             // delete all the files, except cached tables field names
             $aFiles = preg_grep($this->_sPermanentCachePattern, $aFiles, PREG_GREP_INVERT);
@@ -714,6 +722,87 @@ class Utils extends \OxidEsales\Eshop\Core\Base
                 @unlink($sFile);
             }
         }
+    }
+
+    /**
+     * Drops the PERMANENT field-name/table-description cache entries for one
+     * table — the entries `oxResetFileCache()` deliberately keeps.
+     *
+     * `BaseModel::_initDataStructure()` and `_getTableFields()` read these to
+     * decide which columns a model exposes, and nothing invalidates them: a
+     * normal cache clear inverts `$_sPermanentCachePattern` and skips them on
+     * purpose. So after a migration adds a column to a shop with a warm
+     * `source/tmp/`, the column exists in MySQL but never materialises on the
+     * model — `$oArticle->oxarticles__newcolumn` stays unset and any feature
+     * built on it is silently inert until someone purges `source/tmp/` by hand.
+     *
+     * Call this from a migration's `postUp()` for every table whose columns
+     * changed. Never throws: failing to clear a cache must not fail a
+     * migration that already altered the schema.
+     *
+     * @param string $sTable core table name, e.g. 'oxarticles'
+     *
+     * @return int number of cache files removed
+     */
+    public function resetTableFieldCache($sTable)
+    {
+        return static::clearTableFieldCacheIn($this->getCacheFilePath(null, true), $sTable);
+    }
+
+    /**
+     * Directory-explicit, dependency-free variant of resetTableFieldCache().
+     *
+     * Static and free of Registry/oxNew/Config on purpose: a database migration
+     * runs WITHOUT the shop bootstrap (`oxNew()` is not even defined there), so
+     * `Registry::getUtils()` is unavailable — but a migration is exactly where
+     * this cache has to be invalidated. Migrations resolve the compile dir via
+     * `ConfigFile` + `Facts` and call this directly.
+     *
+     * @param string|false $sCacheDir absolute cache/compile dir, or false when unresolvable
+     * @param string       $sTable    core table name, e.g. 'oxarticles'
+     *
+     * @return int number of cache files removed
+     */
+    public static function clearTableFieldCacheIn($sCacheDir, $sTable)
+    {
+        $sTable = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', (string) $sTable));
+        if ($sTable === '' || !$sCacheDir) {
+            return 0;
+        }
+
+        $aFiles = glob(rtrim((string) $sCacheDir, '/\\') . '/*');
+        if (!is_array($aFiles)) {
+            return 0;
+        }
+
+        // Mirrors the three permanent key shapes kept by $_sPermanentCachePattern:
+        // 'fieldnames_<table>_<key>', '<table>_allfields_<bool>' and 'tbdsc_<table>'.
+        //
+        // The first two are self-bounding: their trailing '_' cannot be reached
+        // by a longer table name. 'tbdsc_<table>' runs straight into whatever
+        // follows, so it needs an explicit boundary — without it, purging
+        // 'oxorder' also deleted 'c_tbdsc_oxorderarticles'. database_schema.sql
+        // has 10 such prefix-sharing pairs (oxuser/oxuserpayments,
+        // oxnews/oxnewsletter, oxdelivery/oxdeliveryset, ...).
+        $sPattern = sprintf(
+            '/(c_fieldnames_%1$s_|c_%1$s_allfields_|c_tbdsc_%1$s(?![a-z0-9_]))/i',
+            preg_quote($sTable, '/')
+        );
+
+        $iRemoved = 0;
+        foreach ($aFiles as $sFile) {
+            // basename(), not the full path: a compile dir whose OWN path
+            // contained one of these tokens would otherwise match every file
+            // inside it.
+            if (!preg_match($sPattern, basename($sFile))) {
+                continue;
+            }
+            if (@unlink($sFile)) {
+                $iRemoved++;
+            }
+        }
+
+        return $iRemoved;
     }
 
     /**
@@ -749,7 +838,8 @@ class Utils extends \OxidEsales\Eshop\Core\Base
      */
     public function resetLanguageCache()
     {
-        $aFiles = glob($this->getCacheFilePath(null, true) . '*');
+        $sCacheFilePath = $this->getCacheFilePath(null, true);
+        $aFiles = $sCacheFilePath ? glob($sCacheFilePath . '*') : false;
         if (is_array($aFiles)) {
             // delete all language cache files
             $sPattern = $this->_sLanguageCachePattern;
@@ -765,7 +855,8 @@ class Utils extends \OxidEsales\Eshop\Core\Base
      */
     public function resetMenuCache()
     {
-        $aFiles = glob($this->getCacheFilePath(null, true) . '*');
+        $sCacheFilePath = $this->getCacheFilePath(null, true);
+        $aFiles = $sCacheFilePath ? glob($sCacheFilePath . '*') : false;
         if (is_array($aFiles)) {
             // delete all menu cache files
             $sPattern = $this->_sMenuCachePattern;
@@ -1381,7 +1472,17 @@ class Utils extends \OxidEsales\Eshop\Core\Base
     {
         $versionPrefix = $this->getEditionCacheFilePrefix();
 
-        $sPath = realpath($this->getConfig()->getConfigParam('sCompileDir'));
+        $sCompileDir = $this->getConfig()->getConfigParam('sCompileDir');
+
+        // Guard against an empty/unconfigured compile dir: realpath('') returns
+        // the current working directory, which would make every cache path (and
+        // the glob() in the oxReset*Cache() methods) point at wherever the
+        // process runs from — deleting unrelated files.
+        if (!$sCompileDir) {
+            return false;
+        }
+
+        $sPath = realpath($sCompileDir);
 
         if (!$sPath) {
             return false;
@@ -1429,6 +1530,13 @@ class Utils extends \OxidEsales\Eshop\Core\Base
     {
         $sCache = "<?php\n\$aLangCache = " . var_export($aLangCache, true) . ";\n?>";
         $sFileName = $this->getCacheFilePath($sCacheName);
+
+        // No resolvable cache path (e.g. compile dir not configured) — skip
+        // writing rather than rename() to an empty path (ValueError on PHP 8).
+        if (!$sFileName) {
+            return false;
+        }
+
         $cacheDirectory = $this->getConfig()->getConfigParam('sCompileDir');
 
         $tmpFile = $cacheDirectory . basename($sFileName) . uniqid('.temp', true) . '.txt';

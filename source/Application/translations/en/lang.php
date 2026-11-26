@@ -842,4 +842,16 @@ $aLang = [
 // Core CAPTCHA provider feature (issue #213) — storefront texts
 'O3_CAPTCHA_FAILED'                                           => 'The security check failed. Please try again.',
 'O3_CAPTCHA_CONSENT_NOTICE'                                   => 'Please accept the required cookies. Otherwise we cannot verify that you are human, and the form cannot be submitted.',
+
+// EU guarantee labels (issue #219, Reg. (EU) 2025/1960) - storefront texts.
+// Texts INSIDE the labels are fixed EU artwork, not translations.
+'O3_GUARANTEE_NOTICE_IMG_ALT'                                 => 'Harmonised EU notice on the legal guarantee of conformity of at least two years',
+'O3_GUARANTEE_LABEL_IMG_ALT'                                  => 'EU guarantee label: producer durability guarantee for this product',
+'O3_GUARANTEE_LABEL_FALLBACK_DURATION'                        => 'Producer durability guarantee: %s years',
+'O3_GUARANTEE_LABEL_FALLBACK_GUARANTOR'                       => 'Guarantor: %s',
+'O3_GUARANTEE_LABEL_FALLBACK_NOTE'                            => 'The official EU guarantee label cannot be displayed right now.',
+'O3_GUARANTEE_LEGAL_REMINDER'                                => 'Regardless of this guarantee, the statutory legal guarantee of at least two years applies.',
+'O3_GUARANTEE_CONDITIONS_HEADING'                            => 'Guarantee conditions',
+'O3_GUARANTEE_RIGHTS_LINK'                                   => 'Your legal guarantee rights',
+'O3_GUARANTEE_CLOSE'                                         => 'Close',
 ];

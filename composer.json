@@ -40,7 +40,7 @@
         "symfony/finder": "^5.4",
         "symfony/filesystem": "^5.4",
         "vlucas/phpdotenv": "^5.5",
-        "o3-shop/shop-doctrine-migration-wrapper": "v1.0.3",
+        "o3-shop/shop-doctrine-migration-wrapper": "v1.0.4",
         "o3-shop/shop-db-views-generator": "^v1.0.0",
         "o3-shop/shop-demodata-installer": "^v1.0.0",
         "o3-shop/shop-composer-plugin": "^v1.2.0",
@@ -89,11 +89,6 @@
         ],
         "oe:ide-helper:generate": [
             "if [ -f ./vendor/bin/oe-eshop-ide_helper ]; then oe-eshop-ide_helper; fi"
-        ],
-        "oe:install:module:paypal": [
-            "composer require oxid-solution-catalysts/paypal-module ^2.6.0",
-            "vendor/bin/oe-console oe:module:install-configuration source/modules/osc/paypal",
-            "vendor/bin/oe-console oe:cache:clear"
         ]
     },
     "extra": {
@@ -117,7 +112,8 @@
             }
         },
         "branch-alias": {
-            "dev-b-1.6": "1.6-dev"
+            "dev-b-1.6": "1.6-dev",
+            "dev-b-1.7": "1.7-dev"
         }
     },
     "archive": {

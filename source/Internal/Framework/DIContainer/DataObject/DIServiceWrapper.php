@@ -93,7 +93,7 @@ class DIServiceWrapper
         $this->addShopAwareCallsIfMissing();
         $setActiveShopsCall = $this->getCall($this::SET_ACTIVE_SHOPS_METHOD);
         $currentlyActiveShops = $setActiveShopsCall->getParameter(0);
-        $newActiveShops = array_merge($currentlyActiveShops, $shops);
+        $newActiveShops = array_values(array_unique(array_merge($currentlyActiveShops, $shops)));
         $setActiveShopsCall->setParameter(0, $newActiveShops);
         $this->updateCall($setActiveShopsCall);
         return $newActiveShops;

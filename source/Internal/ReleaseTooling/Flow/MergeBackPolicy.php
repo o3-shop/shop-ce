@@ -34,6 +34,18 @@ namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow;
 final class MergeBackPolicy
 {
     /**
+     * Branch every merge-back PR targets. Also the signal for "this
+     * repo has no separate maintenance line": a package released from
+     * this branch needs no merge-back PR, since its tag is already on
+     * it. Used for that skip (LiveExecutor, both merge-back gates) and
+     * as the PR base (PerRepoActions, MergeBackPrGate). Still spelled out
+     * and must change with it: the branch map in DefaultBranchResolver
+     * (which feeds the skip), the PR title (MergeBackPrTitlePattern),
+     * MergeBackPrGate::TITLE_SEARCH and user-facing messages.
+     */
+    public const BASE_BRANCH = 'main';
+
+    /**
      * Captures the suffix forms o3-shop has actually used or could
      * plausibly use. Strict enough to not match arbitrary noise; loose
      * enough that uppercase / lowercase / dotted variants all count.
