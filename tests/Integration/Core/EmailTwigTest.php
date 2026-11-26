@@ -79,7 +79,8 @@ final class EmailTwigTest extends TestCase
 
     public function testSmartyThemeStillRendersTpl(): void
     {
-        $this->activateTheme('o3-theme', '');
+        // wave is a Smarty theme (O3-Theme 2.x is Twig).
+        $this->activateTheme('wave', '');
 
         $email = $this->sendOrderMail();
 

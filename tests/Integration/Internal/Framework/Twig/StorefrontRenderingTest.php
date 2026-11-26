@@ -73,9 +73,10 @@ final class StorefrontRenderingTest extends TestCase
 
     public function testSmartyThemeUnaffected(): void
     {
-        $this->activateTheme('o3-theme', '');
+        // wave is a Smarty theme (O3-Theme 2.x is Twig).
+        $this->activateTheme('wave', '');
 
-        // Pre-existing, not Twig related: the o3-theme start page raises PHP 8 E_WARNINGs (unset Smarty
+        // Pre-existing, not Twig related: the Smarty start page raises PHP 8 E_WARNINGs (unset Smarty
         // variables such as $removeFunction in widget/product/listitem_line.tpl, Category::$_blIsVisible read
         // from a template). The shop only reports them; PHPUnit would throw. ShopControl::_runOnce() resets
         // error_reporting per widget, so plain E_WARNINGs are swallowed here and everything else still reaches
@@ -97,8 +98,8 @@ final class StorefrontRenderingTest extends TestCase
         }
 
         $this->assertStringNotContainsString('TWIG-FIXTURE', $output);
-        $this->assertStringContainsString('id="newItems"', $output, 'o3-theme page/shop/start.tpl is rendered.');
-        $this->assertStringContainsString('id="offcanvas__basket"', $output, 'o3-theme minibasket widget is rendered.');
+        $this->assertStringContainsString('id="newItems"', $output, 'wave page/shop/start.tpl is rendered.');
+        $this->assertStringContainsString('class="btn-group minibasket-menu"', $output, 'wave minibasket widget is rendered.');
     }
 
     private function renderController(string $class): string

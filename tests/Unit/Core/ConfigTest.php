@@ -1408,6 +1408,8 @@ class ConfigTest extends OxidTestCase
     {
         $oConfig = oxNew('oxConfig');
         $oConfig->init();
+        // getTemplatePath() finds Smarty .tpl files; O3-Theme 2.x is Twig, wave is Smarty.
+        $oConfig->setConfigParam('sTheme', 'wave');
 
         $sDir = $this->_getViewsPath($oConfig) . 'tpl/page/shop/start.tpl';
 

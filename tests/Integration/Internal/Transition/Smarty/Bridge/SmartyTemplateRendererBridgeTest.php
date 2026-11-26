@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Transition\Smarty\Bridge;
 
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\DelegatingTemplateEngine;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
@@ -39,12 +40,23 @@ class SmartyTemplateRendererBridgeTest extends \PHPUnit\Framework\TestCase
 
     public function testRendererUsesThePerCallEngineWithSmartyForTheSmartyTheme()
     {
-        $engine = ContainerFactory::getInstance()->getContainer()
-            ->get(TemplateRendererBridgeInterface::class)
-            ->getTemplateRenderer()
-            ->getTemplateEngine();
+        // wave is a Smarty theme (O3-Theme 2.x is Twig).
+        $config = Registry::getConfig();
+        $themes = [$config->getConfigParam('sTheme'), $config->getConfigParam('sCustomTheme')];
+        $config->setConfigParam('sTheme', 'wave');
+        $config->setConfigParam('sCustomTheme', '');
 
-        $this->assertInstanceOf(DelegatingTemplateEngine::class, $engine);
-        $this->assertSame('tpl', $engine->getDefaultFileExtension());
+        try {
+            $engine = ContainerFactory::getInstance()->getContainer()
+                ->get(TemplateRendererBridgeInterface::class)
+                ->getTemplateRenderer()
+                ->getTemplateEngine();
+
+            $this->assertInstanceOf(DelegatingTemplateEngine::class, $engine);
+            $this->assertSame('tpl', $engine->getDefaultFileExtension());
+        } finally {
+            $config->setConfigParam('sTheme', $themes[0]);
+            $config->setConfigParam('sCustomTheme', $themes[1]);
+        }
     }
 }
