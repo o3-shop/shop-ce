@@ -36,6 +36,8 @@ use OxidEsales\Eshop\Core\Exception\SystemComponentException;
 use OxidEsales\Eshop\Core\Str;
 use OxidEsales\EshopCommunity\Application\Model\O3Revocation;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Framework\Smarty\Legacy\LegacySmartyEngineInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\TemplateEngineResolverInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInterface;
 use PHPMailer\PHPMailer\PHPMailer;
@@ -448,8 +450,12 @@ class Email extends PHPMailer
      */
     protected function getRenderer()
     {
-        $bridge = $this->getContainer()->get(TemplateRendererBridgeInterface::class);
-        $bridge->setEngine($this->_getSmarty());
+        $container = $this->getContainer();
+        $bridge = $container->get(TemplateRendererBridgeInterface::class);
+        // Only Smarty needs its configured instance; the storefront theme's Twig engine is resolved per render.
+        if ($container->get(TemplateEngineResolverInterface::class)->getEngine() instanceof LegacySmartyEngineInterface) {
+            $bridge->setEngine($this->_getSmarty());
+        }
 
         return $bridge->getTemplateRenderer();
     }
@@ -640,16 +646,24 @@ class Email extends PHPMailer
         // Process view data array through oxOutput processor
         $this->_processViewArray();
 
-        $this->setBody($renderer->renderTemplate($this->_sOrderUserTemplate, $this->getViewData()));
-        $this->setAltBody($renderer->renderTemplate($this->_sOrderUserPlainTemplate, $this->getViewData()));
+        // Mails sent from the admin render with the storefront theme's engine and templates.
+        $myConfig = $this->getConfig();
+        $wasAdmin = $myConfig->isAdmin();
+        $myConfig->setAdminMode(false);
+        try {
+            $this->setBody($renderer->renderTemplate($this->_sOrderUserTemplate, $this->getViewData()));
+            $this->setAltBody($renderer->renderTemplate($this->_sOrderUserPlainTemplate, $this->getViewData()));
 
-        // #586A
-        if ($subject === null) {
-            if ($renderer->exists($this->_sOrderUserSubjectTemplate)) {
-                $subject = $renderer->renderTemplate($this->_sOrderUserSubjectTemplate, $this->getViewData());
-            } else {
-                $subject = $shop->oxshops__oxordersubject->getRawValue() . ' (#' . $order->oxorder__oxordernr->value . ')';
+            // #586A
+            if ($subject === null) {
+                if ($renderer->exists($this->_sOrderUserSubjectTemplate)) {
+                    $subject = $renderer->renderTemplate($this->_sOrderUserSubjectTemplate, $this->getViewData());
+                } else {
+                    $subject = $shop->oxshops__oxordersubject->getRawValue() . ' (#' . $order->oxorder__oxordernr->value . ')';
+                }
             }
+        } finally {
+            $myConfig->setAdminMode($wasAdmin);
         }
 
         $this->setSubject($subject);

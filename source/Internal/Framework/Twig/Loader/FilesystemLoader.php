@@ -114,7 +114,7 @@ class FilesystemLoader extends TwigLoader
      * @param string $name
      * @param bool   $throw
      *
-     * @return string|false|null
+     * @return string|null
      */
     public function findTemplate(string $name, bool $throw = true)
     {
@@ -131,7 +131,8 @@ class FilesystemLoader extends TwigLoader
                 throw new LoaderError(sprintf('Unable to find template "%s".', $name));
             }
 
-            return false;
+            // Twig's FilesystemLoader::exists() relies on null for "not found".
+            return null;
         }
 
         return $template;

@@ -25,9 +25,6 @@ namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Twig;
 use OxidEsales\Eshop\Application\Controller\StartController;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopControl;
-use OxidEsales\Eshop\Core\UtilsView;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidEsales\EshopCommunity\Internal\Framework\Templating\Cache\TemplateCacheServiceInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -41,43 +38,17 @@ use PHPUnit\Framework\TestCase;
  */
 final class StorefrontRenderingTest extends TestCase
 {
-    private const FIXTURE_THEME = 'twigfixture';
-
-    /** @var string */
-    private $themeLink;
-
-    /** @var array */
-    private $originalThemes;
-
-    /** @var array */
-    private $originalServer;
+    use FixtureThemeTrait;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        // A storefront GET request, as the web server would describe it.
-        $this->originalServer = $_SERVER;
-        $_SERVER['REQUEST_METHOD'] = 'GET';
-        $_SERVER['REQUEST_URI'] = '/';
-
-        $config = Registry::getConfig();
-        $this->originalThemes = [$config->getConfigParam('sTheme'), $config->getConfigParam('sCustomTheme')];
-
-        // The shop reads themes from its views dir only, so the fixture theme is linked in for the test.
-        $this->themeLink = $config->getViewsDir() . self::FIXTURE_THEME;
-        $this->removeThemeLink();
-        symlink(__DIR__ . '/Fixtures/views/' . self::FIXTURE_THEME, $this->themeLink);
-
-        $this->activateTheme(self::FIXTURE_THEME, '');
+        $this->installFixtureTheme();
     }
 
     protected function tearDown(): void
     {
-        $this->activateTheme((string) $this->originalThemes[0], (string) $this->originalThemes[1]);
-        $this->removeThemeLink();
-        $_SERVER = $this->originalServer;
-
+        $this->uninstallFixtureTheme();
         parent::tearDown();
     }
 
@@ -145,28 +116,5 @@ final class StorefrontRenderingTest extends TestCase
         };
 
         return $shopControl->renderController($class);
-    }
-
-    /**
-     * Twig's template directories and UtilsView's template dirs are resolved once, so both are rebuilt.
-     */
-    private function activateTheme(string $theme, string $customTheme): void
-    {
-        $config = Registry::getConfig();
-        $config->setConfigParam('sTheme', $theme);
-        $config->setConfigParam('sCustomTheme', $customTheme);
-
-        Registry::set(UtilsView::class, null);
-        ContainerFactory::resetContainer();
-        ContainerFactory::getInstance()->getContainer()
-            ->get(TemplateCacheServiceInterface::class)
-            ->invalidateTemplateCache();
-    }
-
-    private function removeThemeLink(): void
-    {
-        if (is_link($this->themeLink)) {
-            unlink($this->themeLink);
-        }
     }
 }
