@@ -205,6 +205,12 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      */
     protected $_oUser = null;
 
+    /** @var \OxidEsales\Eshop\Core\GuaranteeLabelGenerator|null lazy; settable for tests */
+    protected $_oGuaranteeLabelGenerator = null;
+
+    /** @var string|null memoised manufacturer title; null = not looked up yet, '' = no manufacturer. Reset in assign(). */
+    protected $guaranteeManufacturerTitleCache = null;
+
     /**
      * Performance issue. Sometimes you want to load articles without calculating
      * correct discounts and prices etc.
@@ -1217,6 +1223,10 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         //clear seo urls
         $this->_aSeoUrls = [];
 
+        // Instances get reused: a memoised manufacturer title from the previous
+        // record must never leak into this one (#226 item 2).
+        $this->guaranteeManufacturerTitleCache = null;
+
         $this->oxarticles__oxnid = $this->oxarticles__oxid;
 
         // check for simple article.
@@ -2024,6 +2034,182 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     }
 
     /**
+     * Producer commercial guarantee of durability in whole years (#219).
+     * 0 = none / not communicated to the trader.
+     *
+     * @return int
+     */
+    public function getGuaranteeYears(): int
+    {
+        return (int) $this->getRawFieldData('o3guaranteeyears');
+    }
+
+    /**
+     * THE single legal-qualification predicate for the EU durability-guarantee
+     * label: producer guarantee of MORE THAN two years (Art. 6(1)(la) CRD as
+     * amended by Directive (EU) 2024/825). Producer-only / no-extra-cost /
+     * whole-good are operator-side conditions documented in admin help; the
+     * code threshold is the duration rule. Do not re-implement elsewhere.
+     *
+     * @return bool
+     */
+    public function isDurabilityGuaranteeEligible(): bool
+    {
+        return $this->getGuaranteeYears() > 2;
+    }
+
+    /**
+     * Guarantor/brand name as it must appear on the label.
+     * Fallback chain: own field -> active linked manufacturer title -> ''.
+     * '' means the label CANNOT render (mandatory label component).
+     *
+     * Only the MANUFACTURER lookup is memoised (#226 item 2): on the documented
+     * empty-field fallback path the guarantor is resolved up to 3x per article
+     * render — twice from core, once from the theme — and getManufacturer() does
+     * a fresh oxNew() + load() every time, i.e. 3 SELECTs from oxmanufacturers
+     * per article. Reading the own field stays uncached deliberately: it is free
+     * (no query) and it is the value an operator edits, so it must never be
+     * served from a stale cache. The manufacturer cache is dropped in assign()
+     * so a re-load()ed instance cannot serve the previous article's brand.
+     *
+     * @return string
+     */
+    public function getGuaranteeGuarantor(): string
+    {
+        $own = trim(html_entity_decode((string) $this->getRawFieldData('o3guaranteeguarantor'), ENT_QUOTES));
+        if ($own !== '') {
+            return $own;
+        }
+
+        // '' is a meaningful, cacheable result ("mandatory component
+        // unresolvable"), and ??= keeps it because '' is not null.
+        return $this->guaranteeManufacturerTitleCache ??= $this->resolveManufacturerTitle();
+    }
+
+    /**
+     * @return string linked active manufacturer's title, '' when there is none
+     */
+    private function resolveManufacturerTitle(): string
+    {
+        $manufacturer = $this->getManufacturer();
+        if ($manufacturer !== null) {
+            return trim(html_entity_decode((string) $manufacturer->getRawFieldData('oxtitle'), ENT_QUOTES));
+        }
+
+        return '';
+    }
+
+    /**
+     * Model identifier as it must appear on the label (mandatory component,
+     * Reg. (EU) 2025/1960 Annex II). Fallback chain: own field -> OXARTNUM
+     * -> article title.
+     *
+     * @return string
+     */
+    public function getGuaranteeModel(): string
+    {
+        $own = trim(html_entity_decode((string) $this->getRawFieldData('o3guaranteemodel'), ENT_QUOTES));
+        if ($own !== '') {
+            return $own;
+        }
+        $artnum = trim(html_entity_decode((string) $this->getRawFieldData('oxartnum'), ENT_QUOTES));
+        if ($artnum !== '') {
+            return $artnum;
+        }
+        return trim(html_entity_decode((string) $this->getRawFieldData('oxtitle'), ENT_QUOTES));
+    }
+
+    /**
+     * Guarantee conditions text (sec. 479 BGB information duty).
+     *
+     * @return string
+     */
+    public function getGuaranteeConditions(): string
+    {
+        return trim(html_entity_decode((string) $this->getRawFieldData('o3guaranteeconditions'), ENT_QUOTES));
+    }
+
+    /**
+     * Test seam / DI point for the label generator.
+     *
+     * @param \OxidEsales\Eshop\Core\GuaranteeLabelGenerator $generator
+     *
+     * @return void
+     */
+    public function setGuaranteeLabelGenerator(\OxidEsales\Eshop\Core\GuaranteeLabelGenerator $generator): void
+    {
+        $this->_oGuaranteeLabelGenerator = $generator;
+    }
+
+    /**
+     * URL of the composited EU durability-guarantee label PNG for this
+     * article, or null when the label must not / cannot render:
+     * master switch off, not eligible (<= 2 years), guarantor unresolvable
+     * (mandatory label component), or composition failed (already logged by
+     * the generator). Templates render the text fallback when this is null
+     * but the article IS eligible and enabled - see the theme plan.
+     *
+     * @return string|null
+     */
+    public function getDurabilityGuaranteeLabelUrl(): ?string
+    {
+        if (!\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blShowDurabilityGuaranteeLabel', false)) {
+            return null;
+        }
+        if (!$this->isDurabilityGuaranteeEligible()) {
+            return null;
+        }
+        $guarantor = $this->getGuaranteeGuarantor();
+        if ($guarantor === '') {
+            return null;
+        }
+
+        if ($this->_oGuaranteeLabelGenerator === null) {
+            $this->_oGuaranteeLabelGenerator = oxNew(\OxidEsales\Eshop\Core\GuaranteeLabelGenerator::class);
+        }
+
+        return $this->_oGuaranteeLabelGenerator->getLabelUrl(
+            (string) $this->getId(),
+            $this->getGuaranteeYears(),
+            $guarantor,
+            $this->getGuaranteeModel()
+        );
+    }
+
+    /**
+     * URL of the official EU nested GARAN banner PNG (year editable only) for
+     * this article, or null under the same gate chain as
+     * getDurabilityGuaranteeLabelUrl(): master switch off, not eligible
+     * (<= 2 years), guarantor unresolvable (mandatory label component), or
+     * banner generation failed (already logged by the generator). The theme
+     * shows this banner in the buy area; it expands to the full label on first
+     * click - see the theme plan.
+     *
+     * @return string|null
+     */
+    public function getDurabilityGuaranteeNestedUrl(): ?string
+    {
+        if (!\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blShowDurabilityGuaranteeLabel', false)) {
+            return null;
+        }
+        if (!$this->isDurabilityGuaranteeEligible()) {
+            return null;
+        }
+        if ($this->getGuaranteeGuarantor() === '') {
+            return null;
+        }
+
+        if ($this->_oGuaranteeLabelGenerator === null) {
+            $this->_oGuaranteeLabelGenerator = oxNew(\OxidEsales\Eshop\Core\GuaranteeLabelGenerator::class);
+        }
+
+        return $this->_oGuaranteeLabelGenerator->getNestedBannerUrl(
+            (string) $this->getId(),
+            $this->getGuaranteeYears()
+        );
+    }
+
+    /**
      * Checks if article is assigned to category $sCatNID.
      *
      * @param string $sCatNid category ID
@@ -2475,8 +2661,52 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         $blRet = parent::save();
         // saving long description
         $this->_saveArtLongDesc();
+        $this->purgeOutdatedGuaranteeLabels();
 
         return $blRet;
+    }
+
+    /**
+     * Drops this article's now-orphaned generated guarantee labels (#226 item 5).
+     *
+     * Label filenames are content-addressed, so editing any of the three label
+     * fields leaves the previous PNG behind forever. Collecting them here — at
+     * the moment the content changes — keeps the directory bounded without a
+     * scheduled job. Cheap: it short-circuits on a single is_dir() when no
+     * labels were ever generated.
+     *
+     * Never throws and never affects the save result: an uncollected file is
+     * wasted disk, not a failed save.
+     */
+    protected function purgeOutdatedGuaranteeLabels(): void
+    {
+        // Resolved before the try so the catch can log it without calling back
+        // into the object: if getId() is what threw, re-calling it there would
+        // throw again out of the catch and take save() down with it.
+        $articleId = '';
+
+        try {
+            $articleId = (string) $this->getId();
+            if ($articleId === '') {
+                return;
+            }
+
+            if ($this->_oGuaranteeLabelGenerator === null) {
+                $this->_oGuaranteeLabelGenerator = oxNew(\OxidEsales\Eshop\Core\GuaranteeLabelGenerator::class);
+            }
+
+            $this->_oGuaranteeLabelGenerator->purgeOutdatedLabels(
+                $articleId,
+                $this->getGuaranteeYears(),
+                $this->getGuaranteeGuarantor(),
+                $this->getGuaranteeModel()
+            );
+        } catch (\Throwable $e) {
+            \OxidEsales\Eshop\Core\Registry::getLogger()->warning(
+                __METHOD__ . ' - Could not collect outdated guarantee labels for article-ID'
+                . " '" . ($articleId ?: '(unknown)') . "': '{$e->getMessage()}'."
+            );
+        }
     }
 
     /**
@@ -4571,7 +4801,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         }
 
         // certain fields with zero value treat as empty
-        $aZeroValueFields = ['oxarticles__oxprice', 'oxarticles__oxvat', 'oxarticles__oxunitquantity'];
+        $aZeroValueFields = ['oxarticles__oxprice', 'oxarticles__oxvat', 'oxarticles__oxunitquantity', 'oxarticles__o3guaranteeyears'];
 
         if (!$mValue && in_array($sFieldName, $aZeroValueFields)) {
             return true;

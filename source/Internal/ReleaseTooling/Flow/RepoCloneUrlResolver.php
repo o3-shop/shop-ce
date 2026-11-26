@@ -36,27 +36,36 @@ use RuntimeException;
  * Composer-package-name to GitHub-repo-name conversion goes through
  * `PackageRepoSlug::resolve()` so case-renamed repos
  * (`o3-shop/o3-theme` → `o3-shop/o3-Theme`) end up at the right URL.
+ *
+ * For SSH the host of the origin URL is carried over verbatim, so a
+ * `~/.ssh/config` alias (`git@github-work:o3-shop/shop-ce.git`) keeps
+ * selecting the identity the maintainer set up for it. Rewriting the
+ * alias to `github.com` would silently fall back to the default key.
  */
 final class RepoCloneUrlResolver
 {
     public const SCHEME_HTTPS = 'https';
     public const SCHEME_SSH = 'ssh';
+    public const DEFAULT_SSH_HOST = 'github.com';
 
     private string $scheme;
+    private string $sshHost;
 
-    public function __construct(string $scheme)
+    public function __construct(string $scheme, string $sshHost = self::DEFAULT_SSH_HOST)
     {
         if ($scheme !== self::SCHEME_HTTPS && $scheme !== self::SCHEME_SSH) {
             throw new RuntimeException(sprintf('unknown clone-URL scheme: %s', $scheme));
         }
         $this->scheme = $scheme;
+        $this->sshHost = $sshHost;
     }
 
     /**
      * Reads the origin URL of the supplied repo path and infers the
-     * scheme. Throws when the URL doesn't look like a github.com remote
-     * — that's a configuration the auto-clone flow can't handle and
-     * the maintainer should resolve before re-running.
+     * scheme (and, for SSH, the host). Throws when the URL is neither
+     * an https://github.com/... nor an SSH remote — that's a
+     * configuration the auto-clone flow can't handle and the
+     * maintainer should resolve before re-running.
      */
     public static function fromRepoOrigin(ProcessExecutor $exec, string $repoPath): self
     {
@@ -72,11 +81,13 @@ final class RepoCloneUrlResolver
         if (strpos($url, 'https://github.com/') === 0) {
             return new self(self::SCHEME_HTTPS);
         }
-        if (strpos($url, 'git@github.com:') === 0) {
-            return new self(self::SCHEME_SSH);
+        // `git@<host>:owner/repo` and `ssh://git@<host>/owner/repo`. The host may be an
+        // ~/.ssh/config alias rather than github.com, so it is captured, not matched.
+        if (preg_match('#^(?:ssh://)?git@([\w.-]+)[:/]#', $url, $matches) === 1) {
+            return new self(self::SCHEME_SSH, $matches[1]);
         }
         throw new RuntimeException(sprintf(
-            'unsupported origin URL %s (expected https://github.com/... or git@github.com:...)',
+            'unsupported origin URL %s (expected https://github.com/... or git@<host>:...)',
             $url
         ));
     }
@@ -87,11 +98,16 @@ final class RepoCloneUrlResolver
         if ($this->scheme === self::SCHEME_HTTPS) {
             return sprintf('https://github.com/%s.git', $slug);
         }
-        return sprintf('git@github.com:%s.git', $slug);
+        return sprintf('git@%s:%s.git', $this->sshHost, $slug);
     }
 
     public function scheme(): string
     {
         return $this->scheme;
+    }
+
+    public function sshHost(): string
+    {
+        return $this->sshHost;
     }
 }

@@ -78,9 +78,9 @@ class SettingDaoTest extends TestCase
             ->expects($this->once())
             ->method('dispatch')
             ->with(
-                //In the new version of EventDispatcher the entries have to be flipped.
-                $this->stringContains(SettingChangedEvent::NAME),
-                $this->isInstanceOf(SettingChangedEvent::class)
+                // Symfony 5.4 dispatch() order: event object first, event name second.
+                $this->isInstanceOf(SettingChangedEvent::class),
+                $this->stringContains(SettingChangedEvent::NAME)
             );
 
         $shopModuleSettingDao = new SettingDao(

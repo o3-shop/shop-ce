@@ -197,6 +197,25 @@ class UpToDateGate implements PreFlightGate
             ]);
         }
 
+        // PreFlightRunner runs every gate even after BranchGate aborts, so HEAD
+        // may be another branch (e.g. a module's old line b-1.0 while the map
+        // points at b-1.7). Merging origin/<expected> into it would move the
+        // wrong branch; leave it to BranchGate.
+        $head = $this->exec->execute(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], $repoPath, 30);
+        $checkedOut = trim($head->stdout());
+        if (!$head->isSuccess() || $checkedOut !== $expectedBranch) {
+            return GateOutcome::abort(self::NAME, [
+                sprintf(
+                    "%s: not fast-forwarding: the branch checked out is '%s', not %s; "
+                    . 'switch to %s and re-run',
+                    $packageName,
+                    $checkedOut,
+                    $expectedBranch,
+                    $expectedBranch
+                ),
+            ]);
+        }
+
         $merge = $this->exec->execute(
             ['git', 'merge', '--ff-only', 'origin/' . $expectedBranch],
             $repoPath,

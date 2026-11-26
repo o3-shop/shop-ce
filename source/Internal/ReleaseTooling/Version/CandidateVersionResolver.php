@@ -38,6 +38,9 @@ use Composer\Semver\VersionParser;
  *   - otherwise (newer + stability OK + tag matches branch HEAD)
  *       → CASE_USABLE_TAG, use latest_tag
  *
+ * latest_tag is the highest semver tag of the repo, or of the release
+ * line for a line-versioned package (see ReleaseLine).
+ *
  * See: openspec/.../release-graph-derivation/spec.md
  */
 class CandidateVersionResolver
@@ -66,14 +69,33 @@ class CandidateVersionResolver
     public function resolve(string $package, string $fromPin, string $shopTo, string $packageRef): VersionResolution
     {
         $tags = $this->repos->tags($package);
+        $linePrefix = ReleaseLine::tagPrefix($package, $packageRef);
+        if ($linePrefix !== null) {
+            // A line-versioned package's latest tag is the latest of its line,
+            // not of the repo: other lines' tags never describe this branch.
+            $tags = array_filter(
+                $tags,
+                static fn (string $tag): bool => strpos($tag, $linePrefix) === 0,
+                ARRAY_FILTER_USE_KEY
+            );
+        }
         $latestTag = $this->highestSemverTag(array_keys($tags));
 
         if ($latestTag === null) {
+            $note = $linePrefix === null
+                ? 'no semver tags found; Step 4 cuts the first tag'
+                : sprintf(
+                    'no %s* tags on release line %s yet; cut its first tag with --bump %s=%s0',
+                    $linePrefix,
+                    $packageRef,
+                    substr($package, strrpos($package, '/') + 1),
+                    $linePrefix
+                );
             return new VersionResolution(
                 $package,
                 VersionResolution::CASE_NEEDS_NEW_TAG,
                 null,
-                ['no semver tags found; Step 4 cuts the first tag'],
+                [$note],
                 null
             );
         }

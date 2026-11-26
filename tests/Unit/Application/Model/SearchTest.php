@@ -21,12 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
+use oxBaseHelper;
 use oxDb;
+use OxidEsales\Eshop\Core\Price;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Application\Model\Article;
 use OxidEsales\EshopCommunity\Application\Model\Search;
 use OxidEsales\EshopCommunity\Core\TableViewNameGenerator;
 use OxidEsales\TestingLibrary\UnitTestCase;
 use oxTestModules;
+
+require_once TEST_LIBRARY_HELPERS_PATH . 'oxBaseHelper.php';
 
 class SearchTest extends UnitTestCase
 {
@@ -48,6 +53,7 @@ class SearchTest extends UnitTestCase
         $this->tableViewNameGenerator = oxNew('oxTableViewNameGenerator');
         $this->getConfig()->setConfigParam('blUseTimeCheck', true);
         $this->cleanUpTable('oxarticles');
+        $this->cleanUpTable('oxartextends');
         $this->cleanUpTable('oxobject2category');
         $this->cleanUpTable('oxcategories');
     }
@@ -64,6 +70,7 @@ class SearchTest extends UnitTestCase
         $myDB->execute('delete from oxobject2selectlist where oxselnid = "oxsellisttest" ');
         $this->cleanUpTable('oxcategories');
         $this->cleanUpTable('oxarticles');
+        $this->cleanUpTable('oxartextends');
         $this->cleanUpTable('oxobject2category');
         parent::tearDown();
     }
@@ -839,6 +846,23 @@ class SearchTest extends UnitTestCase
         $this->assertEquals($sQ, $sFix);
     }
 
+    public function testSearchRanksMultiWordMatchesByNumberOfMatchedWords()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle']);
+        $this->getConfig()->setConfigParam('blSearchUseAND', false);
+
+        // the adjacent phrase scores highest, then both words scattered, then a single word
+        $this->_insertSearchableArticle('_testMwPhrase', 'zzzalpha zzzbeta');
+        $this->_insertSearchableArticle('_testMwBoth', 'zzzbeta with zzzalpha');
+        $this->_insertSearchableArticle('_testMwOne', 'aaa zzzalpha only');
+
+        /** @var Search $oSearch */
+        $oSearch = oxNew('oxSearch');
+        $oSearchList = $oSearch->getSearchArticles('zzzalpha zzzbeta');
+
+        $this->assertSame(['_testMwPhrase', '_testMwBoth', '_testMwOne'], $oSearchList->arrayKeys());
+    }
+
     public function testGetWhereWithSearchIngLongDescSecondLanguage()
     {
         // forcing config
@@ -895,5 +919,225 @@ class SearchTest extends UnitTestCase
         $this->addToDatabase($sQ3, 'oxobject2category');
         $aResults = $this->_oSearchHandler->getSearchArticles('searchTestVal', '_testCatSearch');
         $this->assertEquals(1, count($aResults));
+    }
+
+    public function testGetSearchSuggestionsReturnsEmptyWhenNoSearchColsConfigured()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', 'xxx');
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('bar');
+
+        $this->assertSame([], $aSuggestions);
+    }
+
+    /**
+     * Inserts a searchable article fixture.
+     *
+     * @param string $sOxid  article id
+     * @param string $sTitle article title
+     * @param float  $dPrice optional price
+     */
+    private function _insertSearchableArticle($sOxid, $sTitle, $dPrice = null)
+    {
+        $oDb = $this->getDb();
+        $sOxidQuoted = $oDb->quote($sOxid);
+        $sTitleQuoted = $oDb->quote($sTitle);
+        $sPriceCol = $dPrice === null ? '' : ', oxprice';
+        $sPriceVal = $dPrice === null ? '' : ', ' . (float) $dPrice;
+
+        $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxparentid, oxtitle{$sPriceCol}) VALUES ({$sOxidQuoted}, 1, 1, '', {$sTitleQuoted}{$sPriceVal})";
+        if ($this->getConfig()->getEdition() === 'EE') {
+            $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxshopid, oxparentid, oxtitle{$sPriceCol}) VALUES ({$sOxidQuoted}, 1, 1, 1, '', {$sTitleQuoted}{$sPriceVal})";
+        }
+        $this->addToDatabase($sInsert, 'oxarticles');
+    }
+
+    public function testGetSearchSuggestionsReturnsEmptyWhenSearchColsIsEmptyArray()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', []);
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('bar');
+
+        $this->assertSame([], $aSuggestions);
+    }
+
+    public function testGetSearchSuggestionsReturnsEmptyForWhitespace()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('   ');
+
+        $this->assertSame([], $aSuggestions);
+    }
+
+    public function testGetSearchSuggestionsReturnsMatchingArticles()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+        $this->_insertSearchableArticle('_testSuggResult', 'SuggFixtureResult');
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('SuggFixtureResult', 10);
+
+        $this->assertCount(1, $aSuggestions);
+        $this->assertSame('_testSuggResult', $aSuggestions[0]['id']);
+        $this->assertSame('SuggFixtureResult', $aSuggestions[0]['title']);
+
+        $expectedKeys = ['id', 'title', 'price', 'icon', 'link'];
+        foreach ($expectedKeys as $sKey) {
+            $this->assertArrayHasKey($sKey, $aSuggestions[0]);
+        }
+    }
+
+    public function testGetSearchSuggestionsKeepsMainPictureOnRepeatedRequests()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle']);
+        $this->_insertSearchableArticle('_testSuggMainPic', 'SuggMainPic');
+        $this->addToDatabase(
+            "UPDATE oxarticles SET oxpic1 = 'sugg-main-pic.jpg', oxthumb = '' WHERE oxid = '_testSuggMainPic'",
+            'oxarticles'
+        );
+
+        $sMasterFile = $this->getConfig()->getPictureDir(false) . 'master/product/1/sugg-main-pic.jpg';
+        @mkdir(dirname($sMasterFile), 0777, true);
+        @touch($sMasterFile);
+
+        // A real request has a frontend controller, which is part of the field-name cache key.
+        $oActiveView = oxNew('oxStart');
+        $oActiveView->setClassKey('searchsuggest');
+        $this->getConfig()->setActiveView($oActiveView);
+
+        $this->cleanTmpDir();
+        oxBaseHelper::cleanup();
+
+        try {
+            $aFirstRequest = $this->_oSearchHandler->getSearchSuggestions('SuggMainPic');
+
+            // A new web request starts with a fresh static cache but reuses the field-name cache in tmp/.
+            oxBaseHelper::cleanup();
+            $aSecondRequest = $this->_oSearchHandler->getSearchSuggestions('SuggMainPic');
+        } finally {
+            @unlink($sMasterFile);
+        }
+
+        $this->assertCount(1, $aFirstRequest);
+        $this->assertStringContainsString('sugg-main-pic.jpg', $aFirstRequest[0]['icon']);
+        $this->assertCount(1, $aSecondRequest);
+        $this->assertStringContainsString('sugg-main-pic.jpg', $aSecondRequest[0]['icon']);
+        $this->assertSame($aFirstRequest[0]['icon'], $aSecondRequest[0]['icon']);
+    }
+
+    public function testGetSearchSuggestionsUsesTheSearchLanguageForTheArticleFields()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle']);
+        $this->_insertSearchableArticle('_testSuggLanguage', 'SuggLanguage');
+        $this->addToDatabase(
+            "UPDATE oxarticles SET oxtitle_1 = 'SuggLanguage' WHERE oxid = '_testSuggLanguage'",
+            'oxarticles'
+        );
+
+        $oSearch = oxNew('oxSearch');
+        $oSearch->setLanguage(1);
+
+        $aSuggestions = $oSearch->getSearchSuggestions('SuggLanguage');
+
+        $this->assertCount(1, $aSuggestions);
+        $this->assertSame('_testSuggLanguage', $aSuggestions[0]['id']);
+    }
+
+    public function testGetSearchSuggestionsReturnsPlaintextQuotesFromRawStorage()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+        $this->_insertSearchableArticle('_testSuggRawQuote', 'SuggRaw "Bar" & Co');
+        $this->addToDatabase(
+            "UPDATE oxarticles SET oxvarselect = 'Size \"L\"' WHERE oxid = '_testSuggRawQuote'",
+            'oxarticles'
+        );
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('SuggRaw');
+
+        $this->assertCount(1, $aSuggestions);
+        $this->assertSame('SuggRaw "Bar" & Co Size "L"', $aSuggestions[0]['title']);
+    }
+
+    public function testGetSearchSuggestionsDecodesHtmlEntitiesFromStoredData()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+        $this->_insertSearchableArticle(
+            '_testSuggEntities',
+            'SuggEnt &quot;Bar&quot; &amp; Co &#039;x&#039; <b>bold</b>'
+        );
+        $this->addToDatabase(
+            "UPDATE oxarticles SET oxvarselect = 'Var &quot;L&quot; &amp; Co' WHERE oxid = '_testSuggEntities'",
+            'oxarticles'
+        );
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('SuggEnt');
+
+        $this->assertCount(1, $aSuggestions);
+        $this->assertSame(
+            'SuggEnt "Bar" & Co \'x\' <b>bold</b> Var "L" & Co',
+            $aSuggestions[0]['title']
+        );
+    }
+
+    public function testGetSearchSuggestionsRespectsLimit()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+        for ($i = 1; $i <= 4; $i++) {
+            $this->_insertSearchableArticle('_testSuggLimit' . $i, 'SuggFixtureLimit' . $i);
+        }
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('SuggFixtureLimit', 3);
+
+        $this->assertCount(3, $aSuggestions);
+    }
+
+    public function testGetSearchSuggestionsMatchesLongDescription()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxlongdesc']);
+
+        $this->_insertSearchableArticle('_testSuggDesc', 'NoMatchingTitle');
+        $this->addToDatabase("REPLACE INTO oxartextends (oxid, oxlongdesc) VALUES ('_testSuggDesc', 'uniqueNeedleInLongDesc')", 'oxartextends');
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('uniqueNeedleInLongDesc');
+
+        $this->assertCount(1, $aSuggestions);
+        $this->assertSame('_testSuggDesc', $aSuggestions[0]['id']);
+    }
+
+    public function testGetSearchSuggestionsFormatsNetPriceWhenShowNetPriceIsEnabled()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle']);
+        $this->getConfig()->setConfigParam('blShowNetPrice', true);
+        $this->getConfig()->setConfigParam('blEnterNetPrice', false);
+
+        $this->_insertSearchableArticle('_testSuggNet', 'NetPriceTest', 100);
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('NetPriceTest');
+
+        $this->assertCount(1, $aSuggestions);
+
+        $oConfig = Registry::getConfig();
+        $oCurrency = $oConfig->getActShopCurrencyObject();
+        $dVat = (float) $oConfig->getConfigParam('dDefaultVAT');
+        $dNetto = round(Price::brutto2Netto(100, $dVat), $oCurrency->decimal);
+        $sFormattedPrice = Registry::getLang()->formatCurrency($dNetto * (float) $oCurrency->rate);
+        $sSign = $oCurrency->sign ?? '';
+        $sSide = $oCurrency->side ?? '';
+        $sExpectedPrice = trim(($sSide === 'Front') ? $sSign . $sFormattedPrice : $sFormattedPrice . ' ' . $sSign);
+
+        $this->assertSame($sExpectedPrice, $aSuggestions[0]['price']);
+    }
+
+    public function testGetSearchSuggestionsOmitsPriceWhenPriceLoadingIsDisabled()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle']);
+        $this->getConfig()->setConfigParam('bl_perfLoadPrice', false);
+
+        $this->_insertSearchableArticle('_testSuggNoPrice', 'NoPriceTest');
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('NoPriceTest');
+
+        $this->assertCount(1, $aSuggestions);
+        $this->assertArrayNotHasKey('price', $aSuggestions[0]);
     }
 }

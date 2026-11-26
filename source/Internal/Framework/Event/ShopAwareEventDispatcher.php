@@ -23,17 +23,33 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ShopAwareEventDispatcher extends EventDispatcher
 {
     /**
-     * @param \callable[] $listeners
-     * @param string      $eventName
-     * @param Event       $event
+     * Normalises the legacy Symfony 3.4 dispatch($eventName, $event) argument
+     * order to the 5.x dispatch($event, $eventName) order, so OXID 6.4-era
+     * modules and legacy core calls keep working after the Symfony upgrade.
+     *
+     * @param object|string $event
+     * @param string|null   $eventName
      */
-    protected function doDispatch($listeners, $eventName, Event $event)
+    public function dispatch($event, $eventName = null): object
+    {
+        if (is_string($event)) {
+            [$event, $eventName] = [$eventName, $event];
+        }
+
+        return parent::dispatch($event, $eventName);
+    }
+
+    /**
+     * @param callable[] $listeners
+     * @param string     $eventName
+     * @param object     $event
+     */
+    protected function doDispatch($listeners, $eventName, object $event)
     {
         foreach ($listeners as $listener) {
             if ($event->isPropagationStopped()) {

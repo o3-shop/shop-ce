@@ -146,19 +146,33 @@ class StandardException extends \Exception
     /**
      * Write exception to log file
      *
+     * Callers use this for exceptions they have already handled, so a failing
+     * logger must not end their flow: falls back to PHP's error_log() and
+     * returns false.
+     *
      * @deprecated since v6.3 (2018-04-25); This method will be removed completely. Use Registry::getLogger() to log error messages in the future.
      *
      * @return mixed
      */
     public function debugOut()
     {
-        $exceptionHandler = new \OxidEsales\Eshop\Core\Exception\ExceptionHandler();
-        /**
-         * @deprecated since v6.0 (2017-02-27); Logging mechanism will be changed in 6.0.
-         */
-        $exceptionHandler->setLogFileName($this->getLogFileName());
+        try {
+            $exceptionHandler = new \OxidEsales\Eshop\Core\Exception\ExceptionHandler();
+            /**
+             * @deprecated since v6.0 (2017-02-27); Logging mechanism will be changed in 6.0.
+             */
+            $exceptionHandler->setLogFileName($this->getLogFileName());
 
-        return $exceptionHandler->writeExceptionToLog($this);
+            return $exceptionHandler->writeExceptionToLog($this);
+        } catch (\Throwable $loggerException) {
+            error_log(
+                __METHOD__ . " - Logging the exception failed: '"
+                . str_replace(["\r", "\n"], ' ', $loggerException->getMessage()) . "'. Original message: '"
+                . str_replace(["\r", "\n"], ' ', $this->getMessage()) . "'."
+            );
+
+            return false;
+        }
     }
 
     /**

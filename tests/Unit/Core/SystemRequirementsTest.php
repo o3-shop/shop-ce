@@ -85,6 +85,51 @@ class SystemRequirementsTest extends \OxidTestCase
         $this->assertCount(3, $requirementGroups);
     }
 
+    public function testGdFreetypeIsARequiredPhpExtension()
+    {
+        $systemRequirements = new SystemRequirements();
+
+        $this->assertArrayHasKey('gd_freetype', $systemRequirements->getRequiredModules());
+    }
+
+    /**
+     * Every required module id must resolve to an existing check method, otherwise
+     * getModuleInfo() fatals while rendering the setup / system health page.
+     */
+    public function testEveryRequiredModuleHasACheckMethod()
+    {
+        $systemRequirements = new SystemRequirements();
+
+        foreach (array_keys($systemRequirements->getRequiredModules()) as $moduleId) {
+            $checkMethod = 'check' . str_replace(' ', '', ucwords(str_replace('_', ' ', $moduleId)));
+            $this->assertTrue(
+                method_exists($systemRequirements, $checkMethod),
+                "Missing $checkMethod() for required module '$moduleId'."
+            );
+        }
+    }
+
+    public function testCheckGdFreetypeReflectsImagettftextAvailability()
+    {
+        $systemRequirements = new SystemRequirements();
+
+        $this->assertSame(
+            function_exists('imagettftext')
+                ? SystemRequirements::MODULE_STATUS_OK
+                : SystemRequirements::MODULE_STATUS_BLOCKS_SETUP,
+            $systemRequirements->checkGdFreetype()
+        );
+    }
+
+    public function testMissingGdFreetypeBlocksSetup()
+    {
+        $this->assertFalse(
+            SystemRequirements::canSetupContinue(
+                ['php_extennsions' => ['gd_freetype' => SystemRequirements::MODULE_STATUS_BLOCKS_SETUP]]
+            )
+        );
+    }
+
     public function testGetModuleInfo()
     {
         /** @var SystemRequirements|Mock $systemRequirementsMock */
@@ -220,13 +265,13 @@ class SystemRequirementsTest extends \OxidTestCase
     public function testGetReqInfoUrlWithServerPermissionsParameterWillAddAnchorToUrl(): void
     {
         $parameter = 'server_permissions';
-        $anchor = '#adjusting-file-and-directory-permissions';
+        $anchor = '#adjust-file-and-directory-permissions';
 
         $url = (new SystemRequirements())->getReqInfoUrl($parameter);
 
         $this->assertStringContainsString($anchor, $url);
         // server_permissions uses the preparation info URL, not the regular one
-        $this->assertStringContainsString('PrepareInstallation.html', $url);
+        $this->assertStringContainsString('NewInstallation.html', $url);
     }
 
     public function testGetReqInfoUrlWithUnknownParameterWillReturnUnchangedUrl(): void

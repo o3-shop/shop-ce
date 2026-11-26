@@ -15,7 +15,12 @@ $finder = (new PhpCsFixer\Finder())
     ->name('*.php')
     ->notName('*.phtml')
     ->ignoreDotFiles(true)
-    ->ignoreVCS(true);
+    ->ignoreVCS(true)
+    // Skip what .gitignore lists, above all the nested module/theme clones
+    // (tinymce-editor, o3-theme, wave, testing-library, …): separate repos
+    // with their own code style (o3-shop/o3-shop#242). New nested clones
+    // MUST be added to .gitignore, or this run will rewrite them.
+    ->ignoreVCSIgnored(true);
 
 return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)

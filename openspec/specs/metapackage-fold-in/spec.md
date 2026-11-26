@@ -26,10 +26,9 @@ the next two requirements.
 
 ### Requirement: Deprecated and removed entries dropped during fold-in
 
-The fold-in SHALL NOT carry `flow-theme`, `vortex-theme`, the o3-shop
-fork of `paypal-module`, or any `tests-deprecated-ce`-style entries
-into `o3-shop/composer.json`. `flow-theme` and `paypal-module` were
-already removed from every v1.6.0 RC tag and the v1.6.0 final tag of
+The fold-in SHALL NOT carry `flow-theme`, `vortex-theme`, or any
+`tests-deprecated-ce`-style entries into `o3-shop/composer.json`.
+`flow-theme` was already removed from every v1.6.0 RC tag and the v1.6.0 final tag of
 the metapackage; the fold-in makes the removal permanent. Users who
 still want any of these MAY install them via `composer require`
 explicitly.
@@ -45,16 +44,11 @@ explicitly.
 - **THEN** `o3-shop/composer.json` does not require
   `o3-shop/vortex-theme`
 
-#### Scenario: o3-shop paypal-module dropped
-
-- **WHEN** the fold-in is applied
-- **THEN** `o3-shop/composer.json` does not require the o3-shop fork
-  of `paypal-module`
-
 ### Requirement: Bundled modules preserved during fold-in
 
 The fold-in SHALL preserve `o3-shop/gdpr-optin-module`,
-`o3-shop/usercentrics`, and `o3-shop/tinymce-editor` from the v1.6.0
+`o3-shop/usercentrics`, `o3-shop/tinymce-editor`, and
+`o3-shop/paypal-checkout` from the v1.6.0
 state of `shop-metapackage-ce/composer.json` `require` into
 `o3-shop/composer.json` `require`. They become candidates for the
 release-graph walk like any other tier-0 dep.

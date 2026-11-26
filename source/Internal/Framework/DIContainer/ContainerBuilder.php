@@ -77,6 +77,7 @@ class ContainerBuilder
      */
     private function loadProjectServices(SymfonyContainerBuilder $symfonyContainer)
     {
+        $editionServices = array_merge($symfonyContainer->getDefinitions(), $symfonyContainer->getAliases());
         $loader = new YamlFileLoader($symfonyContainer, new FileLocator());
         try {
             $this->cleanupProjectYaml();
@@ -88,6 +89,32 @@ class ContainerBuilder
             $loader->load($this->context->getConfigurableServicesFilePath());
         } catch (FileLocatorFileNotFoundException $exception) {
             // In case manually created services file not found, do nothing.
+        }
+        $this->makeProjectServicesPublic($symfonyContainer, $editionServices);
+    }
+
+    /**
+     * Symfony 3.4 made services public by default, Symfony 5.4 makes them private.
+     * OXID 6.4-era modules fetch their own services by id
+     * (ContainerFactory::getInstance()->getContainer()->get(...)), so every service
+     * a module or project file defines is made public again, as it was under 3.4.
+     *
+     * ponytail: this also overrides an explicit "public: false". Symfony 5.4's
+     * YamlFileLoader drops the marker for a "_defaults" flag, so an explicit
+     * private flag cannot be told apart from none. Private only restricts get(),
+     * so making such a service public is harmless.
+     *
+     * @param SymfonyContainerBuilder $symfonyContainer
+     * @param array                   $editionServices definitions and aliases loaded before the project files
+     */
+    private function makeProjectServicesPublic(SymfonyContainerBuilder $symfonyContainer, array $editionServices)
+    {
+        $editionServiceIds = array_flip(array_map('spl_object_id', $editionServices));
+        $allServices = array_merge($symfonyContainer->getDefinitions(), $symfonyContainer->getAliases());
+        foreach ($allServices as $service) {
+            if (!isset($editionServiceIds[spl_object_id($service)])) {
+                $service->setPublic(true);
+            }
         }
     }
 

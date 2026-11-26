@@ -26,6 +26,10 @@ use OxidEsales\EshopCommunity\Internal\Framework\Console\AbstractShopAwareComman
 use OxidEsales\EshopCommunity\Internal\Framework\Console\CommandsProvider\ServicesCommandsProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Container;
 
 class ServicesCommandsProviderTest extends TestCase
@@ -76,5 +80,42 @@ class ServicesCommandsProviderTest extends TestCase
         $container = new Container();
         $provider = new ServicesCommandsProvider($container);
         $this->assertSame([], $provider->getCommands());
+    }
+
+    public function testLegacyCommandWithoutReturnValueRunsWithExitCodeZero(): void
+    {
+        $legacyCommand = new class ('legacy:command') extends Command {
+            public $executed = false;
+
+            protected function execute(InputInterface $input, OutputInterface $output)
+            {
+                $this->executed = true;
+            }
+        };
+        $container = new Container();
+        $container->setParameter('console.command.ids', ['test.service']);
+        $container->set('test.service', $legacyCommand);
+
+        [$command] = (new ServicesCommandsProvider($container))->getCommands();
+
+        $this->assertSame(0, $command->run(new ArrayInput([]), new NullOutput()));
+        $this->assertTrue($legacyCommand->executed);
+    }
+
+    public function testCommandReturningExitCodeKeepsIt(): void
+    {
+        $command = new class ('modern:command') extends Command {
+            protected function execute(InputInterface $input, OutputInterface $output): int
+            {
+                return 3;
+            }
+        };
+        $container = new Container();
+        $container->setParameter('console.command.ids', ['test.service']);
+        $container->set('test.service', $command);
+
+        [$provided] = (new ServicesCommandsProvider($container))->getCommands();
+
+        $this->assertSame(3, $provided->run(new ArrayInput([]), new NullOutput()));
     }
 }

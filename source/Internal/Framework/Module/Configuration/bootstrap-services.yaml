@@ -19,6 +19,7 @@ services:
 
   OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopConfigurationDaoInterface:
     class: OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopConfigurationDao
+    public: true
     arguments:
       Symfony\Component\Filesystem\Filesystem: '@oxid_esales.symfony.file_system'
       Symfony\Component\Config\Definition\NodeInterface: '@oxid_esales.module.configuration.node'
@@ -36,7 +37,7 @@ services:
 
   oxid_esales.module.configuration.node:
     class: Symfony\Component\Config\Definition\NodeInterface
-    factory: 'OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Definition\TreeBuilderFactoryInterface:create'
+    factory: ['@OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Definition\TreeBuilderFactoryInterface', 'create']
 
   OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Definition\TreeBuilderFactoryInterface:
     class: OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Definition\TreeBuilderFactory

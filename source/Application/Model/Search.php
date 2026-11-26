@@ -262,9 +262,12 @@ class Search extends Base
     }
 
     /**
-     * Builds a relevance ORDER BY clause ranked by field priority from aSearchCols config.
-     * Title match ranks highest; each subsequent configured field ranks lower.
-     * Used as default sort when no explicit sort is requested.
+     * Builds a relevance ORDER BY clause for the search string.
+     *
+     * Multi-word queries are tokenized the same way as in _getWhere(), so rows are ranked by how many
+     * of the query words they match (the whole phrase counts as an extra word, lifting adjacent matches).
+     * Within the same score, the first matching field from the aSearchCols config wins - title match ranks
+     * highest, each subsequent configured field lower. Used as default sort when no explicit sort is requested.
      *
      * @param string $sSearchString
      *
@@ -278,28 +281,70 @@ class Search extends Base
             return '';
         }
 
-        $oDb = DatabaseProvider::getDb();
         $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $this->_iLanguage);
-        $myUtilsString = Registry::getUtilsString();
-        $sUml = $myUtilsString->prepareStrForSearch($sSearchString);
+        $aWords = array_filter(explode(' ', $sSearchString), 'strlen');
+        // the whole phrase is ranked alongside the single words, so adjacent matches score one point higher
+        $aTerms = array_unique(array_merge([$sSearchString], $aWords));
 
-        $cases = [];
-        $rank = 1;
+        $aFields = [];
         foreach ($aSearchCols as $sField) {
-            $sSearchField = $this->getSearchField($sArticleTable, $sField);
-            $condition = "{$sSearchField} LIKE " . $oDb->quote("%{$sSearchString}%");
-            if ($sUml) {
-                $condition .= " OR {$sSearchField} LIKE " . $oDb->quote("%{$sUml}%");
-            }
-            $cases[] = "WHEN ({$condition}) THEN {$rank}";
-            $rank++;
+            $aFields[] = $this->getSearchField($sArticleTable, $sField);
         }
 
-        if (!$cases) {
+        $aCases = [];
+        $iRank = 1;
+        foreach ($aFields as $sSearchField) {
+            $aMatches = [];
+            foreach ($aTerms as $sTerm) {
+                $aMatches[] = $this->getRelevanceMatch($sSearchField, $sTerm);
+            }
+            $aCases[] = 'WHEN (' . implode(' OR ', $aMatches) . ") THEN {$iRank}";
+            $iRank++;
+        }
+
+        if (!$aCases) {
             return '';
         }
 
-        return ' ORDER BY CASE ' . implode(' ', $cases) . " ELSE {$rank} END ASC, {$sArticleTable}.oxtitle ASC";
+        $sOrder = ' ORDER BY ';
+
+        // a single-word query matches every returned row exactly once, so the score is constant and pointless
+        if (count($aTerms) > 1) {
+            $aScores = [];
+            foreach ($aTerms as $sTerm) {
+                $aMatches = [];
+                foreach ($aFields as $sSearchField) {
+                    $aMatches[] = $this->getRelevanceMatch($sSearchField, $sTerm);
+                }
+                // IS TRUE turns the match into 1/0 - a NULL column (left joined long description) must not
+                // poison the whole sum
+                $aScores[] = '((' . implode(' OR ', $aMatches) . ') IS TRUE)';
+            }
+            $sOrder .= implode(' + ', $aScores) . ' DESC, ';
+        }
+
+        return $sOrder . 'CASE ' . implode(' ', $aCases) . " ELSE {$iRank} END ASC, {$sArticleTable}.oxtitle ASC";
+    }
+
+    /**
+     * Builds the LIKE condition matching a single search term against one field, special chars included.
+     *
+     * @param string $sSearchField
+     * @param string $sTerm
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getRelevanceMatch(string $sSearchField, string $sTerm): string
+    {
+        $oDb = DatabaseProvider::getDb();
+        $sCondition = "{$sSearchField} LIKE " . $oDb->quote("%{$sTerm}%");
+
+        if (($sUml = Registry::getUtilsString()->prepareStrForSearch($sTerm))) {
+            $sCondition .= " OR {$sSearchField} LIKE " . $oDb->quote("%{$sUml}%");
+        }
+
+        return $sCondition;
     }
 
     /**
@@ -403,5 +448,82 @@ class Search extends Base
             $searchField = "{$table}.{$field}";
         }
         return $searchField;
+    }
+
+    /**
+     * Returns a list of article suggestions for the search dropdown.
+     * Returns lightweight data: id, title, price, icon url, link.
+     *
+     * @param string $sSearchParam search term
+     * @param int    $iLimit      max results
+     *
+     * @return array
+     */
+    public function getSearchSuggestions($sSearchParam, $iLimit = 10)
+    {
+        $sSearchParam = trim((string) $sSearchParam);
+        if ($sSearchParam === '') {
+            return [];
+        }
+
+        $myConfig = Registry::getConfig();
+        $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $this->_iLanguage);
+        $sDescView = Registry::get(TableViewNameGenerator::class)->getViewName('oxartextends', $this->_iLanguage);
+
+        $aSearchCols = $myConfig->getConfigParam('aSearchCols');
+        if (!(is_array($aSearchCols) && count($aSearchCols))) {
+            return [];
+        }
+
+        $oArticle = oxNew(Article::class);
+        // Keep the article's field list on the same language view as the query below.
+        $oArticle->setLanguage($this->_iLanguage);
+        $sActiveSnippet = $oArticle->getSqlActiveSnippet();
+
+        $sSearchClause = $this->_getWhere($sSearchParam);
+        if (!$sSearchClause) {
+            return [];
+        }
+
+        $sDescJoin = '';
+        if (in_array('oxlongdesc', $aSearchCols)) {
+            $sDescJoin = " LEFT JOIN {$sDescView} ON {$sArticleTable}.oxid={$sDescView}.oxid";
+        }
+
+        $sSelect = "SELECT {$oArticle->getSelectFields()}
+                    FROM {$sArticleTable} {$sDescJoin}
+                    WHERE {$sActiveSnippet}
+                      AND {$sArticleTable}.oxparentid = ''
+                      AND {$sArticleTable}.oxissearch = 1
+                      {$sSearchClause}
+                    {$this->_getRelevanceOrder($sSearchParam)}
+                    LIMIT " . (int) $iLimit;
+
+        $aResults = [];
+        $oCurrency = $myConfig->getActShopCurrencyObject();
+        $oArtList = oxNew(ArticleList::class);
+        $oArtList->selectString($sSelect);
+
+        foreach ($oArtList as $oSuggestion) {
+            $sTitle = html_entity_decode((string) $oSuggestion->getRawFieldData('oxtitle'), ENT_QUOTES);
+            $sVarSelect = html_entity_decode((string) $oSuggestion->getRawFieldData('oxvarselect'), ENT_QUOTES);
+            $aResult = [
+                'id'    => $oSuggestion->oxarticles__oxid->value,
+                'title' => $sTitle . ($sVarSelect ? ' ' . $sVarSelect : ''),
+                'icon'  => $oSuggestion->getThumbnailUrl(),
+                'link'  => htmlspecialchars_decode($oSuggestion->getLink(), ENT_QUOTES),
+            ];
+
+            $sFormattedPrice = $oSuggestion->getFPrice();
+            if ($sFormattedPrice !== null) {
+                $sSign = $oCurrency->sign ?? '';
+                $sSide = $oCurrency->side ?? '';
+                $aResult['price'] = trim(($sSide === 'Front') ? $sSign . $sFormattedPrice : $sFormattedPrice . ' ' . $sSign);
+            }
+
+            $aResults[] = $aResult;
+        }
+
+        return $aResults;
     }
 }

@@ -27,6 +27,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopEn
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopEnvironmentConfigurationExtender;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopEnvironmentWithOrphanSettingEvent;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -48,6 +49,9 @@ class ShopEnvironmentConfigurationExtenderTest extends TestCase
         parent::setUp();
         $this->environmentDao = $this->prophesize(ShopEnvironmentConfigurationDaoInterface::class);
         $this->eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
+        // Symfony 5.4 EventDispatcherInterface::dispatch() returns object; make the
+        // double return the dispatched event so the return type is satisfied.
+        $this->eventDispatcher->dispatch(Argument::cetera())->willReturnArgument(0);
         $this->environmentExtension = new ShopEnvironmentConfigurationExtender(
             $this->environmentDao->reveal(),
             $this->eventDispatcher->reveal()
@@ -164,12 +168,12 @@ class ShopEnvironmentConfigurationExtenderTest extends TestCase
         $this->environmentExtension->getExtendedConfiguration($this->shopId, $shopConfiguration);
 
         $this->eventDispatcher->dispatch(
-            ShopEnvironmentWithOrphanSettingEvent::NAME,
             new ShopEnvironmentWithOrphanSettingEvent(
                 $this->shopId,
                 'abc',
                 $missingSettingId
-            )
+            ),
+            ShopEnvironmentWithOrphanSettingEvent::NAME
         )
             ->shouldBeCalledOnce();
     }

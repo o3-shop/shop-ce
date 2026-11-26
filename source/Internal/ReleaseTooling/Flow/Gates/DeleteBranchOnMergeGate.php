@@ -24,17 +24,28 @@ namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates;
 
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\PackageRepoSlug;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\GateOutcome;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\MergeBackPolicy;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\PreFlightGate;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\ProcessExecutor;
 
 /**
  * Verifies a release repo keeps `delete_branch_on_merge = false`, so
- * merging the merge-back PR (whose head IS the release branch) cannot
- * delete the maintenance line.
+ * merging a merge-back PR whose head is the release branch cannot
+ * delete the maintenance line. `bin/release` itself opens merge-backs
+ * from a tag-pinned `merge-back-<tag>` branch, but older and hand-opened
+ * merge-backs (`b-1.x -> main`) still exist, so the guard stays.
  *
  * Remote-only: queries GitHub via `gh api` keyed on the repo slug, so
  * it needs no local checkout (and `$repoPath` is intentionally unused).
  * Fails CLOSED — any unverifiable result aborts.
+ *
+ * Scoped to repos that HAVE a separate maintenance line. When the
+ * release branch is `main`, the merge-back PR would need `main` as
+ * both base and head, so no such PR can exist and no release branch
+ * is reachable by auto-delete — there `delete_branch_on_merge = true`
+ * is ordinary feature-branch hygiene, not a hazard. Aborting on it
+ * would turn a benign repo setting anywhere in the network into a
+ * full release blocker, so those repos are skipped outright.
  *
  * Output assumption: `--jq .delete_branch_on_merge` renders the JSON
  * boolean as the lowercase strings `true`/`false`; anything else
@@ -60,6 +71,10 @@ class DeleteBranchOnMergeGate implements PreFlightGate
 
     public function evaluate(string $repoPath, string $expectedBranch, string $packageName): GateOutcome
     {
+        if ($expectedBranch === MergeBackPolicy::BASE_BRANCH) {
+            return GateOutcome::passed(self::NAME); // no merge-back possible, nothing to guard
+        }
+
         $slug = PackageRepoSlug::resolve($packageName);
         $outcome = $this->exec->execute(
             [$this->ghBin, 'api', 'repos/' . $slug, '--jq', '.delete_branch_on_merge'],

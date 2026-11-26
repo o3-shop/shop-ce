@@ -2,6 +2,7 @@
     "name": "o3-shop/shop-ce",
     "description": "This package contains O3-Shop CE source code.",
     "type": "oxideshop",
+    "version": "dev-b-1.7",
     "keywords": ["o3-shop", "modules", "eShop"],
     "homepage": "https://www.o3-shop.com/",
     "license": "GPL-3.0-only",
@@ -25,26 +26,29 @@
         "ext-json": "*",
         "phpmailer/phpmailer": "^v6.5.0",
         "o3-shop/smarty": "~2.6.34",
-        "doctrine/dbal": "<=2.12.1",
+        "doctrine/dbal": "^2.13",
         "doctrine/collections": "^1.4.0",
         "monolog/monolog": "^v2.10",
-        "psr/container": "1.0.*",
-        "symfony/event-dispatcher": "^3.4",
-        "symfony/dependency-injection": "^3.4.26",
-        "symfony/config": "~3.3 || ~4.0",
-        "symfony/yaml": "~3.4 || ~4.0",
-        "symfony/lock": "^3.4",
-        "symfony/console": "^v3.4.15",
+        "psr/container": "^1.1 || ^2.0",
+        "psr/log": "^1.1",
+        "symfony/event-dispatcher": "^5.4",
+        "symfony/dependency-injection": "^5.4",
+        "symfony/config": "^5.4",
+        "symfony/yaml": "^5.4",
+        "symfony/lock": "^5.4",
+        "symfony/console": "^5.4",
         "webmozart/path-util": "^2.3",
-        "symfony/finder": "^3.4",
-        "symfony/filesystem": "^4.4.17",
+        "symfony/finder": "^5.4",
+        "symfony/filesystem": "^5.4",
         "vlucas/phpdotenv": "^5.5",
-        "o3-shop/shop-doctrine-migration-wrapper": "v1.0.3",
+        "o3-shop/shop-doctrine-migration-wrapper": "v1.0.4",
         "o3-shop/shop-db-views-generator": "^v1.0.0",
         "o3-shop/shop-demodata-installer": "^v1.0.0",
         "o3-shop/shop-composer-plugin": "^v1.2.0",
         "o3-shop/shop-unified-namespace-generator": "^v1.0.0",
-        "o3-shop/shop-facts": "^v1.0.0"
+        "o3-shop/shop-facts": "^v1.0.0",
+        "composer/composer": "~2.2.0",
+        "symfony/process": "^5.4"
     },
     "require-dev": {
         "o3-shop/testing-library": "^v1.2.0",
@@ -58,7 +62,10 @@
     "autoload": {
         "psr-4": {
             "OxidEsales\\EshopCommunity\\": "./source"
-        }
+        },
+        "files": [
+            "source/Core/Compatibility/symfony_bc_aliases.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -83,11 +90,6 @@
         ],
         "oe:ide-helper:generate": [
             "if [ -f ./vendor/bin/oe-eshop-ide_helper ]; then oe-eshop-ide_helper; fi"
-        ],
-        "oe:install:module:paypal": [
-            "composer require oxid-solution-catalysts/paypal-module ^2.6.0",
-            "vendor/bin/oe-console oe:module:install-configuration source/modules/osc/paypal",
-            "vendor/bin/oe-console oe:cache:clear"
         ]
     },
     "extra": {
@@ -111,16 +113,42 @@
             }
         },
         "branch-alias": {
-            "dev-b-1.6": "1.6-dev"
+            "dev-b-1.6": "1.6-dev",
+            "dev-b-1.7": "1.7-dev"
         }
     },
     "archive": {
         "exclude": [".next-bump"]
     },
     "config": {
+        "platform": {
+            "php": "7.4.33"
+        },
         "allow-plugins": {
             "o3-shop/shop-composer-plugin": true,
             "o3-shop/shop-unified-namespace-generator": true
+        },
+        "policy": {
+            "advisories": {
+                "ignore": {
+                    "o3-shop/smarty": {
+                        "reason": "Smarty 2.6 is the template engine of the whole shop and cannot be swapped out here.",
+                        "on-audit": false
+                    },
+                    "smarty/smarty": {
+                        "reason": "Required by o3-shop/shop-unified-namespace-generator; same Smarty 2.6 line as o3-shop/smarty.",
+                        "on-audit": false
+                    },
+                    "symfony/dom-crawler": {
+                        "reason": "Dev only: pulled in by o3-shop/testing-library via o3-shop/mink-selenium-driver.",
+                        "on-audit": false
+                    },
+                    "symfony/polyfill-intl-idn": {
+                        "reason": "Dev only: pinned to 1.17.1 by o3-shop/testing-library.",
+                        "on-audit": false
+                    }
+                }
+            }
         }
     },
     "replace": {

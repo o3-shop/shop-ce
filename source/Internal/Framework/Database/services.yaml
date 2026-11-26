@@ -9,6 +9,7 @@ services:
   Doctrine\DBAL\Connection:
     factory: ['OxidEsales\EshopCommunity\Internal\Framework\Database\ConnectionFactory', get]
     class: Doctrine\DBAL\Connection
+    public: true
 
   OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface:
     class: OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactory

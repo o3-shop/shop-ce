@@ -26,6 +26,12 @@
 #   run-tests.sh --coverage tests/Unit                  # full run with coverage
 #   run-tests.sh --all-failures                         # full suite, every failure reported
 
+# Some Docker runtimes (e.g. OrbStack) start `docker exec` sessions with umask
+# 0000. The testing library then writes its MySQL defaults file world-writable,
+# MySQL ignores that file and falls back to the local socket, and the test DB
+# install fails before any test runs.
+umask 022
+
 # Define colors for output
 GREEN='\033[0;32m'
 RED='\033[0;31m'

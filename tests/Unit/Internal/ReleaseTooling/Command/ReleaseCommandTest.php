@@ -24,6 +24,9 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\ReleaseTooling\Command;
 
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Command\ReleaseCommand;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\LiveExecutor;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\PreFlightGate;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\PreFlightRunner;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\SymfonyProcessExecutor;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning\DryRunPrinter;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning\ReleasePlan;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning\ReleasePlanner;
@@ -474,6 +477,72 @@ class ReleaseCommandTest extends TestCase
         $buildLiveExecutor->setAccessible(true);
         $live = $buildLiveExecutor->invoke($command, null);
         $this->assertInstanceOf(LiveExecutor::class, $live);
+    }
+
+    /**
+     * Every gate that exists MUST be wired into the production runner.
+     *
+     * DeleteBranchOnMergeGate was written, unit-tested and left
+     * unregistered, so its protection was inert while looking present
+     * in the codebase. Asserting a hand-written list would not have
+     * caught that — the list and the registration would have been
+     * forgotten together. So this discovers gate classes from disk:
+     * adding a new gate fails here until it is actually registered.
+     */
+    public function testEveryGateClassIsRegisteredInProductionRunner(): void
+    {
+        $command = new ReleaseCommand();
+        $build = new \ReflectionMethod(ReleaseCommand::class, 'buildDefaultPreFlightRunner');
+        $build->setAccessible(true);
+        $runner = $build->invoke($command, new SymfonyProcessExecutor());
+        $this->assertInstanceOf(PreFlightRunner::class, $runner);
+
+        $gatesProperty = new \ReflectionProperty(PreFlightRunner::class, 'gates');
+        $gatesProperty->setAccessible(true);
+        $registered = array_map(
+            static fn (PreFlightGate $gate): string => $gate->name(),
+            $gatesProperty->getValue($runner)
+        );
+
+        $this->assertSame(
+            array_unique($registered),
+            $registered,
+            'A gate is registered more than once in buildDefaultPreFlightRunner().'
+        );
+
+        foreach ($this->gateClassesOnDisk() as $class) {
+            $this->assertContains(
+                $class::NAME,
+                $registered,
+                sprintf(
+                    '%s exists but is not registered in buildDefaultPreFlightRunner(), '
+                    . 'so it never runs and the protection it implements is inert.',
+                    $class
+                )
+            );
+        }
+    }
+
+    /**
+     * @return array<int,class-string<PreFlightGate>>
+     */
+    private function gateClassesOnDisk(): array
+    {
+        $interfaceFile = (new \ReflectionClass(PreFlightGate::class))->getFileName();
+        $this->assertIsString($interfaceFile);
+        $files = glob(dirname($interfaceFile) . '/Gates/*.php');
+        $this->assertIsArray($files);
+        $this->assertNotEmpty($files, 'No gate classes found on disk — the discovery path is wrong.');
+
+        $classes = [];
+        foreach ($files as $file) {
+            $class = 'OxidEsales\\EshopCommunity\\Internal\\ReleaseTooling\\Flow\\Gates\\'
+                . basename($file, '.php');
+            if (is_subclass_of($class, PreFlightGate::class)) {
+                $classes[] = $class;
+            }
+        }
+        return $classes;
     }
 
     private function planThatAborts(): ReleasePlan

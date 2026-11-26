@@ -138,13 +138,13 @@ class SettingDaoTest extends TestCase
         $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                SettingChangedEvent::NAME,
                 $this->callback(function (SettingChangedEvent $event) {
                     $this->assertSame('mySetting', $event->getSettingName());
                     $this->assertSame(7, $event->getShopId());
                     $this->assertSame('mymod', $event->getModuleId());
                     return true;
-                })
+                }),
+                SettingChangedEvent::NAME
             );
 
         $encoder = $this->createMock(ShopSettingEncoderInterface::class);

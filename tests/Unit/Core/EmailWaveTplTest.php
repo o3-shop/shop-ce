@@ -165,6 +165,9 @@ class EmailWaveTplTest extends \OxidTestCase
     public function testSendOrderEmailToUser()
     {
         $this->getConfig()->setConfigParam('blShowVATForDelivery', false);
+        // The #219 legal-guarantee notice is on by default and rendered by the theme's
+        // order_cust.tpl; switch it off so the fixture body is independent of the wave version.
+        $this->getConfig()->setConfigParam('blShowLegalGuaranteeNotice', false);
 
         $oPrice = oxNew('oxPrice');
         $oPrice->setPrice(256);
@@ -172,7 +175,7 @@ class EmailWaveTplTest extends \OxidTestCase
         /** @var oxBasketItem|PHPUnit\Framework\MockObject\MockObject $oBasketItem */
         $oBasketItem = $this->getMock(
             'oxBasketItem',
-            ['getRegularUnitPrice', 'getVatPercent', 'getAmount', 'getTitle', 'getProductId']
+            ['getRegularUnitPrice', 'getVatPercent', 'getAmount', 'getTitle', 'getProductId', 'getArticle']
         );
 
         $oBasketItem->expects($this->any())->method('getRegularUnitPrice')->will($this->returnValue($oPrice));
@@ -180,6 +183,9 @@ class EmailWaveTplTest extends \OxidTestCase
         $oBasketItem->expects($this->any())->method('getAmount')->will($this->returnValue(1));
         $oBasketItem->expects($this->any())->method('getTitle')->will($this->returnValue('testArticle'));
         $oBasketItem->expects($this->any())->method('getProductId')->will($this->returnValue('_testArticleId'));
+        // Theme order_cust.tpl may call getArticle() directly (wave #219 guarantee label);
+        // stub it or the real getArticle() throws EXCEPTION_ARTICLE_NOPRODUCTID.
+        $oBasketItem->expects($this->any())->method('getArticle')->will($this->returnValue($this->_oArticle));
 
         $oBasketItem->oxarticles__oxtitle = new oxField();
         $oBasketItem->oxarticles__oxvarselect = new oxField();

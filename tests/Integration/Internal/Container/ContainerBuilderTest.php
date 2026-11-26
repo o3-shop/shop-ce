@@ -53,6 +53,23 @@ class ContainerBuilderTest extends TestCase
         );
     }
 
+    public function testProjectServicesWithoutPublicFlagAreFetchable(): void
+    {
+        $context = $this->makeContextStub();
+        $context->setEdition(EditionSelector::COMMUNITY);
+        $context->setGeneratedServicesFilePath(__DIR__ . '/Fixtures/Project/legacy_module_services.yaml');
+        $container = $this->makeContainer($context);
+
+        $this->assertSame(
+            'Service overwriting for Project!',
+            $container->get('oxid_esales.tests.internal.legacy_module_service')->execute()
+        );
+        $this->assertSame(
+            $container->get('oxid_esales.tests.internal.legacy_module_service'),
+            $container->get('oxid_esales.tests.internal.legacy_module_alias')
+        );
+    }
+
     /**
      * @param ContextInterface $context
      * @return Container
