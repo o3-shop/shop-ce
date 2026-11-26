@@ -31,6 +31,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateEngineInterf
 use OxidEsales\EshopCommunity\Internal\Framework\Twig\TwigEngine;
 use OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Twig\Fixtures\FixtureExtension;
 use PHPUnit\Framework\TestCase;
+use Twig\Error\SyntaxError;
 
 class TwigEngineServiceTest extends TestCase
 {
@@ -61,6 +62,14 @@ class TwigEngineServiceTest extends TestCase
         $engine = $container->get('oxid_esales.templating.twig_engine');
 
         $this->assertSame('fixture', $engine->renderFragment('{{ fixture_function() }}', 'ox:fixture'));
+    }
+
+    public function testAssignAdvancedIsNotAvailable(): void
+    {
+        $engine = ContainerFactory::getInstance()->getContainer()->get('oxid_esales.templating.twig_engine');
+
+        $this->expectException(SyntaxError::class);
+        $engine->renderFragment('{{ assign_advanced("array(1)") }}', 'ox:assignadvanced');
     }
 
     public function testEscapersAreRegisteredOnTheEngine(): void

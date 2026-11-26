@@ -31,7 +31,7 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 /**
- * Class AssignAdvancedExtension
+ * Class StyleExtension
  *
  * @package OxidEsales\EshopCommunity\Internal\Framework\Twig\Extensions
  */
