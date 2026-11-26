@@ -1,0 +1,6 @@
+# An OXID 6.4-era module services.yaml: no "public" flag, relying on the
+# Symfony 3.4 public-by-default behaviour.
+services:
+  oxid_esales.tests.internal.legacy_module_service:
+    class: OxidEsales\EshopCommunity\Tests\Integration\Internal\Container\Fixtures\Project\DummyExecutor
+  oxid_esales.tests.internal.legacy_module_alias: '@oxid_esales.tests.internal.legacy_module_service'

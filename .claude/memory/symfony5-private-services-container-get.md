@@ -55,3 +55,13 @@ adds private lazy command proxies (ids like `.oxid_esales.command.*.lazy`, leadi
 non-public definitions in the check loop (`if (!$definition->isPublic()) continue;`).
 This affects real module activation on 5.4, not just tests (surfaced via
 `ModuleInstallerCoverageTest::testActivateSucceedsForRegisteredModule`).
+
+## Module/project services are made public again (2026-11-26)
+
+`ContainerBuilder::loadProjectServices()` now sets every definition/alias loaded
+from `generated_services.yaml` / `configurable_services.yaml` (= module and project
+files) to public, restoring the 3.4 default so 6.4-era modules can still
+`->get()` their own services. Core (edition) services keep their own flags. An
+explicit `public: false` in a module is overridden too: Symfony 5.4's
+YamlFileLoader calls `setChanges()` after applying `_defaults`, so a `_defaults`
+private flag is indistinguishable from none.

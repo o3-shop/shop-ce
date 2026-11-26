@@ -99,3 +99,14 @@ type: feedback
 
 ## The mod_rewrite self-probe runs during Setup BEFORE a DB exists — never read DB-backed `Config` there
 - `SystemRequirements::checkModRewrite()` / `_getModRewriteResponse()` run during the Setup wizard's **System Requirements** step (`STEP_SYSTEMREQ=100`), which is *before* `STEP_DB_INFO=400` — i.e. before the user has entered DB credentials and before any schema exists. In that context `isAdmin()` is `false`, so the host info comes from `$_SERVER` (no Config), and NOTHING in this path may touch the DB. Calling `Registry::getConfig()->getConfigParam('x')` there is a trap: `Config::getConfigParam()` → `init()` → `initVars()` → `_loadVarsFromDb()`, and `initVars()` **throws `DatabaseException`** when the `oxconfig` table is empty/absent → `_handleDbConnectionException()` swaps in the offline page (or rethrows in debug/CLI) → the System Requirements page breaks for **every fresh install**. To read a `config.inc.php` value in any Setup-time code path, use the DB-less `ConfigFile`: `Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)->getVar('x')` (returns null if unset → cast to bool = false). `checkServerPermissions()` in the same class already reads `sCompileDir` this way for exactly this reason. In unit tests, drive such a flag via `Registry::get(ConfigFile::class)->setVar(...)`, not `getConfig()->setConfigParam(...)`. (Caught in o3-shop/o3-shop#27 self-signed-cert work by the final whole-branch review; the per-task reviews missed it because the unit tests run against an already-installed shop where `Config::init()` succeeds.)
+
+## Switching b-1.7 <-> b-2.0 in the same checkout (2026-11-26)
+
+- `source/tmp/container_cache.php` survives the branch switch and references classes
+  that only exist on the other branch (e.g. `ModuleConfigurationRefreshService`), so
+  `oe:cache:clear` itself fatals and `./docker.sh test` aborts. Delete that file first.
+- The first `composer install` after switching to the Symfony 5.4 lock can die with
+  `include(.../symfony/lock/Factory.php)` (stale 3.4 classmap); a second
+  `./docker.sh start` succeeds.
+- Symfony 5 command `execute()` without `return` -> TypeError; `ServicesCommandsProvider`
+  routes such commands through `setCode()` (null -> exit 0) for 6.4-era modules.
