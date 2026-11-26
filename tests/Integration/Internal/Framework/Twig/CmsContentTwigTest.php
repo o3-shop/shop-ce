@@ -79,6 +79,50 @@ final class CmsContentTwigTest extends TestCase
         );
     }
 
+    public function testIfContentDoesNotPassTemplateOutputThroughSmarty(): void
+    {
+        $this->createContent('c1_ifcontent_user', 'A[{ "B" }]C');
+        $template = '{% ifcontent ident "c1_ifcontent_user" %}{{ oCont.oxcontents__oxcontent.value|raw }}|{{ userText }}{% endifcontent %}';
+
+        $this->assertSame('ABC|[{ &quot;PWNED&quot; }]', $this->render($template, ['userText' => '[{ "PWNED" }]']));
+        $this->assertSame('ABC|[{if 1}]PWNED[{/if}]', $this->render($template, ['userText' => '[{if 1}]PWNED[{/if}]']));
+    }
+
+    public function testIfContentParsesTheStoredTitle(): void
+    {
+        $this->createContent('c1_ifcontent_title', 'X', 'T[{if 1}]1[{/if}]');
+
+        $this->assertSame(
+            'T1',
+            $this->render('{% ifcontent ident "c1_ifcontent_title" set oContent %}{{ oContent.oxcontents__oxtitle.value|raw }}{% endifcontent %}')
+        );
+    }
+
+    /**
+     * The checkout order page terms block of the Twig o3-theme (tpl/page/checkout/inc/agb.html.twig).
+     */
+    public function testCheckoutTermsBlockRendersParsedCmsContent(): void
+    {
+        $this->createContent('c1_agb', 'Terms [{if 1}]apply[{/if}]', 'AGB');
+        $this->createContent(
+            'c1_righttocancellegend',
+            'I accept the [{oxifcontent ident="c1_agb" object="oCont"}]<a href="#agb">[{$oCont->oxcontents__oxtitle->value}]</a>[{/oxifcontent}].',
+            'Legend'
+        );
+
+        $output = $this->render(
+            <<<'TWIG'
+{% ifcontent ident "c1_righttocancellegend" set oContent %}<h3>{{ oContent.oxcontents__oxtitle.value|raw }}</h3><label>{{ oContent.oxcontents__oxcontent.value|raw }}</label>{% endifcontent %}
+{% ifcontent ident "c1_agb" set oCont %}<h1>{{ oCont.oxcontents__oxtitle.value|raw }}</h1><div>{{ oCont.oxcontents__oxcontent.value|raw }}</div>{% endifcontent %}
+TWIG
+        );
+
+        $this->assertSame(
+            '<h3>Legend</h3><label>I accept the <a href="#agb">AGB</a>.</label><h1>AGB</h1><div>Terms apply</div>',
+            $output
+        );
+    }
+
     public function testIncludeContentRendersParsedContentUnescaped(): void
     {
         $this->createContent('c1_include', '<b>A[{ "B" }]C</b>', 'Title [{if 1}]T[{/if}]');

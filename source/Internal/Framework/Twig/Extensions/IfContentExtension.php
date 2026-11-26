@@ -78,16 +78,8 @@ class IfContentExtension extends AbstractExtension
     }
 
     /**
-     * The rendered ifcontent body, parsed through Smarty when it contains Smarty tags (as Smarty's oxifcontent).
+     * The content for {% ifcontent %}, its stored fields already parsed by Smarty. The template body is never parsed.
      *
-     * @param string|null $ident
-     */
-    public function renderContent(string $body, $ident = null): string
-    {
-        return strpos($body, '[{') === false ? $body : $this->ifContentLogic->renderContent($body, $ident === null ? null : (string) $ident);
-    }
-
-    /**
      * @param string $sIdent
      * @param string $sOxid
      *
@@ -95,6 +87,6 @@ class IfContentExtension extends AbstractExtension
      */
     public function getContent(?string $sIdent = null, string $sOxid = null)
     {
-        return $this->ifContentLogic->getContent($sIdent, $sOxid);
+        return $this->ifContentLogic->getParsedContent($sIdent, $sOxid);
     }
 }

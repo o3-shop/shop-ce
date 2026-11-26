@@ -41,7 +41,7 @@ class ContentAndIncludeRenderTest extends TestCase
     public function testIfContentRendersBodyWithLoadedContentByIdent(): void
     {
         $logic = $this->createMock(IfContentLogic::class);
-        $logic->expects($this->once())->method('getContent')->with('oxagb', null)->willReturn((object) ['title' => 'AGB']);
+        $logic->expects($this->once())->method('getParsedContent')->with('oxagb', null)->willReturn((object) ['title' => 'AGB']);
 
         $this->assertSame('[AGB]', $this->render('[{% ifcontent ident "oxagb" %}{{ oCont.title }}{% endifcontent %}]', ['ifContent' => $logic]));
     }
@@ -49,7 +49,7 @@ class ContentAndIncludeRenderTest extends TestCase
     public function testIfContentLoadsByOxidAndAssignsToTheGivenVariable(): void
     {
         $logic = $this->createMock(IfContentLogic::class);
-        $logic->expects($this->once())->method('getContent')->with(null, 'abc')->willReturn((object) ['title' => 'T']);
+        $logic->expects($this->once())->method('getParsedContent')->with(null, 'abc')->willReturn((object) ['title' => 'T']);
 
         $this->assertSame('T', $this->render('{% ifcontent oxid "abc" set page %}{{ page.title }}{% endifcontent %}', ['ifContent' => $logic]));
     }
@@ -57,16 +57,16 @@ class ContentAndIncludeRenderTest extends TestCase
     public function testIfContentRendersNothingWhenContentIsMissing(): void
     {
         $logic = $this->createMock(IfContentLogic::class);
-        $logic->method('getContent')->willReturn(false);
+        $logic->method('getParsedContent')->willReturn(false);
 
         $this->assertSame('[]', $this->render('[{% ifcontent ident "missing" %}body{% endifcontent %}]', ['ifContent' => $logic]));
     }
 
-    public function testIfContentPassesABodyWithSmartyTagsToTheLogicAndOutputsItUnescaped(): void
+    public function testIfContentGetsTheContentWithSmartyParsedFieldsFromTheLogic(): void
     {
         $logic = $this->createMock(IfContentLogic::class);
-        $logic->method('getContent')->willReturn((object) ['text' => '<b>A[{ "B" }]C</b>']);
-        $logic->expects($this->once())->method('renderContent')->with('<b>A[{ "B" }]C</b>', 'oxagb')->willReturn('<b>ABC</b>');
+        $logic->expects($this->once())->method('getParsedContent')->with('oxagb', null)->willReturn((object) ['text' => '<b>ABC</b>']);
+        $logic->expects($this->never())->method('getContent');
 
         $this->assertSame(
             '[<b>ABC</b>]',
@@ -74,33 +74,14 @@ class ContentAndIncludeRenderTest extends TestCase
         );
     }
 
-    public function testIfContentLoadedByOxidPassesNoIdentToTheLogic(): void
+    public function testIfContentBodyIsNotPassedThroughSmarty(): void
     {
         $logic = $this->createMock(IfContentLogic::class);
-        $logic->method('getContent')->willReturn((object) ['text' => '[{ "B" }]']);
-        $logic->expects($this->once())->method('renderContent')->with('[{ "B" }]', null)->willReturn('B');
-
-        $this->assertSame('B', $this->render('{% ifcontent oxid "abc" %}{{ oCont.text }}{% endifcontent %}', ['ifContent' => $logic]));
-    }
-
-    public function testIfContentDoesNotCallSmartyForABodyWithoutSmartyTags(): void
-    {
-        $logic = $this->createMock(IfContentLogic::class);
-        $logic->method('getContent')->willReturn((object) ['text' => '{{ 7*7 }}']);
-        $logic->expects($this->never())->method('renderContent');
-
-        $this->assertSame('{{ 7*7 }}', $this->render('{% ifcontent ident "x" %}{{ oCont.text }}{% endifcontent %}', ['ifContent' => $logic]));
-    }
-
-    public function testIfContentInsideSetCaptureAssignsTheParsedBody(): void
-    {
-        $logic = $this->createMock(IfContentLogic::class);
-        $logic->method('getContent')->willReturn((object) ['text' => '[{ "B" }]']);
-        $logic->method('renderContent')->willReturn('<i>B</i>');
+        $logic->method('getParsedContent')->willReturn((object) ['text' => 'C']);
 
         $this->assertSame(
-            '|<i>B</i>|',
-            $this->render('{% set x %}{% ifcontent ident "x" %}{{ oCont.text }}{% endifcontent %}{% endset %}|{{ x }}|', ['ifContent' => $logic], [], [], 'html')
+            'C|[{if 1}]PWNED[{/if}]',
+            $this->render('{% ifcontent ident "x" %}{{ oCont.text }}|{{ userText }}{% endifcontent %}', ['ifContent' => $logic], [], ['userText' => '[{if 1}]PWNED[{/if}]'])
         );
     }
 

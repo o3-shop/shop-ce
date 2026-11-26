@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic;
 
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 
 class IfContentLogic
@@ -59,15 +60,34 @@ class IfContentLogic
     }
 
     /**
-     * Parses rendered CMS content through Smarty, as Smarty's oxifcontent block does with its body.
+     * Active content with its stored oxcontent and oxtitle parsed through Smarty (cache id, active view and
+     * conditions as in Smarty's oxifcontent block), for {% ifcontent %}. Only stored CMS fields are parsed,
+     * never template output, so user data printed by the template cannot reach Smarty.
+     *
+     * @return mixed a parsed copy of the content, or false
      */
-    public function renderContent(string $content, ?string $ident = null): string
+    public function getParsedContent(string $ident = null, string $oxid = null)
     {
-        return (string) Registry::getUtilsView()->parseThroughSmarty(
-            $content,
-            $ident . md5($content),
-            Registry::getConfig()->getActiveView()
-        );
+        $content = $this->getContent($ident, $oxid);
+        if (!$content) {
+            return false;
+        }
+
+        // A copy: getContent() caches the stored content per request.
+        $content = clone $content;
+        foreach (['oxcontent', 'oxtitle'] as $field) {
+            $value = (string) $content->getFieldData($field);
+            if (strpos($value, '[{') !== false) {
+                $parsed = Registry::getUtilsView()->parseThroughSmarty(
+                    $value,
+                    $ident . md5($value),
+                    Registry::getConfig()->getActiveView()
+                );
+                $content->{"oxcontents__{$field}"} = new Field((string) $parsed, Field::T_RAW);
+            }
+        }
+
+        return $content;
     }
 
     /**
