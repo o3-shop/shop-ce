@@ -27,3 +27,9 @@ type: reference
 - After switching the theme branch (engine), the first requests can still use the old engine (TEMPLATENOTFOUND `.tpl`); clear cache and poll a page until it is complete before capturing.
 
 - CMS/Smarty fragments on a Twig theme: Smarty page vars (oxcmp_*) only reached CMS text because the Smarty page render left them on the shared static Smarty instance. `UtilsView::getRenderedContent()` now merges the active views' data under the caller context (core C2, e893619e).
+
+## Theme port pitfalls (Task 7, e-mails)
+- Smarty 2 newline rule (measured): the newline after control tags (assign/if/foreach/capture/comment) is dropped, like Twig; output tags keep it. OXID `[{block}]`/`[{/block}]` are textually transparent, so the newline after them survives unless a control tag precedes. Twig drops it after every `%}`/`#}` → plain mails need an empty line after such block-tag lines for 1.x text layout. Smarty also drops a trailing newline at EOF.
+- Smarty plain mails saw variables the HTML mail assigned just before (shared Smarty object, also across mails in one PHP process: `$style` leaked into later mails). Twig plain templates must set `shop`/`user`/… themselves; compare mails one PHP process per mail.
+- Twig cannot reach magic `__get` properties (`Order::oDelSet`) nor unset dynamic ones (`BasketItem::aDiscounts`): `Base::__call` throws `SystemComponentException` (not BadMethodCallException, so Twig does not swallow it).
+- `Email::setAltBody()`/`setSubject()` decode one level of entities, so plain mails/subjects print core-escaped `.value` as is.
