@@ -60,3 +60,6 @@ services:
       - '@oxid_esales.symfony.file_system'
     public: true
 
+  OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\ThemeTemplateEngineProviderInterface:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Templating\Engine\ThemeTemplateEngineProvider
+    public: true
