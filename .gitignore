@@ -60,6 +60,8 @@ runned.txt
 /.phpstorm.meta.php/oxid.meta.php
 /source/Application/views/wave
 /source/Application/views/o3-theme
+# Test fixture theme, symlinked in by StorefrontRenderingTest
+/source/Application/views/twigfixture
 
 # Satellite working tree for shop-demodata-ce. Cloned at top level (not in
 # vendor/) so PhpStorm's Composer integration doesn't auto-exclude it; the
