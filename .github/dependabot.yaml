@@ -1,13 +1,32 @@
 version: 2
 updates:
+  # b-1.7 (default branch)
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
 
+  # b-2.0: Dependabot only reads this file from the default branch, so every
+  # other branch it should maintain needs its own entry with target-branch.
   - package-ecosystem: "github-actions"
     directory: "/"
+    target-branch: "b-2.0"
     schedule:
-      interval: "daily" # Runs at the start of every hour
-    target-branch: "b-2.0-update-symmfony"   
-    
+      interval: "daily"
+
+  - package-ecosystem: "composer"
+    directory: "/"
+    target-branch: "b-2.0"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    # Symfony (and Doctrine) components must move in lockstep: a single
+    # component bump cannot resolve against the rest of the stack. Grouping
+    # makes Dependabot open one coherent PR per family.
+    groups:
+      symfony:
+        patterns:
+          - "symfony/*"
+      doctrine:
+        patterns:
+          - "doctrine/*"
