@@ -200,3 +200,8 @@ type: feedback
 - `WorkingTreeGate` runs `git status --porcelain`, so **untracked** files (e.g. local `tasks/` notes) abort the cut too. Keeping them is fine: add the path to `.git/info/exclude` (local only, nothing committed) instead of moving or deleting them.
 - Some o3-documentation pages (e.g. `source/User/Installation/Update.md`) have CRLF line endings: a `sed 's/…$/…/'` silently doesn't match. Use `LC_ALL=C sed -i '' $'s/old\r$/new\r/'` and check `git diff` afterwards.
 - A final cut right after an RC with no new commits only bumps the exact pins (metapackage → shop-ce, o3-shop → metapackage) from `-RC<n>` to the final; no leaf gets a new tag (each is `reuse-latest-tag` or `unchanged`).
+- OrbStack starts `docker exec` sessions with umask 0000, so the testing library's
+  MySQL defaults file (`/tmp/testing_lib*.cnf`) was world-writable, MySQL ignored it
+  ("World-writable config file ... is ignored") and fell back to the socket ->
+  `./docker.sh test` died in the bootstrap's test-DB install. `run-tests.sh` now sets
+  `umask 022` first; keep it.
