@@ -10,8 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Twig 3 engine core in `source/Internal/Framework/Twig/` (service `oxid_esales.templating.twig_engine`).
   Adopted OXID twig-component v1.1.0 (GPL-3.0) into the core, ported to Twig 3; adds the
   `twig/twig` dependency. The Twig cache lives in `<sCompileDir>/twig/` and is emptied by
-  `TemplateCacheService::invalidateTemplateCache()` (and so by `oe:cache:clear`). The engine is
-  not yet selectable for rendering; Smarty stays the template engine.
+  `TemplateCacheService::invalidateTemplateCache()` (and so by `oe:cache:clear`).
 - Twig support in O3-Shop 2.0, see `docs/twig.md`: a theme selects its engine with `'templateEngine' => 'twig'|'smarty'`
   in `theme.php` (default `smarty`, inherited from the parent theme); admin and CMS content
   (`parseThroughSmarty`) stay Smarty; e-mails use the storefront engine; modules ship Twig page

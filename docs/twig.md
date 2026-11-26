@@ -39,7 +39,7 @@ Twig templates use the extension `.html.twig`. Controllers keep naming `.tpl` te
 - Templates under `email/plain/` are not escaped.
 - Mark HTML explicitly with `|raw`: CMS content, long descriptions, HTML translations.
 - `seo_url` and `add_url_parameters` return plain URLs; do not add `|raw`.
-- `include_widget`, `include_dynamic`, `script` and `style` return safe markup already.
+- `include_widget`, `include_dynamic`, `mailto`, `script` and `style` return safe markup already.
 - `translate` output is escaped.
 
 ## Modules
