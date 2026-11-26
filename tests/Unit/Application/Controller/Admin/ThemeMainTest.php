@@ -320,6 +320,26 @@ class ThemeMainTest extends OxidTestCase
         $this->assertStringContainsString('mychild', $this->messages[1]);
     }
 
+    public function testActivationLogsEnglishTextWhateverTheAdminLanguage()
+    {
+        \OxidEsales\Eshop\Core\Registry::getLang()->setTplLanguage(0);
+        $this->expectDisplayedMessages([]);
+        $this->expectWarningLogs(
+            1,
+            "Activated theme 'o3-theme': Active modules without Twig templates will not render in the storefront: "
+            . "'smartyonly'. Theme 'mychild' uses template engine 'smarty', but its parent theme 'o3-theme' uses "
+            . "'twig'. The theme will not work."
+        );
+        $controller = $this->controllerWithCheckers(
+            'twig',
+            ['smartyonly'],
+            ['child' => 'mychild', 'parent' => 'o3-theme', 'childEngine' => 'smarty', 'parentEngine' => 'twig']
+        );
+        $this->stubThemeActivation();
+
+        $controller->setTheme();
+    }
+
     public function testRenderAloneDisplaysButDoesNotLog()
     {
         $this->getConfig()->setConfigParam('sTheme', 'o3-theme');

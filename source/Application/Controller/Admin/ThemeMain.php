@@ -191,6 +191,14 @@ class ThemeMain extends AdminDetailsController
         return $this->revocationTemplateValidator;
     }
 
+    /** English log text of each Twig compatibility warning (logs are English, whatever the admin language). */
+    private const TWIG_WARNING_LOG_FORMATS = [
+        'TWIG_MODULES_WITHOUT_TWIG_TEMPLATES' =>
+            "Active modules without Twig templates will not render in the storefront: '%s'.",
+        'THEME_ENGINE_MISMATCH' =>
+            "Theme '%1\$s' uses template engine '%3\$s', but its parent theme '%2\$s' uses '%4\$s'. The theme will not work.",
+    ];
+
     /** @var array{0: ThemeTemplateEngineProviderInterface, 1: ModuleTwigCompatibilityCheckerInterface, 2: ThemeEngineMismatchCheckerInterface}|null */
     protected ?array $twigCompatibilityServices = null;
 
@@ -257,10 +265,9 @@ class ThemeMain extends AdminDetailsController
      */
     protected function logTwigCompatibilityWarnings(string $themeId): void
     {
-        $lang = Registry::getLang();
         $messages = [];
         foreach ($this->getTwigCompatibilityWarnings($themeId, $themeId) as [$key, $args]) {
-            $messages[] = vsprintf($lang->translateString($key), $args);
+            $messages[] = vsprintf(self::TWIG_WARNING_LOG_FORMATS[$key], $args);
         }
         if ($messages !== []) {
             Registry::getLogger()->warning(__METHOD__ . " - Activated theme '$themeId': " . implode(' ', $messages));
